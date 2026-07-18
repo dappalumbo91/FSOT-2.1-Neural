@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-07-18T18:41:16.926366+00:00",
+  "n_datasets": 2,
+  "results": [
+    {
+      "dataset": "sms_spam/spam.csv",
+      "n_train": 111,
+      "n_test": 48,
+      "n_classes": 2,
+      "classes": [
+        "HAM",
+        "SPAM"
+      ],
+      "train_acc": 0.7027027027027027,
+      "test_acc": 0.6041666666666666,
+      "balanced_accuracy": 0.6041666666666666,
+      "per_class_recall": {
+        "HAM": 0.2916666666666667,
+        "SPAM": 0.9166666666666666
+      },
+      "confusion": {
+        "HAM": {
+          "HAM": 7,
+          "SPAM": 17
+        },
+        "SPAM": {
+          "HAM": 2,
+          "SPAM": 22
+        }
+      },
+      "mean_fire_rate_train": 50.935736842125465,
+      "honesty": "Supervised linear readout on FSOT Morse/reservoir fingerprints; stratified train/test split. Not LOO memory retrieval; not clinical diagnosis."
+    },
+    {
+      "dataset": "sentiment_tiny/sentiment_analysis.csv",
+      "n_train": 111,
+      "n_test": 48,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.36036036036036034,
+      "test_acc": 0.2708333333333333,
+      "balanced_accuracy": 0.2708333333333333,
+      "per_class_recall": {
+        "NEGATIVE": 0.4375,
+        "NEUTRAL": 0.125,
+        "POSITIVE": 0.25
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 7,
+          "NEUTRAL": 5,
+          "POSITIVE": 4
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 8,
+          "NEUTRAL": 2,
+          "POSITIVE": 6
+        },
+        "POSITIVE": {
+          "NEGATIVE": 6,
+          "NEUTRAL": 6,
+          "POSITIVE": 4
+        }
+      },
+      "mean_fire_rate_train": 52.234393857560065,
+      "honesty": "Supervised linear readout on FSOT Morse/reservoir fingerprints; stratified train/test split. Not LOO memory retrieval; not clinical diagnosis."
+    }
+  ],
+  "method": "ridge_ovr_least_squares_on_fsot_fingerprints"
+}

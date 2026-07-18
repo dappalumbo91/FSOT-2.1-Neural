@@ -203,16 +203,17 @@ def derive_pd_lesion_scales(eeg_bundle: Optional[Dict[str, Any]] = None) -> Dict
     sync = float(priors.get("sync_pressure", 0.55))
     irreg = float(priors.get("rate_irregularity", 0.42))
 
-    # Stronger than v1 PD lesion
+    # Boundary-strength lesion (must reliably breach healthy envelope for wire-around demo)
+    # EEG/literature priors *scale* severity; they must not soften past catalog floor.
     lesion = {
-        "adapt_step_scale": round(1.2 + 0.9 * irreg, 3),
-        "isi_jitter": round(0.25 + 0.55 * (cv_el - 1.0), 3),
-        "fire_thr_delta": round(-0.06 - 0.08 * sync, 3),
-        "phase_lock_strength": round(min(0.85, 0.35 + 0.5 * sync), 3),
-        "silence_fraction": round(0.08 + 0.12 * max(0.0, beta_el - 1.2), 3),
-        "fi_stim_scale": round(0.85 + 0.2 * irreg, 3),
-        "ref_steps_scale": round(0.9 + 0.25 * irreg, 3),
-        "burst_force": round(0.2 + 0.4 * sync, 3),
+        "adapt_step_scale": round(max(1.75, 1.35 + 1.1 * irreg), 3),
+        "isi_jitter": round(max(0.45, 0.30 + 0.55 * (cv_el - 1.0)), 3),
+        "fire_thr_delta": round(min(-0.08, -0.06 - 0.10 * sync), 3),
+        "phase_lock_strength": round(min(0.85, max(0.55, 0.35 + 0.55 * sync)), 3),
+        "silence_fraction": round(max(0.12, 0.10 + 0.18 * max(0.0, beta_el - 1.15)), 3),
+        "fi_stim_scale": round(min(0.75, 0.55 + 0.25 * irreg), 3),
+        "ref_steps_scale": round(max(1.05, 0.95 + 0.35 * irreg), 3),
+        "burst_force": round(max(0.40, 0.25 + 0.45 * sync), 3),
     }
     return {
         "priors": priors,

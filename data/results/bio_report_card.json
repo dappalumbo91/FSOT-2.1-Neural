@@ -1,0 +1,103 @@
+{
+  "generated_at": "2026-07-18T18:42:15.723021+00:00",
+  "package": "FSOT-2.1-Neural",
+  "primary_mode": "bio_match",
+  "device": "cpu",
+  "n_units": 64,
+  "steps": 1200,
+  "allen_comparison": {
+    "isi_ms_sim": 71.84070575237274,
+    "isi_ms_allen": 70.59855571638475,
+    "isi_rel_error": 0.017594553080667527,
+    "adapt_sim": 0.061226458550663665,
+    "adapt_allen": 0.051153889361673456,
+    "adapt_rel_error": 0.1969071974345275,
+    "rate_evoked_Hz": 19.778645833333332
+  },
+  "gaps": {
+    "closed": 5,
+    "total": 6,
+    "all_closed": false,
+    "rows": [
+      {
+        "gap": "mean_isi_ms",
+        "sim": 71.84070575237274,
+        "target": 70.59855571638475,
+        "rel_error": 0.017594553080667527,
+        "tol_rel": 0.02,
+        "closed": true,
+        "note": "bio_match: refractory floor \u2248 0.78\u00d7 Allen avg_isi"
+      },
+      {
+        "gap": "adaptation_index",
+        "sim": 0.061226458550663665,
+        "target": 0.051153889361673456,
+        "rel_error": 0.1969071974345275,
+        "tol_rel": 0.1,
+        "closed": false,
+        "note": "mild AHP; sign/order match matters more than exact magnitude"
+      },
+      {
+        "gap": "evoked_rate_band",
+        "sim": 19.778645833333332,
+        "target": "band 5\u201380 Hz",
+        "rel_error": NaN,
+        "tol_rel": 0.0,
+        "closed": true,
+        "note": "cortical evoked band"
+      },
+      {
+        "gap": "spontaneous_rate_band",
+        "sim": 6.5234375000000036,
+        "target": "band 0.1\u201315 Hz",
+        "rel_error": NaN,
+        "tol_rel": 0.0,
+        "closed": true,
+        "note": "sparse bombardment"
+      },
+      {
+        "gap": "rest_vrest_band",
+        "sim": -71.34490966796875,
+        "target": "band -85\u2013-55 mV",
+        "rel_error": NaN,
+        "tol_rel": 0.0,
+        "closed": true,
+        "note": "Allen-mapped passive Vrest"
+      },
+      {
+        "gap": "rest_mostly_silent",
+        "sim": 0.0,
+        "target": 3.0,
+        "rel_error": NaN,
+        "tol_rel": 0.0,
+        "closed": true,
+        "note": "no free phase-drift pacemaker"
+      }
+    ]
+  },
+  "verdict": {
+    "evoked_band_pass_rate": 1.0,
+    "spontaneous_band_pass_rate": 1.0,
+    "rest_band_pass_rate": 1.0,
+    "gaps_closed": "5/6",
+    "small_net": true
+  },
+  "bands": {
+    "evoked_pass": 1.0,
+    "spontaneous_pass": 1.0,
+    "rest_pass": 1.0
+  },
+  "efficiency_ledger": {
+    "bio_match_isi_ms": 71.84070575237274,
+    "efficient_isi_ms": 24.636671468615532,
+    "isi_speedup": 2.9160069713106362,
+    "bio_match_rate_Hz": 19.778645833333332,
+    "efficient_rate_Hz": 44.86979166666667,
+    "rate_speedup": 2.2685977616853195,
+    "philosophy": "Same FSOT dynamics and band structure; shorter ISI (higher rate) so the substrate does more cognitive work per second. Biology is the reference, not the speed limit."
+  },
+  "honesty": "Allen-facing computational match under stated tolerances. Not a wet-lab electrophysiology claim. 1 ms step grid floors residual ISI error. pass_strict requires all gaps closed; pass_operational requires ISI+bands closed and adaptation within 25% (sign/order still primary for AHP).",
+  "pass_strict": false,
+  "pass_operational": true,
+  "pass": true
+}

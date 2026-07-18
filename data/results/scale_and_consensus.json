@@ -1,0 +1,151 @@
+{
+  "generated_at": "2026-07-18T18:41:24.911404+00:00",
+  "scale_sweep": {
+    "generated_at": "2026-07-18T18:41:19.882421+00:00",
+    "rows": [
+      {
+        "device": "cpu",
+        "n_units": 64,
+        "steps": 200,
+        "elapsed_s": 0.073000399992452,
+        "unit_steps_per_s": 175341.50499618464,
+        "mean_fire_frac": 0.06
+      },
+      {
+        "device": "cpu",
+        "n_units": 256,
+        "steps": 200,
+        "elapsed_s": 0.07888299999467563,
+        "unit_steps_per_s": 649062.5356978797,
+        "mean_fire_frac": 0.06
+      },
+      {
+        "device": "cpu",
+        "n_units": 1024,
+        "steps": 200,
+        "elapsed_s": 0.08170139999128878,
+        "unit_steps_per_s": 2506688.9921327704,
+        "mean_fire_frac": 0.06
+      },
+      {
+        "device": "cuda",
+        "n_units": 64,
+        "steps": 200,
+        "elapsed_s": 0.5545028999913484,
+        "unit_steps_per_s": 23083.73860659649,
+        "mean_fire_frac": 0.06
+      },
+      {
+        "device": "cuda",
+        "n_units": 256,
+        "steps": 200,
+        "elapsed_s": 0.5300158000027295,
+        "unit_steps_per_s": 96600.89378417836,
+        "mean_fire_frac": 0.06
+      },
+      {
+        "device": "cuda",
+        "n_units": 1024,
+        "steps": 200,
+        "elapsed_s": 0.5398524000047473,
+        "unit_steps_per_s": 379362.95179608173,
+        "mean_fire_frac": 0.06
+      },
+      {
+        "device": "cuda",
+        "n_units": 4096,
+        "steps": 200,
+        "elapsed_s": 0.5511173999984749,
+        "unit_steps_per_s": 1486434.650769994,
+        "mean_fire_frac": 0.06
+      }
+    ],
+    "note": "Vectorized FSOTActiveNeuron step throughput; small-N often CPU-bound by launch overhead."
+  },
+  "lesion_consensus": {
+    "generated_at": "2026-07-18T18:41:24.911404+00:00",
+    "text": "FSOT 2.1 NEURAL CONSENSUS",
+    "failure_mode": "PD_rate_irregularity",
+    "device": "cuda",
+    "healthy": {
+      "backend": "desktop_fsot_gpu",
+      "morse_exact": null,
+      "keys": [
+        "backend",
+        "device",
+        "input",
+        "normalized",
+        "lesion",
+        "quarantine",
+        "consensus",
+        "morse_readout",
+        "chemical_readout",
+        "reservoir_stats",
+        "report_path"
+      ],
+      "summary": {
+        "backend": "desktop_fsot_gpu"
+      }
+    },
+    "lesioned": {
+      "backend": "desktop_fsot_gpu",
+      "lesion": {
+        "applied": true,
+        "eeg": {
+          "n_local": 50,
+          "openneuro": true
+        },
+        "wire_policy": {
+          "strategy": "desync_and_regularize",
+          "actions": [
+            "consensus_quarantine_failed",
+            "inject_phase_noise",
+            "clamp_isi_cv",
+            "boost_fi_stim_on_survivors",
+            "lower_adapt_step",
+            "consensus_sparse_gate"
+          ],
+          "from_signatures": [
+            "isi_cv_high",
+            "burst_clustering",
+            "rate_drop"
+          ],
+          "auto": true,
+          "score": {
+            "clamp_isi_cv": 1.675,
+            "inject_phase_noise": 1.85,
+            "consensus_sparse_gate": 0.44999999999999996,
+            "raise_fire_thr": 0.4033333333333333,
+            "boost_fi_stim_on_survivors": 1.0,
+            "lower_adapt_step": 0.5,
+            "shorten_ref_on_healthy": 0.3333333333333333,
+            "consensus_quarantine_failed": 0.0875
+          }
+        },
+        "mode": "PD_rate_irregularity",
+        "n_silenced": 4,
+        "label": "Parkinson-like rate irregularity / sync pressure"
+      },
+      "quarantine": {
+        "quarantined": 4,
+        "kept": 28,
+        "mask_frac_alive": 0.875
+      },
+      "keys": [
+        "backend",
+        "device",
+        "input",
+        "normalized",
+        "lesion",
+        "quarantine",
+        "consensus",
+        "morse_readout",
+        "chemical_readout",
+        "reservoir_stats",
+        "report_path"
+      ],
+      "ok": true
+    },
+    "full_lesioned_path": "I:\\fsot nuron\\artifacts\\gpu_consensus_morse_chem_report.json"
+  }
+}

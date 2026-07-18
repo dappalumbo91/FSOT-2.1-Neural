@@ -13,10 +13,32 @@ Small, batched **FSOT active neurons** on CPU or CUDA — cortical-style dynamic
 | **Suggested GitHub name** | `FSOT-2.1-Neural` (see `GITHUB_PUBLISH.md`) |
 | **Kaggle** | Notebook already run — see `KAGGLE_RUNBOOK.md` |
 | **CI** | GitHub Actions smoke on every push (`scripts/ci_smoke.py`) |
+| **Results** | See **`RESULTS.md`** and `data/results/` (hard metrics) |
 | **Roadmap** | See `ROADMAP.md` |
 | **Hardware** | NVIDIA GPU (RTX 5070 class validated) + vectorized CPU |
 
 > Neurological failure modes are **substrate engineering boundaries**. This is **not** a medical device, diagnosis, or treatment.
+
+## Results (latest forward stack)
+
+Re-run the full stack anytime:
+
+```powershell
+cd "I:\fsot nuron"
+$env:PYTHONPATH = "I:\fsot nuron"
+python run_forward_stack.py
+```
+
+| Track | Headline (honest) |
+|-------|-------------------|
+| **CI smoke** | Seeds / Morse / codon / neuron / failure catalog |
+| **Scoreboard** | SMS hard top-1 ~0.80 · mental-state fit ~0.81 · emotions fit ~0.65 · sentiment hard ~0.48 |
+| **Bio card** | ISI ~1.8% vs Allen; adapt ~20% (operational pass; strict 5/6 gaps) |
+| **Train/test readout** | SMS test ~0.60 · sentiment test ~0.27 (linear probe on FSOT fingerprints — not LOO retrieval) |
+| **Scale** | CPU efficient at small-N; CUDA wins as N→4k+ |
+| **PD + consensus** | EEG-informed lesion + wire-around + unit quarantine path |
+
+Full tables and JSON: **`RESULTS.md`**, `data/results/`.
 
 ## Why small
 

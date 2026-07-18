@@ -1,0 +1,264 @@
+{
+  "n_datasets": 4,
+  "rank_by_fsot_fit": [
+    {
+      "rank": 1,
+      "name": "eeg_mental_state/mental-state.csv",
+      "kind": "tabular_signal",
+      "fit": 0.8104412648633257,
+      "n_rows": 2479,
+      "metrics": {
+        "energy_cv": 0.9860448745829576,
+        "class_separability": 2.361793696561293,
+        "template_spread": 0.2851131058731658,
+        "n_classes": 3,
+        "fsot_fit_score": 0.8104412648633257
+      }
+    },
+    {
+      "rank": 2,
+      "name": "sms_spam/spam.csv",
+      "kind": "text_classification",
+      "fit": 0.8,
+      "n_rows": 5572,
+      "metrics": {
+        "retrieval_top1_acc": 0.8,
+        "retrieval_top1_hard_acc": 0.8,
+        "retrieval_soft_top2_acc": 0.85,
+        "balanced_accuracy": 0.7894736842105263,
+        "per_class_recall": {
+          "HAM": 0.5789473684210527,
+          "SPAM": 1.0
+        },
+        "confusion": {
+          "HAM": {
+            "HAM": 11,
+            "SPAM": 8
+          },
+          "SPAM": {
+            "HAM": 0,
+            "SPAM": 21
+          }
+        },
+        "n_chewed": 199,
+        "n_eval": 40,
+        "mean_fire_rate": 50.79756774135571,
+        "fsot_fit_score": 0.8,
+        "metric_honesty": "retrieval_top1_acc is hard top-1 leave-one-out label recovery; not clinical diagnosis; not balanced unless balanced_accuracy is cited"
+      }
+    },
+    {
+      "rank": 3,
+      "name": "kaggle_emotions/emotions.csv",
+      "kind": "tabular_signal",
+      "fit": 0.6482029361262123,
+      "n_rows": 2132,
+      "metrics": {
+        "energy_cv": 0.940613564291629,
+        "class_separability": 2.34492629031525,
+        "template_spread": 0.10322889886804978,
+        "n_classes": 3,
+        "fsot_fit_score": 0.6482029361262123
+      }
+    },
+    {
+      "rank": 4,
+      "name": "sentiment_tiny/sentiment_analysis.csv",
+      "kind": "text_classification",
+      "fit": 0.475,
+      "n_rows": 499,
+      "metrics": {
+        "retrieval_top1_acc": 0.475,
+        "retrieval_top1_hard_acc": 0.475,
+        "retrieval_soft_top2_acc": 0.6,
+        "balanced_accuracy": 0.48412698412698413,
+        "per_class_recall": {
+          "NEGATIVE": 0.6666666666666666,
+          "NEUTRAL": 0.21428571428571427,
+          "POSITIVE": 0.5714285714285714
+        },
+        "confusion": {
+          "NEGATIVE": {
+            "NEGATIVE": 8,
+            "NEUTRAL": 2,
+            "POSITIVE": 2
+          },
+          "NEUTRAL": {
+            "NEGATIVE": 4,
+            "NEUTRAL": 3,
+            "POSITIVE": 7
+          },
+          "POSITIVE": {
+            "NEGATIVE": 3,
+            "NEUTRAL": 3,
+            "POSITIVE": 8
+          }
+        },
+        "n_chewed": 197,
+        "n_eval": 40,
+        "mean_fire_rate": 52.21228592770959,
+        "fsot_fit_score": 0.475,
+        "metric_honesty": "retrieval_top1_acc is hard top-1 leave-one-out label recovery; not clinical diagnosis; not balanced unless balanced_accuracy is cited"
+      }
+    }
+  ],
+  "datasets": [
+    {
+      "name": "kaggle_emotions/emotions.csv",
+      "kind": "tabular_signal",
+      "path": "I:\\fsot nuron\\data\\eeg\\kaggle_emotions\\emotions.csv",
+      "n_rows": 2132,
+      "n_features_or_docs": 256,
+      "labels": {
+        "NEUTRAL": 716,
+        "NEGATIVE": 708,
+        "POSITIVE": 708
+      },
+      "metrics": {
+        "energy_cv": 0.940613564291629,
+        "class_separability": 2.34492629031525,
+        "template_spread": 0.10322889886804978,
+        "n_classes": 3,
+        "by_label": {
+          "NEGATIVE": {
+            "n": 708,
+            "energy_mean": 197.70436506422143,
+            "std_mean": 184.60033814613962
+          },
+          "NEUTRAL": {
+            "n": 716,
+            "energy_mean": 38.18056227727229,
+            "std_mean": 28.029141742460432
+          },
+          "POSITIVE": {
+            "n": 708,
+            "energy_mean": 76.22818429324461,
+            "std_mean": 122.17773194404216
+          }
+        },
+        "fsot_fit_score": 0.6482029361262123
+      },
+      "notes": "EEG/signal features \u2192 emotion-style FSOT drive priors"
+    },
+    {
+      "name": "sentiment_tiny/sentiment_analysis.csv",
+      "kind": "text_classification",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\sentiment_tiny\\sentiment_analysis.csv",
+      "n_rows": 499,
+      "n_features_or_docs": 197,
+      "labels": {
+        "NEGATIVE": 66,
+        "NEUTRAL": 66,
+        "POSITIVE": 66
+      },
+      "metrics": {
+        "retrieval_top1_acc": 0.475,
+        "retrieval_top1_hard_acc": 0.475,
+        "retrieval_soft_top2_acc": 0.6,
+        "balanced_accuracy": 0.48412698412698413,
+        "per_class_recall": {
+          "NEGATIVE": 0.6666666666666666,
+          "NEUTRAL": 0.21428571428571427,
+          "POSITIVE": 0.5714285714285714
+        },
+        "confusion": {
+          "NEGATIVE": {
+            "NEGATIVE": 8,
+            "NEUTRAL": 2,
+            "POSITIVE": 2
+          },
+          "NEUTRAL": {
+            "NEGATIVE": 4,
+            "NEUTRAL": 3,
+            "POSITIVE": 7
+          },
+          "POSITIVE": {
+            "NEGATIVE": 3,
+            "NEUTRAL": 3,
+            "POSITIVE": 8
+          }
+        },
+        "n_chewed": 197,
+        "n_eval": 40,
+        "mean_fire_rate": 52.21228592770959,
+        "fsot_fit_score": 0.475,
+        "metric_honesty": "retrieval_top1_acc is hard top-1 leave-one-out label recovery; not clinical diagnosis; not balanced unless balanced_accuracy is cited"
+      },
+      "notes": "Labeled text \u2192 Morse/reservoir memory; hard top-1 leave-one-out label recovery (balanced_accuracy + confusion also reported)"
+    },
+    {
+      "name": "sms_spam/spam.csv",
+      "kind": "text_classification",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\sms_spam\\spam.csv",
+      "n_rows": 5572,
+      "n_features_or_docs": 199,
+      "labels": {
+        "HAM": 100,
+        "SPAM": 100
+      },
+      "metrics": {
+        "retrieval_top1_acc": 0.8,
+        "retrieval_top1_hard_acc": 0.8,
+        "retrieval_soft_top2_acc": 0.85,
+        "balanced_accuracy": 0.7894736842105263,
+        "per_class_recall": {
+          "HAM": 0.5789473684210527,
+          "SPAM": 1.0
+        },
+        "confusion": {
+          "HAM": {
+            "HAM": 11,
+            "SPAM": 8
+          },
+          "SPAM": {
+            "HAM": 0,
+            "SPAM": 21
+          }
+        },
+        "n_chewed": 199,
+        "n_eval": 40,
+        "mean_fire_rate": 50.79756774135571,
+        "fsot_fit_score": 0.8,
+        "metric_honesty": "retrieval_top1_acc is hard top-1 leave-one-out label recovery; not clinical diagnosis; not balanced unless balanced_accuracy is cited"
+      },
+      "notes": "Labeled text \u2192 Morse/reservoir memory; hard top-1 leave-one-out label recovery (balanced_accuracy + confusion also reported)"
+    },
+    {
+      "name": "eeg_mental_state/mental-state.csv",
+      "kind": "tabular_signal",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\eeg_mental_state\\mental-state.csv",
+      "n_rows": 2479,
+      "n_features_or_docs": 48,
+      "labels": {
+        "2.0": 830,
+        "1.0": 830,
+        "0.0": 819
+      },
+      "metrics": {
+        "energy_cv": 0.9860448745829576,
+        "class_separability": 2.361793696561293,
+        "template_spread": 0.2851131058731658,
+        "n_classes": 3,
+        "by_label": {
+          "0.0": {
+            "n": 819,
+            "energy_mean": 12.257423230434162,
+            "std_mean": 12.750323112871058
+          },
+          "1.0": {
+            "n": 830,
+            "energy_mean": 19.460804052236018,
+            "std_mean": 33.5484671150748
+          },
+          "2.0": {
+            "n": 830,
+            "energy_mean": 39.770367438539445,
+            "std_mean": 66.6861705000002
+          }
+        },
+        "fsot_fit_score": 0.8104412648633257
+      },
+      "notes": "EEG/signal features \u2192 emotion-style FSOT drive priors"
+    }
+  ]
+}

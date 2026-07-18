@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-07-18T18:35:32.557225+00:00",
+  "smoke": "PASS",
+  "scoreboard_n": 4,
+  "bio_pass": false,
+  "bio_isi_rel_error": 0.010370412050210396,
+  "readout": [
+    {
+      "dataset": "sms_spam/spam.csv",
+      "test_acc": 0.6041666666666666,
+      "balanced_accuracy": 0.6041666666666666
+    },
+    {
+      "dataset": "sentiment_tiny/sentiment_analysis.csv",
+      "test_acc": 0.2708333333333333,
+      "balanced_accuracy": 0.2708333333333333
+    }
+  ],
+  "scale_rows": 7,
+  "pd_candidates": 40
+}

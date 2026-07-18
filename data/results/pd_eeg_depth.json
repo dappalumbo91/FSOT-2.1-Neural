@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-07-18T18:43:12.768004+00:00",
+  "local_eeg_candidates": 40,
+  "signal_stats_head": [
+    {
+      "path": "I:\\fsot nuron\\data\\eeg\\kaggle_emotions\\emotions.csv",
+      "n": 2000,
+      "energy": 469.887281987475,
+      "diff_energy": 471.9881084951976,
+      "irregularity": 1.409787269624876,
+      "beta_proxy": 1.0044709158712113
+    },
+    {
+      "path": "C:\\Users\\damia\\Desktop\\FSOT NeuroLab\\.venv\\Lib\\site-packages\\debugpy\\ThirdPartyNotices.txt",
+      "error": "Some errors were detected !\n    Line #9 (got 2 columns instead of 1)\n    Line #20 (got 3 columns instead of 1)\n    Line #22 (got 10 columns instead of 1)\n    Line #24 (got 2 columns instead of 1)\n    Line #25 (got 2 columns instead of 1)\n    Line #28 (got 3 columns instead of 1)\n    Line #30 (got 2 columns instead of 1)\n    Line #32 (got 2 columns instead of 1)\n    Line #36 (got 2 columns instead of 1)\n    Line #38 (got 11 columns instead of 1)\n    Line #39 (got 12 columns instead of 1)\n    Line #40 (got 6 columns instead of 1)\n    Line #41 (got 3 columns instead of 1)\n    Line #43 (got 2 columns instead of 1)\n    Line #46 (got 4 columns instead of 1)\n    Line #47 (got 6 columns instead of 1)\n    Line #49 (got 2 columns instead of 1)\n    Line #54 (got 3 columns instead of 1)\n    Line #56 (got 11 columns instead of 1)\n    Line #57 (got 8 columns instead of 1)\n    Line #59 (got 13 columns instead of 1)\n    Line #61 (got 12 columns instead of 1)\n    Line #63 (got 4 columns instead of 1)\n    Line #64 (got 2 columns instead of 1)\n    Line #65 (got 3 columns instead of 1)\n    Line #66 (got 8 columns instead of 1)\n    Line #78 (got 3 columns instead of 1)\n    Line #84 (got 2 columns instead of 1)\n    Line #88 (got 2 columns instead of 1)\n    Line #89 (got 4 columns instead of 1)\n    Line #90 (got 5 columns instead of 1)\n    Line #91 (got 3 columns instead of 1)\n    Line #92 (got 4 columns instead of 1)\n    Line #93 (got 12 columns instead of 1)\n    Line #94 (got 7 columns instead of 1)\n    Line #99 (got 2 columns instead of 1)\n    Line #100 (got 2 columns instead of 1)\n    Line #105 (got 2 columns instead of 1)\n    Line #106 (got 3 columns instead of 1)\n    Line #112 (got 3 columns instead of 1)\n    Line #113 (got 4 columns instead of 1)\n    Line #114 (got 2 columns instead of 1)\n    Line #120 (got 3 columns instead of 1)\n    Line #123 (got 2 columns instead of 1)\n    Line #125 (got 3 columns instead of 1)\n    Line #135 (got 2 columns instead of 1)\n    Line #136 (got 4 columns instead of 1)\n    Line #142 (got 3 columns instead of 1)\n    Line #143 (got 5 columns instead of 1)\n    Line #144 (got 4 columns instead of 1)\n    Line #145 (got 2 columns instead of 1)\n    Line #146 (got 3 columns instead of 1)\n    Line #147 (got 2 columns instead of 1)\n    Line #150 (got 2 columns instead of 1)\n    Line #151 (got 3 columns instead of 1)\n    Line #157 (got 3 columns instead of 1)\n    Line #158 (got 3 columns instead of 1)\n    Line #159 (got 2 columns instead of 1)\n    Line #165 (got 2 columns instead of 1)\n    Line #167 (got 3 columns instead of 1)\n    Line #170 (got 2 columns instead of 1)\n    Line #171 (got 2 columns instead of 1)\n    Line #175 (got 3 columns instead of 1)\n    Line #184 (got 3 columns instead of 1)\n    Line #185 (got 3 columns instead of 1)\n    Line #189 (got 2 columns instead of 1)\n    Line #190 (got 3 columns instead of 1)\n    Line #191 (got 5 columns instead of 1)\n    Line #192 (got 3 columns instead of 1)\n    Line #193 (got 4 columns instead of 1)\n    Line #194 (got 3 columns instead of 1)\n    Line #197 (got 2 columns instead of 1)\n    Line #198 (got 2 columns instead of 1)\n    Line #202 (got 2 columns instead of 1)\n    Line #207 (got 2 columns instead of 1)\n    Line #208 (got 2 columns instead of 1)\n    Line #213 (got 2 columns instead of 1)\n    Line #214 (got 3 columns instead of 1)\n    Line #220 (got 3 columns instead of 1)\n    Line #221 (got 4 columns instead of 1)\n    Line #222 (got 2 columns instead of 1)\n    Line #228 (got 2 columns instead of 1)\n    Line #229 (got 3 columns instead of 1)\n    Line #230 (got 2 columns instead of 1)\n    Line #231 (got 2 columns instead of 1)\n    Line #232 (got 2 columns instead of 1)\n    Line #234 (got 2 columns instead of 1)\n    Line #237 (got 3 columns instead of 1)\n    Line #239 (got 3 columns instead of 1)\n    Line #242 (got 2 columns instead of 1)\n    Line #244 (got 3 columns instead of 1)\n    Line #245 (got 2 columns instead of 1)\n    Line #256 (got 4 columns instead of 1)\n    Line #257 (got 2 columns instead of 1)\n    Line #260 (got 2 columns instead of 1)\n    Line #262 (got 2 columns instead of 1)\n    Line #266 (got 2 columns instead of 1)\n    Line #267 (got 2 columns instead of 1)\n    Line #268 (got 2 columns instead of 1)\n    Line #269 (got 3 columns instead of 1)\n    Line #270 (got 3 columns instead of 1)\n    Line #277 (got 2 columns instead of 1)\n    Line #283 (got 2 columns instead of 1)\n    Line #284 (got 2 columns instead of 1)\n    Line #285 (got 2 columns instead of 1)\n    Line #291 (got 2 columns instead of 1)\n    Line #293 (got 3 columns instead of 1)\n    Line #294 (got 2 columns instead of 1)\n    Line #295 (got 2 columns instead of 1)\n    Line #297 (got 3 columns instead of 1)\n    Line #301 (got 3 columns instead of 1)\n    Line #303 (got 2 columns instead of 1)\n    Line #304 (got 3 columns instead of 1)\n    Line #305 (got 7 columns instead of 1)\n    Line #306 (got 2 columns instead of 1)\n    Line #307 (got 2 columns instead of 1)\n    Line #313 (got 3 columns instead of 1)\n    Line #314 (got 2 columns instead of 1)\n    Line #315 (got 2 columns instead of 1)\n    Line #317 (got 3 columns instead of 1)\n    Line #318 (got 3 columns instead of 1)\n    Line #319 (got 2 columns instead of 1)\n    Line #324 (got 2 columns instead of 1)\n    Line #325 (got 2 columns instead of 1)\n    Line #326 (got 2 columns instead of 1)\n    Line #327 (got 2 columns instead of 1)\n    Line #331 (got 2 columns instead of 1)\n    Line #332 (got 2 columns instead of 1)\n    Line #334 (got 2 columns instead of 1)\n    Line #337 (got 2 columns instead of 1)\n    Line #346 (got 4 columns instead of 1)\n    Line #349 (got 6 columns instead of 1)\n    Line #350 (got 3 columns instead of 1)\n    Line #351 (got 3 columns instead of 1)\n    Line #352 (got 4 columns instead of 1)\n    Line #354 (got 2 columns instead of 1)\n    Line #358 (got 2 columns instead of 1)\n    Line #360 (got 3 columns instead of 1)\n    Line #361 (got 2 columns instead of 1)\n    Line #362 (got 2 columns instead of 1)\n    Line #364 (got 3 columns instead of 1)\n    Line #370 (got 3 columns instead of 1)\n    Line #371 (got 2 columns instead of 1)\n    Line #372 (got 2 columns instead of 1)\n    Line #373 (got 8 columns instead of 1)\n    Line #374 (got 3 columns instead of 1)\n    Line #380 (got 3 columns instead of 1)\n    Line #381 (got 3 columns instead of 1)\n    Line #383 (got 3 columns instead of 1)\n    Line #384 (got 4 columns instead of 1)\n    Line #449 (got 3 columns instead of 1)\n    Line #451 (got 3 columns instead of 1)\n    Line #452 (got 6 columns instead of 1)\n    Line #453 (got 4 columns instead of 1)\n    Line #454 (got 2 columns instead of 1)\n    Line #460 (got 3 columns instead of 1)\n    Line #461 (got 2 columns instead of 1)\n    Line #462 (got 2 columns instead of 1)\n    Line #464 (got 4 columns instead of 1)\n    Line #465 (got 3 columns instead of 1)\n    Line #470 (got 2 columns instead of 1)\n    Line #473 (got 2 columns instead of 1)\n    Line #474 (got 2 columns instead of 1)\n    Line #476 (got 2 columns instead of 1)\n    Line #479 (got 2 columns instead of 1)\n    Line #488 (got 4 columns instead of 1)\n    Line #491 (got 6 columns instead of 1)\n    Line #492 (got 3 columns instead of 1)\n    Line #493 (got 3 columns instead of 1)\n    Line #494 (got 4 columns instead of 1)\n    Line #496 (got 2 columns instead of 1)\n    Line #498 (got 3 columns instead of 1)"
+    },
+    {
+      "path": "C:\\Users\\damia\\Desktop\\FSOT NeuroLab\\.venv\\Lib\\site-packages\\parso\\python\\grammar38.txt",
+      "error": "Some errors were detected !\n    Line #14 (got 4 columns instead of 1)\n    Line #15 (got 3 columns instead of 1)\n    Line #16 (got 4 columns instead of 1)\n    Line #17 (got 2 columns instead of 1)\n    Line #18 (got 4 columns instead of 1)\n    Line #19 (got 2 columns instead of 1)\n    Line #20 (got 3 columns instead of 1)\n    Line #21 (got 4 columns instead of 1)\n    Line #22 (got 2 columns instead of 1)\n    Line #23 (got 4 columns instead of 1)\n    Line #24 (got 2 columns instead of 1)\n    Line #27 (got 6 columns instead of 1)\n    Line #28 (got 4 columns instead of 1)\n    Line #29 (got 2 columns instead of 1)\n    Line #30 (got 4 columns instead of 1)\n    Line #31 (got 4 columns instead of 1)\n    Line #32 (got 4 columns instead of 1)\n    Line #33 (got 2 columns instead of 1)\n    Line #34 (got 4 columns instead of 1)\n    Line #35 (got 2 columns instead of 1)\n    Line #46 (got 3 columns instead of 1)\n    Line #65 (got 3 columns instead of 1)\n    Line #66 (got 2 columns instead of 1)\n    Line #68 (got 2 columns instead of 1)\n    Line #69 (got 2 columns instead of 1)\n    Line #70 (got 2 columns instead of 1)\n    Line #82 (got 2 columns instead of 1)\n    Line #114 (got 3 columns instead of 1)\n    Line #116 (got 3 columns instead of 1)\n    Line #119 (got 3 columns instead of 1)\n    Line #120 (got 3 columns instead of 1)\n    Line #122 (got 3 columns instead of 1)\n    Line #124 (got 3 columns instead of 1)\n    Line #128 (got 3 columns instead of 1)"
+    },
+    {
+      "path": "C:\\Users\\damia\\Desktop\\FSOT NeuroLab\\.venv\\Lib\\site-packages\\parso\\python\\grammar310.txt",
+      "error": "Some errors were detected !\n    Line #14 (got 4 columns instead of 1)\n    Line #15 (got 3 columns instead of 1)\n    Line #16 (got 4 columns instead of 1)\n    Line #17 (got 2 columns instead of 1)\n    Line #18 (got 4 columns instead of 1)\n    Line #19 (got 2 columns instead of 1)\n    Line #20 (got 3 columns instead of 1)\n    Line #21 (got 4 columns instead of 1)\n    Line #22 (got 2 columns instead of 1)\n    Line #23 (got 4 columns instead of 1)\n    Line #24 (got 2 columns instead of 1)\n    Line #27 (got 6 columns instead of 1)\n    Line #28 (got 4 columns instead of 1)\n    Line #29 (got 2 columns instead of 1)\n    Line #30 (got 4 columns instead of 1)\n    Line #31 (got 4 columns instead of 1)\n    Line #32 (got 4 columns instead of 1)\n    Line #33 (got 2 columns instead of 1)\n    Line #34 (got 4 columns instead of 1)\n    Line #35 (got 2 columns instead of 1)\n    Line #46 (got 3 columns instead of 1)\n    Line #65 (got 3 columns instead of 1)\n    Line #66 (got 2 columns instead of 1)\n    Line #68 (got 2 columns instead of 1)\n    Line #69 (got 2 columns instead of 1)\n    Line #70 (got 2 columns instead of 1)\n    Line #82 (got 2 columns instead of 1)\n    Line #112 (got 3 columns instead of 1)\n    Line #114 (got 3 columns instead of 1)\n    Line #117 (got 3 columns instead of 1)\n    Line #118 (got 3 columns instead of 1)\n    Line #120 (got 3 columns instead of 1)\n    Line #122 (got 3 columns instead of 1)\n    Line #126 (got 3 columns instead of 1)"
+    },
+    {
+      "path": "C:\\Users\\damia\\Desktop\\FSOT NeuroLab\\.venv\\Lib\\site-packages\\parso\\python\\grammar311.txt",
+      "error": "Some errors were detected !\n    Line #14 (got 4 columns instead of 1)\n    Line #15 (got 3 columns instead of 1)\n    Line #16 (got 4 columns instead of 1)\n    Line #17 (got 2 columns instead of 1)\n    Line #18 (got 4 columns instead of 1)\n    Line #19 (got 2 columns instead of 1)\n    Line #20 (got 3 columns instead of 1)\n    Line #21 (got 4 columns instead of 1)\n    Line #22 (got 2 columns instead of 1)\n    Line #23 (got 4 columns instead of 1)\n    Line #24 (got 2 columns instead of 1)\n    Line #27 (got 6 columns instead of 1)\n    Line #28 (got 4 columns instead of 1)\n    Line #29 (got 2 columns instead of 1)\n    Line #30 (got 4 columns instead of 1)\n    Line #31 (got 4 columns instead of 1)\n    Line #32 (got 4 columns instead of 1)\n    Line #33 (got 2 columns instead of 1)\n    Line #34 (got 4 columns instead of 1)\n    Line #35 (got 2 columns instead of 1)\n    Line #46 (got 3 columns instead of 1)\n    Line #65 (got 3 columns instead of 1)\n    Line #66 (got 2 columns instead of 1)\n    Line #68 (got 2 columns instead of 1)\n    Line #69 (got 2 columns instead of 1)\n    Line #70 (got 2 columns instead of 1)\n    Line #82 (got 2 columns instead of 1)\n    Line #112 (got 3 columns instead of 1)\n    Line #114 (got 3 columns instead of 1)\n    Line #117 (got 3 columns instead of 1)\n    Line #118 (got 3 columns instead of 1)\n    Line #120 (got 3 columns instead of 1)\n    Line #122 (got 3 columns instead of 1)\n    Line #126 (got 3 columns instead of 1)"
+    },
+    {
+      "path": "C:\\Users\\damia\\Desktop\\FSOT NeuroLab\\.venv\\Lib\\site-packages\\parso\\python\\grammar312.txt",
+      "error": "Some errors were detected !\n    Line #14 (got 4 columns instead of 1)\n    Line #15 (got 3 columns instead of 1)\n    Line #16 (got 4 columns instead of 1)\n    Line #17 (got 2 columns instead of 1)\n    Line #18 (got 4 columns instead of 1)\n    Line #19 (got 2 columns instead of 1)\n    Line #20 (got 3 columns instead of 1)\n    Line #21 (got 4 columns instead of 1)\n    Line #22 (got 2 columns instead of 1)\n    Line #23 (got 4 columns instead of 1)\n    Line #24 (got 2 columns instead of 1)\n    Line #27 (got 6 columns instead of 1)\n    Line #28 (got 4 columns instead of 1)\n    Line #29 (got 2 columns instead of 1)\n    Line #30 (got 4 columns instead of 1)\n    Line #31 (got 4 columns instead of 1)\n    Line #32 (got 4 columns instead of 1)\n    Line #33 (got 2 columns instead of 1)\n    Line #34 (got 4 columns instead of 1)\n    Line #35 (got 2 columns instead of 1)\n    Line #46 (got 3 columns instead of 1)\n    Line #65 (got 3 columns instead of 1)\n    Line #66 (got 2 columns instead of 1)\n    Line #68 (got 2 columns instead of 1)\n    Line #69 (got 2 columns instead of 1)\n    Line #70 (got 2 columns instead of 1)\n    Line #82 (got 2 columns instead of 1)\n    Line #112 (got 3 columns instead of 1)\n    Line #114 (got 3 columns instead of 1)\n    Line #117 (got 3 columns instead of 1)\n    Line #118 (got 3 columns instead of 1)\n    Line #120 (got 3 columns instead of 1)\n    Line #122 (got 3 columns instead of 1)\n    Line #126 (got 3 columns instead of 1)"
+    }
+  ],
+  "measured": {
+    "n_signal_files_scored": 10,
+    "mean_irregularity": 1.409787269624876,
+    "mean_beta_proxy": 1.0044709158712113,
+    "literature": {
+      "beta_band_Hz": [
+        13.0,
+        30.0
+      ],
+      "beta_power_elevation": 1.45,
+      "isi_cv_elevation": 1.55,
+      "sync_pressure": 0.55,
+      "rate_irregularity": 0.42,
+      "burst_index": 0.35,
+      "source": "PD resting-state EEG literature + OpenNeuro ds002778 target"
+    }
+  },
+  "eeg_context_ok": true,
+  "openneuro": {
+    "ok": false,
+    "skipped": true
+  },
+  "pd_lesion": {
+    "priors": {
+      "beta_band_Hz": [
+        13.0,
+        30.0
+      ],
+      "beta_power_elevation": 1.45,
+      "isi_cv_elevation": 1.55,
+      "sync_pressure": 0.36407556302252086,
+      "rate_irregularity": 0.2,
+      "burst_index": 0.35,
+      "source": "allen_nwb+features+pd_priors",
+      "from_nwb": true,
+      "from_pd_priors": true
+    },
+    "fsot_lesion": {
+      "adapt_step_scale": 2.3868510887374135,
+      "isi_jitter": 0.603,
+      "fire_thr_delta": -0.096,
+      "phase_lock_strength": 0.55,
+      "silence_fraction": 0.154,
+      "fi_stim_scale": 0.9544953165870089,
+      "ref_steps_scale": 1.05,
+      "burst_force": 0.414
+    },
+    "break_signature": {
+      "isi_cv_high": true,
+      "burst_clustering": true,
+      "rate_drop": true
+    },
+    "wire_around": {
+      "strategy": "desync_and_regularize",
+      "actions": [
+        "inject_phase_noise",
+        "clamp_isi_cv",
+        "consensus_sparse_gate",
+        "consensus_quarantine_failed",
+        "raise_fire_thr"
+      ]
+    },
+    "measured_scale": 1.3639149078499506
+  },
+  "probe": {
+    "mode_id": "PD_rate_irregularity",
+    "label": "Parkinson-like rate irregularity / sync pressure",
+    "breached": true,
+    "signature_hits": [
+      "rate_drop"
+    ],
+    "relative_flags": {
+      "rate_drop": true,
+      "rate_runaway": false,
+      "isi_prolonged": false,
+      "adaptation_runaway": false,
+      "global_silence": false,
+      "population_sparsity": false
+    },
+    "rate_healthy": 28.703125,
+    "rate_lesion": 20.515625,
+    "rate_wire": 24.4375,
+    "rate_ratio_lesion": 0.7147523135547088,
+    "rate_ratio_wire": 0.8513881328252586,
+    "recovered": true,
+    "wire_strategy": "distributed_redundancy",
+    "wire_actions": [
+      "inject_phase_noise",
+      "clamp_isi_cv",
+      "boost_fi_stim_on_survivors",
+      "lower_adapt_step",
+      "consensus_sparse_gate"
+    ],
+    "eeg_used": true,
+    "n_local_eeg": 50,
+    "openneuro_pd_ok": true
+  },
+  "honesty": "Signal stats are lightweight local proxies (not clinical PSD diagnosis). OpenNeuro ds002778 metadata/priors used when full EDF absent. Failure probe is substrate lesion engineering."
+}
