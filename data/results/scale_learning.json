@@ -1,0 +1,94 @@
+{
+  "cpu_probe": {
+    "generated_at": "2026-07-18T19:16:10.982993+00:00",
+    "rows": [
+      {
+        "n_units": 8,
+        "n_docs": 40,
+        "encode_seconds": 10.446709199997713,
+        "encode_docs_per_s": 3.8289569695314922,
+        "probe_train_seconds": 0.05125199999019969,
+        "probe_device": "cpu",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 30.631655756251938
+      },
+      {
+        "n_units": 16,
+        "n_docs": 40,
+        "encode_seconds": 10.27056299999822,
+        "encode_docs_per_s": 3.894625835020625,
+        "probe_train_seconds": 0.03381209999497514,
+        "probe_device": "cpu",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 62.31401336033
+      },
+      {
+        "n_units": 32,
+        "n_docs": 40,
+        "encode_seconds": 10.258490599997458,
+        "encode_docs_per_s": 3.8992091097699997,
+        "probe_train_seconds": 0.029673299999558367,
+        "probe_device": "cpu",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 124.77469151263999
+      },
+      {
+        "n_units": 64,
+        "n_docs": 40,
+        "encode_seconds": 10.259510499992757,
+        "encode_docs_per_s": 3.8988214886108103,
+        "probe_train_seconds": 0.026831399998627603,
+        "probe_device": "cpu",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 249.52457527109186
+      }
+    ],
+    "note": "Learning-load scale: reservoir encode (CPU) + FSOT-gated probe train."
+  },
+  "cuda_probe": {
+    "generated_at": "2026-07-18T19:16:53.987728+00:00",
+    "rows": [
+      {
+        "n_units": 8,
+        "n_docs": 40,
+        "encode_seconds": 10.324727100000018,
+        "encode_docs_per_s": 3.874194408489492,
+        "probe_train_seconds": 0.05593349999981001,
+        "probe_device": "cuda",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 30.993555267915937
+      },
+      {
+        "n_units": 16,
+        "n_docs": 40,
+        "encode_seconds": 10.277812100001029,
+        "encode_docs_per_s": 3.891878895119711,
+        "probe_train_seconds": 0.8985838000080548,
+        "probe_device": "cuda",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 62.270062321915375
+      },
+      {
+        "n_units": 32,
+        "n_docs": 40,
+        "encode_seconds": 9.806447800001479,
+        "encode_docs_per_s": 4.078948954380196,
+        "probe_train_seconds": 0.6001255000010133,
+        "probe_device": "cuda",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 130.52636654016626
+      },
+      {
+        "n_units": 64,
+        "n_docs": 40,
+        "encode_seconds": 9.652425899999798,
+        "encode_docs_per_s": 4.144035956805515,
+        "probe_train_seconds": 1.387721800012514,
+        "probe_device": "cuda",
+        "train_acc": 1.0,
+        "unit_encode_throughput": 265.218301235553
+      }
+    ],
+    "note": "Learning-load scale: reservoir encode (CPU) + FSOT-gated probe train."
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-07-18T19:15:29.594342+00:00",
+  "n_reports": 5,
+  "n_edf_found": 0,
+  "reports": [
+    {
+      "kind": "csv_bands",
+      "path": "I:\\fsot nuron\\data\\eeg\\kaggle_emotions\\emotions.csv",
+      "n_rows": 2132,
+      "label_col": "label",
+      "n_classes": 3,
+      "band_feature_means": {
+        "mean_delta": 9252592494036.275,
+        "mean_theta": 2181.0129889387376,
+        "mean_alpha": 9262874548624.781,
+        "mean_beta": 11164.454995815568,
+        "mean_gamma": 15.52468084188206
+      },
+      "beta_class_separability": 0.0,
+      "labels": {
+        "NEUTRAL": 716,
+        "NEGATIVE": 708,
+        "POSITIVE": 708
+      }
+    },
+    {
+      "kind": "csv_bands",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\eeg_emotions\\emotions.csv",
+      "n_rows": 2132,
+      "label_col": "label",
+      "n_classes": 3,
+      "band_feature_means": {
+        "mean_delta": 9252592494036.275,
+        "mean_theta": 2181.0129889387376,
+        "mean_alpha": 9262874548624.781,
+        "mean_beta": 11164.454995815568,
+        "mean_gamma": 15.52468084188206
+      },
+      "beta_class_separability": 0.0,
+      "labels": {
+        "NEUTRAL": 716,
+        "NEGATIVE": 708,
+        "POSITIVE": 708
+      }
+    },
+    {
+      "kind": "csv_bands",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\eeg_mental_state\\mental-state.csv",
+      "n_rows": 2479,
+      "label_col": "Label",
+      "n_classes": 3,
+      "band_feature_means": {
+        "mean_delta": 204.15730503928233,
+        "mean_theta": 0.017960471151447836,
+        "mean_alpha": 8.623112238600756,
+        "mean_beta": 198.77160448251854,
+        "mean_gamma": 0.023344566033401817
+      },
+      "beta_class_separability": 0.0,
+      "labels": {
+        "2.0": 830,
+        "1.0": 830,
+        "0.0": 819
+      }
+    },
+    {
+      "kind": "csv_bands",
+      "path": "I:\\fsot nuron\\data\\external\\eeg\\eeg_samnikolas\\features_raw.csv",
+      "n_rows": 4000,
+      "label_col": "Unnamed: 32",
+      "n_classes": 0,
+      "band_feature_means": {
+        "mean_delta": -0.005514027038516617,
+        "mean_theta": -0.025109940862638496,
+        "mean_alpha": -0.011569083391582241,
+        "mean_beta": 0.0966388804026387,
+        "mean_gamma": -0.06636731903323474
+      },
+      "beta_class_separability": 0.0,
+      "labels": {}
+    },
+    {
+      "kind": "csv_bands",
+      "path": "I:\\fsot nuron\\data\\external\\eeg\\eeg_emotions_birdy\\emotions.csv",
+      "n_rows": 2132,
+      "label_col": "label",
+      "n_classes": 3,
+      "band_feature_means": {
+        "mean_delta": 9252592494036.275,
+        "mean_theta": 2181.0129889387376,
+        "mean_alpha": 9262874548624.781,
+        "mean_beta": 11164.454995815568,
+        "mean_gamma": 15.52468084188206
+      },
+      "beta_class_separability": 0.0,
+      "labels": {
+        "NEUTRAL": 716,
+        "NEGATIVE": 708,
+        "POSITIVE": 708
+      }
+    }
+  ],
+  "honesty": "CSV band proxies from feature matrices; EDF uses lightweight pure-Python reader. Not a clinical EEG report."
+}

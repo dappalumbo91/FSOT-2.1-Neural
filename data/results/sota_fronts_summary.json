@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-07-18T18:59:05.764863+00:00",
+  "fronts": {
+    "deep_nlp": {
+      "n": 8,
+      "results": [
+        {
+          "dataset": "financial_news_sentiment/all-data.csv",
+          "test_acc": 0.3333333333333333,
+          "balanced_accuracy": 0.3333333333333333,
+          "n_classes": 3,
+          "error": null
+        },
+        {
+          "dataset": "financial_sentiment/data.csv",
+          "test_acc": 0.35714285714285715,
+          "balanced_accuracy": 0.35714285714285715,
+          "n_classes": 3,
+          "error": null
+        },
+        {
+          "dataset": "social_media_sentiment/sentimentdataset.csv",
+          "test_acc": 0.22972972972972974,
+          "balanced_accuracy": 0.21491228070175442,
+          "n_classes": 19,
+          "error": null
+        },
+        {
+          "dataset": "twitter_entity_sentiment/twitter_training.csv",
+          "test_acc": 0.39759036144578314,
+          "balanced_accuracy": 0.3976190476190476,
+          "n_classes": 4,
+          "error": null
+        },
+        {
+          "dataset": "twitter_entity_sentiment/twitter_validation.csv",
+          "test_acc": 0.27380952380952384,
+          "balanced_accuracy": 0.2738095238095238,
+          "n_classes": 4,
+          "error": null
+        },
+        {
+          "dataset": "imdb_50k/IMDB Dataset.csv",
+          "test_acc": 0.5,
+          "balanced_accuracy": 0.5,
+          "n_classes": 2,
+          "error": null
+        },
+        {
+          "dataset": "sentiment_tiny/sentiment_analysis.csv",
+          "test_acc": 0.5119047619047619,
+          "balanced_accuracy": 0.5119047619047619,
+          "n_classes": 3,
+          "error": null
+        },
+        {
+          "dataset": "sms_spam/spam.csv",
+          "test_acc": 0.9166666666666666,
+          "balanced_accuracy": 0.9166666666666667,
+          "n_classes": 2,
+          "error": null
+        }
+      ]
+    },
+    "eeg_bands": {
+      "n_reports": 5,
+      "n_edf_found": 0
+    },
+    "scale_learning": {
+      "cpu_rows": 4,
+      "cuda": true
+    },
+    "linear_readout": [
+      {
+        "dataset": "sms_spam/spam.csv",
+        "test_acc": 0.9444444444444444,
+        "multi_seed_test_mean": 0.9074074074074074
+      },
+      {
+        "dataset": "sentiment_tiny/sentiment_analysis.csv",
+        "test_acc": 0.4444444444444444,
+        "multi_seed_test_mean": 0.4259259259259259
+      }
+    ]
+  }
+}

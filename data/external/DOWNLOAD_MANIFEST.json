@@ -1,0 +1,82 @@
+﻿{
+    "root":  "I:\\fsot nuron\\data\\external",
+    "datasets":  [
+                     {
+                         "ref":  "jp797498e/twitter-entity-sentiment-analysis",
+                         "dest":  "I:\\fsot nuron\\data\\external\\nlp\\twitter_entity_sentiment",
+                         "n_files":  2,
+                         "size_mb":  10.004,
+                         "ok":  true,
+                         "sample":  [
+                                        "twitter_training.csv",
+                                        "twitter_validation.csv"
+                                    ]
+                     },
+                     {
+                         "ref":  "sbhatti/financial-sentiment-analysis",
+                         "dest":  "I:\\fsot nuron\\data\\external\\nlp\\financial_sentiment",
+                         "n_files":  1,
+                         "size_mb":  0.711,
+                         "ok":  true,
+                         "sample":  [
+                                        "data.csv"
+                                    ]
+                     },
+                     {
+                         "ref":  "ankurzing/sentiment-analysis-for-financial-news",
+                         "dest":  "I:\\fsot nuron\\data\\external\\nlp\\financial_news_sentiment",
+                         "n_files":  7,
+                         "size_mb":  2.57,
+                         "ok":  true,
+                         "sample":  [
+                                        "all-data.csv",
+                                        "License.txt",
+                                        "README.txt",
+                                        "Sentences_50Agree.txt",
+                                        "Sentences_66Agree.txt"
+                                    ]
+                     },
+                     {
+                         "ref":  "lakshmi25npathi/imdb-dataset-of-50k-movie-reviews",
+                         "dest":  "I:\\fsot nuron\\data\\external\\nlp\\imdb_50k",
+                         "n_files":  1,
+                         "size_mb":  63.145,
+                         "ok":  true,
+                         "sample":  [
+                                        "IMDB Dataset.csv"
+                                    ]
+                     },
+                     {
+                         "ref":  "kashishparmar02/social-media-sentiments-analysis-dataset",
+                         "dest":  "I:\\fsot nuron\\data\\external\\nlp\\social_media_sentiment",
+                         "n_files":  1,
+                         "size_mb":  0.163,
+                         "ok":  true,
+                         "sample":  [
+                                        "sentimentdataset.csv"
+                                    ]
+                     },
+                     {
+                         "ref":  "samnikolas/eeg-dataset",
+                         "dest":  "I:\\fsot nuron\\data\\external\\eeg\\eeg_samnikolas",
+                         "n_files":  1,
+                         "size_mb":  4.668,
+                         "ok":  true,
+                         "sample":  [
+                                        "features_raw.csv"
+                                    ]
+                     },
+                     {
+                         "ref":  "birdy654/eeg-brainwave-dataset-feeling-emotions",
+                         "dest":  "I:\\fsot nuron\\data\\external\\eeg\\eeg_emotions_birdy",
+                         "n_files":  1,
+                         "size_mb":  48.828,
+                         "ok":  true,
+                         "sample":  [
+                                        "emotions.csv"
+                                    ]
+                     }
+                 ],
+    "archive_mirror_note":  "Primary cache on I:\\fsot nuron\\data\\external (external I: drive). Project-local.",
+    "downloaded_at":  "2026-07-18T18:56:46.9467166Z"
+}

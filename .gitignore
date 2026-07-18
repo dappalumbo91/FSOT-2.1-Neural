@@ -19,6 +19,10 @@ data/eeg/kaggle_emotions/emotions.csv
 data/kaggle_datasets/**/*.csv
 data/eeg/allen_ephys/*.nwb
 data/eeg/allen_ephys/ephys_features.csv
+# External downloads live on I: — keep manifest only in git
+data/external/**/*
+!data/external/DOWNLOAD_MANIFEST.json
+!data/external/**/README*
 .DS_Store
 .idea/
 .vscode/

@@ -1,0 +1,251 @@
+{
+  "generated_at": "2026-07-18T19:45:57.707299+00:00",
+  "results": [
+    {
+      "dataset": "sentiment_tiny/sentiment_analysis.csv",
+      "path": "data\\kaggle_datasets\\sentiment_tiny\\sentiment_analysis.csv",
+      "n_train": 252,
+      "n_test": 108,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 1.0,
+      "test_acc": 0.49074074074074076,
+      "balanced_accuracy": 0.49074074074074076,
+      "per_class_recall": {
+        "NEGATIVE": 0.5,
+        "NEUTRAL": 0.4166666666666667,
+        "POSITIVE": 0.5555555555555556
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 18,
+          "NEUTRAL": 9,
+          "POSITIVE": 9
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 14,
+          "NEUTRAL": 15,
+          "POSITIVE": 7
+        },
+        "POSITIVE": {
+          "NEGATIVE": 9,
+          "NEUTRAL": 7,
+          "POSITIVE": 20
+        }
+      },
+      "encode_seconds": 142.04555389999587,
+      "n_features": 48,
+      "n_units": 28,
+      "device_probe": "cuda",
+      "method": "deep_fsot_gated_mlp_morse_attention_pool"
+    },
+    {
+      "dataset": "financial_sentiment/data.csv",
+      "path": "data\\external\\nlp\\financial_sentiment\\data.csv",
+      "n_train": 252,
+      "n_test": 108,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.996031746031746,
+      "test_acc": 0.42592592592592593,
+      "balanced_accuracy": 0.4259259259259259,
+      "per_class_recall": {
+        "NEGATIVE": 0.3611111111111111,
+        "NEUTRAL": 0.4166666666666667,
+        "POSITIVE": 0.5
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 13,
+          "NEUTRAL": 13,
+          "POSITIVE": 10
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 8,
+          "NEUTRAL": 15,
+          "POSITIVE": 13
+        },
+        "POSITIVE": {
+          "NEGATIVE": 9,
+          "NEUTRAL": 9,
+          "POSITIVE": 18
+        }
+      },
+      "encode_seconds": 157.02566039998783,
+      "n_features": 48,
+      "n_units": 28,
+      "device_probe": "cuda",
+      "method": "deep_fsot_gated_mlp_morse_attention_pool"
+    },
+    {
+      "dataset": "financial_news_sentiment/all-data.csv",
+      "path": "data\\external\\nlp\\financial_news_sentiment\\all-data.csv",
+      "n_train": 279,
+      "n_test": 120,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.4838709677419355,
+      "test_acc": 0.35,
+      "balanced_accuracy": 0.35000000000000003,
+      "per_class_recall": {
+        "NEGATIVE": 0.025,
+        "NEUTRAL": 0.15,
+        "POSITIVE": 0.875
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 1,
+          "NEUTRAL": 3,
+          "POSITIVE": 36
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 0,
+          "NEUTRAL": 6,
+          "POSITIVE": 34
+        },
+        "POSITIVE": {
+          "NEGATIVE": 0,
+          "NEUTRAL": 5,
+          "POSITIVE": 35
+        }
+      },
+      "encode_seconds": 179.11331739999878,
+      "n_features": 48,
+      "n_units": 32,
+      "device_probe": "cuda",
+      "method": "deep_fsot_gated_mlp_morse_attention_pool"
+    },
+    {
+      "dataset": "imdb_50k/IMDB Dataset.csv",
+      "path": "data\\external\\nlp\\imdb_50k\\IMDB Dataset.csv",
+      "n_train": 280,
+      "n_test": 120,
+      "n_classes": 2,
+      "classes": [
+        "NEGATIVE",
+        "POSITIVE"
+      ],
+      "train_acc": 0.8535714285714285,
+      "test_acc": 0.48333333333333334,
+      "balanced_accuracy": 0.48333333333333334,
+      "per_class_recall": {
+        "NEGATIVE": 0.4666666666666667,
+        "POSITIVE": 0.5
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 28,
+          "POSITIVE": 32
+        },
+        "POSITIVE": {
+          "NEGATIVE": 30,
+          "POSITIVE": 30
+        }
+      },
+      "encode_seconds": 174.76568389999738,
+      "n_features": 48,
+      "n_units": 32,
+      "device_probe": "cuda",
+      "method": "deep_fsot_gated_mlp_morse_attention_pool"
+    },
+    {
+      "dataset": "sms_spam/spam.csv",
+      "path": "data\\kaggle_datasets\\sms_spam\\spam.csv",
+      "n_train": 279,
+      "n_test": 119,
+      "n_classes": 2,
+      "classes": [
+        "HAM",
+        "SPAM"
+      ],
+      "train_acc": 1.0,
+      "test_acc": 0.9327731092436975,
+      "balanced_accuracy": 0.9327683615819209,
+      "per_class_recall": {
+        "HAM": 0.9322033898305084,
+        "SPAM": 0.9333333333333333
+      },
+      "confusion": {
+        "HAM": {
+          "HAM": 55,
+          "SPAM": 4
+        },
+        "SPAM": {
+          "HAM": 4,
+          "SPAM": 56
+        }
+      },
+      "encode_seconds": 169.68561669999326,
+      "n_features": 48,
+      "n_units": 32,
+      "device_probe": "cuda",
+      "method": "deep_fsot_gated_mlp_morse_attention_pool"
+    },
+    {
+      "dataset": "twitter_entity_sentiment/twitter_training.csv",
+      "path": "data\\external\\nlp\\twitter_entity_sentiment\\twitter_training.csv",
+      "n_train": 275,
+      "n_test": 118,
+      "n_classes": 4,
+      "classes": [
+        "IRRELEVANT",
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.41454545454545455,
+      "test_acc": 0.2711864406779661,
+      "balanced_accuracy": 0.2744252873563218,
+      "per_class_recall": {
+        "IRRELEVANT": 0.896551724137931,
+        "NEGATIVE": 0.034482758620689655,
+        "NEUTRAL": 0.1,
+        "POSITIVE": 0.06666666666666667
+      },
+      "confusion": {
+        "IRRELEVANT": {
+          "IRRELEVANT": 26,
+          "NEGATIVE": 2,
+          "NEUTRAL": 1,
+          "POSITIVE": 0
+        },
+        "NEGATIVE": {
+          "IRRELEVANT": 23,
+          "NEGATIVE": 1,
+          "NEUTRAL": 0,
+          "POSITIVE": 5
+        },
+        "NEUTRAL": {
+          "IRRELEVANT": 24,
+          "NEGATIVE": 2,
+          "NEUTRAL": 3,
+          "POSITIVE": 1
+        },
+        "POSITIVE": {
+          "IRRELEVANT": 27,
+          "NEGATIVE": 1,
+          "NEUTRAL": 0,
+          "POSITIVE": 2
+        }
+      },
+      "encode_seconds": 159.4910000999953,
+      "n_features": 48,
+      "n_units": 32,
+      "device_probe": "cuda",
+      "method": "deep_fsot_gated_mlp_morse_attention_pool"
+    }
+  ],
+  "note": "best-of focus runs"
+}
