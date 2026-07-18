@@ -97,20 +97,26 @@ class MorseAttentionPool(nn.Module):
 class FSOTGatedMLP(nn.Module):
     """Multi-layer probe with FSOT-style multiplicative gates from seeds."""
 
-    def __init__(self, in_dim: int, n_classes: int, hidden: int = 64):
+    def __init__(self, in_dim: int, n_classes: int, hidden: int = 64, depth: int = 2):
         super().__init__()
         self.fc1 = nn.Linear(in_dim, hidden)
         self.fc2 = nn.Linear(hidden, hidden)
-        self.fc3 = nn.Linear(hidden, n_classes)
-        # fixed gates from seeds (buffers, not free params we claim as theory)
+        self.fc3 = nn.Linear(hidden, hidden if depth >= 3 else n_classes)
+        self.fc4 = nn.Linear(hidden, n_classes) if depth >= 3 else None
+        self.depth = depth
         g1 = float(SEEDS.c_eff)
         g2 = float(SEEDS.p_var)
+        g3 = float(SEEDS.p_new)
         self.register_buffer("gate1", torch.tensor(g1))
         self.register_buffer("gate2", torch.tensor(g2))
+        self.register_buffer("gate3", torch.tensor(g3))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         h = F.relu(self.fc1(x)) * self.gate1
         h = F.relu(self.fc2(h)) * self.gate2
+        if self.fc4 is not None:
+            h = F.relu(self.fc3(h)) * self.gate3
+            return self.fc4(h)
         return self.fc3(h)
 
 
@@ -120,39 +126,105 @@ class DeepEncodeConfig:
     max_steps: int = 320
     feat_dim: int = 48
     device: str = "cpu"
+    # Long-context / capacity
+    long_context: bool = False
+    chunk_chars: int = 220
+    chunk_overlap: int = 40
+    max_chunks: int = 6  # hierarchical windows over document
+    max_doc_chars: int = 2400
+    long_max_steps: int = 640  # per-chunk Morse/reservoir length
+    long_n_units: int = 48
+    long_feat_dim: int = 160
+    chunk_feat_dim: int = 40  # fixed per-chunk vector before hierarchy
+
+
+def long_context_config(device: str = "cpu") -> DeepEncodeConfig:
+    """Higher capacity encoder for IMDB-style long documents."""
+    return DeepEncodeConfig(
+        n_units=48,
+        max_steps=640,
+        feat_dim=160,
+        device=device,
+        long_context=True,
+        chunk_chars=240,
+        chunk_overlap=48,
+        max_chunks=6,
+        max_doc_chars=2800,
+        long_max_steps=560,
+        long_n_units=48,
+        long_feat_dim=160,
+        chunk_feat_dim=40,
+    )
+
+
+def _chunk_text(text: str, chunk_chars: int, overlap: int, max_chunks: int) -> List[str]:
+    text = " ".join(text.split())
+    if not text:
+        return ["EMPTY"]
+    if len(text) <= chunk_chars:
+        return [text]
+    chunks: List[str] = []
+    step = max(1, chunk_chars - overlap)
+    i = 0
+    while i < len(text) and len(chunks) < max_chunks:
+        piece = text[i : i + chunk_chars]
+        # prefer break at space
+        if i + chunk_chars < len(text):
+            cut = piece.rfind(" ")
+            if cut > chunk_chars // 3:
+                piece = piece[:cut]
+        piece = piece.strip()
+        if len(piece) >= 12:
+            chunks.append(piece)
+        i += max(step, len(piece) - overlap if piece else step)
+    # always include document tail (often holds verdict sentences)
+    if len(text) > chunk_chars and len(chunks) < max_chunks:
+        tail = text[-chunk_chars:].strip()
+        if tail and (not chunks or tail != chunks[-1]):
+            chunks.append(tail)
+    return chunks or [text[:chunk_chars]]
 
 
 class DeepFSOTEncoder:
-    """Encode text → reservoir trajectory → attention pool + stats fingerprint."""
+    """Encode text → reservoir trajectory → attention pool + stats fingerprint.
+
+    long_context=True: hierarchical chunk encode over the full document so
+    capacity is not limited to a single short Morse window.
+    """
 
     def __init__(self, cfg: Optional[DeepEncodeConfig] = None):
         self.cfg = cfg or DeepEncodeConfig()
         self.device = self.cfg.device
         self.codec = ITUMorseCodec()
+        n_units = self.cfg.long_n_units if self.cfg.long_context else self.cfg.n_units
         self.res = FluidReservoir(
-            ReservoirConfig(n_units=self.cfg.n_units, device=self.device)
+            ReservoirConfig(n_units=n_units, device=self.device)
         )
         self.pool = MorseAttentionPool(dim=8).to(self.device)
-        # small learnable attention lives with probe training
+        self._max_steps = (
+            self.cfg.long_max_steps if self.cfg.long_context else self.cfg.max_steps
+        )
+        self._feat_dim = (
+            self.cfg.long_feat_dim if self.cfg.long_context else self.cfg.feat_dim
+        )
 
-    def _stim(self, text: str) -> torch.Tensor:
+    def _stim(self, text: str, max_steps: Optional[int] = None) -> torch.Tensor:
         cleaned = self.codec.roundtrip_accuracy(text)["input_normalized"] or "EMPTY"
         units = [0] * 3 + self.codec.text_to_units(cleaned) + [0] * 3
-        if len(units) > self.cfg.max_steps:
-            units = units[: self.cfg.max_steps]
+        cap = max_steps or self._max_steps
+        if len(units) > cap:
+            # head + tail sample so long reviews keep ending verdict
+            head = int(cap * 0.65)
+            tail = cap - head
+            units = units[:head] + units[-tail:]
         return torch.tensor(
             [0.12 + 0.78 * u for u in units], device=self.device, dtype=torch.float32
         )
 
-    @torch.no_grad()
-    def encode_numpy(self, text: str) -> np.ndarray:
-        stim = self._stim(text)
-        self.res.reset()
-        out = self.res.run_sequence(stim, record=True)
-        S = out["S_dec"]  # [T, B]
-        fired = out["fired_dec"].float()
+    def _trajectory_fingerprint(
+        self, S: torch.Tensor, fired: torch.Tensor, fire_rate: torch.Tensor, text: str
+    ) -> np.ndarray:
         T, B = S.shape
-        # base sequence features [T, 8]
         run = torch.cumsum(S.mean(dim=1), dim=0) / torch.arange(
             1, T + 1, device=S.device, dtype=S.dtype
         )
@@ -171,7 +243,6 @@ class DeepFSOTEncoder:
             ],
             dim=-1,
         )
-        # deterministic pool if attention untrained: energy-weighted mean
         energy = base.abs().mean(dim=-1)
         w = energy / (energy.sum() + 1e-9)
         pooled = (w.unsqueeze(-1) * base).sum(dim=0)  # [8]
@@ -186,6 +257,14 @@ class DeepFSOTEncoder:
                     float(seg.std(unbiased=False)) if seg.numel() else 0.0,
                 ]
             )
+        # quarters for longer windows
+        quarters = []
+        for q in range(4):
+            a, b = q * T // 4, (q + 1) * T // 4
+            seg = s_mean[a:b]
+            quarters.append(float(seg.mean()) if seg.numel() else 0.0)
+            quarters.append(float(fired[a:b].mean()) if b > a else 0.0)
+
         raw = text.upper()
         ln = max(len(raw), 1)
         surface = [
@@ -193,26 +272,92 @@ class DeepFSOTEncoder:
             sum(c.isdigit() for c in raw) / ln,
             sum(c in "!?$%&@#*" for c in raw) / ln,
             raw.count(" ") / ln,
-            min(len(raw) / 280.0, 1.5),
-            min(T / float(self.cfg.max_steps), 1.0),
-            float(out["firing_rate_Hz"].mean().cpu()),
-            float((fired.mean()).cpu()),
+            min(len(raw) / 500.0, 2.5),
+            min(T / float(self._max_steps), 1.5),
+            float(fire_rate.mean().cpu()) if fire_rate.numel() else 0.0,
+            float(fired.mean().cpu()),
         ]
+        # cheap polarity lexemes (surface cue only; reservoir still carries structure)
+        pos = sum(1 for w in ("GOOD", "GREAT", "LOVE", "EXCELLENT", "BEST", "AMAZING") if w in raw)
+        neg = sum(1 for w in ("BAD", "TERRIBLE", "WORST", "HATE", "AWFUL", "BORING") if w in raw)
+        surface.extend([pos / 6.0, neg / 6.0, (pos - neg) / 6.0])
+
         fp = (
             pooled.detach().cpu().tolist()
             + thirds
+            + quarters
             + surface
             + [
                 float(S.mean().cpu()),
                 float(S.std(unbiased=False).cpu()),
                 float(S.max().cpu()),
                 float(S.min().cpu()),
+                float((S.mean(dim=1)[: max(1, T // 5)].mean()).cpu()),  # lead
+                float((S.mean(dim=1)[-max(1, T // 5) :].mean()).cpu()),  # tail
             ]
         )
-        # pad
-        if len(fp) < self.cfg.feat_dim:
-            fp = fp + [0.0] * (self.cfg.feat_dim - len(fp))
-        return np.asarray(fp[: self.cfg.feat_dim], dtype=np.float64)
+        return np.asarray(fp, dtype=np.float64)
+
+    @torch.no_grad()
+    def encode_chunk(self, text: str) -> np.ndarray:
+        stim = self._stim(text, max_steps=self._max_steps)
+        self.res.reset()
+        out = self.res.run_sequence(stim, record=True)
+        return self._trajectory_fingerprint(
+            out["S_dec"], out["fired_dec"].float(), out["firing_rate_Hz"], text
+        )
+
+    @torch.no_grad()
+    def encode_numpy(self, text: str) -> np.ndarray:
+        text = str(text)
+        if not self.cfg.long_context:
+            fp = self.encode_chunk(text[:800])
+            return self._pad(fp)
+
+        doc = text[: self.cfg.max_doc_chars]
+        chunks = _chunk_text(
+            doc, self.cfg.chunk_chars, self.cfg.chunk_overlap, self.cfg.max_chunks
+        )
+        # Always process first + last chunk explicitly for long reviews
+        if len(doc) > self.cfg.chunk_chars * 2:
+            head = doc[: self.cfg.chunk_chars]
+            tail = doc[-self.cfg.chunk_chars :]
+            if head not in chunks:
+                chunks = [head] + chunks
+            if tail not in chunks:
+                chunks = chunks + [tail]
+            chunks = chunks[: self.cfg.max_chunks]
+
+        cd = int(self.cfg.chunk_feat_dim)
+        chunk_fps = [self._pad(self.encode_chunk(ch))[:cd] for ch in chunks]
+        M = np.stack(chunk_fps, axis=0)  # [C, cd]
+        # hierarchical document pool (fixed-width)
+        doc_fp = np.concatenate(
+            [
+                M.mean(axis=0),
+                M.max(axis=0),
+                M.std(axis=0),
+                M[0],  # first window
+                M[-1],  # last window
+                np.array(
+                    [
+                        float(len(chunks)),
+                        min(len(doc) / float(self.cfg.max_doc_chars), 1.5),
+                        float(np.mean([len(c) for c in chunks])),
+                        float(np.max([len(c) for c in chunks])),
+                    ],
+                    dtype=np.float64,
+                ),
+            ]
+        )
+        return self._pad(doc_fp)
+
+    def _pad(self, fp: np.ndarray) -> np.ndarray:
+        fp = np.asarray(fp, dtype=np.float64).ravel()
+        d = self._feat_dim
+        if fp.size < d:
+            fp = np.concatenate([fp, np.zeros(d - fp.size)])
+        return fp[:d]
 
 
 def _load_text_label_frame(path: Path, max_rows: int = 80_000) -> Optional[pd.DataFrame]:
@@ -323,6 +468,7 @@ def train_deep_probe(
     lr: float = 0.05,
     seed: int = 0,
     device: str = "cpu",
+    capacity: str = "standard",
 ) -> Tuple[FSOTGatedMLP, List[str], Dict[str, float]]:
     classes = sorted(set(y))
     cls_to_i = {c: i for i, c in enumerate(classes)}
@@ -333,8 +479,12 @@ def train_deep_probe(
     Xs = (X - mu) / sd
     xt = torch.tensor(Xs, dtype=torch.float32, device=device)
     yt = torch.tensor(y_idx, dtype=torch.long, device=device)
-    hidden = 128 if len(classes) >= 3 else 96
-    model = FSOTGatedMLP(X.shape[1], len(classes), hidden=hidden).to(device)
+    if capacity == "long":
+        hidden, depth, epochs = 192, 3, max(epochs, 120)
+    else:
+        hidden = 128 if len(classes) >= 3 else 96
+        depth = 2
+    model = FSOTGatedMLP(X.shape[1], len(classes), hidden=hidden, depth=depth).to(device)
     # Full-batch more stable on small FSOT-fingerprint sets; mini-batch for larger n
     use_mb = xt.shape[0] >= 400
     opt = torch.optim.Adam(
@@ -385,6 +535,13 @@ def predict_deep(model: FSOTGatedMLP, X: np.ndarray, classes: List[str], device:
     return [classes[int(i)] for i in pred]
 
 
+def _wants_long_context(path: Path, mean_len: float) -> bool:
+    blob = (str(path) + " " + path.name).lower()
+    if any(k in blob for k in ("imdb", "review", "movie")):
+        return True
+    return mean_len >= 180.0
+
+
 def eval_dataset_deep(
     path: Path,
     *,
@@ -392,6 +549,7 @@ def eval_dataset_deep(
     n_units: int = 28,
     device: Optional[str] = None,
     seed: int = 42,
+    long_context: Optional[bool] = None,
 ) -> Dict[str, Any]:
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     df = _load_text_label_frame(path)
@@ -408,15 +566,26 @@ def eval_dataset_deep(
     if len(sample) > max_docs:
         sample = sample.sample(n=max_docs, random_state=seed)
 
-    enc = DeepFSOTEncoder(DeepEncodeConfig(n_units=n_units, device=device if device == "cpu" else "cpu"))
-    # encode on CPU reservoir for stability; probe can be cuda
+    mean_len = float(sample["text"].astype(str).str.len().mean())
+    use_long = long_context if long_context is not None else _wants_long_context(path, mean_len)
+    if use_long:
+        enc_cfg = long_context_config(device="cpu")
+        capacity = "long"
+        # slightly fewer docs if each doc is multi-chunk (runtime)
+        if len(sample) > 280:
+            sample = sample.sample(n=280, random_state=seed)
+    else:
+        enc_cfg = DeepEncodeConfig(n_units=n_units, max_steps=400, feat_dim=64, device="cpu")
+        capacity = "standard"
+
+    enc = DeepFSOTEncoder(enc_cfg)
     t0 = time.perf_counter()
     X_list = []
     y_list = []
     for text, lab in zip(sample["text"].tolist(), sample["label"].tolist()):
         if len(str(text)) < 4:
             continue
-        X_list.append(enc.encode_numpy(str(text)[:400]))
+        X_list.append(enc.encode_numpy(str(text)))
         y_list.append(str(lab))
     encode_s = time.perf_counter() - t0
     X = np.stack(X_list, axis=0)
@@ -425,7 +594,9 @@ def eval_dataset_deep(
     ytr = [y_list[i] for i in tr_idx]
     yte = [y_list[i] for i in te_idx]
 
-    model, classes, meta = train_deep_probe(Xtr, ytr, epochs=100, device=device)
+    model, classes, meta = train_deep_probe(
+        Xtr, ytr, epochs=120 if use_long else 100, device=device, capacity=capacity
+    )
     pred_tr = predict_deep(model, Xtr, classes, device)
     pred_te = predict_deep(model, Xte, classes, device)
     train_acc = float(np.mean([a == b for a, b in zip(pred_tr, ytr)]))
@@ -445,9 +616,18 @@ def eval_dataset_deep(
         "confusion": conf,
         "encode_seconds": encode_s,
         "n_features": int(X.shape[1]),
-        "n_units": n_units,
+        "n_units": enc_cfg.long_n_units if use_long else n_units,
         "device_probe": device,
-        "method": "deep_fsot_gated_mlp_morse_attention_pool",
+        "long_context": use_long,
+        "mean_doc_chars": mean_len,
+        "max_doc_chars": enc_cfg.max_doc_chars if use_long else 800,
+        "max_chunks": enc_cfg.max_chunks if use_long else 1,
+        "max_steps_per_chunk": enc_cfg.long_max_steps if use_long else enc_cfg.max_steps,
+        "method": (
+            "hierarchical_chunk_fsot_reservoir_long_context"
+            if use_long
+            else "deep_fsot_gated_mlp_morse_attention_pool"
+        ),
     }
 
 

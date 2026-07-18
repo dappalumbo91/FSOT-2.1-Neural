@@ -55,4 +55,19 @@ python run_sota_fronts.py
 1. Sentiment / financial 3-class — richer Morse-time attention (learned pool) + more samples  
 2. IMDB — longer sequences, hierarchical reservoir  
 3. GPU encode path for scale-under-learning  
-4. Full OpenNeuro EDF PD segments when available on external drive  
+4. Full OpenNeuro EDF PD segments when available on external drive
+
+## Long-context capacity (latest)
+
+| Dataset | Test | Long | Notes |
+|---------|------|------|-------|
+| imdb_50k/IMDB Dataset.csv | **0.556** | True | chunks=6 steps/chunk=560 |
+| sentiment_tiny/sentiment_analysis.csv | **0.565** | False | chunks=1 steps/chunk=400 |
+| financial_sentiment/data.csv | **0.352** | False | chunks=1 steps/chunk=400 |
+| sms_spam/spam.csv | **0.833** | False | chunks=1 steps/chunk=400 |
+| twitter_entity_sentiment/twitter_training.csv | **0.239** | False | chunks=1 steps/chunk=400 |
+| financial_news_sentiment/all-data.csv | **0.315** | False | chunks=1 steps/chunk=400 |
+| sentiment_tiny/sentiment_analysis.csv [forced_long] | **0.488** | True | chunks=6 steps/chunk=560 |
+
+IMDB hierarchical long-context: **0.556** (was ~0.48–0.50). Sentiment medium-capacity (400 steps, 64-D): **0.565** (best 3-class so far).
+
