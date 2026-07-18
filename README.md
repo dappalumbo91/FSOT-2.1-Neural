@@ -12,6 +12,8 @@ Small, batched **FSOT active neurons** on CPU or CUDA — cortical-style dynamic
 | **License** | Apache-2.0 |
 | **Suggested GitHub name** | `FSOT-2.1-Neural` (see `GITHUB_PUBLISH.md`) |
 | **Kaggle** | Notebook already run — see `KAGGLE_RUNBOOK.md` |
+| **CI** | GitHub Actions smoke on every push (`scripts/ci_smoke.py`) |
+| **Roadmap** | See `ROADMAP.md` |
 | **Hardware** | NVIDIA GPU (RTX 5070 class validated) + vectorized CPU |
 
 > Neurological failure modes are **substrate engineering boundaries**. This is **not** a medical device, diagnosis, or treatment.

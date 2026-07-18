@@ -232,6 +232,23 @@ def eval_tabular_signal(df: pd.DataFrame, path: Path) -> DatasetScore:
     )
 
 
+def _confusion_and_balanced(
+    y_true: Sequence[str], y_pred: Sequence[str]
+) -> Tuple[Dict[str, Dict[str, int]], float, Dict[str, float]]:
+    """Confusion matrix + balanced accuracy (macro recall). No sklearn dependency."""
+    labels = sorted(set(y_true) | set(y_pred))
+    conf: Dict[str, Dict[str, int]] = {a: {b: 0 for b in labels} for a in labels}
+    for t, p in zip(y_true, y_pred):
+        conf[str(t)][str(p)] = conf[str(t)].get(str(p), 0) + 1
+    recalls: Dict[str, float] = {}
+    for lab in labels:
+        tp = conf[lab].get(lab, 0)
+        support = sum(conf[lab].values())
+        recalls[lab] = float(tp / support) if support else 0.0
+    bal = float(np.mean(list(recalls.values()))) if recalls else 0.0
+    return conf, bal, recalls
+
+
 def eval_text_classification(df: pd.DataFrame, path: Path, max_docs: int = 120) -> DatasetScore:
     """Chew labeled texts; measure retrieval of correct label via keyword+fluid match proxy."""
     from .literature_chew import LiteratureMind, chunk_text
@@ -288,18 +305,18 @@ def eval_text_classification(df: pd.DataFrame, path: Path, max_docs: int = 120) 
         if n_chewed >= max_docs:
             break
 
-    # Leave-one-out style: for each memory, query with the text and see if top source label matches
-    correct = 0
+    # Leave-one-out retrieval: hard top-1 + soft top-2 (legacy) + confusion / balanced acc
+    hard_correct = 0
+    soft_score = 0.0
     total = 0
-    # subsample eval for speed
+    y_true: List[str] = []
+    y_pred: List[str] = []
     eval_idx = list(range(len(mind.memory)))
     if len(eval_idx) > 40:
         rng = np.random.default_rng(0)
         eval_idx = list(rng.choice(eval_idx, size=40, replace=False))
 
     for i in eval_idx:
-        m = mind.memory[i]
-        # temporary remove self
         hold = mind.memory.pop(i)
         res = mind.query(hold.text[:200], top_k=3)
         mind.memory.insert(i, hold)
@@ -307,19 +324,35 @@ def eval_text_classification(df: pd.DataFrame, path: Path, max_docs: int = 120) 
             continue
         top_sources = [t["source"] for t in res.get("top", [])]
         total += 1
+        pred = top_sources[0] if top_sources else "UNK"
+        y_true.append(hold.source)
+        y_pred.append(pred)
         if top_sources and top_sources[0] == hold.source:
-            correct += 1
+            hard_correct += 1
+            soft_score += 1.0
         elif hold.source in top_sources[:2]:
-            correct += 0.5  # partial credit top-2
+            soft_score += 0.5  # partial credit top-2 (legacy soft score)
 
-    acc = float(correct / total) if total else 0.0
+    hard_acc = float(hard_correct / total) if total else 0.0
+    soft_acc = float(soft_score / total) if total else 0.0
+    conf, bal_acc, per_class = _confusion_and_balanced(y_true, y_pred)
     labels = sample[label_col].value_counts().to_dict()
     metrics = {
-        "retrieval_top1_acc": acc,
+        # Prefer hard metrics for publication; soft kept for continuity with earlier scoreboard
+        "retrieval_top1_acc": hard_acc,
+        "retrieval_top1_hard_acc": hard_acc,
+        "retrieval_soft_top2_acc": soft_acc,
+        "balanced_accuracy": bal_acc,
+        "per_class_recall": per_class,
+        "confusion": conf,
         "n_chewed": n_chewed,
         "n_eval": total,
         "mean_fire_rate": float(np.mean([m.fire_rate for m in mind.memory])) if mind.memory else 0.0,
-        "fsot_fit_score": float(min(1.0, acc)),  # for text, retrieval accuracy is the fit
+        "fsot_fit_score": float(min(1.0, hard_acc)),
+        "metric_honesty": (
+            "retrieval_top1_acc is hard top-1 leave-one-out label recovery; "
+            "not clinical diagnosis; not balanced unless balanced_accuracy is cited"
+        ),
     }
     return DatasetScore(
         name=path.parent.name + "/" + path.name,
@@ -329,7 +362,10 @@ def eval_text_classification(df: pd.DataFrame, path: Path, max_docs: int = 120) 
         n_features_or_docs=n_chewed,
         labels={str(k): int(v) for k, v in labels.items()},
         metrics=metrics,
-        notes="Labeled text chewed into Morse/reservoir memory; retrieval accuracy = label recovery",
+        notes=(
+            "Labeled text → Morse/reservoir memory; hard top-1 leave-one-out label recovery "
+            "(balanced_accuracy + confusion also reported)"
+        ),
     )
 
 
