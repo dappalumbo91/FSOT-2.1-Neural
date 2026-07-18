@@ -1,0 +1,105 @@
+{
+  "created": "2026-07-12T18:15:00Z",
+  "archive_root": "I:/FSOT-Physical-Archive",
+  "scope": "FSOT 2.1 essentials only (not all Desktop projects)",
+  "estimated_size_gb": 17,
+  "github_remote": "https://github.com/dappalumbo91/FSOT-2.1-Lean.git",
+  "github_head": "43d1fe4 fix(archive): I: drive is definitive independent hub, not C: Desktop",
+  "canonical_lean_hub": "I:/FSOT-Physical-Archive/02_FSOT-2.1-Lean-Full",
+  "deprecated_mirror": "C:/Users/damia/Desktop/FSOT-2.1-Lean/FSOT-2.1-Lean-main/FSOT-2.1-Lean-main",
+  "one_click_play": "powershell -ExecutionPolicy Bypass -File I:/FSOT-Physical-Archive/PLAY.ps1",
+  "portability_audit": "python scripts/audit_archive_portability.py",
+  "sections": {
+    "01_SR-ITE-USB-Original": {
+      "source": "H:/",
+      "size_gb": 1.874,
+      "description": "SR-ITE continuous cognition substrate (photonic VRAM, Zig driver, oracle streams, born souls)"
+    },
+    "02_FSOT-2.1-Lean-Full": {
+      "source": "I:/FSOT-Physical-Archive/02_FSOT-2.1-Lean-Full",
+      "size_gb": 6.972,
+      "description": "Canonical Lean hub: proofs, 336+ extension panels, founding Tier 96, .lake cache. Git push origin from HERE only."
+    },
+    "03_FSOT-PublicData": {
+      "source": "G:/FSOT-PublicData",
+      "size_gb": 8.064,
+      "description": "External downloaded data: AnAge, OpenNeuro, The Well spot chunks, tier81/89/90/93 caches, consciousness genetics"
+    },
+    "04_Genetics-Longevity": {
+      "size_gb": 0.05,
+      "description": "Tier94 caches + portable genetics verification (CAMEO, codon map, protein formulas)"
+    },
+    "05_Zebrahub-Development": {
+      "size_gb": 2.15,
+      "description": "Zebrafish development / predictive validation caches"
+    },
+    "06_Founding-Archives": {
+      "size_gb": 0.04,
+      "description": "Bundled fsuft_aasb + fsot_tech founding PDFs/markdown (drive-letter independent)"
+    },
+    "08_Verified-Desktop-Projects": {
+      "source": "C:/Users/damia/Desktop (synced via scripts/sync_verified_desktop_projects.py)",
+      "description": "Tier 88 verified desktop mirrors: transporter sims, fuel lab engine_simulator, BH/WH cycle, species catalog. Vendor copy in 02_FSOT-2.1-Lean-Full/vendor/verified_desktop/"
+    }
+  },
+  "portability": {
+    "audited_at": "2026-07-14",
+    "data_complete_on_drive": true,
+    "drive_letter_independent": true,
+    "host_prerequisites_one_time": [
+      "Python 3.10+",
+      "pip install -r 02_FSOT-2.1-Lean-Full/requirements.txt"
+    ],
+    "bundled_toolchain": "07_Portable-Toolchain (rocq, isabelle, fstar, cargo, elan, rustup)",
+    "bundle_command": "powershell -ExecutionPolicy Bypass -File I:/FSOT-Physical-Archive/bundle_toolchain.ps1",
+    "bootstrap_command": ". I:/FSOT-Physical-Archive/bootstrap_toolchain.ps1",
+    "optional_host_tools": [
+      "Python 3.10+ (only host prerequisite if not bundled)",
+      "MSVC Build Tools (Windows linker for Rust — usually preinstalled)"
+    ],
+    "no_download_verification": "Cached benchmarks in data/, 03_FSOT-PublicData, vendor/ — no live API calls in --portable mode",
+    "known_scientific_debt": [
+      "Geomagnetism hp_storm_classifier 100% scalar error (data present; precision gate fails)",
+      "Zebrafish_Predictive_Validation mean_displacement_um 0.74%"
+    ],
+    "three_location_policy": {
+      "i_drive": "Definitive master — verify and git push only from here",
+      "github": "Synced from I:; lacks .lake cache and large archive-only blobs",
+      "c_desktop": "Deprecated mirror at same commit; extra vendor blobs not authoritative"
+    }
+  },
+  "restore_env_vars": {
+    "FSOT_EXTERNAL_DATA_ROOT": "I:/FSOT-Physical-Archive/03_FSOT-PublicData",
+    "FSOT_ANOMALY_CACHE_ROOT": "I:/FSOT-Physical-Archive/03_FSOT-PublicData/anomaly_observables"
+  },
+  "canonical_policy": "I:/FSOT-Physical-Archive is the definitive independent master. GitHub is synced FROM here only. C: Desktop is a deprecated read-only mirror.",
+  "setup_command": ". I:/FSOT-Physical-Archive/set_fsot_archive_env.ps1",
+  "verify_commands": {
+    "lean_hub": "cd I:/FSOT-Physical-Archive/02_FSOT-2.1-Lean-Full && python scripts/fsot_verification_runner.py",
+    "archive_independence": "python scripts/audit_archive_independence.py",
+    "scrub_desktop_paths": "python scripts/scrub_archive_desktop_paths.py",
+    "photonic_h_payload": "python scripts/verify_photonic_forge.py",
+    "extension_domains": "python scripts/verify_extension_domains.py"
+  },
+  "intentionally_not_on_github": [
+    ".lake/ Lean build cache (~4.35 GB)",
+    "vendor/linguistics/db/ (400MB SQLite replaced by portable JSON on GitHub)",
+    "vendor/knowledge_base/export/ and transfer/",
+    "verification/coq/*.vo compiled artifacts",
+    "explorations/",
+    "G:/FSOT-PublicData — API downloads, HDF5, genetics ingest caches",
+    "H:/ SR-ITE runtime state, sensory streams, born_souls, unified oracle",
+    "Desktop LLM weights, Genetics 12GB, nuron 27GB, linguistics 21GB — excluded from this archive"
+  ],
+  "on_github": [
+    "All Lean proofs, scripts, YAML manifests, benchmark JSON",
+    "329 extension domain panels and certificate.json",
+    "Portable vendor snapshots (linguistics derivations, math generator rules, trinary oracles)",
+    "Tier 90-93 consciousness, ontology, base mathematics panels"
+  ],
+  "fsot_verification": {
+    "h_photonic_payload": "PASS — 180 voxels, trinary 40/60/80, 0 resonance errors",
+    "lean_photonic_forge": "PASS"
+  },
+  "h_drive_note": "H:/ is 5 GB total — too small for full archive. Use I:/ as primary physical master. H:/ can hold portable subset after format."
+}

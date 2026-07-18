@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "live": true,
+  "data": {
+    "data": {
+      "dataset": {
+        "id": "ds002778",
+        "name": "UC San Diego Resting State EEG Data from Patients with Parkinson's Disease"
+      }
+    },
+    "extensions": {
+      "openneuro": {
+        "version": "5.3.0"
+      }
+    }
+  },
+  "dataset_id": "ds002778"
+}

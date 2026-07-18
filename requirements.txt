@@ -1,0 +1,6 @@
+torch>=2.1.0
+numpy>=1.24
+matplotlib>=3.7
+mpmath>=1.3
+# optional for richer Allen SDK access (offline CSV works without it)
+# allensdk>=2.16.0

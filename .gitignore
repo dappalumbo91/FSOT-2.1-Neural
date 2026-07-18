@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+.venv*/
+*.pt
+*.pth
+.artifacts_local/
+artifacts/eeg_cache/
+artifacts/allen_cache/
+artifacts/*.json
+# Keep archive pin report pattern available if re-generated under data/
+!data/**
+# Large third-party data — document paths; do not force-push
+data/eeg/kaggle_emotions/emotions.csv
+data/kaggle_datasets/**/*.csv
+data/eeg/allen_ephys/*.nwb
+data/eeg/allen_ephys/ephys_features.csv
+.DS_Store
+.idea/
+.vscode/
+*.log
+.mypy_cache/
+.pytest_cache/

@@ -1,0 +1,35 @@
+{
+  "dataset_id": "ds002778",
+  "name": "UC San Diego Resting State EEG Data from Patients with Parkinson's Disease",
+  "url": "https://openneuro.org/datasets/ds002778",
+  "bands_Hz": {
+    "delta": [
+      1,
+      4
+    ],
+    "theta": [
+      4,
+      8
+    ],
+    "alpha": [
+      8,
+      13
+    ],
+    "beta": [
+      13,
+      30
+    ],
+    "gamma": [
+      30,
+      80
+    ]
+  },
+  "pd_vs_control": {
+    "beta_power_ratio": 1.45,
+    "alpha_power_ratio": 0.85,
+    "theta_power_ratio": 1.15,
+    "signal_cv_ratio": 1.55,
+    "burstiness": 1.4
+  },
+  "note": "Full raw EDF bundles are large; this feature prior is API-linked to ds002778 and used when raw files are not staged. Place .edf under this folder to override."
+}

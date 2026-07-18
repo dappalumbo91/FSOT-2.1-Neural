@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fsot-2-1-neural"
+version = "0.3.0"
+description = "FSOT 2.1 micro-neuron / neural substrate: GPU-CPU batch, bio lock, failure boundaries, Morse+chemical readout, consensus bridge"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Damian Arthur Palumbo" }]
+keywords = ["FSOT", "neural", "trinary", "Morse", "GPU", "Lean"]
+dependencies = [
+  "torch>=2.1.0",
+  "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+viz = ["matplotlib>=3.7"]
+mp = ["mpmath>=1.3"]
+
+[project.urls]
+Homepage = "https://github.com/dappalumbo91/FSOT-2.1-Neural"
+Theory = "https://github.com/dappalumbo91/FSOT-2.1-Lean"
+
+[tool.setuptools.packages.find]
+include = ["fsot_nuron*"]

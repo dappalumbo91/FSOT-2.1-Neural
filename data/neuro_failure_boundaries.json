@@ -1,0 +1,175 @@
+{
+  "title": "Neurological failure boundaries for FSOT micro-neuron substrate",
+  "purpose": "Map known neurodegenerative / neurological break modes onto FSOT timing and scalar knobs. Goal is system boundary awareness and wire-around design — not clinical treatment.",
+  "sources_note": "Mechanisms summarized from established neurology literature; local hooks to OpenNeuro PD EEG index and Allen ephys envelope on this machine.",
+  "local_data_hooks": {
+    "openneuro_pd_eeg": "I:/FSOT-Physical-Archive/03_FSOT-PublicData/consciousness/openneuro/openneuro_index.json#ds002778",
+    "allen_ephys_envelope": "Desktop/nuron/cell data/allen_cell_types/ephys_features.csv",
+    "smiles_chem_precision": "FSOT SMILES Lab median_error_pct ~0.058"
+  },
+  "healthy_operating_envelope": {
+    "firing_rate_Hz": [0.1, 80.0],
+    "mean_isi_ms": [12.0, 200.0],
+    "adaptation_index": [-0.15, 0.55],
+    "isi_cv": [0.05, 1.2],
+    "vrest_mV": [-85.0, -55.0],
+    "note": "Soft envelope from cortical literature + Allen population; not a diagnosis."
+  },
+  "failure_modes": [
+    {
+      "id": "AD_synaptic_fatigue",
+      "label": "Alzheimer-like synaptic / metabolic fatigue",
+      "mechanism": "Synaptic loss, impaired plasticity, metabolic stress; progressive inability to sustain drive.",
+      "clinical_refs": ["Alzheimer disease synaptic failure literature", "amyloid/tau cascade (context only)"],
+      "fsot_lesion": {
+        "adapt_step_scale": 2.4,
+        "adapt_gain_scale": 1.8,
+        "fi_stim_scale": 0.55,
+        "fire_thr_delta": 0.12,
+        "silence_fraction": 0.15,
+        "d_eff_delta": -1.5
+      },
+      "break_signature": {
+        "rate_drop": true,
+        "adaptation_runaway": true,
+        "emergent_fraction_drop": true
+      },
+      "wire_around": {
+        "strategy": "distributed_redundancy",
+        "actions": ["boost_fi_stim_on_survivors", "lower_adapt_step", "reroute_via_consensus_gate"]
+      }
+    },
+    {
+      "id": "PD_rate_irregularity",
+      "label": "Parkinson-like rate irregularity / sync pressure",
+      "mechanism": "Dopaminergic circuit disruption; irregular ISI, pathologically synchronized bursts; elevated beta-band pressure (OpenNeuro ds002778 target).",
+      "clinical_refs": ["OpenNeuro ds002778 PD resting EEG", "basal ganglia rate models", "PD beta-band EEG literature"],
+      "fsot_lesion": {
+        "adapt_step_scale": 1.75,
+        "isi_jitter": 0.55,
+        "fire_thr_delta": -0.10,
+        "phase_lock_strength": 0.65,
+        "silence_fraction": 0.12,
+        "fi_stim_scale": 0.95,
+        "ref_steps_scale": 1.05,
+        "burst_force": 0.45
+      },
+      "break_signature": {
+        "isi_cv_high": true,
+        "burst_clustering": true,
+        "rate_drop": true
+      },
+      "wire_around": {
+        "strategy": "desync_and_regularize",
+        "actions": ["inject_phase_noise", "clamp_isi_cv", "consensus_sparse_gate", "consensus_quarantine_failed", "raise_fire_thr"]
+      },
+      "eeg_source": {
+        "openneuro_id": "ds002778",
+        "name": "UC San Diego Resting State EEG Data from Patients with Parkinson's Disease"
+      }
+    },
+    {
+      "id": "ALS_motor_dropout",
+      "label": "ALS-like unit dropout + late silence",
+      "mechanism": "Motor unit loss; remaining units hyperexcitable then fail.",
+      "clinical_refs": ["ALS motor neuron hyperexcitability then dropout"],
+      "fsot_lesion": {
+        "silence_fraction": 0.35,
+        "fire_thr_delta": -0.10,
+        "adapt_step_scale": 1.6,
+        "fi_stim_scale": 1.25,
+        "hard_kill_after_spikes": 40
+      },
+      "break_signature": {
+        "population_sparsity": true,
+        "survivor_hyperexcitability": true,
+        "late_silence": true
+      },
+      "wire_around": {
+        "strategy": "recruit_reserve_pool",
+        "actions": ["spawn_reserve_units", "cap_survivor_rate", "load_balance_consensus"]
+      }
+    },
+    {
+      "id": "MS_conduction_delay",
+      "label": "MS-like demyelination / conduction delay",
+      "mechanism": "Myelin damage → slowed/blocked conduction; longer effective refractory.",
+      "clinical_refs": ["demyelinating conduction block"],
+      "fsot_lesion": {
+        "ref_steps_scale": 1.85,
+        "fi_stim_scale": 0.75,
+        "fire_thr_delta": 0.08,
+        "silence_fraction": 0.10
+      },
+      "break_signature": {
+        "isi_prolonged": true,
+        "rate_drop": true
+      },
+      "wire_around": {
+        "strategy": "parallel_paths",
+        "actions": ["shorten_ref_on_healthy", "duplicate_signal_paths", "subms_timing_compensate"]
+      }
+    },
+    {
+      "id": "EPI_runaway",
+      "label": "Epileptiform hyperexcitability",
+      "mechanism": "Reduced inhibition / runaway recruitment; pathological high rate.",
+      "clinical_refs": ["epileptic hyperexcitability models"],
+      "fsot_lesion": {
+        "fire_thr_delta": -0.22,
+        "adapt_step_scale": 0.35,
+        "ref_steps_scale": 0.55,
+        "fi_stim_scale": 1.4,
+        "silence_fraction": 0.0
+      },
+      "break_signature": {
+        "rate_runaway": true,
+        "adaptation_collapse": true
+      },
+      "wire_around": {
+        "strategy": "inhibitory_clamp",
+        "actions": ["raise_fire_thr", "increase_adapt_step", "consensus_collapse_gate"]
+      }
+    },
+    {
+      "id": "ISCHEMIA_energy_collapse",
+      "label": "Ischemic / energy-failure collapse",
+      "mechanism": "ATP failure, depolarization block, widespread silence.",
+      "clinical_refs": ["ischemic penumbra depolarization"],
+      "fsot_lesion": {
+        "fi_stim_scale": 0.25,
+        "fire_thr_delta": 0.25,
+        "silence_fraction": 0.45,
+        "d_eff_delta": -3.0,
+        "s_clamp": 0.05
+      },
+      "break_signature": {
+        "global_silence": true,
+        "s_collapse": true
+      },
+      "wire_around": {
+        "strategy": "checkpoint_restore",
+        "actions": ["snapshot_state", "revive_from_reserve", "lower_metabolic_load"]
+      }
+    },
+    {
+      "id": "SYNUCLEIN_propagation",
+      "label": "Synuclein-like progressive recruitment failure",
+      "mechanism": "Spreading pathology; neighboring units gradually lesioned.",
+      "clinical_refs": ["alpha-synuclein propagation models"],
+      "fsot_lesion": {
+        "silence_fraction": 0.08,
+        "adapt_step_scale": 1.5,
+        "spread_per_100_steps": 0.04,
+        "fi_stim_scale": 0.85
+      },
+      "break_signature": {
+        "progressive_sparsity": true
+      },
+      "wire_around": {
+        "strategy": "quarantine_and_reroute",
+        "actions": ["isolate_hot_units", "consensus_exclude_failed", "chemical_path_reroute"]
+      }
+    }
+  ]
+}
