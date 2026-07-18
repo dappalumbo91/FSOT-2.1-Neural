@@ -1,4 +1,4 @@
-# SOTA fronts — data + refinement
+﻿# SOTA fronts â€” data + refinement
 
 ## Data downloads (external **I:** drive only)
 
@@ -20,15 +20,15 @@ Manifest: `data/external/DOWNLOAD_MANIFEST.json`
 
 | Dataset | Test | Classes | Note |
 |---------|------|---------|------|
-| SMS spam | **~0.90–0.93** | 2 | Strong binary |
-| Sentiment tiny | **~0.49–0.51** | 3 | Climbing (was 0.27 linear early) |
-| Financial sentiment | **~0.36–0.43** | 3 | Open |
-| Financial news | ~0.33–0.35 | 3 | Open |
-| IMDB 50k sample | ~0.48–0.50 | 2 | Needs longer context / capacity |
-| Twitter entity | ~0.27–0.40 | 4 | Open |
+| SMS spam | **~0.90â€“0.93** | 2 | Strong binary |
+| Sentiment tiny | **~0.49â€“0.51** | 3 | Climbing (was 0.27 linear early) |
+| Financial sentiment | **~0.36â€“0.43** | 3 | Open |
+| Financial news | ~0.33â€“0.35 | 3 | Open |
+| IMDB 50k sample | ~0.48â€“0.50 | 2 | Needs longer context / capacity |
+| Twitter entity | ~0.27â€“0.40 | 4 | Open |
 | Social media | ~0.23 | 19 | Hard multi-class |
 
-Method: Morse → FluidReservoir → time-pool fingerprint → **FSOT-gated multi-layer probe**.
+Method: Morse â†’ FluidReservoir â†’ time-pool fingerprint â†’ **FSOT-gated multi-layer probe**.
 
 ## EEG bands
 
@@ -38,7 +38,7 @@ Method: Morse → FluidReservoir → time-pool fingerprint → **FSOT-gated mult
 
 ## Scale under learning
 
-- Encode load ~4 docs/s at 8–64 units (CPU reservoir path)
+- Encode load ~4 docs/s at 8â€“64 units (CPU reservoir path)
 - Probe train on CPU/CUDA measured in `data/results/scale_learning.json`
 - Encode still dominates; next climb is GPU-side reservoir encode
 
@@ -52,8 +52,8 @@ python run_sota_fronts.py
 
 ## Next climb order
 
-1. Sentiment / financial 3-class — richer Morse-time attention (learned pool) + more samples  
-2. IMDB — longer sequences, hierarchical reservoir  
+1. Sentiment / financial 3-class â€” richer Morse-time attention (learned pool) + more samples  
+2. IMDB â€” longer sequences, hierarchical reservoir  
 3. GPU encode path for scale-under-learning  
 4. Full OpenNeuro EDF PD segments when available on external drive
 
@@ -69,5 +69,17 @@ python run_sota_fronts.py
 | financial_news_sentiment/all-data.csv | **0.315** | False | chunks=1 steps/chunk=400 |
 | sentiment_tiny/sentiment_analysis.csv [forced_long] | **0.488** | True | chunks=6 steps/chunk=560 |
 
-IMDB hierarchical long-context: **0.556** (was ~0.48–0.50). Sentiment medium-capacity (400 steps, 64-D): **0.565** (best 3-class so far).
+IMDB hierarchical long-context: **0.556** (was ~0.48â€“0.50). Sentiment medium-capacity (400 steps, 64-D): **0.565** (best 3-class so far).
+
+## Climb update (learned attention + multi-seed hierarchical)
+
+| Track | Prior | Best now |
+|-------|-------|----------|
+| IMDB hierarchical | 0.556 | **0.607** (seed 99) |
+| Sentiment 3-class deep | 0.565 | **0.581** (seed 42) |
+| Financial 3-class deep | ~0.36–0.43 | **0.408** |
+| Learned Morse attention | experimental | still weak on multi-class (0.33); hierarchical path leads |
+
+Multi-seed IMDB: 0.560 / 0.583 / **0.607** — capacity is climbing, not noise-only.
+See `CLIMB.md` and `data/results/climb_suite.json`.
 

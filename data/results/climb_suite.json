@@ -1,0 +1,424 @@
+{
+  "generated_at": "2026-07-18T22:45:14.781331+00:00",
+  "goal": "climb IMDB + 3-class; multi-seed hierarchical + residual attention",
+  "prior_best": {
+    "imdb": 0.556,
+    "sentiment": 0.565
+  },
+  "results": [
+    {
+      "tag": "imdb_hier_seed42",
+      "dataset": "imdb_50k/IMDB Dataset.csv",
+      "test_acc": 0.56,
+      "balanced_accuracy": 0.556,
+      "n_train": 196,
+      "n_test": 84,
+      "method": "hierarchical_chunk_fsot_reservoir_long_context",
+      "long_context": true
+    },
+    {
+      "tag": "imdb_hier_seed7",
+      "dataset": "imdb_50k/IMDB Dataset.csv",
+      "test_acc": 0.583,
+      "balanced_accuracy": 0.585,
+      "n_train": 196,
+      "n_test": 84,
+      "method": "hierarchical_chunk_fsot_reservoir_long_context",
+      "long_context": true
+    },
+    {
+      "dataset": "imdb_50k/IMDB Dataset.csv",
+      "path": "I:\\fsot nuron\\data\\external\\nlp\\imdb_50k\\IMDB Dataset.csv",
+      "n_train": 196,
+      "n_test": 84,
+      "n_classes": 2,
+      "classes": [
+        "NEGATIVE",
+        "POSITIVE"
+      ],
+      "train_acc": 1.0,
+      "test_acc": 0.6071428571428571,
+      "balanced_accuracy": 0.6071428571428572,
+      "per_class_recall": {
+        "NEGATIVE": 0.5238095238095238,
+        "POSITIVE": 0.6904761904761905
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 22,
+          "POSITIVE": 20
+        },
+        "POSITIVE": {
+          "NEGATIVE": 13,
+          "POSITIVE": 29
+        }
+      },
+      "encode_seconds": 1215.5556692999962,
+      "n_features": 160,
+      "n_units": 48,
+      "device_probe": "cuda",
+      "long_context": true,
+      "mean_doc_chars": 1300.1416666666667,
+      "max_doc_chars": 2800,
+      "max_chunks": 6,
+      "max_steps_per_chunk": 560,
+      "method": "hierarchical_chunk_fsot_reservoir_long_context",
+      "tag": "imdb_hier_seed99"
+    },
+    {
+      "dataset": "imdb_50k/IMDB Dataset.csv",
+      "path": "I:\\fsot nuron\\data\\external\\nlp\\imdb_50k\\IMDB Dataset.csv",
+      "n_train": 196,
+      "n_test": 84,
+      "n_classes": 2,
+      "classes": [
+        "NEGATIVE",
+        "POSITIVE"
+      ],
+      "train_acc": 0.6122448979591837,
+      "test_acc": 0.47619047619047616,
+      "balanced_accuracy": 0.4761904761904762,
+      "per_class_recall": {
+        "NEGATIVE": 0.8333333333333334,
+        "POSITIVE": 0.11904761904761904
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 35,
+          "POSITIVE": 7
+        },
+        "POSITIVE": {
+          "NEGATIVE": 37,
+          "POSITIVE": 5
+        }
+      },
+      "encode_seconds": 598.1676688000007,
+      "t_pool": 56,
+      "long_context": true,
+      "mean_doc_chars": 1331.6357142857144,
+      "max_chunks": 4,
+      "max_steps_per_chunk": 360,
+      "n_units": 40,
+      "device_probe": "cuda",
+      "method": "learned_morse_time_attention_fsot_gated_mlp",
+      "tag": "imdb_attention_v2"
+    },
+    {
+      "dataset": "sentiment_tiny/sentiment_analysis.csv",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\sentiment_tiny\\sentiment_analysis.csv",
+      "n_train": 290,
+      "n_test": 124,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 1.0,
+      "test_acc": 0.5806451612903226,
+      "balanced_accuracy": 0.5821428571428572,
+      "per_class_recall": {
+        "NEGATIVE": 0.675,
+        "NEUTRAL": 0.4523809523809524,
+        "POSITIVE": 0.6190476190476191
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 27,
+          "NEUTRAL": 7,
+          "POSITIVE": 6
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 11,
+          "NEUTRAL": 19,
+          "POSITIVE": 12
+        },
+        "POSITIVE": {
+          "NEGATIVE": 4,
+          "NEUTRAL": 12,
+          "POSITIVE": 26
+        }
+      },
+      "encode_seconds": 205.36136219999753,
+      "n_features": 64,
+      "n_units": 40,
+      "device_probe": "cuda",
+      "long_context": false,
+      "mean_doc_chars": 60.22463768115942,
+      "max_doc_chars": 800,
+      "max_chunks": 1,
+      "max_steps_per_chunk": 400,
+      "method": "deep_fsot_gated_mlp_morse_attention_pool",
+      "tag": "sentiment_deep_seed42"
+    },
+    {
+      "dataset": "sentiment_tiny/sentiment_analysis.csv",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\sentiment_tiny\\sentiment_analysis.csv",
+      "n_train": 290,
+      "n_test": 124,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.993103448275862,
+      "test_acc": 0.5564516129032258,
+      "balanced_accuracy": 0.5555555555555555,
+      "per_class_recall": {
+        "NEGATIVE": 0.5,
+        "NEUTRAL": 0.5,
+        "POSITIVE": 0.6666666666666666
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 20,
+          "NEUTRAL": 9,
+          "POSITIVE": 11
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 10,
+          "NEUTRAL": 21,
+          "POSITIVE": 11
+        },
+        "POSITIVE": {
+          "NEGATIVE": 4,
+          "NEUTRAL": 10,
+          "POSITIVE": 28
+        }
+      },
+      "encode_seconds": 204.91241500001343,
+      "n_features": 64,
+      "n_units": 40,
+      "device_probe": "cuda",
+      "long_context": false,
+      "mean_doc_chars": 60.25845410628019,
+      "max_doc_chars": 800,
+      "max_chunks": 1,
+      "max_steps_per_chunk": 400,
+      "method": "deep_fsot_gated_mlp_morse_attention_pool",
+      "tag": "sentiment_deep_seed7"
+    },
+    {
+      "dataset": "sentiment_tiny/sentiment_analysis.csv",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\sentiment_tiny\\sentiment_analysis.csv",
+      "n_train": 290,
+      "n_test": 124,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 1.0,
+      "test_acc": 0.5725806451612904,
+      "balanced_accuracy": 0.5706349206349206,
+      "per_class_recall": {
+        "NEGATIVE": 0.45,
+        "NEUTRAL": 0.5714285714285714,
+        "POSITIVE": 0.6904761904761905
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 18,
+          "NEUTRAL": 12,
+          "POSITIVE": 10
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 12,
+          "NEUTRAL": 24,
+          "POSITIVE": 6
+        },
+        "POSITIVE": {
+          "NEGATIVE": 6,
+          "NEUTRAL": 7,
+          "POSITIVE": 29
+        }
+      },
+      "encode_seconds": 208.93827880000754,
+      "n_features": 64,
+      "n_units": 40,
+      "device_probe": "cuda",
+      "long_context": false,
+      "mean_doc_chars": 60.830917874396135,
+      "max_doc_chars": 800,
+      "max_chunks": 1,
+      "max_steps_per_chunk": 400,
+      "method": "deep_fsot_gated_mlp_morse_attention_pool",
+      "tag": "sentiment_deep_seed99"
+    },
+    {
+      "dataset": "sentiment_tiny/sentiment_analysis.csv",
+      "path": "I:\\fsot nuron\\data\\kaggle_datasets\\sentiment_tiny\\sentiment_analysis.csv",
+      "n_train": 279,
+      "n_test": 120,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.3333333333333333,
+      "test_acc": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "per_class_recall": {
+        "NEGATIVE": 1.0,
+        "NEUTRAL": 0.0,
+        "POSITIVE": 0.0
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 40,
+          "NEUTRAL": 0,
+          "POSITIVE": 0
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 40,
+          "NEUTRAL": 0,
+          "POSITIVE": 0
+        },
+        "POSITIVE": {
+          "NEGATIVE": 40,
+          "NEUTRAL": 0,
+          "POSITIVE": 0
+        }
+      },
+      "encode_seconds": 207.5915501999989,
+      "t_pool": 80,
+      "long_context": false,
+      "mean_doc_chars": 60.59649122807018,
+      "max_chunks": 1,
+      "max_steps_per_chunk": 420,
+      "n_units": 36,
+      "device_probe": "cuda",
+      "method": "learned_morse_time_attention_fsot_gated_mlp",
+      "tag": "sentiment_attention_v2"
+    },
+    {
+      "dataset": "financial_sentiment/data.csv",
+      "path": "I:\\fsot nuron\\data\\external\\nlp\\financial_sentiment\\data.csv",
+      "n_train": 279,
+      "n_test": 120,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.978494623655914,
+      "test_acc": 0.4083333333333333,
+      "balanced_accuracy": 0.4083333333333334,
+      "per_class_recall": {
+        "NEGATIVE": 0.325,
+        "NEUTRAL": 0.5,
+        "POSITIVE": 0.4
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 13,
+          "NEUTRAL": 10,
+          "POSITIVE": 17
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 8,
+          "NEUTRAL": 20,
+          "POSITIVE": 12
+        },
+        "POSITIVE": {
+          "NEGATIVE": 12,
+          "NEUTRAL": 12,
+          "POSITIVE": 16
+        }
+      },
+      "encode_seconds": 229.8600829000061,
+      "n_features": 64,
+      "n_units": 40,
+      "device_probe": "cuda",
+      "long_context": false,
+      "mean_doc_chars": 116.58395989974937,
+      "max_doc_chars": 800,
+      "max_chunks": 1,
+      "max_steps_per_chunk": 400,
+      "method": "deep_fsot_gated_mlp_morse_attention_pool",
+      "tag": "financial_deep"
+    },
+    {
+      "dataset": "financial_sentiment/data.csv",
+      "path": "I:\\fsot nuron\\data\\external\\nlp\\financial_sentiment\\data.csv",
+      "n_train": 252,
+      "n_test": 108,
+      "n_classes": 3,
+      "classes": [
+        "NEGATIVE",
+        "NEUTRAL",
+        "POSITIVE"
+      ],
+      "train_acc": 0.3333333333333333,
+      "test_acc": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "per_class_recall": {
+        "NEGATIVE": 0.0,
+        "NEUTRAL": 0.0,
+        "POSITIVE": 1.0
+      },
+      "confusion": {
+        "NEGATIVE": {
+          "NEGATIVE": 0,
+          "NEUTRAL": 0,
+          "POSITIVE": 36
+        },
+        "NEUTRAL": {
+          "NEGATIVE": 0,
+          "NEUTRAL": 0,
+          "POSITIVE": 36
+        },
+        "POSITIVE": {
+          "NEGATIVE": 0,
+          "NEUTRAL": 0,
+          "POSITIVE": 36
+        }
+      },
+      "encode_seconds": 240.08560869999928,
+      "t_pool": 64,
+      "long_context": false,
+      "mean_doc_chars": 108.93888888888888,
+      "max_chunks": 1,
+      "max_steps_per_chunk": 420,
+      "n_units": 36,
+      "device_probe": "cuda",
+      "method": "learned_morse_time_attention_fsot_gated_mlp",
+      "tag": "financial_attention_v2"
+    },
+    {
+      "method": "multitask_domain_tagged_fsot_probe",
+      "n_train": 377,
+      "n_test": 162,
+      "n_classes": 8,
+      "test_acc": 0.35802469135802467,
+      "balanced_accuracy": 0.33564814814814814,
+      "per_domain_test_acc": {
+        "financial_sentiment": 0.25925925925925924,
+        "sentiment_tiny": 0.2777777777777778,
+        "sms_spam": 0.5370370370370371
+      },
+      "encode_seconds": 382.0422558999999,
+      "device_probe": "cuda",
+      "train_acc": 1.0,
+      "tag": "multitask"
+    }
+  ],
+  "best": {
+    "imdb_hier": 0.6071428571428571,
+    "imdb_attention": 0.47619047619047616,
+    "sentiment_deep": 0.5806451612903226,
+    "sentiment_attention": 0.3333333333333333,
+    "financial_deep": 0.4083333333333333,
+    "financial_attention": 0.3333333333333333,
+    "multitask": 0.35802469135802467,
+    "multitask_per_domain": {
+      "financial_sentiment": 0.25925925925925924,
+      "sentiment_tiny": 0.2777777777777778,
+      "sms_spam": 0.5370370370370371
+    }
+  }
+}
