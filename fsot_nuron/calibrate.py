@@ -50,17 +50,25 @@ def _err_stats(errors: List[float]) -> Dict[str, float]:
 
 def _adapt_step_from_target(R: float, ad: float, n_isi: float = 10.0) -> float:
     """
-    Solve A = ((n-1)·δ) / (2·R + (n-1)·δ) for δ.
-    A = adaptation index, R = base ISI ms, n_isi = intervals in train.
+    Solve A = ((ISI_late - ISI_early) / (ISI_late + ISI_early)) for δ.
+
+    With ISI_k ≈ R + k·δ and early/late thirds of a train of n intervals:
+      early ≈ R + 0.5·k·δ, late ≈ R + (n - 0.5·k)·δ  (k = n/3)
+    A ≈ (late-early)/(late+early) ≈ ((n-k)δ) / (2R + n·δ)
+    => δ = 2 A R / (n(1-A) - k(1+A) + eps)  (clamped)
+    Simplified robust form used in practice:
+      δ = 2 A R / ((n-1)(1-A)) with n matched to expected spikes.
     """
-    A = max(0.0, min(0.5, float(ad)))
+    A = max(0.0, min(0.55, float(ad)))
     R = max(8.0, float(R))
     n1 = max(2.0, n_isi - 1.0)
-    # A*(2R + n1*d) = n1*d  =>  2 A R = n1 d (1-A)  => d = 2 A R / (n1 (1-A))
     if A < 1e-6:
         return 0.0
+    # Slightly stronger than pure mid-train formula to compensate AHP decay
+    # and early/late third averaging (empirical factor ~1.15 on cortical FI).
     d = (2.0 * A * R) / (n1 * (1.0 - A) + 1e-9)
-    return float(max(0.0, min(8.0, d)))
+    d *= 1.12
+    return float(max(0.0, min(10.0, d)))
 
 
 def analytical_lock(
@@ -117,8 +125,8 @@ def calibrate_batch(
     if grade == "fsot":
         isi_tol = min(isi_tol, 0.005)
         adapt_tol = min(adapt_tol, 0.02)
-        steps = max(steps, 1000)
-        max_iters = max(max_iters, 4)
+        steps = max(steps, 1200)
+        max_iters = max(max_iters, 8)
 
     op = OperatingMode.parse(mode)
     isi_scale = 1.0 if op is OperatingMode.BIO_MATCH else 1.0 / 3.0
@@ -186,33 +194,48 @@ def calibrate_batch(
                 new_ref[b] = max(4.0, min(200.0, float(new_ref[b].item()) * fac))
             if ad_sim == ad_sim:
                 if abs(ad_sim) < 1e-5 and abs(ta) > 0.005:
-                    sfac = 1.8
+                    sfac = 2.2
                 else:
+                    # signed: if sim adapt too high, reduce step; too low, raise
                     sfac = abs(ta) / max(abs(ad_sim), 1e-4)
-                sfac = 1.0 + 0.85 * (sfac - 1.0)
-                sfac = max(0.4, min(2.5, sfac))
-                new_step[b] = max(0.0, min(8.0, float(new_step[b].item()) * sfac))
+                    if (ad_sim > 0 and ta > 0) or (ad_sim < 0 and ta < 0):
+                        sfac = ta / (ad_sim + 1e-6) if abs(ad_sim) > 1e-5 else sfac
+                sfac = 1.0 + 0.92 * (sfac - 1.0)
+                sfac = max(0.35, min(3.0, sfac))
+                new_step[b] = max(0.0, min(10.0, float(new_step[b].item()) * sfac))
         net.ref_steps = new_ref.round().to(torch.int32)
         net.adapt_step = new_step
 
-    # Population mean snap — FSOT-grade lock on sample means (Allen cross-ref)
+    # Population mean snap — up to 3 alternating ISI/adapt corrections
     pop_tgt_isi = sum(targets_isi) / len(targets_isi)
     pop_tgt_ad = sum(targets_ad) / len(targets_ad)
-    rows = _per_unit_metrics(net, steps=steps)
-    pop_isi = sum(r["isi"] for r in rows if r["isi"] == r["isi"]) / max(
-        1, sum(1 for r in rows if r["isi"] == r["isi"])
-    )
-    pop_ad = sum(r["adapt"] for r in rows if r["adapt"] == r["adapt"]) / max(
-        1, sum(1 for r in rows if r["adapt"] == r["adapt"])
-    )
-    if pop_isi == pop_isi and pop_isi > 1:
-        fac = pop_tgt_isi / pop_isi
-        fac = max(0.92, min(1.08, fac))
-        net.ref_steps = (net.ref_steps.float() * fac).round().clamp(4, 200).to(torch.int32)
-    if pop_ad == pop_ad and abs(pop_ad) > 1e-6 and abs(pop_tgt_ad) > 1e-6:
-        sfac = abs(pop_tgt_ad) / abs(pop_ad)
-        sfac = max(0.7, min(1.5, sfac))
-        net.adapt_step = (net.adapt_step * sfac).clamp(0.0, 8.0)
+    for _snap in range(3):
+        rows = _per_unit_metrics(net, steps=steps)
+        pop_isi = sum(r["isi"] for r in rows if r["isi"] == r["isi"]) / max(
+            1, sum(1 for r in rows if r["isi"] == r["isi"])
+        )
+        pop_ad = sum(r["adapt"] for r in rows if r["adapt"] == r["adapt"]) / max(
+            1, sum(1 for r in rows if r["adapt"] == r["adapt"])
+        )
+        isi_ok = pop_isi == pop_isi and abs(pop_isi - pop_tgt_isi) / pop_tgt_isi <= 0.015
+        ad_ok = (
+            pop_ad == pop_ad
+            and abs(pop_tgt_ad) > 1e-9
+            and abs(pop_ad - pop_tgt_ad) / abs(pop_tgt_ad) <= 0.08
+        )
+        if isi_ok and ad_ok:
+            break
+        if pop_isi == pop_isi and pop_isi > 1 and not isi_ok:
+            fac = pop_tgt_isi / pop_isi
+            fac = max(0.90, min(1.12, fac))
+            net.ref_steps = (net.ref_steps.float() * fac).round().clamp(4, 200).to(torch.int32)
+        if pop_ad == pop_ad and abs(pop_tgt_ad) > 1e-6:
+            if abs(pop_ad) < 1e-5:
+                sfac = 1.6
+            else:
+                sfac = pop_tgt_ad / (pop_ad + 1e-9)
+            sfac = max(0.55, min(2.2, float(sfac)))
+            net.adapt_step = (net.adapt_step * sfac).clamp(0.0, 10.0)
 
     # Final measure after snap
     rows = _per_unit_metrics(net, steps=steps)
@@ -250,11 +273,11 @@ def calibrate_batch(
         pop_isi_err == pop_isi_err
         and pop_isi_err <= max(isi_tol * 2, 0.01)
         and pop_ad_err == pop_ad_err
-        and pop_ad_err <= max(adapt_tol * 2.5, 0.05)
+        and pop_ad_err <= max(adapt_tol * 2.0, 0.04)
     )
     med_ok = (
         isi_stats.get("median", 9) <= max(isi_tol * 4, 0.03)
-        and ad_stats.get("median", 9) <= max(adapt_tol * 5, 0.15)
+        and ad_stats.get("median", 9) <= max(adapt_tol * 4, 0.10)
     )
     return {
         "ok": True,

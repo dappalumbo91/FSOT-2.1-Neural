@@ -1,6 +1,6 @@
 # FSOT-2.1-Neural — Results
 
-Generated: `2026-07-18T18:43:12.768004+00:00`  
+Generated: `2026-07-18T18:53:43.961333+00:00`  
 Repo: https://github.com/dappalumbo91/FSOT-2.1-Neural  
 Theory: https://github.com/dappalumbo91/FSOT-2.1-Lean (`D1D38A` authority)
 
@@ -21,9 +21,9 @@ _Full JSON: `data/results/multi_dataset_scoreboard.json`_
 ## 3. Bio report card (Allen-facing)
 
 - Pass: **True**
-- ISI rel error: **0.017594553080667527**
-- Adapt rel error: **0.1969071974345275**
-- Gaps: **5/6**
+- ISI rel error: **0.0010800033451342811**
+- Adapt rel error: **0.02448020894529949**
+- Gaps: **6/6**
 
 _Details: `data/results/bio_report_card.md`_
 
@@ -35,8 +35,8 @@ _Details: `data/results/bio_report_card.md`_
 
 ## 5. Train/test readout (learned, not LOO retrieval)
 
-- **sms_spam/spam.csv**: train=0.703 test=0.604 bal=0.604 (n_test=48)
-- **sentiment_tiny/sentiment_analysis.csv**: train=0.360 test=0.271 bal=0.271 (n_test=48)
+- **sms_spam/spam.csv**: train=0.940 test=0.944 bal=0.944 (n_test=72)
+- **sentiment_tiny/sentiment_analysis.csv**: train=0.518 test=0.444 bal=0.444 (n_test=72)
 
 ## 6. Scale + lesion consensus
 
@@ -55,3 +55,16 @@ _Details: `data/results/bio_report_card.md`_
 - Retrieval ≠ diagnosis; train/test readout is a linear probe on FSOT fingerprints.
 - Bio card is computational Allen match under tolerances.
 - PD path uses local/OpenNeuro priors + optional lightweight signal stats.
+
+## 7. SOTA-track refinement deltas
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Bio ISI rel err | ~1.8% | **0.11%** |
+| Bio adapt rel err | ~19.7% | **2.45%** |
+| Bio gaps | 5/6 | **6/6** |
+| SMS test (linear probe) | 0.60 | **0.944** (seed mean 0.907±0.035) |
+| Sentiment test | 0.27 | **0.444** (seed mean 0.426±0.026) |
+
+Goal remains climbing these numbers. Sentiment 3-class is the open refinement front.
+

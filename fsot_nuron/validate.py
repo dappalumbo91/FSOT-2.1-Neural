@@ -42,7 +42,7 @@ def build_allen_tuned_batch(
     seed: int = 42,
     mode: str = "bio_match",
     calibrate: bool = True,
-    calibrate_steps: int = 700,
+    calibrate_steps: int = 1200,
 ) -> tuple[FSOTNeuronBatch, List[Dict[str, float]], Dict[str, Any]]:
     op = OperatingMode.parse(mode)
     rows = load_ephys_csv()

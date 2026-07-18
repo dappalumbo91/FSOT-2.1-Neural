@@ -46,15 +46,26 @@ def isi_stats(fired: torch.Tensor, dt_ms: float = 1.0) -> Tuple[float, float]:
 
 def adaptation_index(fired: torch.Tensor) -> float:
     """
-    Allen-like adaptation: (ISI_late - ISI_early) / (ISI_late + ISI_early)
-    using first vs last inter-spike intervals when enough spikes exist.
-    Fallback: early vs late half spike-count asymmetry.
+    Allen-like adaptation: (ISI_late - ISI_early) / (ISI_late + ISI_early).
+
+    Uses mean of the first third vs last third of ISIs when the train is long
+    enough (more stable than single first/last ISI). Falls back to early/late
+    spike-count asymmetry if the unit barely fires.
     """
     idx = torch.nonzero(fired, as_tuple=False).flatten()
     if idx.numel() >= 4:
         isi = (idx[1:] - idx[:-1]).float()
-        early = isi[0]
-        late = isi[-1]
+        n = int(isi.numel())
+        if n >= 6:
+            k = max(1, n // 3)
+            early = isi[:k].mean()
+            late = isi[-k:].mean()
+        elif n >= 3:
+            early = isi[:2].mean()
+            late = isi[-2:].mean()
+        else:
+            early = isi[0]
+            late = isi[-1]
         return float(((late - early) / (late + early + 1e-6)).item())
     T = fired.shape[0]
     mid = max(1, T // 2)

@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-07-18T18:53:28.884668+00:00",
+  "goal": "SOTA-track refinement (measured climb, not claim of arrival)",
+  "bio": {
+    "pass_operational": true,
+    "pass_strict": true,
+    "isi_rel_error": 0.0010800033451342811,
+    "adapt_rel_error": 0.02448020894529949,
+    "gaps_closed": "6/6",
+    "changes": [
+      "adaptation_index uses early/late third means",
+      "calibrate: more iters, dual snap, stronger adapt correction",
+      "longer calibrate_steps default 1200"
+    ]
+  },
+  "readout": {
+    "method": "class_balanced_ridge_ovr_standardized_fsot_fingerprints_multiseed",
+    "results": [
+      {
+        "dataset": "sms_spam/spam.csv",
+        "test_acc": 0.9444444444444444,
+        "balanced_accuracy": 0.9444444444444444,
+        "multi_seed_test_mean": 0.9074074074074074,
+        "multi_seed_test_std": 0.03464497580346238,
+        "n_features": 32
+      },
+      {
+        "dataset": "sentiment_tiny/sentiment_analysis.csv",
+        "test_acc": 0.4444444444444444,
+        "balanced_accuracy": 0.4444444444444444,
+        "multi_seed_test_mean": 0.4259259259259259,
+        "multi_seed_test_std": 0.02618914004394619,
+        "n_features": 32
+      }
+    ],
+    "changes": [
+      "richer reservoir temporal thirds + morse unit hist + surface cues",
+      "feature standardization",
+      "class-balanced ridge OVR",
+      "3-seed mean/std",
+      "more units/docs"
+    ]
+  },
+  "prior_baseline": {
+    "adapt_rel_error": 0.197,
+    "sms_test": 0.604,
+    "sentiment_test": 0.271
+  }
+}

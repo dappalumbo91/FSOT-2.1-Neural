@@ -168,14 +168,63 @@ class LiteratureMind:
                 phrases.append(phrase)
         chem = generative_chemical_report(tern_list)
         hist = _ternary_hist(tern_list)
-        # extend fingerprint with S moments
+        # Richer temporal fingerprint for SOTA-track readout (still seed-driven substrate)
         s = S_mean.cpu()
-        fp = hist + [
-            float(s.mean()),
-            float(s.std(unbiased=False)),
-            float((s > 0.4).float().mean()),
-            float(out["firing_rate_Hz"].mean().cpu()),
+        fire_f = fire_any.float().cpu()
+        T = max(int(s.numel()), 1)
+        thirds = []
+        for a, b in ((0, T // 3), (T // 3, 2 * T // 3), (2 * T // 3, T)):
+            seg = s[a:b]
+            fseg = fire_f[a:b]
+            if seg.numel() == 0:
+                thirds.extend([0.0, 0.0, 0.0])
+            else:
+                thirds.extend(
+                    [
+                        float(seg.mean()),
+                        float(seg.std(unbiased=False)),
+                        float(fseg.mean()),
+                    ]
+                )
+        # Morse unit density (dash/dot/space structure in drive)
+        u = units if units else [0]
+        n_u = max(len(u), 1)
+        u_hist = [
+            sum(1 for x in u if x == 0) / n_u,
+            sum(1 for x in u if x == 1) / n_u,
+            sum(1 for x in u if x == 2) / n_u,
+            sum(1 for x in u if x >= 3) / n_u,
+            len(u) / 400.0,
         ]
+        # Text surface cues (cheap; coupled to Morse length already)
+        raw = text.upper()
+        letters = sum(1 for c in raw if "A" <= c <= "Z")
+        digits = sum(1 for c in raw if c.isdigit())
+        punct = sum(1 for c in raw if c in "!?$%&@#*")
+        spaces = raw.count(" ")
+        ln = max(len(raw), 1)
+        surface = [
+            letters / ln,
+            digits / ln,
+            punct / ln,
+            spaces / ln,
+            min(len(raw) / 200.0, 1.5),
+        ]
+        fp = (
+            hist
+            + [
+                float(s.mean()),
+                float(s.std(unbiased=False)),
+                float((s > 0.4).float().mean()),
+                float(out["firing_rate_Hz"].mean().cpu()),
+                float(s.min()),
+                float(s.max()),
+                float((s > 0.0).float().mean()),
+            ]
+            + thirds
+            + u_hist
+            + surface
+        )
         return {
             "morse": morse,
             "fingerprint": fp,

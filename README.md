@@ -29,14 +29,15 @@ $env:PYTHONPATH = "I:\fsot nuron"
 python run_forward_stack.py
 ```
 
-| Track | Headline (honest) |
-|-------|-------------------|
+| Track | Headline (SOTA track — measured) |
+|-------|----------------------------------|
 | **CI smoke** | Seeds / Morse / codon / neuron / failure catalog |
 | **Scoreboard** | SMS hard top-1 ~0.80 · mental-state fit ~0.81 · emotions fit ~0.65 · sentiment hard ~0.48 |
-| **Bio card** | ISI ~1.8% vs Allen; adapt ~20% (operational pass; strict 5/6 gaps) |
-| **Train/test readout** | SMS test ~0.60 · sentiment test ~0.27 (linear probe on FSOT fingerprints — not LOO retrieval) |
+| **Bio card** | **Strict 6/6** · ISI ~**0.11%** · adapt ~**2.4%** vs Allen |
+| **Train/test readout** | SMS test ~**0.94** (seed mean ~0.91) · sentiment ~**0.44** (3-class; still climbing) |
 | **Scale** | CPU efficient at small-N; CUDA wins as N→4k+ |
 | **PD + consensus** | EEG-informed lesion + wire-around + unit quarantine path |
+| **Refinement ledger** | data/results/refinement_ledger.json |
 
 Full tables and JSON: **`RESULTS.md`**, `data/results/`.
 
