@@ -4,10 +4,10 @@
   "lean_hub": "I:\\FSOT-Physical-Archive\\02_FSOT-2.1-Lean-Full",
   "manifest_ok": true,
   "compute_path": "I:\\FSOT-Physical-Archive\\02_FSOT-2.1-Lean-Full\\vendor\\fsot_compute.py",
-  "compute_sha256": "B0DBDB66E9201411D1A5D54FC810553D4F9A66D5E903A2EA5161364097CD9768",
+  "compute_sha256": "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70",
   "cert_authority_sha256": "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70",
-  "compute_matches_certificate": false,
-  "compute_matches_disk_note": "DRIFT: disk=B0DBDB66E920\u2026 cert=D1D38A185487\u2026 Re-pin compute or regenerate certificate before claim-sensitive theory runs.",
+  "compute_matches_certificate": true,
+  "compute_matches_disk_note": "vendor/fsot_compute.py matches certificate authority hash.",
   "lean_build_ok": true,
   "sorry_count_formal": 0,
   "n_proved_claims": 65,
@@ -27,15 +27,13 @@
   "github_theory": "https://github.com/dappalumbo91/FSOT-2.1-Lean",
   "github_neural": "https://github.com/dappalumbo91/FSOT-2.1-Neural",
   "snapshot_written": null,
-  "generated_at": "2026-07-18T17:22:42.431308+00:00",
+  "generated_at": "2026-07-18T17:28:37.395140+00:00",
   "notes": [
     "Local SEEDS match archive closed-form (float64).",
     "manifest.canonical_lean_hub=I:/FSOT-Physical-Archive/02_FSOT-2.1-Lean-Full",
     "I:/FSOT-Physical-Archive is the definitive independent master. GitHub is synced FROM here only. C: Desktop is a deprecated read-only mirror.",
     "certificate generated_at=2026-07-13T04:15:43.263517+00:00",
-    "DRIFT: disk=B0DBDB66E920\u2026 cert=D1D38A185487\u2026 Re-pin compute or regenerate certificate before claim-sensitive theory runs.",
-    "cross_proof generated_at=2026-07-16T17:33:14.691886+00:00",
-    "Archive is linked but compute hash drifts from certificate \u2014 neural substrate still uses closed-form seeds (OK); theory claims need re-pin."
+    "cross_proof generated_at=2026-07-16T17:33:14.691886+00:00"
   ],
   "certificate_excerpt": {
     "generated_at": "2026-07-13T04:15:43.263517+00:00",
