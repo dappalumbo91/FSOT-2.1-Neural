@@ -251,6 +251,11 @@ def main() -> int:
     ap.add_argument("--steps", type=int, default=800)
     ap.add_argument("--device", type=str, default="cpu")
     ap.add_argument("--obsidian", action="store_true", help="Write local Obsidian vault")
+    ap.add_argument(
+        "--sensory",
+        action="store_true",
+        help="Inject vision + system-metric interoception (trinary edge quantize)",
+    )
     ap.add_argument("--vault-name", type=str, default="FSOT_Brain_Design")
     args = ap.parse_args()
 
@@ -262,14 +267,25 @@ def main() -> int:
     print("=== FSOT Brain Design — multi-region genetic architecture ===")
     print("path: codon → cell types → microcircuit → regions → projections")
     print("doctrine: mechanism fidelity + computer-native efficiency (not 86B units)")
+    print("substrate destination: trinary bare metal (not permanent binary ontology)")
     print(f"profile: {args.profile}")
+    print(f"sensory: {args.sensory}")
     print("offline dynamics: local torch only")
 
     pin = pin_archive(write_snapshot=False)
     print(f"archive pin seed_ok: {pin.seed_match_ok}")
 
+    from fsot_nuron.trinary_substrate import self_test as trit_self_test
+
+    trit = trit_self_test()
+    print(f"trinary_substrate_ok: {trit.get('ok')} ATG={trit.get('sample_ATG')}")
+
     suite = run_brain_design_suite(
-        steps=args.steps, device=args.device, scale=args.scale, profile=args.profile
+        steps=args.steps,
+        device=args.device,
+        scale=args.scale,
+        profile=args.profile,
+        sensory=args.sensory,
     )
     brain = suite["brain"]
     st = suite["structure"]
@@ -297,6 +313,14 @@ def main() -> int:
     print(f"  by region:  { {k: round(v, 2) for k, v in dyn['rate_by_region'].items()} }")
     print(f"  by type:    { {k: round(v, 2) for k, v in dyn['rate_by_cell_type'].items()} }")
 
+    print("\n--- Sensory ---")
+    sm = suite.get("sensory") or {}
+    print(f"  enabled:     {sm.get('enabled')}")
+    if sm.get("enabled"):
+        print(f"  injections:  {sm.get('injections')}")
+        print(f"  modalities:  {sm.get('modalities')}")
+        print(f"  trinary edge:{sm.get('trinary_edge')}")
+
     print("\n--- Gates ---")
     for k, v in gates.items():
         print(f"  {k}: {v}")
@@ -310,6 +334,9 @@ def main() -> int:
         "formulas_ref": suite.get("formulas_ref"),
         "thesis_ref": suite.get("thesis_ref"),
         "efficiency_ref": suite.get("efficiency_ref"),
+        "trinary_ref": suite.get("trinary_ref"),
+        "sensory": sm,
+        "trinary_substrate": trit,
         "pin_seed_ok": pin.seed_match_ok,
         "structure": st,
         "dynamics": dyn,
@@ -327,8 +354,10 @@ def main() -> int:
             "mean_rate_Hz": dyn["mean_rate_Hz"],
             "n_synapses": st["n_synapses"],
             "isi_scale": suite.get("isi_scale"),
+            "sensory_injections": sm.get("injections"),
         },
-        notes="multi-region FSOT brain; efficiency doctrine active",
+        notes="multi-region FSOT brain; trinary bare-metal destination; efficiency doctrine",
+        extra={"trinary_ref": "docs/TRINARY_BARE_METAL.md"},
     )
     # drop non-serializable
     ARTIFACTS.mkdir(parents=True, exist_ok=True)

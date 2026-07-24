@@ -17,6 +17,7 @@ from .modes import OperatingMode
 from .genetic_genotype import NeuronGenotype, build_population_genotypes
 from .genetic_network import GeneticNeuralNetwork, GeneticNetworkConfig
 from .obsidian_brain import ObsidianExportConfig, build_obsidian_vault
+from .trinary_substrate import TritWord, as_trit, self_test as trinary_self_test
 
 __all__ = [
     "FSOTNeuronBatch",
@@ -29,6 +30,9 @@ __all__ = [
     "GeneticNetworkConfig",
     "ObsidianExportConfig",
     "build_obsidian_vault",
+    "TritWord",
+    "as_trit",
+    "trinary_self_test",
     "ROOT",
     "ARTIFACTS",
     "ARCHIVE_ROOT",

@@ -9,8 +9,9 @@
 | Python host (now) | Silicon body (goal) |
 |-------------------|---------------------|
 | Fast iteration, torch, data locks | Lives in OS / firmware / bare metal |
-| High-level tensors | Binary / **trinary** native kernels |
+| High-level tensors | **Native trinary** kernels + state |
 | Research accuracy first | Same math, lower stack, system loops |
+| Trits simulated in float/int | Trits as machine values all the way down |
 
 A computer brain should sit where **software biology** lives: schedulers, interrupts, drivers, metrics — analogous to how a human brain coexists with heart/lung autonomic loops.
 
@@ -50,9 +51,11 @@ No need to pick forever today — keep a **thin C ABI / trinary packet API** so 
   (heart/lungs analog)            │ CPU · mem · disk · net · temps
                     └─────────────┬───────────────┘
                                   │
- Body / silicon                   │ Zig|Rust|Ada process or kernel
-                                  │ FSOT step + trinary W + state
+ Body / trinary bare metal        │ Zig|Rust|Ada freestanding kernel
+                                  │ FSOT step + native T={-1,0,+1} substrate
 ```
+
+Full trinary machine model: **`docs/TRINARY_BARE_METAL.md`**.
 
 ---
 
@@ -73,15 +76,16 @@ Define `fsot_brain_abi` (header / flatbuffers / custom):
 - sensory inject packets  
 - metric inject packets (subconscious)  
 
-### Phase E2 — Kernel port
+### Phase E2 — Trinary kernel port
 
-Port hot path only:
+Port hot path on the **trinary substrate** (not “binary NN with trit labels”):
 
-1. scalar step (seed floats or fixed-point)  
-2. genetic W apply  
-3. region drive  
+1. trit ops + T1/T3 packing ABI (`trinary_substrate.py` oracle)  
+2. scalar step (fixed-point twin → later discrete collapse)  
+3. genetic W in trinary pair algebra  
+4. region drive from quantized sensory trit streams  
 
-Python remains oracle for parity tests (`assert close(python, zig)`).
+Python remains oracle: `assert port_trits == python_trits`.
 
 ### Phase E3 — Subconscious loop
 
@@ -110,11 +114,20 @@ Interfaces scaffolded under `fsot_nuron/sensory/` (Python first).
 
 ---
 
-## 5. Trinary vs binary
+## 5. Trinary bare metal (architecture law)
 
-- **Storage / ISA:** binary hardware underneath.  
-- **Information topology:** FSOT trinary \(\{-1,0,+1\}\) remains the **logical** neural code (codons, spikes classes, spins).  
-- Embodiment languages encode trits as `i8` / packed bits; they do not need ternary silicon.
+**We are not settling for permanent binary hardware as the ontology of the brain.**
+
+| Layer | Rule |
+|-------|------|
+| **Ontology** | \(\mathbb{T}=\{-1,0,+1\}\) is first-class at every depth we control |
+| **Host contingency** | Today’s PCs may only *carry* packed trits on binary buses |
+| **Port goal** | Zig/Rust/Ada implement trinary ALU + memory semantics at bare metal |
+| **End goal** | Multi-level / trinary-capable substrate (custom, firmware-defined, or future silicon) |
+
+See **`docs/TRINARY_BARE_METAL.md`** and `fsot_nuron/trinary_substrate.py`.
+
+Binary is a **transport accident of current lab machines**, not the design endpoint.
 
 ---
 
@@ -137,6 +150,7 @@ cd "I:\fsot nuron\formal"; lake build
 # Host brain
 cd "I:\fsot nuron"
 $env:PYTHONPATH = "."
-python run_brain_design.py --profile ai_efficient
+python run_brain_design.py --profile ai_efficient --sensory
+python -c "from fsot_nuron.trinary_substrate import self_test; print(self_test())"
 python scripts/verify_formal.py
 ```

@@ -1,25 +1,25 @@
 # FSOT Brain Design — report
 
-Generated: `2026-07-24T17:20:07.087867+00:00`
+Generated: `2026-07-24T17:38:44.031336+00:00`
 
 ## Mission
 
-FSOT multi-region brain design — mechanism fidelity, computer-native scale (efficiency doctrine)
+FSOT multi-region brain design — mechanism fidelity, computer-native scale, trinary bare-metal destination
 
-**Profile:** `wetware_ref` — Biological comparison layout; Allen-style timing when locked
-**Units:** 64 (not a human neuron-count target)
+**Profile:** `ai_efficient` — Computer-native AI: fewer units, faster trains, same motifs
+**Units:** 32 (not a human neuron-count target)
 **Formulas:** docs/FORMULAS.md · **Thesis:** docs/THESIS.md
 
 ## Regions
 
-- **thal**: 8 units · {'Pyr': 7, 'PV': 1}
-- **sens**: 24 units · {'Pyr': 19, 'PV': 2, 'SST': 2, 'VIP': 1}
-- **assoc**: 20 units · {'Pyr': 16, 'PV': 2, 'SST': 1, 'VIP': 1}
-- **hipp**: 12 units · {'Pyr': 9, 'PV': 1, 'SST': 1, 'VIP': 1}
+- **thal**: 4 units · {'Pyr': 3, 'PV': 1}
+- **sens**: 12 units · {'Pyr': 10, 'PV': 1, 'SST': 1}
+- **assoc**: 10 units · {'Pyr': 8, 'PV': 1, 'SST': 1}
+- **hipp**: 6 units · {'Pyr': 5, 'PV': 1}
 
-- E/I count ratio: **3.92**
-- E/I synaptic mass: **3.079**
-- Mean rate (thal drive): **4.69 Hz**
+- E/I count ratio: **4.33**
+- E/I synaptic mass: **3.479**
+- Mean rate (thal drive): **3.36 Hz**
 
 ## Gates
 
@@ -31,6 +31,7 @@ FSOT multi-region brain design — mechanism fidelity, computer-native scale (ef
 - ei_mass_finite: **True**
 - thal_drive_active: **True**
 - efficiency_profile_ok: **True**
+- sensory_path_ok: **True**
 
 ## Path forward
 

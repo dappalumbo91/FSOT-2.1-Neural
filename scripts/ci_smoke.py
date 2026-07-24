@@ -141,7 +141,15 @@ def main() -> int:
     else:
         print("formal_lean_ok: skipped (lake not installed)")
 
-    # 9) Morse remains optional secondary gate (do not fail CI if missing)
+    # 9) Trinary substrate oracle (bare-metal port contract)
+    from fsot_nuron.trinary_substrate import self_test as trit_self_test
+
+    tr = trit_self_test()
+    print(f"trinary_substrate_ok: {tr.get('ok')} errors={tr.get('errors')}")
+    if not tr.get("ok"):
+        errors.append(f"trinary substrate: {tr.get('errors')}")
+
+    # 10) Morse remains optional secondary gate (do not fail CI if missing)
     try:
         from fsot_nuron.morse_itu import verify_morse_tables
 
