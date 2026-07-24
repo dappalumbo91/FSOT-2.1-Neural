@@ -31,8 +31,9 @@ if (-not $qemu) {
     exit 0
 }
 
-$serialLog = Join-Path $PSScriptRoot "qemu_serial.log"
-$errLog = Join-Path $PSScriptRoot "qemu_err.log"
+# Use TEMP paths so spaces in project path do not break QEMU -serial file:
+$serialLog = Join-Path $env:TEMP "fsot_trit_qemu_serial.log"
+$errLog = Join-Path $env:TEMP "fsot_trit_qemu_err.log"
 Remove-Item $serialLog, $errLog -ErrorAction SilentlyContinue
 
 Write-Host "=== QEMU (serial log, ~3s) ==="
