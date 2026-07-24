@@ -107,19 +107,23 @@ def main() -> int:
     for k in sorted(sim_rate.keys()):
         print(f"  {k:4} rate={sim_rate[k]:6.2f} Hz  ISI={sim_isi.get(k, float('nan')):6.2f} ms  n={len(by_type[k])}")
 
-    # Biological order gates on simulation
+    # relative rate error vs wet-lab class means (when both exist)
+    rel = {}
+    for k in ("Pyr", "PV", "SST", "VIP"):
+        if k in targets and k in sim_rate and targets[k].mean_rate_Hz > 1:
+            rel[k] = abs(sim_rate[k] - targets[k].mean_rate_Hz) / targets[k].mean_rate_Hz
+
+    # Biological order + absolute fidelity gates (bio first, performance later)
     sim_gates = {
         "sim_pv_rate_gt_pyr": sim_rate.get("PV", 0) > sim_rate.get("Pyr", 1e9),
         "sim_pv_isi_lt_pyr": sim_isi.get("PV", 1e9) < sim_isi.get("Pyr", 0),
         "wet_lab_pv_faster_than_pyr": bool(wet_gates.get("pv_rate_gt_pyr")),
         "has_pv_target": "PV" in targets,
         "has_pyr_target": "Pyr" in targets,
+        # Absolute wet-lab rate fidelity (relaxed bands while we climb)
+        "pv_rate_within_35pct": rel.get("PV", 1.0) <= 0.35,
+        "pyr_rate_within_35pct": rel.get("Pyr", 1.0) <= 0.35,
     }
-    # relative rate error vs wet-lab class means (when both exist)
-    rel = {}
-    for k in ("Pyr", "PV", "SST", "VIP"):
-        if k in targets and k in sim_rate and targets[k].mean_rate_Hz > 1:
-            rel[k] = abs(sim_rate[k] - targets[k].mean_rate_Hz) / targets[k].mean_rate_Hz
 
     print("\n--- Gates ---")
     for k, v in sim_gates.items():
@@ -176,12 +180,33 @@ def main() -> int:
     (res / "CLASS_EPHYS.md").write_text("\n".join(md), encoding="utf-8")
     print(f"\nWrote {res / 'CLASS_EPHYS.md'}")
 
+    # Learning-band proxies (model-Hz; independent of silicon wall-clock)
+    from fsot_nuron.learning_bands import band_powers_from_fired, encoding_vs_rest_report
+
+    bands_fi = band_powers_from_fired(hist["fired"])
+    net.reset()
+    hist_rest = net.run(600, stimulus_pattern="rest", record=True)
+    sme = encoding_vs_rest_report(hist["fired"], hist_rest["fired"])
+    print("\n--- Learning band proxies (model-Hz, not wall-clock) ---")
+    print(f"  FI theta_rel={bands_fi.get('theta_rel'):.4f} gamma_rel={bands_fi.get('gamma_rel'):.4f}")
+    print(f"  SME-style theta_encode>rest: {sme.get('theta_encode_gt_rest')} gamma: {sme.get('gamma_encode_gt_rest')}")
+
     record_run(
         "class_ephys_allen",
         profile="bio_match_class_lock",
         gates=sim_gates,
-        metrics={"sim_rate": sim_rate, "sim_isi": sim_isi, "rate_rel_err": rel, "targets_n": {k: v.n_cells for k, v in targets.items()}},
-        notes="Allen Cre-line wet-lab class lock; PV vs Pyr order",
+        metrics={
+            "sim_rate": sim_rate,
+            "sim_isi": sim_isi,
+            "rate_rel_err": rel,
+            "targets_n": {k: v.n_cells for k, v in targets.items()},
+            "bands_fi": bands_fi,
+            "sme_directional": {
+                "theta": sme.get("theta_encode_gt_rest"),
+                "gamma": sme.get("gamma_encode_gt_rest"),
+            },
+        },
+        notes="Allen Cre-line wet-lab class lock; PV rate within 35%; learning band proxies",
     )
 
     ok = all(
@@ -191,9 +216,11 @@ def main() -> int:
             sim_gates.get("wet_lab_pv_faster_than_pyr"),
             sim_gates.get("sim_pv_rate_gt_pyr"),
             sim_gates.get("sim_pv_isi_lt_pyr"),
+            sim_gates.get("pv_rate_within_35pct"),
+            sim_gates.get("pyr_rate_within_35pct"),
         ]
     )
-    print("\nPASS" if ok else "\nFAIL (class order / data)")
+    print("\nPASS" if ok else "\nFAIL (class order / absolute wet-lab rate fidelity)")
     return 0 if ok else 1
 
 

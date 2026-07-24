@@ -4,6 +4,21 @@
 
 ---
 
+## 0. Biological time vs computer GHz (important)
+
+| | Biological / model time | Silicon wall-clock |
+|--|-------------------------|---------------------|
+| Unit | 1 step = 1 ms of *simulated* neuron time | real milliseconds on CPU/QEMU |
+| Rate “80 Hz” | 80 spikes per **model** second | how fast we *simulate* that second |
+| Bare metal | Does **not** rewrite biology | Runs the same protocol faster |
+
+If PV is wrong vs Allen, fix **phenotype lock to wet-lab ms/Hz**, not “slow the computer down.”  
+Performance tweaks (`efficient` mode, Zig speed) come **after** `bio_match` fidelity.
+
+Learning-band targets (theta/gamma, etc.): **`docs/LEARNING_ALIGNMENT.md`**.
+
+---
+
 ## 1. The confusing phrase (and the fix)
 
 When docs said **“not wet-lab identity”**, that did **not** mean:

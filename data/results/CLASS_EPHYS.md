@@ -1,6 +1,6 @@
 # Class ephys — Allen wet-lab → FSOT
 
-Generated: `2026-07-24T18:04:22.226972+00:00`
+Generated: `2026-07-24T18:14:16.217965+00:00`
 
 ## Wet-lab targets (mouse Cre lines)
 
@@ -11,10 +11,10 @@ Generated: `2026-07-24T18:04:22.226972+00:00`
 
 ## Simulation (class-locked FI)
 
-- **PV**: rate 29.2 Hz, ISI 31.8 ms
-- **Pyr**: rate 10.8 Hz, ISI 90.3 ms
-- **SST**: rate 12.5 Hz, ISI 76.0 ms
-- **VIP**: rate 15.0 Hz, ISI 61.8 ms
+- **PV**: rate 76.7 Hz, ISI 12.0 ms
+- **Pyr**: rate 12.5 Hz, ISI 76.4 ms
+- **SST**: rate 15.8 Hz, ISI 58.0 ms
+- **VIP**: rate 18.3 Hz, ISI 50.9 ms
 
 ## Gates
 
@@ -23,5 +23,7 @@ Generated: `2026-07-24T18:04:22.226972+00:00`
 - `wet_lab_pv_faster_than_pyr`: **True**
 - `has_pv_target`: **True**
 - `has_pyr_target`: **True**
+- `pv_rate_within_35pct`: **True**
+- `pyr_rate_within_35pct`: **True**
 
 See `docs/BIO_ACCURACY.md` for how we use wet-lab data without owning a lab.

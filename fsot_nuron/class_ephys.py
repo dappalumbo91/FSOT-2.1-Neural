@@ -174,36 +174,49 @@ def apply_class_targets_to_genotype_phenotype(
 ) -> Dict[str, float]:
     """
     Snap refractory / adapt_step / fi toward wet-lab class means.
-    Scalar law unchanged; timing phenotype locked to Allen class stats.
+
+    Primary lock for FI rate match uses Allen mean_rate_Hz → ISI_eff = 1000/rate
+    (Allen avg_isi and avg_firing_rate can disagree across protocols; rate is
+    the operational FI target). Scalar law unchanged.
     """
     ph = dict(phenotype)
     t = targets.get(cell_type)
     if t is None:
         return ph
-    isi = max(8.0, min(200.0, t.mean_isi_ms))
+    rate = t.mean_rate_Hz if t.mean_rate_Hz == t.mean_rate_Hz and t.mean_rate_Hz > 1 else 15.0
+    # Primary: rate → ISI (FI sustained-drive operational definition)
+    isi_from_rate = 1000.0 / rate
+    isi_table = t.mean_isi_ms if t.mean_isi_ms == t.mean_isi_ms and t.mean_isi_ms > 5 else isi_from_rate
+    # Fast-spiking: almost pure rate lock; regular-spiking: blend with table ISI
+    if rate >= 40.0:
+        isi = isi_from_rate
+    else:
+        isi = 0.65 * isi_from_rate + 0.35 * isi_table
+    isi = max(5.0, min(200.0, isi))
+
     ad = max(0.0, min(0.55, t.mean_adapt if t.mean_adapt == t.mean_adapt else 0.05))
     scale = 1.0 if mode == "bio_match" else 1.0 / 3.0
-    # ISI ≈ R + 0.5*(n-1)*δ → set R from isi and mild adapt
-    R = isi * (1.0 - 0.45 * ad) * scale
-    R = max(4.0, min(180.0, R))
-    ph["refractory_steps"] = float(int(round(R)))
-    # adapt_step from target A (same family as calibrate._adapt_step_from_target)
-    n1 = 9.0
-    if ad < 1e-6:
+    # Refractory floor = operational ISI (train adapt separate)
+    R = isi * scale
+    # PV: prevent train_count*adapt_step from killing high rate
+    if cell_type == "PV" or rate >= 40.0:
+        R = max(4.0, min(40.0, isi_from_rate * 0.92 * scale))
         d = 0.0
+        ph["adapt_gain"] = 0.01
+        ph["adapt_decay"] = 0.995
+        ph["fire_threshold"] = float(max(0.84, ph.get("fire_threshold", 1.05) - 0.10))
+        ph["fi_stim"] = float(min(1.4, 0.55 + 0.012 * rate))
     else:
-        d = (2.0 * ad * R) / (n1 * (1.0 - ad) + 1e-9) * 1.12
+        R = max(5.0, min(180.0, isi * (1.0 - 0.35 * ad)))
+        n1 = 9.0
+        d = 0.0 if ad < 1e-6 else (2.0 * ad * R) / (n1 * (1.0 - ad) + 1e-9) * 1.12
+        ph["adapt_gain"] = float(max(0.01, min(0.09, 0.02 + 0.5 * ad)))
+        ph["fi_stim"] = float(max(0.35, min(1.1, 0.32 + 0.012 * rate)))
+    ph["refractory_steps"] = float(int(round(R)))
     ph["adapt_step"] = float(max(0.0, min(10.0, d)))
-    # FI stim: higher for higher-rate classes (wet-lab rate authority)
-    rate = t.mean_rate_Hz if t.mean_rate_Hz == t.mean_rate_Hz else 15.0
-    # Stronger drive for fast-spiking PV (Allen ~80 Hz class means need more FI)
-    ph["fi_stim"] = float(max(0.30, min(1.15, 0.28 + 0.009 * rate)))
-    if cell_type == "PV":
-        ph["fire_threshold"] = float(max(0.88, ph.get("fire_threshold", 1.05) - 0.06))
-        ph["fi_stim"] = float(min(1.2, ph["fi_stim"] * 1.15))
     if t.mean_vrest_mV == t.mean_vrest_mV:
         ph["vrest_mV"] = float(t.mean_vrest_mV)
-    ph["avg_isi_ms_target"] = float(isi * scale)
+    ph["avg_isi_ms_target"] = float((1000.0 / rate) * scale)
     ph["adaptation_target"] = float(ad)
     ph["class_rate_target_Hz"] = float(rate)
     return ph
