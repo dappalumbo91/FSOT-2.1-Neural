@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-07-24T18:04:22.226972+00:00",
+  "authority": "Allen Cell Types public wet-lab (cells.json Cre lines + ef__*)",
+  "targets": {
+    "PV": {
+      "cell_type": "PV",
+      "n_cells": 222,
+      "mean_isi_ms": 20.327146552128315,
+      "mean_adapt": 0.008800404433301741,
+      "mean_rate_Hz": 83.3504049172855,
+      "mean_vrest_mV": -73.4975573957459,
+      "mean_tau_ms": 7.89375696167908,
+      "mean_rin_mohm": 113.21687230393906,
+      "source": "Allen Cell Types (public wet-lab)"
+    },
+    "VIP": {
+      "cell_type": "VIP",
+      "n_cells": 149,
+      "mean_isi_ms": 47.48605767162297,
+      "mean_adapt": 0.056175473857460634,
+      "mean_rate_Hz": 34.81541758294487,
+      "mean_vrest_mV": -70.30963858327559,
+      "mean_tau_ms": 14.828310442159584,
+      "mean_rin_mohm": 208.075643979734,
+      "source": "Allen Cell Types (public wet-lab)"
+    },
+    "Pyr": {
+      "cell_type": "Pyr",
+      "n_cells": 723,
+      "mean_isi_ms": 83.53367114901145,
+      "mean_adapt": 0.06237347812281482,
+      "mean_rate_Hz": 16.35121532610921,
+      "mean_vrest_mV": -73.51912852260625,
+      "mean_tau_ms": 20.89490122032072,
+      "mean_rin_mohm": 172.81820929349584,
+      "source": "Allen Cell Types (public wet-lab)"
+    },
+    "SST": {
+      "cell_type": "SST",
+      "n_cells": 155,
+      "mean_isi_ms": 64.04927020621784,
+      "mean_adapt": 0.09400471206401721,
+      "mean_rate_Hz": 29.538052683455557,
+      "mean_vrest_mV": -68.95153615560876,
+      "mean_tau_ms": 26.754380514319646,
+      "mean_rin_mohm": 246.49360942014724,
+      "source": "Allen Cell Types (public wet-lab)"
+    }
+  },
+  "wet_lab_order_gates": {
+    "pv_rate_gt_pyr": true,
+    "pv_isi_lt_pyr": true,
+    "pv_n": 222,
+    "pyr_n": 723,
+    "sst_adapt_ge_pyr": true
+  },
+  "sim_rate_Hz": {
+    "Pyr": 10.833333015441895,
+    "PV": 29.16666603088379,
+    "SST": 12.499999046325684,
+    "VIP": 14.999999046325684
+  },
+  "sim_isi_ms": {
+    "Pyr": 90.33333587646484,
+    "PV": 31.823530197143555,
+    "SST": 75.95714416503907,
+    "VIP": 61.80392074584961
+  },
+  "sim_gates": {
+    "sim_pv_rate_gt_pyr": true,
+    "sim_pv_isi_lt_pyr": true,
+    "wet_lab_pv_faster_than_pyr": true,
+    "has_pv_target": true,
+    "has_pyr_target": true
+  },
+  "rate_rel_err": {
+    "Pyr": 0.3374600725767765,
+    "PV": 0.6500716935949149,
+    "SST": 0.5768170914893449,
+    "VIP": 0.5691564229959494
+  },
+  "note": "Biological accuracy vs public wet-lab class statistics. Not a claim that the PC is a physical patch-clamp rig."
+}

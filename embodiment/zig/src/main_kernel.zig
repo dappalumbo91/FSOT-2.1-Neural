@@ -1,6 +1,7 @@
 //! FSOT trinary + neuron freestanding kernel — Multiboot1 + COM1 serial.
 const trit = @import("trit.zig");
 const neuron = @import("neuron.zig");
+const network = @import("network.zig");
 const scalar = @import("scalar.zig");
 const serial = @import("serial.zig");
 
@@ -78,7 +79,17 @@ fn kmain() noreturn {
         serial.write("FSOT_NEURON FAIL\n");
     }
 
-    if (tr.ok and pst.ok and (s0 == s0)) {
+    serial.write("test:network...\n");
+    const nst = network.networkSelfTest();
+    if (nst.ok) {
+        serial.write("FSOT_NETWORK PASS spikes=");
+        serial.writeU32(nst.spikes);
+        serial.write("\n");
+    } else {
+        serial.write("FSOT_NETWORK FAIL\n");
+    }
+
+    if (tr.ok and pst.ok and nst.ok and (s0 == s0)) {
         serial.write("FSOT_STAGE_ZIG_NEURON_OK\n");
     } else {
         serial.write("FSOT_STAGE_ZIG_NEURON_FAIL\n");

@@ -1,98 +1,44 @@
 {
-  "ts_utc": "2026-07-24T17:55:43.643642+00:00",
-  "experiment": "zig_neuron_parity",
-  "profile": "zig_f64",
-  "git_sha": "ec131316a0f4",
+  "ts_utc": "2026-07-24T18:04:22.234709+00:00",
+  "experiment": "class_ephys_allen",
+  "profile": "bio_match_class_lock",
+  "git_sha": "cf250339eaa3",
   "formulas_ref": "docs/FORMULAS.md",
   "thesis_ref": "docs/THESIS.md",
   "authority_pin_prefix": "D1D38A",
   "gates": {
-    "scalar": true,
-    "trace": true,
-    "spikes": true,
-    "ternary": true,
-    "bio_data_present": true
+    "sim_pv_rate_gt_pyr": true,
+    "sim_pv_isi_lt_pyr": true,
+    "wet_lab_pv_faster_than_pyr": true,
+    "has_pv_target": true,
+    "has_pyr_target": true
   },
   "metrics": {
-    "max_abs_dS": 1.4955135163585709e-06,
-    "scalar_abs_err": 0.0,
-    "spike_mismatch": 0,
-    "tern_mismatch": 0,
-    "bio": {
-      "mean_isi_ms": 74.81583952903748,
-      "mean_adaptation_index": 0.05599649185023736,
-      "mean_firing_rate_Hz": 18.65625,
-      "primary_mode": "bio_match",
-      "data_source": "I:\\fsot nuron\\data\\eeg\\allen_ephys\\ephys_features.csv",
-      "n_cells": 2333,
-      "gaps_summary": {
-        "n_closed": 6,
-        "n_total": 6,
-        "all_closed": true,
-        "rows": [
-          {
-            "gap": "mean_isi_ms",
-            "sim": 74.81583952903748,
-            "target": 75.27912108681248,
-            "rel_error": 0.0061541839367995664,
-            "tol_rel": 0.02,
-            "closed": true,
-            "note": "bio_match: refractory floor \u2248 0.78\u00d7 Allen avg_isi"
-          },
-          {
-            "gap": "adaptation_index",
-            "sim": 0.05599649185023736,
-            "target": 0.05684276925132009,
-            "rel_error": 0.014888039364391734,
-            "tol_rel": 0.1,
-            "closed": true,
-            "note": "mild AHP; sign/order match matters more than exact magnitude"
-          },
-          {
-            "gap": "evoked_rate_band",
-            "sim": 18.65625,
-            "target": "band 5\u201380 Hz",
-            "rel_error": NaN,
-            "tol_rel": 0.0,
-            "closed": true,
-            "note": "cortical evoked band"
-          },
-          {
-            "gap": "spontaneous_rate_band",
-            "sim": 6.625,
-            "target": "band 0.1\u201315 Hz",
-            "rel_error": NaN,
-            "tol_rel": 0.0,
-            "closed": true,
-            "note": "sparse bombardment"
-          },
-          {
-            "gap": "rest_vrest_band",
-            "sim": -69.892578125,
-            "target": "band -85\u2013-55 mV",
-            "rel_error": NaN,
-            "tol_rel": 0.0,
-            "closed": true,
-            "note": "Allen-mapped passive Vrest"
-          },
-          {
-            "gap": "rest_mostly_silent",
-            "sim": 0.0,
-            "target": 3.0,
-            "rel_error": NaN,
-            "tol_rel": 0.0,
-            "closed": true,
-            "note": "no free phase-drift pacemaker"
-          }
-        ]
-      },
-      "target_isi_ms": 73.02592276803136,
-      "isi_rel_err": 0.02451070377695638
+    "sim_rate": {
+      "Pyr": 10.833333015441895,
+      "PV": 29.16666603088379,
+      "SST": 12.499999046325684,
+      "VIP": 14.999999046325684
+    },
+    "sim_isi": {
+      "Pyr": 90.33333587646484,
+      "PV": 31.823530197143555,
+      "SST": 75.95714416503907,
+      "VIP": 61.80392074584961
+    },
+    "rate_rel_err": {
+      "Pyr": 0.3374600725767765,
+      "PV": 0.6500716935949149,
+      "SST": 0.5768170914893449,
+      "VIP": 0.5691564229959494
+    },
+    "targets_n": {
+      "PV": 222,
+      "VIP": 149,
+      "Pyr": 723,
+      "SST": 155
     }
   },
-  "notes": "Zig freestanding neuron step parity vs Python; stage STAGE_ZIG_NEURON_STEP.md",
-  "efficiency_doctrine": "docs/EFFICIENCY_DOCTRINE.md",
-  "extra": {
-    "stage_doc": "docs/STAGE_ZIG_NEURON_STEP.md"
-  }
+  "notes": "Allen Cre-line wet-lab class lock; PV vs Pyr order",
+  "efficiency_doctrine": "docs/EFFICIENCY_DOCTRINE.md"
 }

@@ -3,6 +3,7 @@ const std = @import("std");
 const trit = @import("trit.zig");
 const scalar = @import("scalar.zig");
 const neuron = @import("neuron.zig");
+const network = @import("network.zig");
 const seeds = @import("seeds.zig");
 
 fn printF64(label: []const u8, x: f64) void {
@@ -49,6 +50,14 @@ pub fn main() !void {
         std.process.exit(1);
     }
     std.debug.print("FSOT_NEURON PASS spikes={d}\n", .{pst.spikes});
+
+    const nst = network.networkSelfTest();
+    if (!nst.ok) {
+        std.debug.print("FSOT_NETWORK FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_NETWORK PASS units=16 spikes={d}\n", .{nst.spikes});
+
     printF64("SEEDS_K=", seeds.k);
     std.debug.print("FSOT_STAGE_ZIG_NEURON_OK\n", .{});
 }

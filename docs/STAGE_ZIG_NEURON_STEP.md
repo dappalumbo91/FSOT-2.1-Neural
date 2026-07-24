@@ -236,10 +236,11 @@ Honesty: computational population match under stated protocol—not a wet-lab el
 
 ## 10. Ethics / honesty
 
-Not a medical device. Computational model. Bio metrics are **population statistical agreement** under a stated protocol, not wet-lab identity. Public data only for verification panels.
+Not a medical device. We **calibrate and score against public wet-lab datasets** (Allen Cell Types, OpenNeuro, …). That *is* biological accuracy for a computational neurological system. We do **not** claim the computer *is* a living preparation — we claim **fidelity to wet-lab measurements under named protocols**. See **`docs/BIO_ACCURACY.md`**. Missing pieces → import more public wet-lab data and close gates.
 
 ---
 
 ## 11. Changelog entry
 
-- **2026-07-24:** Stage opened. Zig scalar+neuron step; Python parity PASS; stage documentation; bio harness wired to Allen when CSV present.
+- **2026-07-24:** Stage opened. Zig scalar+neuron step; Python parity PASS; stage documentation; bio harness wired to Allen when CSV present.  
+- **2026-07-24 (follow-on):** Allen Cre-line class lock (PV/Pyr/SST/VIP); `run_class_ephys.py` PASS (PV faster than Pyr); Zig multi-unit network + W under QEMU; BIO_ACCURACY.md clarifies wet-lab data vs “identity.”
