@@ -1,61 +1,39 @@
 {
-  "ts_utc": "2026-07-24T18:14:16.488991+00:00",
-  "experiment": "class_ephys_allen",
-  "profile": "bio_match_class_lock",
-  "git_sha": "bad104eca064",
+  "ts_utc": "2026-07-24T18:20:11.383633+00:00",
+  "experiment": "scalpel_class_rates",
+  "profile": "tol_0.05",
+  "git_sha": "57c13be76074",
   "formulas_ref": "docs/FORMULAS.md",
   "thesis_ref": "docs/THESIS.md",
   "authority_pin_prefix": "D1D38A",
   "gates": {
-    "sim_pv_rate_gt_pyr": true,
-    "sim_pv_isi_lt_pyr": true,
-    "wet_lab_pv_faster_than_pyr": true,
-    "has_pv_target": true,
-    "has_pyr_target": true,
-    "pv_rate_within_35pct": true,
-    "pyr_rate_within_35pct": true
+    "pyr_within_tol": true,
+    "pv_within_tol": true,
+    "pv_faster_than_pyr": true,
+    "scalpel_ok": true
   },
   "metrics": {
-    "sim_rate": {
-      "Pyr": 12.499999046325684,
-      "PV": 76.66666412353516,
-      "SST": 15.833333015441895,
-      "VIP": 18.333332061767578
+    "Pyr": {
+      "target": 16.35121532610921,
+      "measured": 16.363636016845703,
+      "rel_err": 0.0007596188105150371
     },
-    "sim_isi": {
-      "Pyr": 76.35714108336205,
-      "PV": 12.0,
-      "SST": 58.0,
-      "VIP": 50.904762268066406
+    "PV": {
+      "target": 83.3504049172855,
+      "measured": 83.63636016845703,
+      "rel_err": 0.0034307601919307163
     },
-    "rate_rel_err": {
-      "Pyr": 0.23553088886512308,
-      "PV": 0.0801884621962316,
-      "SST": 0.46396828575262716,
-      "VIP": 0.4734134089275269
+    "SST": {
+      "target": 29.538052683455557,
+      "measured": 20.909090042114258,
+      "rel_err": 0.2921303829271871
     },
-    "targets_n": {
-      "PV": 222,
-      "VIP": 149,
-      "Pyr": 723,
-      "SST": 155
-    },
-    "bands_fi": {
-      "theta": 5747.41357421875,
-      "alpha": 14880.9140625,
-      "sigma": 112447.5390625,
-      "gamma": 307047.9375,
-      "total": 878498.4375,
-      "theta_rel": 0.006542315078640934,
-      "alpha_rel": 0.016939033044666058,
-      "sigma_rel": 0.12799970297329072,
-      "gamma_rel": 0.3495144947255527
-    },
-    "sme_directional": {
-      "theta": true,
-      "gamma": true
+    "VIP": {
+      "target": 34.81541758294487,
+      "measured": 27.27272605895996,
+      "rel_err": 0.2166480268695633
     }
   },
-  "notes": "Allen Cre-line wet-lab class lock; PV rate within 35%; learning band proxies",
+  "notes": "Scalpel rate lock Pyr then PV to Allen wet-lab",
   "efficiency_doctrine": "docs/EFFICIENCY_DOCTRINE.md"
 }
