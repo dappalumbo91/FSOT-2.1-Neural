@@ -2,7 +2,9 @@
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-$zig = (Get-Command zig -ErrorAction SilentlyContinue)?.Source
+$zigCmd = Get-Command zig -ErrorAction SilentlyContinue
+$zig = $null
+if ($zigCmd) { $zig = $zigCmd.Source }
 if (-not $zig) {
     $cand = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Filter zig.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
     if ($cand) { $zig = $cand }
@@ -18,7 +20,9 @@ if (-not (Test-Path $kernel)) {
     exit 2
 }
 
-$qemu = (Get-Command qemu-system-x86_64 -ErrorAction SilentlyContinue)?.Source
+$qemuCmd = Get-Command qemu-system-x86_64 -ErrorAction SilentlyContinue
+$qemu = $null
+if ($qemuCmd) { $qemu = $qemuCmd.Source }
 if (-not $qemu -and (Test-Path "C:\Program Files\qemu\qemu-system-x86_64.exe")) {
     $qemu = "C:\Program Files\qemu\qemu-system-x86_64.exe"
 }
