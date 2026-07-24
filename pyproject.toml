@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fsot-2-1-neural"
-version = "0.3.0"
-description = "FSOT 2.1 micro-neuron / neural substrate: GPU-CPU batch, bio lock, failure boundaries, Morse+chemical readout, consensus bridge"
+version = "0.4.0"
+description = "FSOT 2.1 genetic-codon neural network: ion-channel gene programs, trinary synapses, bio-accurate FSOT dynamics"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }

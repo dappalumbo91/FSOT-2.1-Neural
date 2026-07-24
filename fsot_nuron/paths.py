@@ -13,7 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = Path(os.environ.get("FSOT_NURON_ARTIFACTS", str(ROOT / "artifacts")))
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
 DATA = ROOT / "data"
+DATA.mkdir(parents=True, exist_ok=True)
 ARCHIVE_SNAPSHOT = DATA / "archive_snapshot"
+DOCS = ROOT / "docs"
 
 
 def _env_path(name: str) -> Path | None:

@@ -11,7 +11,11 @@ build/
 .artifacts_local/
 artifacts/eeg_cache/
 artifacts/allen_cache/
+artifacts/obsidian_vaults/
 artifacts/*.json
+# Keep scientific thesis ledger (jsonl is small)
+!data/thesis_ledger/
+!data/thesis_ledger/**
 # Keep archive pin report pattern available if re-generated under data/
 !data/**
 # Large third-party data — document paths; do not force-push

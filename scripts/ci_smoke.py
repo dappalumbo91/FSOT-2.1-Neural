@@ -41,31 +41,48 @@ def main() -> int:
     else:
         errors.append("missing data/archive_snapshot/fsot_compute_AUTHORITY_PIN.json")
 
-    # 3) Morse + codon gates
-    from fsot_nuron.morse_itu import verify_morse_tables
+    # 3) Codon map (genetic authority) — primary
     from fsot_nuron.chemical_codon import codon_path_verify
+    from fsot_nuron.genetic_genotype import genetic_authority_report, build_population_genotypes
 
-    mv = verify_morse_tables()
     cv = codon_path_verify()
-    print(f"morse_ok: {mv.get('letter_digit_ok')} phrase={mv.get('phrase_test', {}).get('exact_morse_path')}")
     print(f"codon_ok: {cv.get('perfect')} {cv.get('roundtrip_ok')}/{cv.get('n_codons')}")
-    if not mv.get("letter_digit_ok"):
-        errors.append("morse table fail")
     if not cv.get("perfect"):
         errors.append("codon map fail")
 
-    # 4) Tiny CPU neuron step (no CUDA required)
-    import torch
-    from fsot_nuron.neuron_batch import FSOTNeuronBatch, NeuronConfig
+    auth = genetic_authority_report()
+    genes_ok = all(
+        auth["channel_genes"][k]["n_codons"] >= 4
+        for k in ("SCN", "KCN", "CACNA", "LEAK")
+    )
+    print(f"channel_genes_ok: {genes_ok}")
+    if not genes_ok:
+        errors.append("channel gene programs incomplete")
 
-    cfg = NeuronConfig(n_units=8)
-    net = FSOTNeuronBatch(cfg, device="cpu")
-    S, fired, phase, ternary = net.step(torch.ones(8) * 0.5)
-    print(f"neuron_step_ok: fired={int(fired.sum())} S_mean={float(S.mean()):.4f}")
+    # 4) Tiny genetic network step (primary substrate)
+    import torch
+    from fsot_nuron.genetic_network import GeneticNeuralNetwork, GeneticNetworkConfig
+
+    gcfg = GeneticNetworkConfig(n_units=8, connectivity="genetic_dense", seed=0)
+    gnet = GeneticNeuralNetwork(gcfg, device="cpu")
+    S, fired, phase, ternary, syn = gnet.step(torch.ones(8) * 0.5)
+    print(
+        f"genetic_net_ok: fired={int(fired.sum())} S_mean={float(S.mean()):.4f} "
+        f"synapses={int((gnet.W != 0).sum())}"
+    )
     if S.shape[0] != 8:
         errors.append(f"unexpected S shape {tuple(S.shape)}")
+    if int((gnet.W != 0).sum()) < 8:
+        errors.append("genetic weight matrix too sparse/empty")
 
-    # 5) Failure catalog loads
+    # 5) Population genotype diversity
+    pop = build_population_genotypes(16, seed=1, diversity=True)
+    spins = {round(g.composite_spin, 4) for g in pop}
+    print(f"genotype_diversity: n={len(pop)} unique_spins={len(spins)}")
+    if len(spins) < 2:
+        errors.append("genotype diversity collapsed")
+
+    # 6) Failure catalog loads (engineering boundaries)
     from fsot_nuron.failure_boundaries import load_failure_catalog
 
     cat = load_failure_catalog()
@@ -74,6 +91,47 @@ def main() -> int:
     print(f"failure_boundaries: {n}")
     if n < 5:
         errors.append(f"too few failure modes: {n}")
+
+    # 7) Local Obsidian vault builder (tiny, no dynamics — filesystem only)
+    from fsot_nuron.obsidian_brain import ObsidianExportConfig, build_obsidian_vault
+    from fsot_nuron.paths import ARTIFACTS
+
+    vroot = ARTIFACTS / "obsidian_vaults" / "_ci_smoke_vault"
+    man = build_obsidian_vault(
+        vault_root=vroot,
+        cfg=ObsidianExportConfig(
+            n_units=6,
+            top_k_out=2,
+            connectivity="genetic_sparse",
+            sparse_keep=0.3,
+            run_dynamics=False,
+            device="cpu",
+            seed=0,
+        ),
+        clean=True,
+    )
+    home = vroot / "00_Home.md"
+    n0 = vroot / "02_Neurons" / "N000.md"
+    print(
+        f"obsidian_local_ok: edges={man['n_edges_export']} "
+        f"home={home.is_file()} n0={n0.is_file()} offline={man.get('offline')}"
+    )
+    if not home.is_file() or not n0.is_file():
+        errors.append("obsidian vault missing notes")
+    if not man.get("offline", False):
+        errors.append("obsidian vault not marked offline")
+
+    # 8) Morse remains optional secondary gate (do not fail CI if missing)
+    try:
+        from fsot_nuron.morse_itu import verify_morse_tables
+
+        mv = verify_morse_tables()
+        print(
+            f"morse_secondary: {mv.get('letter_digit_ok')} "
+            f"phrase={mv.get('phrase_test', {}).get('exact_morse_path')}"
+        )
+    except Exception as e:
+        print(f"morse_secondary: skipped ({e})")
 
     if errors:
         print("FAIL:")

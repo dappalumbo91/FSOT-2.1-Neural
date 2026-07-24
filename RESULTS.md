@@ -1,70 +1,50 @@
 # FSOT-2.1-Neural — Results
 
-Generated: `2026-07-18T18:53:43.961333+00:00`  
+**Mission metrics** live in `data/results/GENETIC_NETWORK.md` (genetic-codon network).  
+Legacy NLP/EEG climb numbers are retained below for history only.
+
 Repo: https://github.com/dappalumbo91/FSOT-2.1-Neural  
 Theory: https://github.com/dappalumbo91/FSOT-2.1-Lean (`D1D38A` authority)
 
-## 1. Quality gates
+---
 
-- CI smoke: **PASS**
-- Morse/codon verify: **see smoke**
+## 0. Primary mission — genetic-codon network
 
-## 2. Multi-dataset scoreboard (hard metrics)
+Re-run:
 
-- **eeg_mental_state/mental-state.csv** [tabular_signal] rank#1 fit=0.810
-- **sms_spam/spam.csv** [text_classification] rank#2 hard_top1=0.800 bal=0.789 fit=0.800
-- **kaggle_emotions/emotions.csv** [tabular_signal] rank#3 fit=0.648
-- **sentiment_tiny/sentiment_analysis.csv** [text_classification] rank#4 hard_top1=0.475 bal=0.484 fit=0.475
+```powershell
+python run_genetic_bio.py --units 64 --steps 1200
+```
 
-_Full JSON: `data/results/multi_dataset_scoreboard.json`_
+Latest gates (see `data/results/genetic_network_report.json`):
 
-## 3. Bio report card (Allen-facing)
+| Gate | Status |
+|------|--------|
+| Codon map 64/64 | **PASS** |
+| Channel genes SCN/KCN/CACNA/LEAK | **PASS** |
+| Genetic synapses | **PASS** (dense density 1.0 on off-diagonal) |
+| Archive seed pin | **PASS** |
+| Mean ISI (FI, Allen-locked) | ~77 ms (Allen target ~71 ms) |
+| Mean adaptation | ~0.027 (Allen target ~0.051) |
+| Mean rate | ~19 Hz |
+| Rate↔SCN expression corr | positive (weak; genetic diversity preserved under lock) |
 
-- Pass: **True**
-- ISI rel error: **0.0010800033451342811**
-- Adapt rel error: **0.02448020894529949**
-- Gaps: **6/6**
+Honesty: Allen lock sets population timing scale; gene expression multiplies relative refractory / adapt / FI. Not a wet-lab claim.
 
-_Details: `data/results/bio_report_card.md`_
+---
 
-## 4. PD EEG depth
+## 1. Quality gates (CI)
 
-- Local EEG candidates: 40
-- Signal files scored: 10
-- Probe summary: `{"mode_id": "PD_rate_irregularity", "label": "Parkinson-like rate irregularity / sync pressure", "breached": true, "signature_hits": ["rate_drop"], "relative_flags": {"rate_drop": true, "rate_runaway": false, "isi_prolonged": false, "adaptation_runaway": false, "global_silence": false, "population_s`
+- CI smoke: **PASS** (seeds, codon, channel genes, genetic net, failure catalog)
+- Morse: secondary only
 
-## 5. Train/test readout (learned, not LOO retrieval)
+## 2–7. Legacy NLP / EEG scoreboard (demoted)
 
-- **sms_spam/spam.csv**: train=0.940 test=0.944 bal=0.944 (n_test=72)
-- **sentiment_tiny/sentiment_analysis.csv**: train=0.518 test=0.444 bal=0.444 (n_test=72)
+These tracks were an exploration climb and are **not** the product KPI.
 
-## 6. Scale + lesion consensus
+- SMS hard top-1 ~0.80 · train/test probe ~0.94  
+- Mental-state EEG fit ~0.81 · emotions ~0.65  
+- Sentiment / IMDB hierarchical climb — see `SOTA_FRONTS.md` / `CLIMB.md`  
+- Bio card (non-genetic batch path): ISI ~0.11%, adapt ~2.45%, 6/6 gaps — `data/results/bio_report_card.md`
 
-- cpu n=64: 175342 unit-steps/s
-- cpu n=256: 649063 unit-steps/s
-- cpu n=1024: 2506689 unit-steps/s
-- cuda n=64: 23084 unit-steps/s
-- cuda n=256: 96601 unit-steps/s
-- cuda n=1024: 379363 unit-steps/s
-- cuda n=4096: 1486435 unit-steps/s
-
-- Lesion consensus backend: `desktop_fsot_gpu`
-
-## Honesty
-
-- Retrieval ≠ diagnosis; train/test readout is a linear probe on FSOT fingerprints.
-- Bio card is computational Allen match under tolerances.
-- PD path uses local/OpenNeuro priors + optional lightweight signal stats.
-
-## 7. SOTA-track refinement deltas
-
-| Metric | Before | After |
-|--------|--------|-------|
-| Bio ISI rel err | ~1.8% | **0.11%** |
-| Bio adapt rel err | ~19.7% | **2.45%** |
-| Bio gaps | 5/6 | **6/6** |
-| SMS test (linear probe) | 0.60 | **0.944** (seed mean 0.907±0.035) |
-| Sentiment test | 0.27 | **0.444** (seed mean 0.426±0.026) |
-
-Goal remains climbing these numbers. Sentiment 3-class is the open refinement front.
-
+Full legacy JSON remains under `data/results/`.

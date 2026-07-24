@@ -52,12 +52,13 @@ If `compute_matches_cert: False`, the archive has **hash drift** (neural seeds s
 
 | Layer | Role | Precision style |
 |-------|------|-----------------|
-| Batched micro-neuron | Apply scalar + timing to small nets | Allen pop-mean ISI/adapt lock |
-| Failure boundaries | Known neurological break modes → lesions | Signature + wire-around |
-| Morse (ITU) | Symbolic readout alphabet | Exact table round-trip |
-| Chemical codon | Generative meaning (64-codon trinary) | 64/64 map invertibility; SMILES Lab bar |
-| Consensus | No-softmax attention from FSOT-GPU | Owned operators |
-| Multi-dataset scoreboard | EEG fit + text retrieval probes | Honest metric names |
+| **Genetic genotype** | 64-codon → SCN/KCN/CACNA/LEAK programs | 64/64 map; seed-only expression |
+| **Genetic network** | Trinary \(W_{ij}\) + FSOT dynamics | Protein-style pair interaction |
+| Batched micro-neuron | Scalar + timing substrate | Allen pop-mean ISI/adapt lock |
+| Failure boundaries | Neurological break modes → lesions | Signature + wire-around |
+| Chemical codon | Map parse / AA process (genotype path) | 64/64 invertibility |
+| Morse (ITU) | Optional symbolic readout (secondary) | Exact table round-trip |
+| Multi-dataset scoreboard | Legacy NLP/EEG demos (secondary) | Honest metric names |
 
 ## How to cite
 
@@ -71,10 +72,11 @@ If `compute_matches_cert: False`, the archive has **hash drift** (neural seeds s
 ```powershell
 $env:PYTHONPATH = "."
 python run_archive_pin.py
+python scripts/ci_smoke.py
+python run_genetic_bio.py --units 32 --steps 800
+# secondary:
 python run_language_loop.py --verify-only
-python run_bio_validate.py --mode bio_match --primary-only
 python run_failure_probe.py --mode all
-python run_gpu_consensus.py --text "FSOT 2.1" --failure-mode PD_rate_irregularity
 ```
 
 ## Kaggle
