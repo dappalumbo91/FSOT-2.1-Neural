@@ -71,11 +71,16 @@ python run_brain_design.py --profile wetware_ref   # larger bio-comparison layou
 # 3) Population genetic vault (single-region view)
 python run_obsidian_brain.py
 
-# 4) CI smoke
+# 4) Lean formal panel (codon · neuro fold · cell types)
+python scripts/verify_formal.py
+# or: cd formal; lake build
+
+# 5) CI smoke
 python scripts/ci_smoke.py
 ```
 
-**Road to a full brain design:** see **`BRAIN_PATH.md`**.
+**Road to a full brain design:** see **`BRAIN_PATH.md`**.  
+**Python → silicon body:** see **`docs/EMBODIMENT_ROADMAP.md`** (Zig / Rust / Ada; sensory + system-metric subconscious).
 
 ### Local second brain (offline)
 

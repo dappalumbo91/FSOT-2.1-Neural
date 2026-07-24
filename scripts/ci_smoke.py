@@ -121,7 +121,27 @@ def main() -> int:
     if not man.get("offline", False):
         errors.append("obsidian vault not marked offline")
 
-    # 8) Morse remains optional secondary gate (do not fail CI if missing)
+    # 8) Lean formal panel if lake is available (skip soft-fail if missing toolchain)
+    import shutil
+    import subprocess
+
+    if shutil.which("lake"):
+        r = subprocess.run(
+            ["lake", "build"],
+            cwd=str(ROOT / "formal"),
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+        print(f"formal_lean_ok: {r.returncode == 0}")
+        if r.returncode != 0:
+            errors.append("lake build failed")
+            sys.stdout.write(r.stdout or "")
+            sys.stderr.write(r.stderr or "")
+    else:
+        print("formal_lean_ok: skipped (lake not installed)")
+
+    # 9) Morse remains optional secondary gate (do not fail CI if missing)
     try:
         from fsot_nuron.morse_itu import verify_morse_tables
 

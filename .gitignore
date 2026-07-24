@@ -12,6 +12,8 @@ build/
 artifacts/eeg_cache/
 artifacts/allen_cache/
 artifacts/obsidian_vaults/
+formal/.lake/
+formal/lake-manifest.json
 artifacts/*.json
 # Keep scientific thesis ledger (jsonl is small)
 !data/thesis_ledger/

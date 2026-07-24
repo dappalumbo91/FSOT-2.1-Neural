@@ -1,29 +1,15 @@
 {
-  "ts_utc": "2026-07-24T17:20:07.087867+00:00",
-  "experiment": "brain_design",
-  "profile": "wetware_ref",
-  "git_sha": "b43f29ef1f31",
+  "ts_utc": "2026-07-24T17:30:35.871766+00:00",
+  "experiment": "formal_lean_panel",
+  "profile": "lean4",
+  "git_sha": "9db9d06ad8fa",
   "formulas_ref": "docs/FORMULAS.md",
   "thesis_ref": "docs/THESIS.md",
   "authority_pin_prefix": "D1D38A",
   "gates": {
-    "has_excitatory": true,
-    "has_inhibitory": true,
-    "multi_region": true,
-    "has_projections": true,
-    "has_synapses": true,
-    "ei_mass_finite": true,
-    "thal_drive_active": true,
-    "efficiency_profile_ok": true
+    "lake_build": true
   },
-  "metrics": {
-    "n_units": 64,
-    "ei_count_ratio": 3.923076923076923,
-    "ei_mass_ratio": 3.0794895625395085,
-    "mean_rate_Hz": 4.6875,
-    "n_synapses": 1323,
-    "isi_scale": 1.0
-  },
-  "notes": "multi-region FSOT brain; efficiency doctrine active",
+  "metrics": {},
+  "notes": "formal/ FSOTNeural lake build ok",
   "efficiency_doctrine": "docs/EFFICIENCY_DOCTRINE.md"
 }

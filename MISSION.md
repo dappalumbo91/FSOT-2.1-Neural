@@ -67,9 +67,13 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 |---------------------|--|
 | Thesis | [`docs/THESIS.md`](docs/THESIS.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
+| Formal (Lean) | [`formal/`](formal/) · [`docs/FORMAL_VERIFICATION_CHOICE.md`](docs/FORMAL_VERIFICATION_CHOICE.md) |
+| Embodiment | [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md) — Python host → Zig/Rust/Ada body |
 | Efficiency doctrine | [`docs/EFFICIENCY_DOCTRINE.md`](docs/EFFICIENCY_DOCTRINE.md) |
 | Path / phases | [`BRAIN_PATH.md`](BRAIN_PATH.md) |
 | Run ledger | `data/thesis_ledger/runs.jsonl` |
+
+**Python is the lab, not the permanent body.** Silicon-depth embodiment (Zig/Rust/Ada) + sensory/subconscious loops are the target once the host is solid.
 
 ## Success criteria
 

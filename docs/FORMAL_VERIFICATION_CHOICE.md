@@ -151,13 +151,13 @@ Coq remains excellent if you need a **second opinion** on exported numbers (as t
 
 ---
 
-## 7. Practical next step
+## 7. Practical next step — **started**
 
-1. Keep Python/PyTorch as **executable domain engine** + real-data gates.  
-2. Start **Lean neural panel**: codon round-trip + neuroscience fold + expression positivity (smallest end-to-end formal slice).  
-3. Hook obligations into existing `run_cross_proof_verification` only if you want Coq/Isabelle numbers.  
-4. Defer SPARK until Ada (or proven-kernel) step exists.  
-5. Record formal claims in thesis ledger with `formulas_ref` + Lean module path.
+1. Python/PyTorch remains **temporary host** + real-data gates (not the permanent body).  
+2. **Lean neural panel** lives in `formal/` — `lake build` / `python scripts/verify_formal.py`.  
+3. Hook obligations into archive cross-proof only when exporting new numeric literals.  
+4. Embodiment languages: Zig (SR-ITE default) / Rust / Ada-SPARK — `docs/EMBODIMENT_ROADMAP.md`.  
+5. Sensory + subconscious metrics: `fsot_nuron/sensory/` scaffold.
 
 ---
 
