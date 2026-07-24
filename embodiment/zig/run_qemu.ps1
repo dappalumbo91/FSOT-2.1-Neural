@@ -14,8 +14,8 @@ if (-not $zig) { throw "zig not found on PATH" }
 Write-Host "=== zig build kernel ==="
 & $zig build kernel
 
-$kernel = Join-Path $PSScriptRoot "zig-out\bin\fsot_trit_kernel"
-if (-not (Test-Path $kernel)) {
+$kernelSrc = Join-Path $PSScriptRoot "zig-out\bin\fsot_trit_kernel"
+if (-not (Test-Path $kernelSrc)) {
     Write-Host "FAIL: kernel binary not found"
     exit 2
 }
@@ -27,23 +27,20 @@ if (-not $qemu -and (Test-Path "C:\Program Files\qemu\qemu-system-x86_64.exe")) 
     $qemu = "C:\Program Files\qemu\qemu-system-x86_64.exe"
 }
 if (-not $qemu) {
-    Write-Host "WARN: qemu-system-x86_64 not found - kernel at $kernel"
+    Write-Host "WARN: qemu-system-x86_64 not found - kernel at $kernelSrc"
     exit 0
 }
 
-# Use TEMP paths so spaces in project path do not break QEMU -serial file:
+# Copy artifacts to TEMP (no spaces) so QEMU path parsing is reliable on Windows
+$kernel = Join-Path $env:TEMP "fsot_trit_kernel"
 $serialLog = Join-Path $env:TEMP "fsot_trit_qemu_serial.log"
 $errLog = Join-Path $env:TEMP "fsot_trit_qemu_err.log"
+Copy-Item -Force $kernelSrc $kernel
 Remove-Item $serialLog, $errLog -ErrorAction SilentlyContinue
 
 Write-Host "=== QEMU (serial log, ~3s) ==="
-$p = Start-Process -FilePath $qemu -ArgumentList @(
-    "-display", "none",
-    "-serial", "file:$serialLog",
-    "-no-reboot",
-    "-m", "32M",
-    "-kernel", $kernel
-) -PassThru -WindowStyle Hidden -RedirectStandardError $errLog
+$arg = "-display none -serial file:$serialLog -no-reboot -m 32M -kernel `"$kernel`""
+$p = Start-Process -FilePath $qemu -ArgumentList $arg -PassThru -WindowStyle Hidden -RedirectStandardError $errLog
 
 Start-Sleep -Seconds 3
 if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
