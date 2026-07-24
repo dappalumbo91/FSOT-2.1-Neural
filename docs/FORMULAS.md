@@ -195,7 +195,20 @@ Boolean claims used in CI / thesis ledger:
 
 ---
 
-## 12. Change control
+## 12. Formal verification (which prover)
+
+Full comparison: [`FORMAL_VERIFICATION_CHOICE.md`](FORMAL_VERIFICATION_CHOICE.md).
+
+| Role | System |
+|------|--------|
+| **Primary math home** | **Lean 4** (FSOT-2.1-Lean / archive hub) |
+| Optional numeric cross-check | Coq **or** Isabelle (export obligations) |
+| Boot scalar kernel | F\* (+ Rust/QEMU triangulation) |
+| Step-kernel contracts (when Ada) | SPARK/GNATprove |
+
+Do **not** re-prove the full spine in every system for neural work.
+
+## 13. Change control
 
 When code changes a formula:
 
@@ -203,3 +216,4 @@ When code changes a formula:
 2. Bump thesis `Last revised`.  
 3. Append ledger row with `formulas_ref: docs/FORMULAS.md@<git sha>`.  
 4. Re-run pin + `run_brain_design.py` / `run_genetic_bio.py`.  
+5. If formalized, update Lean neural panel / obligations in the same release train.  

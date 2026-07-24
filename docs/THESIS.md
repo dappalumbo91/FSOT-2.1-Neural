@@ -9,6 +9,7 @@
 | **Code repository** | [FSOT-2.1-Neural](https://github.com/dappalumbo91/FSOT-2.1-Neural) |
 | **Physical archive** | `I:\FSOT-Physical-Archive` |
 | **Companion formulas** | [`docs/FORMULAS.md`](FORMULAS.md) |
+| **Formal verification choice** | [`docs/FORMAL_VERIFICATION_CHOICE.md`](FORMAL_VERIFICATION_CHOICE.md) |
 | **Efficiency doctrine** | [`docs/EFFICIENCY_DOCTRINE.md`](EFFICIENCY_DOCTRINE.md) |
 | **Path / phases** | [`BRAIN_PATH.md`](../BRAIN_PATH.md) |
 | **Last revised** | 2026-07-24 |
