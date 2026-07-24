@@ -27,7 +27,7 @@ if (-not $qemu -and (Test-Path "C:\Program Files\qemu\qemu-system-x86_64.exe")) 
     $qemu = "C:\Program Files\qemu\qemu-system-x86_64.exe"
 }
 if (-not $qemu) {
-    Write-Host "WARN: qemu-system-x86_64 not found — kernel at $kernel"
+    Write-Host "WARN: qemu-system-x86_64 not found - kernel at $kernel"
     exit 0
 }
 
