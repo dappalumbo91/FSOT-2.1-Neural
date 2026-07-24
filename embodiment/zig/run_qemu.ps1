@@ -49,11 +49,11 @@ Write-Host "--- serial output ---"
 if (Test-Path $serialLog) {
     Get-Content $serialLog
     $txt = Get-Content $serialLog -Raw
-    if ($txt -match "FSOT_TRIT PASS") {
+    if (($txt -match "FSOT_STAGE_ZIG_NEURON_OK") -or (($txt -match "FSOT_TRIT PASS") -and ($txt -match "FSOT_NEURON PASS"))) {
         Write-Host "=== QEMU GATE PASS ==="
         exit 0
     }
-    Write-Host "=== QEMU GATE FAIL (no PASS line) ==="
+    Write-Host "=== QEMU GATE FAIL (missing stage PASS lines) ==="
     exit 1
 }
 Write-Host "no serial log"

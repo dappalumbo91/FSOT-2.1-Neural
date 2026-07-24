@@ -15,8 +15,10 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(host);
 
+    b.installArtifact(host);
     const run_host = b.addRunArtifact(host);
-    const host_step = b.step("host", "Run trinary self-test on host");
+    const host_step = b.step("host", "Run trinary + neuron self-test on host");
+    host_step.dependOn(&b.addInstallArtifact(host, .{}).step);
     host_step.dependOn(&run_host.step);
 
     // --- Freestanding Multiboot kernel for QEMU ---

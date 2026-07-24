@@ -73,7 +73,13 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | Path / phases | [`BRAIN_PATH.md`](BRAIN_PATH.md) |
 | Run ledger | `data/thesis_ledger/runs.jsonl` |
 
-**Python is the lab, not the permanent body.** Destination is a **trinary bare-metal** substrate (Zig/Rust/Ada kernel) — not permanent binary ontology. Sensory + system-metric subconscious loops inject at the edge as trit streams. See `docs/TRINARY_BARE_METAL.md`.
+**Python is the lab, not the permanent body.** Destination is a **trinary bare-metal Zig** substrate. Sensory + system-metric loops inject as trit streams.
+
+| Stage docs | |
+|------------|--|
+| **Current stage** | [`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md) |
+| Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
+| Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 
 ## Success criteria
 

@@ -73,14 +73,18 @@ python run_obsidian_brain.py
 
 # 4) Lean formal panel (codon · neuro fold · cell types)
 python scripts/verify_formal.py
-# or: cd formal; lake build
 
-# 5) CI smoke
+# 5) Zig neuron step parity vs Python + Allen bio card
+python scripts/parity_zig_neuron.py
+cd embodiment\zig; powershell -File .\run_qemu.ps1
+
+# 6) CI smoke
 python scripts/ci_smoke.py
 ```
 
-**Road to a full brain design:** see **`BRAIN_PATH.md`**.  
-**Python → silicon body:** see **`docs/EMBODIMENT_ROADMAP.md`** (Zig / Rust / Ada; sensory + system-metric subconscious).
+**Current stage doc:** [`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md)  
+**Road to a full brain design:** [`BRAIN_PATH.md`](BRAIN_PATH.md)  
+**Python → Zig body:** [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md)
 
 ### Local second brain (offline)
 
