@@ -27,12 +27,12 @@ A computer brain should sit where **software biology** lives: schedulers, interr
 | C | Portable glue | Only if needed for drivers; prefer Zig/Rust wrappers. |
 | Formal Lean | **Math**, not the body | Already primary prover (`formal/`). |
 
-**Recommendation:**  
-- **Math / consistency** → Lean (done Phase V1 panel).  
-- **First embodiment kernel** → **Zig** (matches archive SR-ITE soul/body split) *or* **Rust** if you want stronger borrow-checked isolation.  
-- **Second pass safety** → optional **Ada/SPARK** contracts on the same step API.
+**Decision:** **Zig is the embodiment language** (custom trinary, freestanding, QEMU).  
+- **Math** → Lean (`formal/`).  
+- **Body** → Zig (`embodiment/zig/`) — host test + Multiboot kernel.  
+- **Optional later** → Ada/SPARK contracts on the same trit ABI.
 
-No need to pick forever today — keep a **thin C ABI / trinary packet API** so Zig and Rust can both host the same brain image.
+I/O: **serial UART** (bring-up) + **parallel TritWord** (mind datapath). Display later. See `docs/BARE_METAL_IO.md`.
 
 ---
 
@@ -76,16 +76,15 @@ Define `fsot_brain_abi` (header / flatbuffers / custom):
 - sensory inject packets  
 - metric inject packets (subconscious)  
 
-### Phase E2 — Trinary kernel port
+### Phase E2 — Trinary kernel port (**in progress — Zig**)
 
-Port hot path on the **trinary substrate** (not “binary NN with trit labels”):
+1. trit ops + T1 packing + parallel `TritWord` — `embodiment/zig/src/trit.zig`  
+2. Host self-test: `zig build host` → `FSOT_TRIT PASS`  
+3. Freestanding Multiboot kernel + **COM1 serial**: `zig build kernel`  
+4. QEMU: `embodiment/zig/run_qemu.ps1` (`-serial stdio`)  
+5. Next: scalar step + genetic W + sensory inject in Zig  
 
-1. trit ops + T1/T3 packing ABI (`trinary_substrate.py` oracle)  
-2. scalar step (fixed-point twin → later discrete collapse)  
-3. genetic W in trinary pair algebra  
-4. region drive from quantized sensory trit streams  
-
-Python remains oracle: `assert port_trits == python_trits`.
+Python remains oracle: `fsot_nuron/trinary_substrate.py`.
 
 ### Phase E3 — Subconscious loop
 

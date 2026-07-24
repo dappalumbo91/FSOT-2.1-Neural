@@ -149,7 +149,36 @@ def main() -> int:
     if not tr.get("ok"):
         errors.append(f"trinary substrate: {tr.get('errors')}")
 
-    # 10) Morse remains optional secondary gate (do not fail CI if missing)
+    # 10) Zig trinary host if zig is on PATH (optional soft on missing)
+    zig = shutil.which("zig")
+    if zig:
+        zig_dir = ROOT / "embodiment" / "zig"
+        r = subprocess.run(
+            [zig, "build", "host"],
+            cwd=str(zig_dir),
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+        print(f"zig_trit_host_build: {r.returncode == 0}")
+        if r.returncode != 0:
+            errors.append("zig build host failed")
+            sys.stdout.write(r.stdout or "")
+            sys.stderr.write(r.stderr or "")
+        else:
+            # run installed host binary if present
+            for name in ("fsot_trit_host.exe", "fsot_trit_host"):
+                exe = zig_dir / "zig-out" / "bin" / name
+                if exe.is_file():
+                    r2 = subprocess.run([str(exe)], capture_output=True, text=True, timeout=60)
+                    print(f"zig_trit_host_run: {r2.returncode == 0} {(r2.stdout or '').strip()}")
+                    if r2.returncode != 0:
+                        errors.append("zig host self-test failed")
+                    break
+    else:
+        print("zig_trit_host: skipped (zig not on PATH)")
+
+    # 11) Morse remains optional secondary gate (do not fail CI if missing)
     try:
         from fsot_nuron.morse_itu import verify_morse_tables
 
