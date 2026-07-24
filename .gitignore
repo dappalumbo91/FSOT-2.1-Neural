@@ -16,6 +16,8 @@ formal/.lake/
 formal/lake-manifest.json
 embodiment/zig/.zig-cache/
 embodiment/zig/zig-out/
+embodiment/zig/qemu_serial.log
+embodiment/zig/qemu_err.log
 artifacts/*.json
 # Keep scientific thesis ledger (jsonl is small)
 !data/thesis_ledger/

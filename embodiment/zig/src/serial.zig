@@ -4,18 +4,19 @@
 const COM1: u16 = 0x3F8;
 
 fn outb(port: u16, value: u8) void {
+    // i386 / x86 freestanding port I/O
     asm volatile ("outb %[val], %[port]"
         :
         : [val] "{al}" (value),
-          [port] "{dx}" (port),
-        : .{ .memory = true });
+          [port] "N{dx}" (port),
+    );
 }
 
 fn inb(port: u16) u8 {
     return asm volatile ("inb %[port], %[ret]"
         : [ret] "={al}" (-> u8),
-        : [port] "{dx}" (port),
-        : .{ .memory = true });
+        : [port] "N{dx}" (port),
+    );
 }
 
 pub fn init() void {
