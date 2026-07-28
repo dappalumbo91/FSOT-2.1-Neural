@@ -1,0 +1,143 @@
+{
+  "generated_at": "2026-07-28T16:37:16.024619+00:00",
+  "certificate": "FSOT-2.1-Neural scientific stage verification",
+  "overall": "PASS",
+  "lean_build": {
+    "ok": true,
+    "returncode": 0,
+    "stdout_tail": "Build completed successfully (10 jobs).\n",
+    "stderr_tail": ""
+  },
+  "formal_theorems": [
+    "FSOTNeural.formal_panel_ok",
+    "FSOTNeural.wetlab_structural_ok",
+    "FSOTNeural.scientific_panel_ok",
+    "FSOTNeural.stage_scientific_verification"
+  ],
+  "formal_claims": [
+    {
+      "lean": "FSOTNeural.allCodons_card",
+      "claim": "Exactly 64 DNA codons",
+      "runtime": "codon_path_verify perfect 64/64",
+      "wetlab_check": "T0/codon_map_64_roundtrip"
+    },
+    {
+      "lean": "FSOTNeural.codon_in_own_fiber",
+      "claim": "Every codon \u2208 fiber of primary(trinary) map",
+      "runtime": "A,G=+1; C,T=-1 primary map",
+      "wetlab_check": "T0/codon_map_64_roundtrip"
+    },
+    {
+      "lean": "FSOTNeural.purine_pos / pyrimidine_neg",
+      "claim": "A,G \u2192 +; C,T \u2192 \u2212",
+      "runtime": "chemical_codon / trinary_substrate",
+      "wetlab_check": "T4 gene ORFs"
+    },
+    {
+      "lean": "FSOTNeural.neuroFold",
+      "claim": "D_eff=13, N=4, P=3, observed",
+      "runtime": "seeds.NEURO_* / neuron_batch",
+      "wetlab_check": "T0 structure"
+    },
+    {
+      "lean": "FSOTNeural.synapseSign / only_pyr_exc",
+      "claim": "Pyr +; PV/SST/VIP \u2212",
+      "runtime": "cell_types / scalpel population",
+      "wetlab_check": "T1/pv_faster_than_pyr + class rates"
+    },
+    {
+      "lean": "FSOTNeural.fractions_sum_100",
+      "claim": "Cortical fractions 80+8+7+5=100",
+      "runtime": "cell type mix design",
+      "wetlab_check": "structural"
+    },
+    {
+      "lean": "FSOTNeural.expressionPos_true",
+      "claim": "Expression score always positive",
+      "runtime": "genetic_genotype expression",
+      "wetlab_check": "T4/gene_ORF_*"
+    },
+    {
+      "lean": "FSOTNeural.free_parameters_zero",
+      "claim": "0 free parameters on scalar path",
+      "runtime": "fsot_bridge free_parameters=0",
+      "wetlab_check": "T0/fsot_bridge_zero_free"
+    },
+    {
+      "lean": "FSOTNeural.machine_primary / morse_not_primary",
+      "claim": "Machine body primary; Morse secondary",
+      "runtime": "machine_encode EncodePath",
+      "wetlab_check": "T0/machine_abi_roundtrip"
+    },
+    {
+      "lean": "FSOTNeural.wetlab_structural_ok",
+      "claim": "4 Allen classes; tol floor 2%; freeParams=0",
+      "runtime": "run_wetlab_accuracy_battery",
+      "wetlab_check": "T1\u2013T2 Allen rates"
+    },
+    {
+      "lean": "FSOTNeural.scientific_panel_ok",
+      "claim": "Master structural certificate (no sorry)",
+      "runtime": "lake build formal/",
+      "wetlab_check": "full battery critical path"
+    },
+    {
+      "lean": "FSOTNeural.stage_scientific_verification",
+      "claim": "formal_panel \u2227 wetlab_structural \u2227 free0 \u2227 scientific_panel",
+      "runtime": "export_lean_wetlab_certificate.py",
+      "wetlab_check": "this document"
+    }
+  ],
+  "archive_pin": {
+    "connected": true,
+    "seed_match_ok": true,
+    "compute_sha256": "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70",
+    "compute_matches_certificate": true,
+    "lean_build_ok_archive": true,
+    "seven_way_bare_metal": true,
+    "S_Biology": 0.4447250077038458,
+    "S_Neuroscience": 0.5143619629083619,
+    "free_parameters": 0,
+    "formula": "S = K * (T1 + T2 + T3)"
+  },
+  "wetlab_battery_status": {
+    "battery_present": true,
+    "n_pass": 34,
+    "n_checks": 36,
+    "critical_fail_count": 0,
+    "critical_fails": [],
+    "soft_fails": [
+      {
+        "tier": "T2",
+        "name": "rate_Pyr_within_1pct",
+        "ok": false,
+        "critical": false,
+        "measured": 0.012070575883824328,
+        "expected": "|err| \u2264 1% (stretch)",
+        "source": "Allen Cre FI rate",
+        "note": "",
+        "t_s": 6.73
+      },
+      {
+        "tier": "T2",
+        "name": "rate_SST_within_1pct",
+        "ok": false,
+        "critical": false,
+        "measured": 0.010402939410548344,
+        "expected": "|err| \u2264 1% (stretch)",
+        "source": "Allen Cre FI rate",
+        "note": "",
+        "t_s": 6.73
+      }
+    ],
+    "generated_at": "2026-07-28T16:09:43.037486+00:00"
+  },
+  "wetlab_battery_path": "I:\\fsot nuron\\data\\results\\wetlab_accuracy_battery.json",
+  "formal_dir": "I:\\fsot nuron\\formal",
+  "toolchain": "leanprover/lean4:v4.31.0",
+  "authority_split": {
+    "continuous_scalar": "I:\\FSOT-Physical-Archive\\02_FSOT-2.1-Lean-Full",
+    "neural_panel": "I:\\fsot nuron\\formal",
+    "empirical": "run_wetlab_accuracy_battery.py"
+  }
+}

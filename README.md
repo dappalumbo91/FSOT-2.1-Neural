@@ -75,8 +75,10 @@ python run_brain_design.py --profile wetware_ref   # larger bio-comparison layou
 # 3) Population genetic vault (single-region view)
 python run_obsidian_brain.py
 
-# 4) Lean formal panel (codon · neuro fold · cell types)
+# 4) Lean formal panel + wet-lab scientific certificate
 python scripts/verify_formal.py
+python scripts/export_lean_wetlab_certificate.py
+# → docs/LEAN_WETLAB_CROSSREF.md · data/results/LEAN_WETLAB_CERTIFICATE.md
 
 # 5) Zig neuron step parity vs Python + Allen bio card
 python scripts/parity_zig_neuron.py

@@ -97,6 +97,7 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **GitHub hygiene** | [`docs/GITHUB_HYGIENE.md`](docs/GITHUB_HYGIENE.md) |
 | **Wet-lab battery** | [`docs/WETLAB_ACCURACY_BATTERY.md`](docs/WETLAB_ACCURACY_BATTERY.md) · `python run_wetlab_accuracy_battery.py` |
 | **Genome as code** | [`docs/GENOME_AS_CODE.md`](docs/GENOME_AS_CODE.md) · `python run_cellular_expand.py --check` |
+| **Lean × wet-lab certificate** | [`docs/LEAN_WETLAB_CROSSREF.md`](docs/LEAN_WETLAB_CROSSREF.md) · `python scripts/export_lean_wetlab_certificate.py` |
 | Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 

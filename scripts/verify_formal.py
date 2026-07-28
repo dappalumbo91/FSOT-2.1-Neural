@@ -42,7 +42,10 @@ def main() -> int:
         print("FAIL: lake build")
         return r.returncode
 
-    print("PASS: formal panel builds (codon · neuro fold · cell types · expression)")
+    print(
+        "PASS: formal panel builds "
+        "(codon · neuro fold · cell types · expression · authority · wetlab gates · scientific_panel_ok)"
+    )
     # thesis ledger optional
     try:
         sys.path.insert(0, str(ROOT))
@@ -51,13 +54,24 @@ def main() -> int:
         record_run(
             "formal_lean_panel",
             profile="lean4",
-            gates={"lake_build": True},
+            gates={"lake_build": True, "scientific_panel_ok": True},
             metrics={},
-            notes="formal/ FSOTNeural lake build ok",
+            notes="formal/ FSOTNeural lake build ok incl. Certificate.scientific_panel_ok",
             formulas_ref="docs/FORMULAS.md",
         )
     except Exception as e:
         print(f"ledger skip: {e}")
+    # Prefer full certificate export when battery JSON exists
+    try:
+        exp = ROOT / "scripts" / "export_lean_wetlab_certificate.py"
+        if exp.is_file():
+            subprocess.run(
+                [sys.executable, str(exp), "--skip-lake"],
+                cwd=str(ROOT),
+                check=False,
+            )
+    except Exception as e:
+        print(f"certificate export skip: {e}")
     return 0
 
 
