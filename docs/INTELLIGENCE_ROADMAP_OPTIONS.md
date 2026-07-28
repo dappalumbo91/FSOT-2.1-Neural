@@ -50,20 +50,22 @@
 
 | Option | What it is |
 |--------|------------|
-| **D1 Local native control panel** | Run, lock rates, encode/retrieve, charts — **no web server** |
-| **D2 Live network graph view** | Regions, spikes, fingerprints (Obsidian-like or GPU canvas) |
-| **D3 Telemetry strip** | Serial/metrics from brain → local meters |
+| **D1 Local control panel (scavenge Linux/Windows UI libs)** | GTK/Qt/Dear PyGui/ImGui — **reuse fonts & windows**, no reinvent |
+| **D2 Live network graph view** | Regions, spikes, fingerprints on scavenged GPU stack (Mesa/Cairo/…) |
+| **D3 Telemetry strip** | Engine log / QEMU serial → local meters |
 | **D4 Scenario library** | One-click: scalpel, probe, consolidate, QEMU check |
+| **D5 Minimal Linux guest (Alpine/Buildroot)** | Boot whole product in QEMU using open-source OS display stack |
 
-See **`docs/PRODUCT_UI_AND_DISPLAY.md`** for display architecture.
+See **`docs/PRODUCT_UI_AND_DISPLAY.md`** — especially **Option P4 (scavenge Linux)**.
 
 ---
 
 ## Recommended sequence for “usable intelligence product”
 
-1. **D1 + D2** — local UI so you can *use* the accurate brain daily  
+1. **D1 + D2 via scavenged UI stack** — local console, no custom font/window engine  
 2. **A1–A4** — deepen memory under the UI  
-3. **C2** — Zig engine as local process (QEMU stays verifier)  
+3. **C2 / D5** — Zig as Linux process; optional Alpine guest for “organism + UI”  
 4. **A5–A8 / B\*** — research climbs with AlphaFold-class gates  
+5. Freestanding Zig stays **verification body**, not the place we reimplement GNOME  
 
 Checkpoint accuracy must not regress when UI is added.

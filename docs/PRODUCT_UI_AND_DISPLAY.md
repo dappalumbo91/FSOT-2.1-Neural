@@ -85,6 +85,58 @@ QEMU window shows it on the host monitor
 - **Body verification:** P2 or serial-only QEMU  
 - Same trit/brain ABI so both talk the same language  
 
+### Option P4 — **Scavenge open-source Linux display stack** (strong recommendation)
+
+**Do not reinvent windows, fonts, input, and compositors in freestanding Zig.**  
+Reuse what Linux already solved under open licenses.
+
+```text
+┌──────────────────────────────────────────────────┐
+│  Your FSOT app (Python/Zig)                        │
+│  GTK / Qt / Dear ImGui / SDL  (existing widgets)   │
+└──────────────────────┬───────────────────────────┘
+                       │ uses
+┌──────────────────────▼───────────────────────────┐
+│  Linux userspace (open source)                     │
+│  FreeType (fonts) · Pango · Cairo · libinput       │
+│  Wayland or X11 · Mesa (OpenGL/Vulkan) · DRM/KMS   │
+└──────────────────────┬───────────────────────────┘
+                       │ runs on
+┌──────────────────────▼───────────────────────────┐
+│  A) Host Linux / WSL2-with-WSLg / dual-boot        │  easiest product
+│  B) Minimal Linux *guest* in QEMU (Buildroot/Alpine)│ body + display together
+│  C) Same guest kernel + your Zig brain as a process │ organism + UI
+└──────────────────────────────────────────────────┘
+```
+
+**What you scavenge (examples, all FOSS):**
+
+| Need | Open-source component | License examples |
+|------|------------------------|------------------|
+| Fonts rendering | FreeType, HarfBuzz, Pango | FTL/GPL, MIT |
+| 2D vector / UI paint | Cairo, Skia | MPL/MIT |
+| Windowing | Wayland (wlroots), X11 | MIT |
+| Full toolkits | GTK 4, Qt (LGPL), FLTK | LGPL/GPL |
+| Immediate-mode UI | Dear ImGui, Nuklear | MIT |
+| GPU | Mesa | MIT |
+| Tiny stack | DirectFB / DRM dumb buffer + FreeType | various |
+| Whole minimal OS | Alpine, Buildroot, Yocto, FreeBSD | various |
+
+**You still write:** FSOT brain, scalpel, memory probe, telemetry, product layout.  
+**You do not write:** font engines, Unicode shaping, window managers, GPU drivers.
+
+**QEMU fit:** boot **Alpine or Buildroot Linux** as the guest (not bare metal for the *product* UI path). Run:
+
+- `fsot_brain` (Zig or Python) as a normal Linux process  
+- UI as another process or same process with GTK/Qt/ImGui  
+- Optional: keep **freestanding Zig kernel** as a second QEMU machine for verification only  
+
+**Windows host fit:** develop UI with the same idea — use existing stacks (Qt/PySide, Dear PyGui) which themselves wrap OS fonts/windowing. Or run Linux guest under QEMU/WSL for a pure Linux scavenged stack.
+
+**Licensing note:** prefer MIT/BSD/Apache/LGPL toolkits for a product you control; read GPL implications if you statically link GPL-only pieces. Alpine + MIT/LGPL UI is a common pattern.
+
+**Why this beats pure freestanding UI:** months of work become days; “nice” is free; you stay local and offline-capable; bare-metal freestanding remains for *body law*, not *chrome*.
+
 ---
 
 ## 4. Local UI toolkits (no web primary)
@@ -104,10 +156,10 @@ QEMU window shows it on the host monitor
 
 **Recommendation for FSOT-Neural product v1:**
 
-1. **Dear PyGui** or **PySide6** control surface on Windows (talks to existing Python brain + scalpel + probe).  
-2. Live views: region rates, class locks, encode/retrieve, band meters, serial log from QEMU.  
-3. Parallel: Zig process ABI for when UI should call bare-metal-speed step without QEMU.  
-4. Later: optional guest framebuffer for “organism display.”
+1. **Scavenge Linux UI stack (P4)** *or* host **Dear PyGui / PySide6** on Windows — both reuse fonts/windows instead of inventing them.  
+2. Prefer: **Python brain + scavenged toolkit** first; **Zig brain as Linux process** second; **freestanding QEMU** stays the accuracy/body gate.  
+3. Live views: region rates, class locks, encode/retrieve, band meters, serial/log from engine.  
+4. Optional later: full **Alpine/Buildroot guest** so “the organism” boots Linux + your UI + your brain in one QEMU window.
 
 ---
 
@@ -166,13 +218,13 @@ You **do** need the **brain calculations** able to live there — which we alrea
 
 ## 8. Proposed product milestone (next build phase)
 
-**FSOT Neural Console v0.1 (local)**
+**FSOT Neural Console v0.1 (local, scavenged stack)**
 
-1. Freeze science: `v0.5.0-bio-intel` tag  
-2. Scaffold `product/console/` Dear PyGui or PySide app  
+1. Science frozen: `v0.5.0-bio-intel`  
+2. Scaffold `product/console/` using **existing** UI libs (Dear PyGui / PySide / GTK) — **no custom font/window engine**  
 3. Buttons: Pin · Scalpel · Probe · Consolidate · QEMU check  
-4. Panels: class accuracy, retrieve score, serial log  
-5. No network listeners  
+4. Panels: class accuracy, retrieve score, engine log  
+5. No network listeners; optional later **Buildroot/Alpine** image that bundles the same app  
 
 Then resume intelligence climbs from `INTELLIGENCE_ROADMAP_OPTIONS.md` **through the console**.
 
