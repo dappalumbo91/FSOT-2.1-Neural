@@ -178,12 +178,29 @@ def _joint_features(v: List[float], a: List[float]) -> List[float]:
 
 def _bind_strength(vstats: Dict[str, float], astats: Dict[str, float]) -> float:
     """
-    High when both modalities are 'on' — classic co-occurrence learning gate.
+    High when modalities co-activate *and* co-vary in the biological sense:
+    classic Hebbian gate — joint activity with congruence, not just energy.
+
+    FSOT-lawful weights: φ-gate and ψ_con only.
     """
+    gate = SEEDS.phi / (1.0 + SEEDS.phi)
     v_on = min(1.0, float(vstats.get("contrast", 0)) * 2 + float(vstats.get("motion", 0)) * 3)
-    a_on = min(1.0, float(astats.get("rms", 0)) * 6 + float(astats.get("dialogue_prior", 0)))
-    # both must contribute (AND-ish with soft floor)
-    return float(min(1.0, math.sqrt(max(1e-6, v_on * a_on)) * (0.5 + 0.5 * SEEDS.phi / (1 + SEEDS.phi))))
+    a_on = min(
+        1.0,
+        float(astats.get("rms", 0)) * 6 + float(astats.get("dialogue_prior", 0)),
+    )
+    # Congruence: motion/energy vs audio energy (normalized same scale)
+    v_sig = min(1.0, float(vstats.get("motion", 0)) * 4)
+    a_sig = min(1.0, float(astats.get("rms", 0)) * 5 + float(astats.get("speech_band", 0)))
+    # high when both high or both low; penalize anti-correlated energy
+    match = 1.0 - abs(v_sig - a_sig)
+    co_high = v_sig * a_sig
+    co_low = (1.0 - v_sig) * (1.0 - a_sig)
+    congruence = gate * match + (1.0 - gate) * (co_high + co_low)
+    joint = math.sqrt(max(1e-6, v_on * a_on))
+    # Hebbian-ish: co-occurrence × congruence; φ / ψ_con only
+    raw = joint * (0.35 + 0.65 * congruence) * (SEEDS.psi_con + gate) / 1.5
+    return float(min(1.0, max(0.0, raw)))
 
 
 def iter_audiovisual_moments(

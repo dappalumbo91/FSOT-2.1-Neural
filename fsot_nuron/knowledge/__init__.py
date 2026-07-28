@@ -18,6 +18,7 @@ from .episode_memory import (
     recall_plain_english,
     EpisodeMemory,
 )
+from .monologue import run_grounded_monologue, MonologueReport
 
 __all__ = [
     "KnowledgeLexicon",
@@ -40,4 +41,6 @@ __all__ = [
     "retrieve_by_query",
     "recall_plain_english",
     "EpisodeMemory",
+    "run_grounded_monologue",
+    "MonologueReport",
 ]

@@ -211,14 +211,40 @@ def captions_near(
     *,
     window_s: float = 1.25,
 ) -> List[CaptionCue]:
-    """Captions overlapping or near a visual moment (subtitle sync)."""
-    hit = []
+    """
+    Captions overlapping or near a visual moment (subtitle sync).
+
+    Prefer strict temporal overlap, then mid-time proximity, then window.
+    Order hits by distance so bind takes the best line first.
+    """
+    # FSOT-lawful default window if caller leaves classic default
+    try:
+        from ..seeds import SEEDS
+
+        if abs(window_s - 1.25) < 1e-9:
+            # φ + 1/e ≈ 1.986 → ~2s dialogue tolerance without free fit
+            window_s = float(SEEDS.phi + 1.0 / SEEDS.e)
+    except Exception:
+        pass
+
+    scored: List[Tuple[float, CaptionCue]] = []
     for c in cues:
-        if c.start_s - window_s <= t_sec <= c.end_s + window_s:
-            hit.append(c)
+        # strict overlap (caption covers t)
+        if c.start_s <= t_sec <= c.end_s:
+            dist = 0.0
+        elif c.start_s - window_s <= t_sec <= c.end_s + window_s:
+            # outside interval but within pad
+            if t_sec < c.start_s:
+                dist = c.start_s - t_sec
+            else:
+                dist = t_sec - c.end_s
         elif abs(c.mid_s() - t_sec) <= window_s:
-            hit.append(c)
-    return hit
+            dist = abs(c.mid_s() - t_sec)
+        else:
+            continue
+        scored.append((dist, c))
+    scored.sort(key=lambda x: x[0])
+    return [c for _d, c in scored]
 
 
 def captions_in_range(

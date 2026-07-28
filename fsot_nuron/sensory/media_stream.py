@@ -86,6 +86,29 @@ def discover_media_files(
 # Pixel decode (eye / HDMI-like)
 # ---------------------------------------------------------------------------
 
+def _center_surround_at_frac(gray: np.ndarray, center_frac: float) -> float:
+    """
+    Center–surround difference at a relative window size.
+    center_frac in (0, 0.5]: fraction of each dimension half-width for the center box.
+    FSOT: scale ladder uses 1/φ and 1/φ² (no free RF sizes).
+    """
+    h, w = gray.shape
+    frac = float(max(0.05, min(0.49, center_frac)))
+    # center half-span as fraction of half-image → full center width = 2*frac*half = frac*dim
+    ch = max(1, int(round(h * frac)))
+    cw = max(1, int(round(w * frac)))
+    cy0 = max(0, (h - ch) // 2)
+    cx0 = max(0, (w - cw) // 2)
+    cy1, cx1 = min(h, cy0 + ch), min(w, cx0 + cw)
+    center = gray[cy0:cy1, cx0:cx1]
+    mask = np.ones_like(gray, dtype=bool)
+    mask[cy0:cy1, cx0:cx1] = False
+    surround = gray[mask]
+    c_mean = float(center.mean()) if center.size else float(gray.mean())
+    s_mean = float(surround.mean()) if surround.size else c_mean
+    return float(c_mean - s_mean)
+
+
 def _rgb_to_features(
     rgb: np.ndarray,
     prev_gray: Optional[np.ndarray] = None,
@@ -94,13 +117,17 @@ def _rgb_to_features(
     """
     Frame → compact feature vector.
 
-    Biological / display analogs:
+    Biological / display analogs (cascade, FSOT seed-scaled):
       - Luma (Y) ~ rod brightness
       - RGB means ~ cone summary
       - Hue histogram ~ color spectrum bins
       - Spatial grid means ~ retinotopic coarse map
       - Motion energy ~ delta vs previous frame (optic flow proxy)
       - Edge energy ~ high-frequency / contour
+      - Multi-scale center–surround (φ ladder) + ON/OFF split
+      - Spatial RG/YB opponent *energy* (not only global mean)
+      - Orientation energy ~ V1 simple-cell proxy (0/45/90/135°)
+      - Magno-like (luma motion) / parvo-like (color contrast) split
     """
     if rgb.ndim == 2:
         rgb = np.stack([rgb, rgb, rgb], axis=-1)
@@ -108,18 +135,39 @@ def _rgb_to_features(
     if rgb.max() > 1.5:
         rgb = rgb / 255.0
     h, w, _ = rgb.shape
-    # Luma BT.601
+    # Luma BT.601 (~ rod / V channel)
     gray = 0.299 * rgb[:, :, 0] + 0.587 * rgb[:, :, 1] + 0.114 * rgb[:, :, 2]
     r_m, g_m, b_m = float(rgb[:, :, 0].mean()), float(rgb[:, :, 1].mean()), float(rgb[:, :, 2].mean())
     luma = float(gray.mean())
     contrast = float(gray.std())
 
-    # Hue histogram (8 bins) via atan2 on opponent channels
+    # Cone-opponent channels (RG / YB) — retina-like, not free RGB only
     rg = rgb[:, :, 0] - rgb[:, :, 1]
     yb = 0.5 * (rgb[:, :, 0] + rgb[:, :, 1]) - rgb[:, :, 2]
+    rg_opp = float(rg.mean())
+    yb_opp = float(yb.mean())
+    # Spatial opponent energy (local contrast, not just global mean)
+    rg_energy = float(np.mean(np.abs(rg)))
+    yb_energy = float(np.mean(np.abs(yb)))
     hue = np.arctan2(yb, rg + 1e-6)  # -pi..pi
     hist, _ = np.histogram(hue, bins=8, range=(-math.pi, math.pi), density=True)
     hist = (hist / (hist.sum() + 1e-9)).astype(np.float32)
+
+    # Multi-scale center–surround: coarse 1/φ, mid 1/e, fine 1/φ³ (seed ladder)
+    inv_phi = 1.0 / SEEDS.phi
+    inv_phi3 = inv_phi ** 3  # ~0.236 — true fine RF vs mid ~0.37
+    cs_coarse = _center_surround_at_frac(gray, inv_phi)       # ~0.618 → clamp to 0.49
+    cs_mid = _center_surround_at_frac(gray, 1.0 / SEEDS.e)    # ~0.368
+    cs_fine = _center_surround_at_frac(gray, inv_phi3)        # ~0.236
+    # Primary CS = φ-weighted blend of scales (coarse dominates slightly)
+    w_c = SEEDS.phi / (SEEDS.phi + 1.0 + inv_phi)  # ~0.447
+    w_m = 1.0 / (SEEDS.phi + 1.0 + inv_phi)        # ~0.276
+    w_f = inv_phi / (SEEDS.phi + 1.0 + inv_phi)    # ~0.276
+    cs_energy = float(w_c * cs_coarse + w_m * cs_mid + w_f * cs_fine)
+    # ON / OFF channels (rectified)
+    cs_on = float(max(0.0, cs_energy))
+    cs_off = float(max(0.0, -cs_energy))
+    multi_scale_cs = True
 
     # Coarse retinotopic grid
     gh, gw = max(1, h // grid), max(1, w // grid)
@@ -133,18 +181,89 @@ def _rgb_to_features(
             else:
                 tiles.append(float(gray[y0:y1, x0:x1].mean()))
 
-    # Edge energy (simple gradient)
-    gy = np.diff(gray, axis=0)
-    gx = np.diff(gray, axis=1)
+    # Edge energy (simple gradient) + orientation energy (V1 simple-cell proxy)
+    gy = np.diff(gray, axis=0, prepend=gray[:1, :])
+    gx = np.diff(gray, axis=1, prepend=gray[:, :1])
     edge = float(np.mean(np.abs(gy)) + np.mean(np.abs(gx)))
+    # 0°, 45°, 90°, 135° energy (normalized) — full frame
+    e0 = float(np.mean(np.abs(gx)))
+    e90 = float(np.mean(np.abs(gy)))
+    e45 = float(np.mean(np.abs(gx + gy) * 0.5))
+    e135 = float(np.mean(np.abs(gx - gy) * 0.5))
+    osum = e0 + e90 + e45 + e135 + 1e-9
+    orient = [e0 / osum, e45 / osum, e90 / osum, e135 / osum]
+    orient_entropy = float(-sum(p * math.log(p + 1e-12) for p in orient) / math.log(4))
 
-    # Motion vs previous
+    # --- RF cascade detail (retinotopic ON/OFF + multi-scale orient) ---
+    # 2×2 quadrant center–surround (local RF map, not only global CS)
+    q_cs: List[float] = []
+    qh, qw = max(1, h // 2), max(1, w // 2)
+    for qi in range(2):
+        for qj in range(2):
+            y0, y1 = qi * qh, h if qi == 1 else (qi + 1) * qh
+            x0, x1 = qj * qw, w if qj == 1 else (qj + 1) * qw
+            patch = gray[y0:y1, x0:x1]
+            if patch.size < 4:
+                q_cs.append(0.0)
+                continue
+            q_cs.append(_center_surround_at_frac(patch, inv_phi3))
+    q_on = [max(0.0, v) for v in q_cs]
+    q_off = [max(0.0, -v) for v in q_cs]
+    local_on_energy = float(sum(q_on) / max(1, len(q_on)))
+    local_off_energy = float(sum(q_off) / max(1, len(q_off)))
+    # Fine-scale orientation (center crop ~1/e) — V1 simple-cell cascade
+    ch, cw = max(4, int(h / SEEDS.e)), max(4, int(w / SEEDS.e))
+    cy0, cx0 = (h - ch) // 2, (w - cw) // 2
+    gcrop = gray[cy0 : cy0 + ch, cx0 : cx0 + cw]
+    gy_f = np.diff(gcrop, axis=0, prepend=gcrop[:1, :])
+    gx_f = np.diff(gcrop, axis=1, prepend=gcrop[:, :1])
+    ef0 = float(np.mean(np.abs(gx_f)))
+    ef90 = float(np.mean(np.abs(gy_f)))
+    ef45 = float(np.mean(np.abs(gx_f + gy_f) * 0.5))
+    ef135 = float(np.mean(np.abs(gx_f - gy_f) * 0.5))
+    efsum = ef0 + ef90 + ef45 + ef135 + 1e-9
+    orient_fine = [ef0 / efsum, ef45 / efsum, ef90 / efsum, ef135 / efsum]
+    # DoG residual energy: coarse CS vs fine CS disagreement (bipolar cascade proxy)
+    dog_residual = float(abs(cs_coarse - cs_fine))
+    rf_cascade = 1.0
+
+    # Motion vs previous; magno-like = motion on luma, parvo-like = color energy
     motion = 0.0
     if prev_gray is not None and prev_gray.shape == gray.shape:
         motion = float(np.mean(np.abs(gray - prev_gray)))
+    magno = float(motion * (1.0 + contrast))  # transient / motion-biased
+    parvo = float(rg_energy + yb_energy)      # sustained color contrast
 
     feats = (
-        [luma, contrast, r_m, g_m, b_m, edge, motion]
+        [
+            luma,
+            contrast,
+            r_m,
+            g_m,
+            b_m,
+            edge,
+            motion,
+            cs_energy,
+            rg_opp,
+            yb_opp,
+            orient_entropy,
+            cs_on,
+            cs_off,
+            cs_coarse,
+            cs_mid,
+            cs_fine,
+            rg_energy,
+            yb_energy,
+            magno,
+            parvo,
+            local_on_energy,
+            local_off_energy,
+            dog_residual,
+            rf_cascade,
+        ]
+        + orient
+        + orient_fine
+        + q_cs
         + hist.tolist()
         + tiles
     )
@@ -156,6 +275,35 @@ def _rgb_to_features(
         "b": b_m,
         "edge": edge,
         "motion": motion,
+        "cs_energy": cs_energy,
+        "center_surround": cs_energy,
+        "cs_on": cs_on,
+        "cs_off": cs_off,
+        "cs_coarse": cs_coarse,
+        "cs_mid": cs_mid,
+        "cs_fine": cs_fine,
+        "multi_scale_cs": float(multi_scale_cs),
+        "on_off": 1.0,
+        "rg": rg_opp,
+        "rg_opp": rg_opp,
+        "yb": yb_opp,
+        "yb_opp": yb_opp,
+        "rg_energy": rg_energy,
+        "yb_energy": yb_energy,
+        "spatial_opp": 1.0,
+        "orient_entropy": orient_entropy,
+        "orientation": True,
+        "orient_0": orient[0],
+        "orient_45": orient[1],
+        "orient_90": orient[2],
+        "orient_135": orient[3],
+        "orient_fine": True,
+        "local_on_energy": local_on_energy,
+        "local_off_energy": local_off_energy,
+        "dog_residual": dog_residual,
+        "rf_cascade": True,
+        "magno": magno,
+        "parvo": parvo,
         "n_feats": float(len(feats)),
     }
     return feats, gray.astype(np.float32), stats
@@ -324,20 +472,54 @@ def sample_audio_window(
     win = mono * np.hanning(len(mono))
     spec = np.abs(np.fft.rfft(win))
     freqs = np.fft.rfftfreq(len(win), d=1.0 / sr)
-    # log-spaced bands 20Hz–8kHz
-    edges = np.logspace(np.log10(20), np.log10(min(8000, sr / 2 - 1)), n_bands + 1)
+    fmax = min(8000.0, sr / 2.0 - 1.0)
+    # Log-spaced tonotopic bands (cochlea-like place code), φ-tilted edges
+    # ERB-ish proxy: denser low-freq packing via log10 + slight φ warp
+    lo, hi = 20.0, fmax
+    raw = np.logspace(np.log10(lo), np.log10(hi), n_bands + 1)
+    # mild φ-tilt: compress high end slightly (not free-fit)
+    t = np.linspace(0.0, 1.0, n_bands + 1)
+    warp = 1.0 + (1.0 / SEEDS.phi - 1.0) * t  # 1 → 1/φ
+    edges = lo * (raw / lo) ** warp
+    edges = np.clip(edges, lo, hi)
+    edges[-1] = hi
     bands = []
     for i in range(n_bands):
         m = (freqs >= edges[i]) & (freqs < edges[i + 1])
         bands.append(float(spec[m].mean()) if m.any() else 0.0)
     bsum = sum(bands) + 1e-9
     bands = [b / bsum for b in bands]
+    peak_band = int(max(range(n_bands), key=lambda i: bands[i])) if n_bands else 0
+    # Speech formant proxy (F1 ~300–800, F2 ~800–2500) vs music residual
+    f1_m = (freqs >= 300) & (freqs < 800)
+    f2_m = (freqs >= 800) & (freqs <= 2500)
+    speech_m = (freqs >= 300) & (freqs <= 3400)
+    low_m = freqs < 300
+    high_m = freqs > 3400
+    f1 = float(spec[f1_m].mean()) if f1_m.any() else 0.0
+    f2 = float(spec[f2_m].mean()) if f2_m.any() else 0.0
+    speech = float(spec[speech_m].mean()) if speech_m.any() else 0.0
+    low = float(spec[low_m].mean()) if low_m.any() else 0.0
+    high = float(spec[high_m].mean()) if high_m.any() else 0.0
+    tot = speech + low + high + 1e-9
+    speech_n, low_n, high_n = speech / tot, low / tot, high / tot
     # centroid
     denom = float(spec.sum()) + 1e-9
     centroid = float((freqs * spec).sum() / denom) / (sr / 2)
     peak = float(np.max(np.abs(mono)))
-    feats = [rms, peak, centroid] + bands
-    stats = {"rms": rms, "peak": peak, "centroid_norm": centroid, "n_bands": float(n_bands)}
+    feats = [rms, peak, centroid, speech_n, low_n, high_n, f1 / (tot), f2 / (tot)] + bands
+    stats = {
+        "rms": rms,
+        "peak": peak,
+        "centroid_norm": centroid,
+        "n_bands": float(n_bands),
+        "peak_band": float(peak_band),
+        "speech_band": speech_n,
+        "music_band": low_n + high_n * 0.5,
+        "formant_f1": f1 / (tot),
+        "formant_f2": f2 / (tot),
+        "tonotopic": 1.0,
+    }
     return feats, stats
 
 

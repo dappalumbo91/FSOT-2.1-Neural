@@ -1,0 +1,500 @@
+{
+  "generated_at": "2026-07-28T20:03:42.131807+00:00",
+  "duration_s": 57.27,
+  "n_checks": 37,
+  "n_pass": 37,
+  "critical_fails": [],
+  "soft_fails": [],
+  "checks": [
+    {
+      "tier": "T0",
+      "name": "seeds_match_archive",
+      "ok": true,
+      "critical": true,
+      "measured": 7.172083472051352e-15,
+      "expected": "<1e-12 class",
+      "source": "I:\\FSOT-Physical-Archive closed forms",
+      "note": "",
+      "t_s": 1.26
+    },
+    {
+      "tier": "T0",
+      "name": "archive_pin_D1D38A",
+      "ok": true,
+      "critical": true,
+      "measured": "D1D38A185487B452E470",
+      "expected": "D1D38A\u2026",
+      "source": "vendor/fsot_compute.py",
+      "note": "",
+      "t_s": 1.27
+    },
+    {
+      "tier": "T0",
+      "name": "codon_map_64_roundtrip",
+      "ok": true,
+      "critical": true,
+      "measured": "64/64",
+      "expected": "64/64",
+      "source": "data/64_codon_trinary_map.txt (A,G=+1; C,T=-1)",
+      "note": "",
+      "t_s": 1.27
+    },
+    {
+      "tier": "T0",
+      "name": "atlas_S_Biology",
+      "ok": true,
+      "critical": true,
+      "measured": 0.4447250077038458,
+      "expected": "\u2248+0.445",
+      "source": "fsot_compute DomainConfig Biology D_eff=12",
+      "note": "",
+      "t_s": 1.29
+    },
+    {
+      "tier": "T0",
+      "name": "atlas_S_Neuroscience",
+      "ok": true,
+      "critical": true,
+      "measured": 0.5143619629083619,
+      "expected": "\u2248+0.514",
+      "source": "fsot_compute Neuroscience D_eff=14",
+      "note": "",
+      "t_s": 1.29
+    },
+    {
+      "tier": "T0",
+      "name": "fsot_bridge_zero_free",
+      "ok": true,
+      "critical": true,
+      "measured": 0,
+      "expected": 0,
+      "source": "S=K(T1+T2+T3)",
+      "note": "",
+      "t_s": 1.3
+    },
+    {
+      "tier": "T0",
+      "name": "machine_abi_roundtrip",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "utf8": true,
+        "frame": true
+      },
+      "expected": "lossless UTF-8 + frame",
+      "source": "machine_encode (not Morse)",
+      "note": "",
+      "t_s": 1.3
+    },
+    {
+      "tier": "T0",
+      "name": "zig_host_body",
+      "ok": true,
+      "critical": true,
+      "measured": true,
+      "expected": "FSOT_TRIT PASS (+ FSOT_FRAME if rebuilt)",
+      "source": "I:\\fsot nuron\\embodiment\\zig\\zig-out\\bin\\fsot_trit_host.exe",
+      "note": "",
+      "t_s": 1.37
+    },
+    {
+      "tier": "T1",
+      "name": "allen_target_Pyr",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n": 723,
+        "rate_Hz": 16.35121532610921
+      },
+      "expected": "public Allen Cre means",
+      "source": "Allen Cell Types Database (mouse, min_cells=15)",
+      "note": "",
+      "t_s": 1.4
+    },
+    {
+      "tier": "T1",
+      "name": "allen_target_PV",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n": 222,
+        "rate_Hz": 83.3504049172855
+      },
+      "expected": "public Allen Cre means",
+      "source": "Allen Cell Types Database (mouse, min_cells=15)",
+      "note": "",
+      "t_s": 1.4
+    },
+    {
+      "tier": "T1",
+      "name": "allen_target_SST",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n": 155,
+        "rate_Hz": 29.538052683455557
+      },
+      "expected": "public Allen Cre means",
+      "source": "Allen Cell Types Database (mouse, min_cells=15)",
+      "note": "",
+      "t_s": 1.4
+    },
+    {
+      "tier": "T1",
+      "name": "allen_target_VIP",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n": 149,
+        "rate_Hz": 34.81541758294487
+      },
+      "expected": "public Allen Cre means",
+      "source": "Allen Cell Types Database (mouse, min_cells=15)",
+      "note": "",
+      "t_s": 1.4
+    },
+    {
+      "tier": "T1",
+      "name": "pv_faster_than_pyr",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "PV_Hz": 83.0769271850586,
+        "Pyr_Hz": 16.153846740722656
+      },
+      "expected": "PV >> Pyr (cortical order)",
+      "source": "Allen wet-lab order",
+      "note": "",
+      "t_s": 6.9
+    },
+    {
+      "tier": "T2",
+      "name": "rate_Pyr_within_2pct",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "target_Hz": 16.35121532610921,
+        "measured_Hz": 16.153846740722656,
+        "rel_err": 0.012070575883824328
+      },
+      "expected": "|err| \u2264 2%",
+      "source": "Allen Cre FI rate",
+      "note": "",
+      "t_s": 6.9
+    },
+    {
+      "tier": "T2",
+      "name": "rate_PV_within_2pct",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "target_Hz": 83.3504049172855,
+        "measured_Hz": 83.0769271850586,
+        "rel_err": 0.0032810606318985427
+      },
+      "expected": "|err| \u2264 2%",
+      "source": "Allen Cre FI rate",
+      "note": "",
+      "t_s": 6.9
+    },
+    {
+      "tier": "T2",
+      "name": "rate_SST_within_2pct",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "target_Hz": 29.538052683455557,
+        "measured_Hz": 29.230770111083984,
+        "rel_err": 0.010402939410548344
+      },
+      "expected": "|err| \u2264 2%",
+      "source": "Allen Cre FI rate",
+      "note": "",
+      "t_s": 6.9
+    },
+    {
+      "tier": "T2",
+      "name": "rate_VIP_within_2pct",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "target_Hz": 34.81541758294487,
+        "measured_Hz": 34.615386962890625,
+        "rel_err": 0.005745460888920435
+      },
+      "expected": "|err| \u2264 2%",
+      "source": "Allen Cre FI rate",
+      "note": "",
+      "t_s": 6.9
+    },
+    {
+      "tier": "T2",
+      "name": "scalpel_all_focus_2pct",
+      "ok": true,
+      "critical": true,
+      "measured": true,
+      "expected": true,
+      "source": "scalpel_calibrate tol=0.02",
+      "note": "",
+      "t_s": 6.9
+    },
+    {
+      "tier": "T2",
+      "name": "rate_Pyr_within_1pct",
+      "ok": true,
+      "critical": false,
+      "measured": {
+        "target_Hz": 16.35121532610921,
+        "measured_Hz": 16.341463088989258,
+        "rel_err": 0.000596422768916685,
+        "method": "precision_micro_climb",
+        "sim_ms": 4200.0,
+        "dt_ms": 0.5
+      },
+      "expected": "|err| \u2264 1% (continuous-ms climb)",
+      "source": "Allen Cre FI rate + precision_climb",
+      "note": "",
+      "t_s": 49.73
+    },
+    {
+      "tier": "T2",
+      "name": "rate_PV_within_1pct",
+      "ok": true,
+      "critical": false,
+      "measured": {
+        "target_Hz": 83.3504049172855,
+        "measured_Hz": 83.41463470458984,
+        "rel_err": 0.0007705995833863263,
+        "method": "precision_micro_climb",
+        "sim_ms": 4200.0,
+        "dt_ms": 0.5
+      },
+      "expected": "|err| \u2264 1% (continuous-ms climb)",
+      "source": "Allen Cre FI rate + precision_climb",
+      "note": "",
+      "t_s": 49.73
+    },
+    {
+      "tier": "T2",
+      "name": "rate_SST_within_1pct",
+      "ok": true,
+      "critical": false,
+      "measured": {
+        "target_Hz": 29.538052683455557,
+        "measured_Hz": 29.512195587158203,
+        "rel_err": 0.0008753825641267492,
+        "method": "precision_micro_climb",
+        "sim_ms": 4200.0,
+        "dt_ms": 0.5
+      },
+      "expected": "|err| \u2264 1% (continuous-ms climb)",
+      "source": "Allen Cre FI rate + precision_climb",
+      "note": "",
+      "t_s": 49.73
+    },
+    {
+      "tier": "T2",
+      "name": "rate_VIP_within_1pct",
+      "ok": true,
+      "critical": false,
+      "measured": {
+        "target_Hz": 34.81541758294487,
+        "measured_Hz": 34.63414764404297,
+        "rel_err": 0.0052065995896800055,
+        "method": "precision_micro_climb",
+        "sim_ms": 4200.0,
+        "dt_ms": 0.5
+      },
+      "expected": "|err| \u2264 1% (continuous-ms climb)",
+      "source": "Allen Cre FI rate + precision_climb",
+      "note": "",
+      "t_s": 49.73
+    },
+    {
+      "tier": "T2",
+      "name": "precision_all_focus_1pct",
+      "ok": true,
+      "critical": false,
+      "measured": true,
+      "expected": true,
+      "source": "precision_micro_climb tol=0.01 dt=0.5 sim_ms=4200",
+      "note": "",
+      "t_s": 49.73
+    },
+    {
+      "tier": "T3",
+      "name": "mental_state_eeg_loaded",
+      "ok": true,
+      "critical": false,
+      "measured": {
+        "concentrating": 830,
+        "neutral": 830,
+        "relaxed": 819
+      },
+      "expected": "concentrate/neutral/relaxed public EEG",
+      "source": "I:\\fsot nuron\\data\\kaggle_datasets\\eeg_mental_state\\mental-state.csv",
+      "note": "",
+      "t_s": 51.34
+    },
+    {
+      "tier": "T3",
+      "name": "study_theta_elevated_vs_rest",
+      "ok": true,
+      "critical": true,
+      "measured": 1.573884113069094,
+      "expected": ">1.0 (concentrate > relax energy proxy)",
+      "source": "public mental-state EEG feature matrix",
+      "note": "",
+      "t_s": 51.34
+    },
+    {
+      "tier": "T3",
+      "name": "literature_sme_priors",
+      "ok": true,
+      "critical": true,
+      "measured": [
+        "sederberg_2003_sme",
+        "creery_2022_consolidation",
+        "alpha_ideation"
+      ],
+      "expected": "Sederberg SME + Creery consolidation",
+      "source": "iEEG literature (coded priors)",
+      "note": "",
+      "t_s": 51.34
+    },
+    {
+      "tier": "T3",
+      "name": "sme_theta_encode_gt_rest",
+      "ok": true,
+      "critical": true,
+      "measured": true,
+      "expected": true,
+      "source": "Sederberg-style direction on spike-band proxy",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T3",
+      "name": "sme_gamma_encode_gt_rest",
+      "ok": true,
+      "critical": true,
+      "measured": true,
+      "expected": true,
+      "source": "Sederberg-style direction on spike-band proxy",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T3",
+      "name": "consolidate_top1_ge_half",
+      "ok": true,
+      "critical": true,
+      "measured": 1.0,
+      "expected": "\u22650.5",
+      "source": "FSOT machine items + offline replay",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T3",
+      "name": "consolidate_above_chance",
+      "ok": true,
+      "critical": true,
+      "measured": 1.0,
+      "expected": "> 0.125",
+      "source": "8-item chance floor",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T4",
+      "name": "gene_ORF_SCN",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n_codons": 6,
+        "dna": "ATGAAATTTCGTTATTGG"
+      },
+      "expected": "\u22654 codons DNA ORF",
+      "source": "codon map + standard genetic code \u2192 phenotype",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T4",
+      "name": "gene_ORF_KCN",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n_codons": 6,
+        "dna": "ATGCTGGTTTCATCTTAG"
+      },
+      "expected": "\u22654 codons DNA ORF",
+      "source": "codon map + standard genetic code \u2192 phenotype",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T4",
+      "name": "gene_ORF_CACNA",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n_codons": 6,
+        "dna": "ATGGATGAGTGTTATTGA"
+      },
+      "expected": "\u22654 codons DNA ORF",
+      "source": "codon map + standard genetic code \u2192 phenotype",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T4",
+      "name": "gene_ORF_LEAK",
+      "ok": true,
+      "critical": true,
+      "measured": {
+        "n_codons": 6,
+        "dna": "ATGGGTGCAAGCTCTTAA"
+      },
+      "expected": "\u22654 codons DNA ORF",
+      "source": "codon map + standard genetic code \u2192 phenotype",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T4",
+      "name": "genotype_diversity",
+      "ok": true,
+      "critical": true,
+      "measured": 5,
+      "expected": "\u22652 unique composite spins",
+      "source": "codon-derived spins",
+      "note": "",
+      "t_s": 57.26
+    },
+    {
+      "tier": "T4",
+      "name": "genetic_synapses_nonempty",
+      "ok": true,
+      "critical": true,
+      "measured": 128,
+      "expected": "seed-folded W from trinary spins",
+      "source": "trinary_pair_interaction + \u03c6 geometry",
+      "note": "",
+      "t_s": 57.27
+    },
+    {
+      "tier": "T4",
+      "name": "genetic_step_finite_S",
+      "ok": true,
+      "critical": true,
+      "measured": 0.28540849685668945,
+      "expected": "finite S",
+      "source": "FSOTNeuronBatch + genetic W",
+      "note": "",
+      "t_s": 57.27
+    }
+  ],
+  "doctrine": "public wet-lab authority; zero free params on FSOT scalar"
+}

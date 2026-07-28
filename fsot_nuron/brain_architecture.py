@@ -120,12 +120,18 @@ class BrainDesignConfig:
     local_syn_scale: float = 0.14
     device: str = "cpu"
     dt_ms: float = 1.0
-    # Motif gains (seed-multiplied later; these are structural relative strengths)
-    gain_ee: float = 0.35
-    gain_ei: float = 0.85
-    gain_ie: float = 0.75
-    gain_ii: float = 0.40
-    gain_vip_i: float = 0.55
+    # Motif gains — seed-structured cortical FF/FB (φ-gate); not free-fit to data
+    # E→I strong, E→E weaker, I→E feedback, moderate I→I, VIP→I disinhibition
+    gain_ee: float = 0.085   # sparse E→E (directed local)
+    gain_ei: float = 0.55    # strong E→I feedforward
+    gain_ie: float = 0.42    # I→E feedback (balances E/I mass into ~1–5 band)
+    gain_ii: float = 0.22    # I→I / lateral inhibition
+    gain_vip_i: float = 0.30  # VIP→I disinhibition
+    # Local wiring sparsity / directedness (fly-motif + cortical FF bias)
+    # 0 → auto from SEEDS (φ, e). Not free-fit to Allen rates.
+    local_k_ff: int = 0      # feedforward local out-degree (0=auto ~e)
+    local_k_fb: int = 0      # feedback local out-degree (0=auto ~φ/2)
+    recip_attenuate: float = 0.0  # 0 → 1/φ on weaker of reciprocal pairs
 
 
 @dataclass
@@ -255,24 +261,57 @@ class FSOTBrainDesign:
         meta = self.units
         gens = self.genotypes
 
-        # --- local (within-region) motifs ---
-        for region_id, ids in self.region_index.items():
-            for post in ids:
-                for pre in ids:
-                    if post == pre:
-                        continue
-                    mp, mq = meta[post], meta[pre]
-                    # local distance within region
-                    dist = abs(mp.region_local_id - mq.region_local_id) + 1
-                    w = _fsot_pair_weight(gens[post], gens[pre], dist)
-                    gain = _motif_gain(
-                        mq.cell_type, mp.cell_type, mq.synapse_sign, mp.synapse_sign, self.cfg
-                    )
-                    # Polarity: inhibitory presynaptic → negative conductance into post
-                    polarity = float(mq.synapse_sign)
-                    W[post, pre] = w * gain * polarity
+        # Seed-auto local out-degrees (computer-centric sparse motifs ≈ fly band)
+        k_ff = int(self.cfg.local_k_ff) or max(2, int(round(s.e)))          # ~3
+        k_fb = int(self.cfg.local_k_fb) or max(1, int(round(s.phi / 2.0)))  # ~1
+        recip_scale = float(self.cfg.recip_attenuate) or (1.0 / s.phi)       # weaker of pair
 
-        # --- long-range projections (E→E preferred) ---
+        # --- local (within-region) wiring ---
+        # 1) Dense E↔I / I↔I / VIP motifs (cortical microcircuit literature)
+        # 2) Sparse directed E→E (computer-centric / fly density band)
+        for _region_id, ids in self.region_index.items():
+            ordered = sorted(ids, key=lambda i: meta[i].region_local_id)
+            e_ids = [i for i in ordered if meta[i].synapse_sign > 0]
+            i_ids = [i for i in ordered if meta[i].synapse_sign < 0]
+
+            def _set_edge(post: int, pre: int, ff_boost: bool = False) -> None:
+                if post == pre:
+                    return
+                mp, mq = meta[post], meta[pre]
+                dist = abs(mp.region_local_id - mq.region_local_id) + 1
+                w = _fsot_pair_weight(gens[post], gens[pre], dist)
+                gain = _motif_gain(
+                    mq.cell_type, mp.cell_type, mq.synapse_sign, mp.synapse_sign, self.cfg
+                )
+                if ff_boost and mp.region_local_id > mq.region_local_id:
+                    gain = gain * (s.phi / (s.phi + 1.0 / s.phi))
+                elif ff_boost:
+                    gain = gain * (1.0 / s.phi)
+                polarity = float(mq.synapse_sign)
+                W[post, pre] = w * gain * polarity
+
+            # E→I and I→E: full bipartite (preserves E/I mass band)
+            for pre in e_ids:
+                for post in i_ids:
+                    _set_edge(post, pre)
+            for pre in i_ids:
+                for post in e_ids:
+                    _set_edge(post, pre)
+            # I→I / VIP→I: sparse directed (VIP disinhibition still via motif gain)
+            for pre in i_ids:
+                higher = [i for i in i_ids if meta[i].region_local_id > meta[pre].region_local_id]
+                lower = [i for i in i_ids if meta[i].region_local_id < meta[pre].region_local_id]
+                for post in higher[:k_ff] + lower[: max(1, k_fb)]:
+                    _set_edge(post, pre)
+
+            # E→E: sparse directed k-nearest (not all-to-all)
+            for pre in e_ids:
+                higher = [i for i in e_ids if meta[i].region_local_id > meta[pre].region_local_id]
+                lower = [i for i in e_ids if meta[i].region_local_id < meta[pre].region_local_id]
+                for post in higher[:k_ff] + lower[:k_fb]:
+                    _set_edge(post, pre, ff_boost=True)
+
+        # --- long-range projections (E→E preferred, directed src→dst only) ---
         for proj in self.cfg.projections:
             src_ids = self.region_index.get(proj.src, [])
             dst_ids = self.region_index.get(proj.dst, [])
@@ -280,20 +319,42 @@ class FSOTBrainDesign:
             dst_e = [i for i in dst_ids if meta[i].synapse_sign > 0]
             if not src_e or not dst_e:
                 continue
-            # Deterministic subsample by density
-            n_links = max(1, int(proj.density * len(src_e) * len(dst_e) / max(1, len(src_e))))
-            # connect each src E to k dest E
             k = max(1, int(proj.density * len(dst_e)))
             for si, pre in enumerate(src_e):
                 for j in range(k):
-                    # stable (non-PYTHONHASHSEED) mix of projection kind
                     kind_h = sum((i + 1) * ord(c) for i, c in enumerate(proj.kind))
                     post = dst_e[(si * 7 + j * 3 + kind_h % 5) % len(dst_e)]
                     if post == pre:
                         continue
-                    dist = 8 + abs(si - j)  # long-range distance proxy
+                    dist = 8 + abs(si - j)
                     w = _fsot_pair_weight(gens[post], gens[pre], dist)
+                    # directed long-range: only src→dst, no automatic reverse
                     W[post, pre] = W[post, pre] + w * proj.strength
+
+        # Reciprocal attenuation on *same-sign* pairs (E↔E, I↔I).
+        # E↔I loops stay dense (cortical recurrent inhibition). Same-sign
+        # directedness pushes whole-graph reciprocity toward fly band.
+        with torch.no_grad():
+            for i in range(n):
+                for j in range(i + 1, n):
+                    if meta[i].synapse_sign != meta[j].synapse_sign:
+                        continue
+                    a = float(W[i, j].item())
+                    b = float(W[j, i].item())
+                    if a == 0.0 or b == 0.0:
+                        continue
+                    # stronger same-sign attenuation (1/φ² if default)
+                    scale = recip_scale * recip_scale if recip_scale < 1.0 else recip_scale
+                    if abs(a) >= abs(b):
+                        W[j, i] = W[j, i] * scale
+                    else:
+                        W[i, j] = W[i, j] * scale
+
+        # Drop near-zero edges (sparsity toward fly density band)
+        mask = W != 0
+        if mask.any():
+            thr = float(W[mask].abs().mean().item()) / (s.phi * s.e)  # ~ mean/(φ·e)
+            W = torch.where(W.abs() >= thr, W, torch.zeros_like(W))
 
         # Normalize nonzero mean |W|
         mask = W != 0

@@ -84,13 +84,28 @@ def bind_dialogue_to_moments(
     moments: Sequence[AVMoment],
     cues: Sequence[CaptionCue],
     *,
-    window_s: float = 1.35,
+    window_s: Optional[float] = None,
 ) -> List[Dict[str, Any]]:
-    """Pair each moment with caption lines at that time."""
+    """
+    Pair each moment with caption lines at that time.
+
+    Default temporal window is seed-structured: φ + 1/e (via captions_near).
+    Best-matching cue (strict overlap preferred) is listed first.
+    """
+    # None → captions_near applies φ-window; keep optional explicit override
+    near_kw: Dict[str, Any] = {}
+    if window_s is not None:
+        near_kw["window_s"] = float(window_s)
     bindings = []
     for m in moments:
-        near = captions_near(cues, m.t_sec, window_s=window_s)
-        line = " ".join(c.text for c in near).strip()
+        near = captions_near(cues, m.t_sec, **near_kw)
+        # Prefer the nearest cue's text first, then any additional overlaps
+        if near:
+            primary = near[0].text.strip()
+            extras = [c.text.strip() for c in near[1:] if c.text.strip() and c.text.strip() != primary]
+            line = primary if not extras else (primary + " " + " ".join(extras[:2])).strip()
+        else:
+            line = ""
         bindings.append(
             {
                 "t_sec": m.t_sec,

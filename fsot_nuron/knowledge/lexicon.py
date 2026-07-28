@@ -75,21 +75,49 @@ class KnowledgeLexicon:
         return out
 
     def match_text(self, text: str) -> List[KnowledgeEntry]:
-        """Find lexicon keys mentioned in free text (title, transcript)."""
+        """
+        Find lexicon keys mentioned in free text (title, transcript, dialogue).
+
+        Matching order (stronger first):
+          1. multiword keys as substrings
+          2. single-word keys as word boundaries
+          3. examples / related phrases (weaker secondary hits)
+        """
         low = (text or "").lower()
         hits: List[KnowledgeEntry] = []
+        secondary: List[KnowledgeEntry] = []
         for key, e in self.entries.items():
-            if len(key) < 3:
+            if len(key) < 2:
                 continue
-            if re.search(rf"\b{re.escape(key)}\b", low):
+            if " " in key:
+                if key in low:
+                    hits.append(e)
+                continue
+            if len(key) >= 3 and re.search(rf"\b{re.escape(key)}\b", low):
                 hits.append(e)
-        # multiword titles
+                continue
+            # secondary: examples or related surface forms appear in dialogue
+            for ex in e.examples[:6]:
+                ex_l = str(ex).lower().strip()
+                if len(ex_l) >= 4 and ex_l in low:
+                    secondary.append(e)
+                    break
+            else:
+                for rel in e.related[:4]:
+                    rel_l = str(rel).lower().strip()
+                    if len(rel_l) >= 4 and (
+                        (" " in rel_l and rel_l in low)
+                        or re.search(rf"\b{re.escape(rel_l)}\b", low)
+                    ):
+                        secondary.append(e)
+                        break
+        # multiword show titles (legacy safety)
         if "adventure time" in low and "adventure time" in self.entries:
             hits.append(self.entries["adventure time"])
-        # dedupe
+        # dedupe — primary first, then secondary
         seen = set()
-        uniq = []
-        for h in hits:
+        uniq: List[KnowledgeEntry] = []
+        for h in hits + secondary:
             if h.key not in seen:
                 uniq.append(h)
                 seen.add(h.key)

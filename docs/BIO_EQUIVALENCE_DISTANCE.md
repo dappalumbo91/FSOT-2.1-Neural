@@ -11,20 +11,22 @@
 Rough **order-of-magnitude** status for *this* codebase (not marketing).  
 100% = “matches public wet-lab / clinical target under named protocol.”
 
-| Layer | Bio target | FSOT status | ~fidelity | Limiting factor |
-|-------|------------|-------------|-----------|-----------------|
-| **Cell-class rates** | Allen PV/Pyr/SST/VIP FI | Scalpel ≤2% · precision ≤1% | **~95–99%** on rates | Integer-spike / timing already solved |
-| **E/I microcircuit motifs** | Cortical E→I, VIP disinhibition | Genetic W motifs | **~60–75%** | Simplified densities, not full connectome |
-| **Regional anatomy** | thal→sens→assoc↔hipp | Named regions + projections | **~50–65%** | Few dozen units; no laminar V1/A1 |
-| **Thalamic sensory gate** | LGN/MGN-like filter | Seed-lawful relay &lt; primary | **~55–70%** | Motif-level, not full relay nuclei |
-| **Retina-like decode** | luminance, color opponency, motion | Luma/RGB/hue/grid/motion | **~35–50%** | No photoreceptor cascade, no center-surround RF library |
-| **Cochlea-like decode** | frequency maps, speech bands | FFT bands + speech-band prior | **~30–45%** | No basilar membrane / hair-cell model |
-| **Cross-modal binding** | STS / association co-occurrence | Vision⊗audio → assoc | **~40–55%** | Real co-occurrence; weak object semantics |
-| **Language / dialogue** | speech→meaning with vision | Subtitles + STT optional + lexicon | **~25–40%** | Needs captions/STT; not open vocab vision-language |
-| **Episodic memory** | encode–retain–retrieve, SME | learning_probe + bands | **~45–60%** | SME direction often green; capacity/delay limited |
-| **Open-world identity** | “Jake from pixels alone” | **Unclaimed** (frontier) | **~0–10%** | No held-out pixel-ID gate yet |
-| **Self curriculum** | autonomous study design | Probing (fixed discovery) | **~10–20%** | Heuristic chew ≠ authored curriculum |
-| **Free monologue** | open generative language | Partial compositional | **~15–25%** | Not an LLM; grounded regurgitation only |
+| Layer | Bio target | FSOT status | ~fidelity (refine `--domain bio`) | Limiting factor |
+|-------|------------|-------------|-----------------------------------|-----------------|
+| **Cell-class rates** | Allen PV/Pyr/SST/VIP FI | Scalpel ≤2% · precision ≤1% | **~96%** | Timing / integer spikes mostly solved |
+| **E/I microcircuit motifs** | Cortical E→I, VIP disinhibition | Sparse directed E→E + dense E↔I | **~99%** (mass band) | Not full connectome densities |
+| **Thalamic sensory gate** | LGN/MGN-like filter | Seed-lawful relay &lt; primary | **~100%** motif | Motif-level, not full nuclei |
+| **Retina-like decode** | CS, opponency, orientation | Multi-scale CS / ON-OFF / orient | **~72%** soft ceiling | No full photoreceptor cascade |
+| **Cochlea-like decode** | tonotopy, speech bands | φ-tilted log bands + formants | **~72%** soft ceiling | No basilar membrane / IHC |
+| **Fly connectome motifs** | FlyWire density/reciprocity/hubs | Same-sign recip in band | **~78%** | N≪ fly brain; E↔I floor density |
+| **EEG / learning bands** | mental-state θ + Sederberg SME | Public EEG + spike-band SME | **~85%** | Not clinical iEEG |
+| **Information accuracy** | encode–delay–retrieve under load | 12-item / 280-step probe | **~88%** | Small-N machine items |
+| **Episodic memory / SME** | SME θ/γ + consolidate | learning_bio gates | **~72%** soft ceiling | Capacity/delay limits |
+| **Cross-modal binding** | STS co-occurrence | Sync/async bind separation | **~74%** | Weak object semantics |
+| **Language / dialogue** | caption→trit→lexicon | Measured SRT/bind/cross-feed | **~72%** soft ceiling | Open-vocab VL unclaimed |
+| **Open-world identity** | pixels alone | Synthetic retina entities | **~55%** ceiling | Real crops required |
+| **Self curriculum** | self-authored plan | Gap plan + synthetic Δ | **~72%** | Real execute budget unclaimed |
+| **Free monologue** | multi-turn grounded | Memory monologue (no LLM) | **~72%** | Free LLM monologue unclaimed |
 
 **Bottom line for “watching a movie + language + association”:**
 

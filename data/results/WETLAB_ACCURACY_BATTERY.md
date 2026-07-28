@@ -1,6 +1,6 @@
 # Wet-lab accuracy battery
 
-Generated: `2026-07-28T18:02:36.771276+00:00` · **37/37** pass · 57.76s
+Generated: `2026-07-28T20:03:42.131807+00:00` · **37/37** pass · 57.27s
 
 ## Critical failures
 
@@ -42,8 +42,8 @@ _None._
 | T3 | literature_sme_priors | Y | `["sederberg_2003_sme", "creery_2022_cons` | Sederberg SME + Creery consolidation | iEEG literature (coded priors) |
 | T3 | sme_theta_encode_gt_rest | Y | `True` | True | Sederberg-style direction on spike-band  |
 | T3 | sme_gamma_encode_gt_rest | Y | `True` | True | Sederberg-style direction on spike-band  |
-| T3 | consolidate_top1_ge_half | Y | `0.875` | ≥0.5 | FSOT machine items + offline replay |
-| T3 | consolidate_above_chance | Y | `0.875` | > 0.125 | 8-item chance floor |
+| T3 | consolidate_top1_ge_half | Y | `1.0` | ≥0.5 | FSOT machine items + offline replay |
+| T3 | consolidate_above_chance | Y | `1.0` | > 0.125 | 8-item chance floor |
 | T4 | gene_ORF_SCN | Y | `{"n_codons": 6, "dna": "ATGAAATTTCGTTATT` | ≥4 codons DNA ORF | codon map + standard genetic code → phen |
 | T4 | gene_ORF_KCN | Y | `{"n_codons": 6, "dna": "ATGCTGGTTTCATCTT` | ≥4 codons DNA ORF | codon map + standard genetic code → phen |
 | T4 | gene_ORF_CACNA | Y | `{"n_codons": 6, "dna": "ATGGATGAGTGTTATT` | ≥4 codons DNA ORF | codon map + standard genetic code → phen |

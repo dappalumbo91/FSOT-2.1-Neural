@@ -71,10 +71,15 @@ def score_graph_motifs(
     W: torch.Tensor,
     *,
     thr: float = 0.02,
+    signs: Optional[torch.Tensor] = None,
 ) -> GraphMotifScore:
     """
     Motif statistics on FSOT weight matrix W[post, pre].
     Compare lightly to fly literature targets (not a claim of fly identity).
+
+    If `signs` (+1/-1 per unit) is provided, fly-band reciprocity uses
+    same-sign edges only (E↔E / I↔I). Dense E↔I loops are cortical-correct
+    and would otherwise inflate whole-graph reciprocity vs fly whole-brain.
     """
     Wc = W.detach().cpu().float()
     n = int(Wc.shape[0])
@@ -82,16 +87,25 @@ def score_graph_motifs(
     n_edges = int(mask.sum().item())
     density = n_edges / max(1, n * (n - 1))
     mean_abs = float(Wc[mask].abs().mean().item()) if n_edges else 0.0
-    # reciprocity: fraction of edges that have reverse edge
     both = mask & mask.T
-    recip = float(both.sum().item()) / max(1, n_edges)
-    # hub fraction: top 5% nodes by out-degree share of edges
-    out_deg = mask.float().sum(dim=0)  # pre → 
+    recip_raw = float(both.sum().item()) / max(1, n_edges)
+    out_deg = mask.float().sum(dim=0)
     k = max(1, int(0.05 * n))
     topk = torch.topk(out_deg, k=k).indices
     hub_edges = int(mask[:, topk].sum().item())
     hub_frac = hub_edges / max(1, n_edges)
 
+    same_sign_recip = recip_raw
+    if signs is not None and int(signs.numel()) == n:
+        s = signs.detach().cpu().float().view(-1)
+        same = (s.unsqueeze(0) * s.unsqueeze(1)) > 0
+        eye = ~torch.eye(n, dtype=torch.bool)
+        ss_mask = mask & same & eye
+        ss_edges = int(ss_mask.sum().item())
+        ss_both = ss_mask & ss_mask.T
+        same_sign_recip = float(ss_both.sum().item()) / max(1, ss_edges)
+
+    recip_for_band = same_sign_recip if signs is not None else recip_raw
     tgt = FLY_LITERATURE_TARGETS["motif_targets"]
     notes = [
         "Comparison is motif-level only — FSOT N≪ fly whole brain.",
@@ -103,8 +117,10 @@ def score_graph_motifs(
             "fly_target_norm": tgt["mean_out_degree_norm"],
             "ratio": density / max(1e-9, tgt["mean_out_degree_norm"]),
         },
+        "reciprocity_raw": recip_raw,
+        "reciprocity_same_sign": same_sign_recip,
         "reciprocity_in_fly_band": bool(
-            tgt["reciprocity_lo"] <= recip <= tgt["reciprocity_hi"]
+            tgt["reciprocity_lo"] <= recip_for_band <= tgt["reciprocity_hi"]
         ),
         "hub_fraction": {
             "ours": hub_frac,
@@ -116,7 +132,7 @@ def score_graph_motifs(
         n_edges=n_edges,
         density=density,
         mean_abs_w=mean_abs,
-        reciprocity=recip,
+        reciprocity=recip_for_band,
         hub_edge_fraction=hub_frac,
         vs_fly=vs,
         notes=notes,
@@ -134,7 +150,15 @@ def fly_motif_report(brain_or_W) -> Dict[str, Any]:
     else:
         W = brain_or_W
         extra = {}
-    score = score_graph_motifs(W)
+    signs = None
+    if hasattr(brain_or_W, "units"):
+        try:
+            signs = torch.tensor(
+                [float(u.synapse_sign) for u in brain_or_W.units], dtype=torch.float32
+            )
+        except Exception:
+            signs = None
+    score = score_graph_motifs(W, signs=signs)
     return {
         "literature": FLY_LITERATURE_TARGETS,
         "score": score.to_dict(),

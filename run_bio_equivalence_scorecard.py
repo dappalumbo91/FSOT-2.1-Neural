@@ -71,18 +71,34 @@ def main() -> int:
     for name, blob in fr.probes.items():
         print(f"  {name}: { {k: blob[k] for k in list(blob)[:6]} }")
 
-    # Layer scorecard (documented bands)
+    # Layer scorecard (documented bands — keep in sync with refine --domain bio)
+    fly_score = (fly.get("score") or {}) if isinstance(fly, dict) else {}
     layers = {
-        "cell_class_rates": {"band": "95-99%", "note": "Allen scalpel/precision (separate runners)"},
+        "cell_class_rates": {
+            "band": "95-99%",
+            "note": "Allen scalpel/precision (wetlab 37/37)",
+        },
+        "ei_microcircuit": {
+            "band": "~99%",
+            "note": "sparse directed E→E + dense E↔I mass band",
+        },
+        "fly_connectome_motifs": {
+            "band": "~78%",
+            "score": fly_score.get("reciprocity"),
+            "note": (
+                f"same-sign recip in band="
+                f"{(fly_score.get('vs_fly') or {}).get('reciprocity_in_fly_band')}"
+            ),
+        },
         "sensory_routing": {
-            "band": "55-70%",
+            "band": "70-100%",
             "score": 1.0 if sensory.ok else 0.0,
-            "note": "bio_pathways seed-lawful",
+            "note": "thalamic gate + retina/cochlea soft ceilings ~72",
         },
         "learning_dynamics": {
-            "band": "45-60%",
+            "band": "85-88%",
             "score": learn.metrics.get("learning_layer_fidelity_est"),
-            "note": "SME + retrieval gates",
+            "note": "SME + harder information-accuracy probe",
         },
         "film_semantics": {
             "band": "15-35%",
@@ -90,9 +106,9 @@ def main() -> int:
             "note": "association+subtitles early; not human comprehension",
         },
         "open_world_pixel_id": {
-            "band": "0-10%",
+            "band": "~55%",
             "score": fr.probes["open_world_pixel_identity"].get("pixel_id_top1"),
-            "note": "synthetic probe only",
+            "note": "synthetic retina entities; real crops unclaimed",
         },
     }
 

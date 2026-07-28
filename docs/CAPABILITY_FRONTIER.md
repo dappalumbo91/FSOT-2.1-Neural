@@ -5,7 +5,7 @@ so progress is honest and comparable.
 
 **Live status file:** [`data/capability_frontier/STATUS.md`](../data/capability_frontier/STATUS.md)  
 **Append-only ledger:** `data/capability_frontier/frontier_runs.jsonl`  
-**Last snapshot:** `2026-07-28T19:04:20.716861+00:00` · git `88c1c6592f74`
+**Last snapshot:** `2026-07-28T19:52:17.559837+00:00` · git `aabf7f615eeb`
 
 ## Status vocabulary
 
@@ -22,8 +22,8 @@ so progress is honest and comparable.
 
 **ID:** `open_world_pixel_identity`  
 **One-liner:** Recognize a specific entity (e.g. Jake) from pixels alone  
-**Current status:** `unclaimed`  
-**Note:** AV clusters + tutors exist; pixel-only identity not measured/green
+**Current status:** `probing`  
+**Note:** synthetic tutor-ablated top1=1.000 chance=0.250 (not real Jake pixels)
 
 ### We do **not** claim
 
@@ -47,11 +47,11 @@ Held-out silent clips of ≥3 characters: top-1 name accuracy ≥ 0.70 with no p
 
 ```json
 {
-  "pixel_id_top1": null,
-  "pixel_id_chance": null,
-  "n_characters": 0,
-  "n_heldout_clips": 0,
-  "tutor_ablated": null
+  "pixel_id_top1": 1.0,
+  "pixel_id_chance": 0.25,
+  "n_characters": 4,
+  "n_heldout_clips": 16,
+  "tutor_ablated": true
 }
 ```
 
@@ -62,7 +62,7 @@ Held-out silent clips of ≥3 characters: top-1 name accuracy ≥ 0.70 with no p
 **ID:** `self_directed_curriculum`  
 **One-liner:** Choose its own learning sequence without human ordering  
 **Current status:** `probing`  
-**Note:** run_autonomous_learn.py chews discovered docs/media with fixed heuristics; not self-authored curriculum
+**Note:** gap-driven order heuristic measured; not self-authored curriculum
 
 ### We do **not** claim
 
@@ -86,9 +86,9 @@ Without human file lists: agent writes a multi-step plan, executes it, and impro
 
 ```json
 {
-  "curriculum_steps_planned": 0,
+  "curriculum_steps_planned": 4,
   "curriculum_self_authored": false,
-  "gap_driven_fraction": 0.0,
+  "gap_driven_fraction": 1.0,
   "metric_delta_vs_fixed_order": null
 }
 ```
@@ -100,7 +100,7 @@ Without human file lists: agent writes a multi-step plan, executes it, and impro
 **ID:** `free_monologue`  
 **One-liner:** Open-ended generative language like a large language model  
 **Current status:** `partial`  
-**Note:** plain_english / recall_plain_english are compositional expansions, not free generative monologue
+**Note:** compositional grounded expansion scored; not free monologue
 
 ### We do **not** claim
 
@@ -125,10 +125,10 @@ Multi-turn dialogue (≥5 turns) answering open questions about chewed media/doc
 ```json
 {
   "monologue_mode": "compositional_regurgitation",
-  "max_coherent_sentences": null,
-  "groundedness_score": null,
+  "max_coherent_sentences": 2,
+  "groundedness_score": 0.5,
   "external_llm_used": false,
-  "n_turns": 0
+  "n_turns": 1
 }
 ```
 

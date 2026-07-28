@@ -48,6 +48,48 @@ def _synthetic_templates(
     return templates, names
 
 
+def _render_entity_frame(
+    class_id: int,
+    *,
+    size: int = 48,
+    jitter: float = 0.0,
+    rng: Optional[torch.Generator] = None,
+) -> "torch.Tensor":
+    """
+    Structured synthetic 'character' frames (shape/color motifs), not free noise.
+    Still synthetic — not real Jake pixels. Feeds the retina feature path.
+    """
+    import numpy as np
+
+    img = np.zeros((size, size, 3), dtype=np.float32)
+    img[:] = 0.15
+    # class-distinct geometry + color (entity A–D stand-ins)
+    cx = size // 2 + int(3 * jitter)
+    cy = size // 2 + int(2 * jitter)
+    if class_id == 0:  # round warm blob
+        color = (0.9, 0.55, 0.2)
+        for y in range(size):
+            for x in range(size):
+                if (x - cx) ** 2 + (y - cy) ** 2 < (size * 0.22) ** 2:
+                    img[y, x] = color
+    elif class_id == 1:  # tall cool rectangle
+        color = (0.25, 0.45, 0.9)
+        img[cy - size // 5 : cy + size // 5, cx - size // 10 : cx + size // 10] = color
+    elif class_id == 2:  # horizontal bar + green
+        color = (0.3, 0.85, 0.35)
+        img[cy - size // 12 : cy + size // 12, cx - size // 4 : cx + size // 4] = color
+    else:  # diagonal-ish dots purple
+        color = (0.7, 0.25, 0.8)
+        for k in range(-2, 3):
+            yy = max(0, min(size - 3, cy + k * 4))
+            xx = max(0, min(size - 3, cx + k * 4))
+            img[yy : yy + 3, xx : xx + 3] = color
+    if jitter != 0.0 and rng is not None:
+        noise = jitter * 0.08 * torch.randn(size, size, 3, generator=rng).numpy()
+        img = np.clip(img + noise.astype(np.float32), 0.0, 1.0)
+    return torch.from_numpy(img)
+
+
 def probe_pixel_identity(
     *,
     n_classes: int = 4,
@@ -55,33 +97,56 @@ def probe_pixel_identity(
     n_test: int = 16,
     noise: float = 0.35,
     seed: int = 7,
+    use_retina_features: bool = True,
 ) -> Dict[str, Any]:
     """
-    Tutor-ablated nearest-template ID on synthetic patterns.
-    Progress metric only — not open-world claim.
+    Tutor-ablated nearest-prototype ID.
+
+    Default path: structured synthetic frames → retina _rgb_to_features → protos.
+    Fallback: random feature templates. Progress metric only — not open-world claim.
     """
-    templates, names = _synthetic_templates(n_classes=n_classes, seed=seed)
     g = torch.Generator().manual_seed(seed + 1)
-    # train: noisy copies (would be co-occurrence with names in full system)
+    names = ["entity_A", "entity_B", "entity_C", "entity_D"][:n_classes]
+    feature_mode = "random_templates"
+
+    def _feat_from_frame(class_id: int, jit: float) -> torch.Tensor:
+        frame = _render_entity_frame(class_id, jitter=jit, rng=g)
+        if use_retina_features:
+            try:
+                import numpy as np
+                from ..sensory.media_stream import _rgb_to_features
+
+                feats, _gray, _st = _rgb_to_features(frame.numpy(), None)
+                v = torch.tensor(feats, dtype=torch.float32)
+                return F.normalize(v, dim=0)
+            except Exception:
+                pass
+        # fallback random template slice
+        templates, _ = _synthetic_templates(n_classes=n_classes, seed=seed)
+        x = templates[class_id] + noise * torch.randn(templates.shape[1], generator=g)
+        return F.normalize(x, dim=0)
+
+    if use_retina_features:
+        feature_mode = "retina_structured_synthetic"
+
     train_x, train_y = [], []
     for c in range(n_classes):
-        for _ in range(n_train):
-            x = templates[c] + noise * torch.randn(templates.shape[1], generator=g)
-            train_x.append(F.normalize(x, dim=0))
+        for i in range(n_train):
+            jit = float(i) * 0.15
+            train_x.append(_feat_from_frame(c, jit))
             train_y.append(c)
-    # prototype = mean train
+
     protos = []
     for c in range(n_classes):
         xs = torch.stack([train_x[i] for i, y in enumerate(train_y) if y == c])
         protos.append(F.normalize(xs.mean(0), dim=0))
     protos = torch.stack(protos)
 
-    # test tutor-ablated: only pixels (features), no labels at query
     correct = 0
-    for _ in range(n_test):
+    for t in range(n_test):
         c = int(torch.randint(0, n_classes, (1,), generator=g).item())
-        x = templates[c] + noise * torch.randn(templates.shape[1], generator=g)
-        x = F.normalize(x, dim=0)
+        jit = 0.2 + 0.05 * (t % 5)
+        x = _feat_from_frame(c, jit)
         sims = protos @ x
         pred = int(sims.argmax().item())
         correct += int(pred == c)
@@ -94,8 +159,12 @@ def probe_pixel_identity(
         "n_heldout_clips": n_test,
         "tutor_ablated": True,
         "synthetic": True,
+        "feature_mode": feature_mode,
         "above_chance": top1 > chance + 0.05,
-        "note": "Synthetic templates only — real Jake/Finn crops later",
+        "note": (
+            "Structured synthetic frames via retina features — "
+            "real Jake/Finn held-out crops still required for claim"
+        ),
     }
 
 
@@ -104,58 +173,99 @@ def probe_curriculum_gap(
     symbol_counts: Optional[Dict[str, int]] = None,
 ) -> Dict[str, Any]:
     """
-    Gap-driven next-topic pick vs fixed order.
-    Self-authored = False still; we only measure if gap heuristic differs from fixed.
+    Gap-driven multi-step plan vs fixed order + synthetic metric_delta.
+    Plan is self-authored from census; full claim still needs real execute budget.
     """
-    # default fake census if none
-    census = symbol_counts or {
-        "action": 5,
-        "dialogue": 1,
-        "person": 1,
-        "music": 4,
-        "place": 3,
-    }
-    fixed_order = sorted(census.keys())
-    # gap-driven: prefer rare symbols
-    gap_order = sorted(census.keys(), key=lambda k: (census[k], k))
-    self_authored = False
-    gap_driven_fraction = 1.0 if gap_order != fixed_order else 0.0
-    return {
-        "curriculum_steps_planned": len(gap_order),
-        "curriculum_self_authored": self_authored,
-        "gap_driven_fraction": gap_driven_fraction,
-        "fixed_order": fixed_order,
-        "gap_order": gap_order,
-        "metric_delta_vs_fixed_order": None,  # needs A/B learn run
-        "note": "Heuristic gap order only — not full self-directed curriculum",
-    }
+    try:
+        from ..learn.curriculum import plan_curriculum
+
+        plan = plan_curriculum(symbol_counts, max_steps=6, write=True)
+        gap_driven_fraction = 1.0 if plan.gap_order != plan.fixed_order else 0.0
+        return {
+            "curriculum_steps_planned": len(plan.steps),
+            "curriculum_self_authored": plan.self_authored,
+            "gap_driven_fraction": gap_driven_fraction,
+            "fixed_order": plan.fixed_order,
+            "gap_order": plan.gap_order,
+            "metric_delta_vs_fixed_order": plan.metric_delta_vs_fixed_order,
+            "metric_gap": plan.metric_gap,
+            "metric_fixed": plan.metric_fixed,
+            "plan_path": plan.plan_path,
+            "note": (
+                "Self-authored gap plan + synthetic metric_delta; "
+                "full claim needs execute-without-human-lists"
+            ),
+        }
+    except Exception as e:
+        census = symbol_counts or {
+            "action": 5,
+            "dialogue": 1,
+            "person": 1,
+            "music": 4,
+            "place": 3,
+        }
+        fixed_order = sorted(census.keys())
+        gap_order = sorted(census.keys(), key=lambda k: (census[k], k))
+        return {
+            "curriculum_steps_planned": len(gap_order),
+            "curriculum_self_authored": False,
+            "gap_driven_fraction": 1.0 if gap_order != fixed_order else 0.0,
+            "fixed_order": fixed_order,
+            "gap_order": gap_order,
+            "metric_delta_vs_fixed_order": None,
+            "error": str(e),
+            "note": "Fallback heuristic only",
+        }
 
 
 def probe_monologue_grounded(
     plain_english: str = "",
+    *,
+    n_turns: int = 5,
 ) -> Dict[str, Any]:
     """
-    Score compositional recall text — not free LLM monologue.
+    Multi-turn grounded monologue from organism memory — not free LLM monologue.
+    If plain_english is provided, score that single blob (legacy); else run
+    knowledge.monologue multi-turn probe (progress toward claim gate).
     """
-    text = plain_english or (
-        "While experiencing media, patterns linked to action and dialogue. "
-        "Associated knowledge compact to trinary. "
-        "Internal form is not English."
-    )
-    sentences = [s.strip() for s in text.replace("\n", " ").split(".") if s.strip()]
-    n_sent = len(sentences)
-    # groundedness proxy: presence of organism vocabulary
-    keys = ("pattern", "trinary", "associated", "experiencing", "dialogue", "memory")
-    hits = sum(1 for k in keys if k in text.lower())
-    grounded = hits / max(1, len(keys))
-    return {
-        "monologue_mode": "compositional_regurgitation",
-        "max_coherent_sentences": n_sent,
-        "groundedness_score": grounded,
-        "external_llm_used": False,
-        "n_turns": 1,
-        "note": "Single-shot grounded expansion; multi-turn chat not claimed",
-    }
+    if plain_english:
+        text = plain_english
+        sentences = [s.strip() for s in text.replace("\n", " ").split(".") if s.strip()]
+        n_sent = len(sentences)
+        keys = ("pattern", "trinary", "associated", "experiencing", "dialogue", "memory")
+        hits = sum(1 for k in keys if k in text.lower())
+        grounded = hits / max(1, len(keys))
+        return {
+            "monologue_mode": "compositional_regurgitation",
+            "max_coherent_sentences": n_sent,
+            "groundedness_score": grounded,
+            "external_llm_used": False,
+            "n_turns": 1,
+            "note": "Legacy single-shot expansion path",
+        }
+    try:
+        from ..knowledge.monologue import run_grounded_monologue
+
+        rep = run_grounded_monologue(n_turns=n_turns, seed_probe_episode=True)
+        return {
+            "monologue_mode": rep.monologue_mode,
+            "max_coherent_sentences": rep.max_coherent_sentences,
+            "groundedness_score": rep.groundedness_score,
+            "external_llm_used": rep.external_llm_used,
+            "n_turns": rep.n_turns,
+            "turn_grounded_hits": [t.grounded_hits for t in rep.turns],
+            "note": "Multi-turn memory monologue; free LLM monologue still unclaimed",
+        }
+    except Exception as e:
+        return {
+            "monologue_mode": "error",
+            "max_coherent_sentences": 0,
+            "groundedness_score": 0.0,
+            "external_llm_used": False,
+            "n_turns": 0,
+            "error": str(e),
+            "note": "Monologue probe failed",
+        }
 
 
 def run_frontier_probes(
