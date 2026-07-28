@@ -92,15 +92,18 @@ python scripts/ci_smoke.py
 **Stage docs:**  
 [`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md) · [`docs/STAGE_INTELLIGENCE_PROBE.md`](docs/STAGE_INTELLIGENCE_PROBE.md) · [`docs/STAGE_RETENTION_CONSOLIDATION.md`](docs/STAGE_RETENTION_CONSOLIDATION.md)  
 
-**Local product console (no web):**
+**Local product console — boot and see it (no web):**
 
 ```powershell
+cd "I:\fsot nuron"
+$env:PYTHONPATH = "I:\fsot nuron"
+$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
 python run_console.py
 # or: python -m product.console
 ```
 
-Uses host OS fonts/windows (tkinter v0.2). **Machine encoding** (UTF-8/T1 packs / OS ABI words) is primary body I/O — Morse is secondary only.  
-[`docs/MACHINE_ENCODING.md`](docs/MACHINE_ENCODING.md) · `python run_machine_encode.py --verify`  
+Console **v0.3** auto-boots: pin archive → fold S strip → machine ABI. Buttons for scalpel, **FSOT-bridged** intel probe, Zig/QEMU.  
+[`docs/FSOT_APPLICATION_NEURAL.md`](docs/FSOT_APPLICATION_NEURAL.md) · [`docs/MACHINE_ENCODING.md`](docs/MACHINE_ENCODING.md) · `python run_fsot_bridge.py`  
 UI architecture: [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md).  
 **Road to a full brain design:** [`BRAIN_PATH.md`](BRAIN_PATH.md)  
 **Python → Zig body:** [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md)

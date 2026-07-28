@@ -62,7 +62,10 @@ $env:PYTHONPATH = "I:\fsot nuron"
 python run_archive_pin.py          # fail-closed pin
 python run_fsot_bridge.py          # folds + machine/chem bridges + inject
 python run_machine_encode.py --verify --inject-demo
+python run_intelligence_probe.py --item-mode fsot_machine --items 6 --skip-scalpel
+python run_console.py              # bootable UI — see pin + S folds live
 ```
+
 
 | Module | Role |
 |--------|------|

@@ -43,10 +43,19 @@ def main() -> int:
     from fsot_nuron.scalpel_rate import scalpel_calibrate
     from fsot_nuron.thesis_ledger import record_run
     from fsot_nuron.paths import ARTIFACTS, DATA
+    from fsot_nuron.archive_pin import pin_archive
+    from fsot_nuron.fsot_bridge import fold_diagnostics
 
     print("=== FSOT SCALPEL rate targeting ===")
     print("Policy: biological accuracy first — close large rel_err, then tight.")
     print(f"tol={args.tol:.0%}  focus={args.focus}  steps={args.steps}")
+
+    pin = pin_archive(write_snapshot=False)
+    folds = fold_diagnostics()
+    print(
+        f"archive pin seed_ok={pin.seed_match_ok}  "
+        f"S_bio={folds.get('S_Biology'):+.4f}  S_neuro={folds.get('S_Neuroscience'):+.4f}"
+    )
 
     targets = build_class_targets(min_cells=15, mouse_only=True)
     if "Pyr" not in targets or "PV" not in targets:
@@ -129,8 +138,10 @@ def main() -> int:
         "focus": focus,
         "report": report.to_dict(),
         "gates": gates,
-        "authority": "Allen Cell Types Cre-line wet-lab rates",
-        "policy": "scalpel: large error first (Pyr), then PV; bio before performance",
+        "fsot_folds": folds,
+        "pin_seed_ok": pin.seed_match_ok,
+        "authority": "Allen Cell Types Cre-line wet-lab rates + archive D1D38A pin",
+        "policy": "scalpel: large error first (Pyr), then PV; bio before performance; through FSOT",
     }
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     (ARTIFACTS / "scalpel_rates.json").write_text(json.dumps(out, indent=2), encoding="utf-8")

@@ -37,6 +37,12 @@ def main() -> int:
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--skip-scalpel", action="store_true")
     ap.add_argument("--suite", action="store_true", help="run delay + consolidate suite")
+    ap.add_argument(
+        "--item-mode",
+        default="fsot_machine",
+        choices=["fsot_machine", "random"],
+        help="fsot_machine (default): labels via machine encode + FSOT bridge; random=legacy",
+    )
     args = ap.parse_args()
 
     consolidate = args.consolidate or (args.suite and not args.no_consolidate)
@@ -49,6 +55,7 @@ def main() -> int:
     from fsot_nuron.thesis_ledger import record_run
     from fsot_nuron.paths import ARTIFACTS, DATA
     from fsot_nuron.archive_pin import pin_archive
+    from fsot_nuron.fsot_bridge import fold_diagnostics
     from fsot_nuron.scalpel_rate import scalpel_calibrate
     from fsot_nuron.class_ephys import build_class_targets
     from fsot_nuron.cell_types import build_typed_population
@@ -59,11 +66,17 @@ def main() -> int:
     print("accurate neurons → multi-region brain → encode/delay/consolidate/retrieve")
     print(
         f"profile={args.profile} scalpel_tol={args.tol:.0%} items={args.items} "
-        f"delay={args.delay_steps} consolidate={consolidate}"
+        f"delay={args.delay_steps} consolidate={consolidate} item_mode={args.item_mode}"
     )
 
     pin = pin_archive(write_snapshot=False)
     print(f"archive pin seed_ok: {pin.seed_match_ok}")
+    folds = fold_diagnostics()
+    print(
+        f"FSOT folds  S_bio={folds.get('S_Biology'):+.4f}  "
+        f"S_neuro={folds.get('S_Neuroscience'):+.4f}  "
+        f"S_body={folds.get('S_Computer_Body'):+.4f}  pin_ok={folds.get('pin_ok')}"
+    )
 
     # --- Scalpel 1% with fallback to 2% ---
     scalpel_tol_used = args.tol
@@ -106,6 +119,7 @@ def main() -> int:
             encode_steps=args.encode_steps,
             retrieve_steps=args.retrieve_steps,
             seed=7,
+            item_mode=args.item_mode,
             **kw,
         )
 
@@ -174,6 +188,8 @@ def main() -> int:
     out = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "mission": "retention + consolidation on scalpel-accurate FSOT brain",
+        "doctrine": "pin→fold→bridge→couple; item_mode=" + args.item_mode,
+        "fsot_folds": folds,
         "scalpel": scalpel_meta,
         "scalpel_detail": report.to_dict() if report is not None else None,
         "results": results,
@@ -184,6 +200,7 @@ def main() -> int:
             "delay_steps": args.delay_steps,
             "consolidate": consolidate,
             "tol": scalpel_meta.get("tol_used"),
+            "item_mode": args.item_mode,
         },
     }
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
@@ -205,6 +222,8 @@ def main() -> int:
         f"- Delay: **{args.delay_steps}** model-ms",
         f"- Consolidate: **{consolidate}**",
         f"- Scalpel tol used: **{scalpel_meta.get('tol_used')}** ok={scalpel_meta.get('scalpel_ok')}",
+        f"- Item mode: **{args.item_mode}**",
+        f"- S_Biology: **{folds.get('S_Biology')}** · S_Neuroscience: **{folds.get('S_Neuroscience')}**",
         "",
         "## Accuracy ladder",
         "",

@@ -38,7 +38,7 @@ def make_item_patterns(
     feat_dim: int = 12,
     seed: int = 7,
 ) -> List[Dict[str, Any]]:
-    """Deterministic item set: continuous features + trit quantize."""
+    """Deterministic item set: continuous features + trit quantize (legacy baseline)."""
     g = torch.Generator().manual_seed(seed)
     items = []
     for i in range(n_items):
@@ -51,6 +51,88 @@ def make_item_patterns(
                 "label": f"item_{i}",
                 "features": feat.tolist(),
                 "trits": trits,
+                "source": "random_gaussian",
+            }
+        )
+    return items
+
+
+# Fixed vocabulary — machine-path text labels (not Morse), seed-indexed order
+_FSOT_ITEM_VOCAB = (
+    "alpha wave",
+    "beta spike",
+    "theta nest",
+    "gamma burst",
+    "hippocampus map",
+    "sensory gate",
+    "codon ATG start",
+    "FSOT scalar K",
+    "trinary fold",
+    "neural substrate",
+    "allen pyramid",
+    "pv basket",
+    "sst martinotti",
+    "vip disinhibit",
+    "machine word pack",
+    "biology fold twelve",
+)
+
+
+def make_fsot_item_patterns(
+    n_items: int,
+    feat_dim: int = 12,
+    seed: int = 7,
+) -> List[Dict[str, Any]]:
+    """
+    Memory items through FSOT doctrine (not random free features):
+
+      text label → machine lossless bit→trit (OS body)
+                → bridge_machine_payload (Computer_Body fold → S)
+                → couple_features_with_S
+                → encode drive from sensory_strength
+
+    Archive math modulates the domain engine; features stay real vectors.
+    """
+    from .machine_encode import text_to_utf8_trits, trits_to_drive_features
+    from .fsot_bridge import bridge_machine_payload, couple_features_with_S
+    from .seeds import SEEDS
+
+    items: List[Dict[str, Any]] = []
+    # rotate vocab by seed for determinism without free noise
+    rot = int(seed) % len(_FSOT_ITEM_VOCAB)
+    for i in range(n_items):
+        base = _FSOT_ITEM_VOCAB[(rot + i) % len(_FSOT_ITEM_VOCAB)]
+        label = f"{base} #{i}"
+        br = bridge_machine_payload(label)
+        mods = br["modulators"]
+        trits = text_to_utf8_trits(label)
+        feats = trits_to_drive_features(trits, n_features=feat_dim)
+        feats = couple_features_with_S(feats, mods)
+        # unit L2 for stable cosine retrieve (domain hygiene, not free fit)
+        t = torch.tensor(feats, dtype=torch.float64)
+        t = t / (t.norm() + 1e-8)
+        strength = float(mods["sensory_strength"])
+        # pattern strength seed-folded from gain + poof (fixed seeds only)
+        pattern_strength = float(
+            0.35 * SEEDS.phi / SEEDS.e + 0.20 * float(mods.get("feature_gain", 1.0))
+        )
+        pattern_strength = max(0.25, min(0.75, pattern_strength))
+        items.append(
+            {
+                "id": i,
+                "label": label,
+                "features": t.tolist(),
+                "trits": [int(x) for x in trits[:feat_dim]],
+                "source": "fsot_machine_bridge",
+                "drive_amp": strength,
+                "pattern_strength": pattern_strength,
+                "fsot": {
+                    "fold": br["fold"],
+                    "S": mods["S"],
+                    "trit": mods["trit"],
+                    "sensory_strength": strength,
+                    "bridge": br["bridge"],
+                },
             }
         )
     return items
@@ -126,6 +208,9 @@ def run_encode_epoch(
     brain.reset()
     n = brain.n_units
     feats = item["features"]
+    # Per-item FSOT modulators when present (machine bridge → strength)
+    drive_amp = float(item.get("drive_amp", drive_amp))
+    pattern_strength = float(item.get("pattern_strength", pattern_strength))
     sens_ids = brain.region_index.get("sens", [])
     assoc_ids = brain.region_index.get("assoc", [])
     thal_ids = brain.region_index.get("thal", [])
@@ -352,15 +437,25 @@ def learning_probe(
     replay_rounds: int = 2,
     replay_steps: int = 120,
     probe_immediate: bool = False,
+    item_mode: str = "fsot_machine",
 ) -> LearningReport:
     """
     Encode-all → [optional immediate probe] → delay and/or offline consolidate
     → retrieve-each.
 
+    item_mode:
+      fsot_machine (default) — labels via machine encode + FSOT bridge couple
+      random — legacy Gaussian features (baseline control)
+
     delay_steps: pure rest after encoding (retention delay in model-ms).
     consolidate: sleep-like rest + soft replay before final retrieve.
     """
-    items = make_item_patterns(n_items, seed=seed)
+    if item_mode in ("fsot_machine", "fsot", "machine"):
+        items = make_fsot_item_patterns(n_items, seed=seed)
+        mode_note = "items via FSOT machine bridge (Computer_Body → S couple)"
+    else:
+        items = make_item_patterns(n_items, seed=seed)
+        mode_note = "items via random gaussian (legacy baseline)"
     memories: List[MemoryTrace] = []
     encode_hists = []
 
@@ -399,7 +494,10 @@ def learning_probe(
                 top1_immediate=top1_imm,
                 top1_after_delay=top1_delay,
                 per_item=per_item,
-                notes=f"Retention delay {delay_steps} model-ms (no offline replay).",
+                notes=(
+                    f"{mode_note}. Retention delay {delay_steps} model-ms "
+                    "(no offline replay)."
+                ),
             )
         # if consolidate after delay, record mid-probe optionally cheap skip
         top1_delay, _, _, _ = _retrieve_all(brain, items, memories, retrieve_steps)
@@ -432,7 +530,7 @@ def learning_probe(
             consolidate_sigma_rel=float(consol_meta.get("sigma_rel_replay") or float("nan")),
             per_item=per_item,
             notes=(
-                "Offline consolidate: rest + soft replay; "
+                f"{mode_note}. Offline consolidate: rest + soft replay; "
                 f"sigma_rel_replay={consol_meta.get('sigma_rel_replay')}"
             ),
         )
@@ -451,7 +549,7 @@ def learning_probe(
         top1_immediate=top1,
         per_item=per_item,
         notes=(
-            "Fingerprint retrieval on multi-region FSOT brain; "
+            f"{mode_note}. Fingerprint retrieval on multi-region FSOT brain; "
             "not a transformer LM. Wet-lab class rates locked separately via scalpel."
         ),
     )

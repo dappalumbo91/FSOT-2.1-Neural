@@ -482,6 +482,50 @@ def couple_features_with_S(
     return out
 
 
+def fold_diagnostics(*, prefer_authority: bool = True) -> Dict[str, Any]:
+    """
+    Snapshot of preregistered fold scalars for live console / probe reports.
+
+    Always routes through compute_S (archive mpmath when available).
+    """
+    pin_ok = False
+    pin_sha: Optional[str] = None
+    try:
+        pin = pin_archive(write_snapshot=False)
+        pin_ok = bool(pin.connected and pin.seed_match_ok)
+        pin_sha = pin.compute_sha256
+    except Exception as e:
+        pin = None
+        pin_err = str(e)
+    else:
+        pin_err = None
+
+    folds_out: Dict[str, Any] = {}
+    for name in ("Biology", "Neuroscience", "Biochemistry", "Neural_Substrate", "Computer_Body"):
+        snap = compute_S(name, prefer_authority=prefer_authority)
+        folds_out[name] = {
+            "S": snap.S,
+            "trit": snap.trit,
+            "D_eff": snap.D_eff,
+            "delta_psi": snap.delta_psi,
+            "observed": snap.observed,
+            "source": snap.source,
+        }
+
+    return {
+        "pin_ok": pin_ok,
+        "pin_sha256": pin_sha,
+        "pin_error": pin_err,
+        "authority_sha256": CERT_AUTHORITY_SHA256,
+        "formula": "S = K * (T1 + T2 + T3)",
+        "free_parameters": 0,
+        "folds": folds_out,
+        "S_Biology": folds_out.get("Biology", {}).get("S"),
+        "S_Neuroscience": folds_out.get("Neuroscience", {}).get("S"),
+        "S_Computer_Body": folds_out.get("Computer_Body", {}).get("S"),
+    }
+
+
 def verify_fsot_bridge() -> Dict[str, Any]:
     """Smoke: pin, atlas S, machine + chemical bridges, no free params."""
     pin = require_pin(write_snapshot=False)
