@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-07-28T17:04:28.016081+00:00",
+  "doctrine": "resolve continuous-ms timing before free-parameter accuracy pushes",
+  "rows": [
+    {
+      "dt_ms": 1.0,
+      "steps": 1400,
+      "sim_ms": 1400.0,
+      "scalpel_ok_2pct": true,
+      "n_within_1pct": 2,
+      "n_within_2pct": 4,
+      "classes": {
+        "Pyr": {
+          "target_Hz": 16.35121532610921,
+          "measured_Hz": 16.153846740722656,
+          "rel_err": 0.012070575883824328,
+          "within_1pct": false,
+          "within_2pct": true,
+          "R_ms": 59,
+          "fi": 0.5687682098793726
+        },
+        "PV": {
+          "target_Hz": 83.3504049172855,
+          "measured_Hz": 83.0769271850586,
+          "rel_err": 0.0032810606318985427,
+          "within_1pct": true,
+          "within_2pct": true,
+          "R_ms": 12,
+          "fi": 1.2753892040336694
+        },
+        "SST": {
+          "target_Hz": 29.538052683455557,
+          "measured_Hz": 29.230770111083984,
+          "rel_err": 0.010402939410548344,
+          "within_1pct": false,
+          "within_2pct": true,
+          "R_ms": 32,
+          "fi": 1.038546953778949
+        },
+        "VIP": {
+          "target_Hz": 34.81541758294487,
+          "measured_Hz": 34.615386962890625,
+          "rel_err": 0.005745460888920435,
+          "within_1pct": true,
+          "within_2pct": true,
+          "R_ms": 28,
+          "fi": 1.2862095878702986
+        }
+      }
+    },
+    {
+      "dt_ms": 0.25,
+      "steps": 5600,
+      "sim_ms": 1400.0,
+      "scalpel_ok_2pct": true,
+      "n_within_1pct": 2,
+      "n_within_2pct": 4,
+      "classes": {
+        "Pyr": {
+          "target_Hz": 16.35121532610921,
+          "measured_Hz": 16.153846740722656,
+          "rel_err": 0.012070575883824328,
+          "within_1pct": false,
+          "within_2pct": true,
+          "R_ms": 61,
+          "fi": 0.5452350867329638
+        },
+        "PV": {
+          "target_Hz": 83.3504049172855,
+          "measured_Hz": 83.84615325927734,
+          "rel_err": 0.005947761651353799,
+          "within_1pct": true,
+          "within_2pct": true,
+          "R_ms": 12,
+          "fi": 1.2753892040336694
+        },
+        "SST": {
+          "target_Hz": 29.538052683455557,
+          "measured_Hz": 29.230770111083984,
+          "rel_err": 0.010402939410548344,
+          "within_1pct": false,
+          "within_2pct": true,
+          "R_ms": 32,
+          "fi": 0.9911235608963903
+        },
+        "VIP": {
+          "target_Hz": 34.81541758294487,
+          "measured_Hz": 34.615386962890625,
+          "rel_err": 0.005745460888920435,
+          "within_1pct": true,
+          "within_2pct": true,
+          "R_ms": 28,
+          "fi": 1.1879539465503544
+        }
+      }
+    }
+  ],
+  "recommendation": {
+    "recommended_dt_ms": 0.25,
+    "reason": "maximize classes within 2% then 1%; prefer coarser dt if tied",
+    "best_n_1pct": 2,
+    "best_n_2pct": 4
+  },
+  "note": "ref_timer_ms continuous; FI onset scales with dt; steps = sim_ms/dt"
+}

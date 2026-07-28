@@ -74,16 +74,17 @@ class FSOTNeuronBatch:
         self.vrest = torch.full((B,), self.cfg.vrest_mV, device=self.device, dtype=dtype)
         self.adapt_gain = torch.full((B,), 0.02, device=self.device, dtype=dtype)
         self.adapt_decay = torch.full((B,), 0.988, device=self.device, dtype=dtype)
-        # Per-unit absolute refractory (ms) — primary ISI floor
+        # Per-unit absolute refractory duration in **milliseconds** (not step counts)
         self.ref_steps = torch.full(
             (B,), int(self.cfg.refractory_steps), device=self.device, dtype=torch.int32
         )
+        self.ref_ms_base = self.ref_steps.float()  # continuous-time ISI floor
         # Per-spike ISI lengthening (ms) → sets Allen adaptation index analytically
         self.adapt_step = torch.full((B,), 0.7, device=self.device, dtype=dtype)
         self.fi_stim = torch.full((B,), 0.50, device=self.device, dtype=dtype)
         self.mode_name = "default"
-        # Sub-ms residual: fractional refractory debt (efficient timing beyond 1 ms grid)
-        self.ref_residual = torch.zeros(B, device=self.device, dtype=dtype)
+        # Continuous refractory timer (ms remaining) — true sub-ms resolution
+        self.ref_timer_ms = torch.zeros(B, device=self.device, dtype=dtype)
         self.dt_ms = float(self.cfg.dt_ms)
         self.subms_enabled = True
 
@@ -96,7 +97,7 @@ class FSOTNeuronBatch:
         self.adapt.zero_()
         self.train_count.zero_()
         self.quiet_count.zero_()
-        self.ref_residual.zero_()
+        self.ref_timer_ms.zero_()
         self.steps_run = 0
 
     def apply_bio_params(
@@ -124,6 +125,8 @@ class FSOTNeuronBatch:
             self.adapt_decay = adapt_decay.to(self.device, self.dtype)
         if refractory_steps is not None:
             self.ref_steps = refractory_steps.to(self.device, dtype=torch.int32)
+            # API still accepts "steps" name but values are refractory **ms** floors
+            self.ref_ms_base = self.ref_steps.float()
         if fi_stim is not None:
             self.fi_stim = fi_stim.to(self.device, self.dtype)
         if adapt_step is not None:
@@ -136,7 +139,10 @@ class FSOTNeuronBatch:
         self, stimulus: torch.Tensor | float
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        One ms-proxy step for all units.
+        One simulation step of duration ``cfg.dt_ms`` (model-ms), default 1.0.
+
+        Refractory is a **continuous timer in milliseconds** so sub-ms ``dt_ms``
+        can resolve rates that integer 1 ms grids cannot (soft 1% misses).
 
         Returns: S, fired (bool), phase, ternary
         """
@@ -149,16 +155,12 @@ class FSOTNeuronBatch:
             elif stim.shape[0] != self.S.shape[0]:
                 raise ValueError(f"stimulus batch {stim.shape} != units {self.S.shape}")
 
-        # Sub-ms: consume residual first, then integer refractory steps
-        if self.subms_enabled:
-            self.ref_residual = (self.ref_residual - self.dt_ms).clamp(min=0.0)
-            residual_block = self.ref_residual > 1e-6
-            in_ref = (self.refractory > 0) | residual_block
-            can_tick = (self.refractory > 0) & (~residual_block)
-        else:
-            in_ref = self.refractory > 0
-            can_tick = self.refractory > 0
-        self.refractory = torch.where(can_tick, self.refractory - 1, self.refractory)
+        dt = float(self.dt_ms)
+        # Continuous refractory countdown (ms)
+        self.ref_timer_ms = (self.ref_timer_ms - dt).clamp(min=0.0)
+        in_ref = self.ref_timer_ms > 1e-9
+        # Keep integer counter for telemetry (~ceil remaining steps)
+        self.refractory = torch.ceil(self.ref_timer_ms / max(dt, 1e-9)).to(torch.int32)
 
         # Decay adaptation (AHP) every step — per-unit decay
         self.adapt = self.adapt * self.adapt_decay
@@ -190,29 +192,27 @@ class FSOTNeuronBatch:
         )
         self.S = S
         self.ternary = trinary_from_S(S)
-        dphase = 0.0015 + 0.10 * stim_eff.clamp(min=0.0) + 0.02 * self.adapt
+        # Phase advance scales with dt so dphase/ms stays similar across resolutions
+        dphase = (0.0015 + 0.10 * stim_eff.clamp(min=0.0) + 0.02 * self.adapt) * dt
         self.phase = (self.phase + dphase) % (2 * torch.pi)
 
         thr = self.fire_thr + 0.35 * self.adapt - 0.50 * stim_eff.clamp(min=0)
         can_fire = (~in_ref) & (S > thr)
         fired = can_fire
 
-        # Reset train after long silence so each FI epoch has clean first ISI
+        # Quiet time in steps ≈ 150 ms / dt
+        quiet_limit = max(1, int(round(150.0 / max(dt, 1e-9))))
         self.quiet_count = torch.where(fired, torch.zeros_like(self.quiet_count), self.quiet_count + 1)
         self.train_count = torch.where(
-            self.quiet_count > 150, torch.zeros_like(self.train_count), self.train_count
+            self.quiet_count > quiet_limit, torch.zeros_like(self.train_count), self.train_count
         )
 
         if fired.any():
-            # Analytical adaptation: ISI_k ≈ ref + train_count * adapt_step
+            # Analytical adaptation: ISI_k ≈ ref_ms + train_count * adapt_step_ms
             self.train_count = torch.where(fired, self.train_count + 1, self.train_count)
-            total_ref_ms = self.ref_steps.float() + self.train_count.float() * self.adapt_step
-            # Integer part + sub-ms residual (efficient fine timing)
-            int_ref = total_ref_ms.floor().to(torch.int32).clamp(0, 250)
-            frac = (total_ref_ms - int_ref.float()).clamp(0.0, 0.999)
-            self.refractory = torch.where(fired, int_ref, self.refractory)
-            if self.subms_enabled:
-                self.ref_residual = torch.where(fired, frac * self.dt_ms, self.ref_residual)
+            total_ref_ms = self.ref_ms_base + self.train_count.float() * self.adapt_step
+            total_ref_ms = total_ref_ms.clamp(0.0, 250.0)
+            self.ref_timer_ms = torch.where(fired, total_ref_ms, self.ref_timer_ms)
             self.phase = torch.where(fired, torch.zeros_like(self.phase), self.phase)
             self.spike_count = self.spike_count + fired.to(torch.int64)
             self.adapt = torch.where(
@@ -246,9 +246,14 @@ class FSOTNeuronBatch:
             return torch.stack(frames, dim=0)
 
         t = torch.arange(steps, device=self.device)
+        dt = max(1e-9, float(self.dt_ms))
+        # Convert model-ms periods → step counts at this resolution
+        per_steps = max(1, int(round(80.0 / dt)))
+        burst_steps = max(1, int(round(20.0 / dt)))
+        fi_onset = max(1, int(round(100.0 / dt)))  # 100 model-ms rest
         if stimulus_pattern == "periodic":
             # ~80 ms cycle, 20 ms burst — theta-like sensory packet
-            burst = (t % 80) < 20
+            burst = (t % per_steps) < burst_steps
             track = torch.where(
                 burst,
                 torch.full_like(t, 0.65, dtype=self.dtype),
@@ -259,11 +264,11 @@ class FSOTNeuronBatch:
             # Per-unit FI amplitude (Allen rheobase-scaled when mapped)
             return self.fi_stim.unsqueeze(0).expand(steps, B).contiguous()
         if stimulus_pattern == "fi_step":
-            # 100 ms rest + sustained current (classic step protocol)
+            # 100 model-ms rest + sustained current (classic step protocol)
             track = torch.zeros(steps, B, device=self.device, dtype=self.dtype)
-            amp = self.fi_stim.unsqueeze(0).expand(max(1, steps - 100), B)
-            if steps > 100:
-                track[100:] = amp
+            if steps > fi_onset:
+                amp = self.fi_stim.unsqueeze(0).expand(steps - fi_onset, B)
+                track[fi_onset:] = amp
             else:
                 track[:] = self.fi_stim.unsqueeze(0).expand(steps, B)
             return track

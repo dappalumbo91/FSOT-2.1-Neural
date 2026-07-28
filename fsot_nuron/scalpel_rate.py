@@ -25,11 +25,13 @@ from .neuron_batch import FSOTNeuronBatch
 class ScalpelClassState:
     cell_type: str
     target_Hz: float
-    refractory_steps: int
+    refractory_steps: int  # integer ms floor (compat)
     fi_stim: float
     fire_threshold: float
     adapt_step: float
     adapt_gain: float
+    # Continuous refractory duration (ms) — prefer this for sub-ms timing
+    refractory_ms: float = float("nan")
     measured_Hz: float = float("nan")
     rel_err: float = float("nan")
     iters: int = 0
@@ -71,9 +73,15 @@ def _apply_class_knobs(
 ) -> None:
     n = len(labels)
     refs, thr, fi, ad_step, again = [], [], [], [], []
+    ref_ms = []
     for i, lab in enumerate(labels):
         k = knobs[lab]
+        # Prefer continuous refractory_ms when set
+        rms = float(k.refractory_ms) if k.refractory_ms == k.refractory_ms else float(k.refractory_steps)
+        k.refractory_ms = rms
+        k.refractory_steps = max(1, int(round(rms)))
         refs.append(int(k.refractory_steps))
+        ref_ms.append(rms)
         thr.append(k.fire_threshold)
         fi.append(k.fi_stim)
         ad_step.append(k.adapt_step)
@@ -89,6 +97,8 @@ def _apply_class_knobs(
         adapt_step=torch.tensor(ad_step, device=net.device, dtype=net.dtype),
         mode_name="scalpel_rate",
     )
+    # Continuous-ms floor (fractional) — this is the sub-ms lever
+    net.ref_ms_base = torch.tensor(ref_ms, device=net.device, dtype=net.dtype)
 
 
 def _measure(
@@ -96,23 +106,23 @@ def _measure(
     labels: List[str],
     steps: int,
     *,
-    fi_onset_ms: int = 100,
+    fi_onset_ms: float = 100.0,
 ) -> Dict[str, float]:
     """
     Mean class rate during *sustained FI only* (skip fi_step rest head).
 
-    neuron_batch fi_step: zeros for first 100 ms, then constant fi_stim.
-    Using full-trace spike_count/T understates rate by ~onset/T — scalpel
-    must match wet-lab FI rates in the drive epoch.
+    neuron_batch fi_step: zeros for first ~100 model-ms, then constant fi_stim.
+    Onset is converted to step index via net.dt_ms so sub-ms grids stay honest.
     """
     net.reset()
     hist = net.run(steps, stimulus_pattern="fi_step", record=True)
     fired = hist["fired"]  # [T, B]
     T = int(fired.shape[0])
-    onset = min(max(0, fi_onset_ms), T - 1)
+    dt = float(getattr(net, "dt_ms", None) or net.cfg.dt_ms)
+    onset = int(round(float(fi_onset_ms) / max(dt, 1e-9)))
+    onset = min(max(0, onset), T - 1)
     window = fired[onset:]
-    dur_s = max(1e-9, (T - onset) * float(net.cfg.dt_ms) / 1000.0)
-    # per-unit rate in drive window
+    dur_s = max(1e-9, (T - onset) * dt / 1000.0)
     spikes = window.float().sum(dim=0)  # [B]
     rates = (spikes / dur_s).detach().cpu().tolist()
     return _mean_rate_by_label(rates, labels)
@@ -131,10 +141,12 @@ def init_knobs_from_targets(
             continue
         ph = apply_class_targets_to_genotype_phenotype(lab, ph0, targets, mode=mode)
         tgt = targets[lab].mean_rate_Hz if lab in targets else ph.get("class_rate_target_Hz", 15.0)
+        r0 = float(ph["refractory_steps"])
         knobs[lab] = ScalpelClassState(
             cell_type=lab,
             target_Hz=float(tgt),
-            refractory_steps=int(round(ph["refractory_steps"])),
+            refractory_steps=int(round(r0)),
+            refractory_ms=r0,
             fi_stim=float(ph["fi_stim"]),
             fire_threshold=float(ph["fire_threshold"]),
             adapt_step=float(ph["adapt_step"]),
@@ -234,26 +246,29 @@ def scalpel_calibrate(
                     break
                 # Scalpel: rate ≈ 1000 / R_eff when FI is suprathreshold
                 # Adjust R toward 1000/tgt, with measured feedback
+                # Continuous R_ms ≈ 1000/rate when FI is suprathreshold
                 ideal_R = max(3.0, 1000.0 / tgt - 0.5)
+                cur_R = (
+                    float(st.refractory_ms)
+                    if st.refractory_ms == st.refractory_ms
+                    else float(st.refractory_steps)
+                )
                 if m < tgt:
-                    # too slow: set R from target (rate≈1000/R), boost drive
                     ratio = max(0.15, m / tgt)
-                    st.refractory_steps = max(3, int(round(ideal_R * (0.65 + 0.35 * ratio))))
-                    # If still missing spikes (m << 1000/R), cut R harder
-                    r_max = 1000.0 / max(1, st.refractory_steps)
+                    cur_R = max(3.0, ideal_R * (0.65 + 0.35 * ratio))
+                    r_max = 1000.0 / max(1.0, cur_R)
                     if m < 0.85 * min(tgt, r_max):
-                        st.refractory_steps = max(3, int(round(st.refractory_steps * 0.90)))
+                        cur_R = max(3.0, cur_R * 0.90)
                     st.fi_stim = min(1.8, st.fi_stim * (1.0 + min(0.35, (tgt - m) / tgt)))
                     st.fire_threshold = max(0.80, st.fire_threshold - 0.02)
                     st.adapt_step = 0.0 if (tgt - m) / tgt > 0.08 else st.adapt_step
                     st.adapt_gain = min(st.adapt_gain, 0.015) if m < 0.8 * tgt else st.adapt_gain
                 else:
-                    # too fast: lengthen R toward ideal * (m/tgt)
                     ratio = m / tgt
-                    st.refractory_steps = min(
-                        200, int(round(ideal_R * ratio * 0.55 + st.refractory_steps * 0.45))
-                    )
+                    cur_R = min(200.0, ideal_R * ratio * 0.55 + cur_R * 0.45)
                     st.fi_stim = max(0.28, st.fi_stim * (1.0 - min(0.12, (m - tgt) / tgt)))
+                st.refractory_ms = float(cur_R)
+                st.refractory_steps = max(1, int(round(cur_R)))
 
             _apply_class_knobs(net, labels, knobs, base_d_eff, base_vrest, base_adec)
             measured = _measure(net, labels, steps)

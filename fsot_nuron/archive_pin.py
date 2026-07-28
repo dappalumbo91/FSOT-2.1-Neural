@@ -139,9 +139,11 @@ def archive_derived_floats() -> dict[str, float]:
     a_in = a_bleed * (1.0 + math.cos(theta_s) / phi)
     suction = poof * (-math.cos(theta_s - pi))
     chaos = gamma_c / omega
-    p_new = (gamma / e) * math.sqrt(2.0)
+    p_base = gamma / e
+    p_new = p_base * math.sqrt(2.0)
     c_factor = c_eff * p_new
     k = phi * (gamma / e) * math.sqrt(2.0) / math.log(pi) * 0.99
+    c_cosm = 1.0 / (phi * 10.0)
     return {
         "pi": pi,
         "e": e,
@@ -152,6 +154,8 @@ def archive_derived_floats() -> dict[str, float]:
         "psi_con": psi_con,
         "eta_eff": eta_eff,
         "beta": float(beta),
+        "gamma_c": gamma_c,
+        "omega": omega,
         "chaos": chaos,
         "theta_s": theta_s,
         "poof": poof,
@@ -161,9 +165,11 @@ def archive_derived_floats() -> dict[str, float]:
         "a_in": a_in,
         "a_bleed": a_bleed,
         "suction": suction,
+        "p_base": p_base,
         "p_new": p_new,
         "c_factor": c_factor,
         "k": k,
+        "c_cosm": c_cosm,
     }
 
 

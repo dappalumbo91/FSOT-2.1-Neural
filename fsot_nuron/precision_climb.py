@@ -32,16 +32,20 @@ from .class_ephys import ClassEphysTarget
 from .neuron_batch import FSOTNeuronBatch
 
 
-def _seed_step_R(err: float) -> int:
+def _seed_step_R_ms(err: float) -> float:
     """
-    Integer refractory delta — only when |err| is large.
-    Near soft-miss band (|err|≤0.02) return 0: use POOF-scaled FI instead.
+    Continuous refractory delta in **milliseconds** (not integer steps).
+    Uses POOF for fine scale near 1% band — this is the timing fix.
+    too fast (err>0) → +R_ms; too slow → −R_ms.
     """
     if abs(err) < 1e-9:
-        return 0
+        return 0.0
+    s = SEEDS
+    # Fine: fraction of a ms from POOF/φ; coarser if far
     if abs(err) <= 0.02:
-        return 0  # R is too coarse for 1% band
-    mag = max(1, min(2, int(math.ceil(SEEDS.phi * min(1.5, abs(err) / 0.03)))))
+        mag = s.poof * s.phi * min(2.0, abs(err) / 0.01)  # ~0.15–0.5 ms
+    else:
+        mag = min(2.0, s.phi * abs(err) / 0.02)
     return mag if err > 0 else -mag
 
 
@@ -130,20 +134,25 @@ def precision_micro_climb(
         err_abs_before = abs(err)
 
         # Snapshot for rollback if error worsens (immune / proofreading)
+        cur_R = (
+            float(st.refractory_ms)
+            if st.refractory_ms == st.refractory_ms
+            else float(st.refractory_steps)
+        )
         snap = (
-            st.refractory_steps,
+            cur_R,
             st.fi_stim,
             st.fire_threshold,
             st.adapt_step,
             st.adapt_gain,
         )
 
-        dR = _seed_step_R(err)
-        if dR != 0:
-            st.refractory_steps = max(3, min(200, st.refractory_steps + dR))
-        # POOF/SUCTION + consciousness-gate FI micro-step (primary near 1%)
+        dR = _seed_step_R_ms(err)
+        cur_R = max(3.0, min(200.0, cur_R + dR))
+        st.refractory_ms = cur_R
+        st.refractory_steps = max(1, int(round(cur_R)))
+        # POOF/SUCTION + consciousness-gate FI micro-step
         st.fi_stim = float(max(0.25, min(1.85, st.fi_stim * _seed_fi_factor(err))))
-        # Observer-style threshold micro-nudge only if still outside 1.5%
         if abs(err) > 0.015:
             thr_nudge = SEEDS.c_factor * 0.01 * (1.0 if err > 0 else -1.0)
             st.fire_threshold = float(max(0.80, min(1.15, st.fire_threshold + thr_nudge)))
@@ -162,12 +171,14 @@ def precision_micro_climb(
         rolled = False
         if new_err == new_err and new_err > err_abs_before + 1e-6:
             (
-                st.refractory_steps,
+                cur_R,
                 st.fi_stim,
                 st.fire_threshold,
                 st.adapt_step,
                 st.adapt_gain,
             ) = snap
+            st.refractory_ms = cur_R
+            st.refractory_steps = max(1, int(round(cur_R)))
             _apply_class_knobs(net, labels, knobs, base_d_eff, base_vrest, base_adec)
             measured = _measure(net, labels, steps)
             for lab, ks in knobs.items():
@@ -183,7 +194,8 @@ def precision_micro_climb(
                 "round": rnd,
                 "focus": focus,
                 "err_before": err,
-                "dR": dR,
+                "dR_ms": dR,
+                "R_ms": st.refractory_ms,
                 "rolled_back": rolled,
                 "measured": dict(measured),
                 "rel_err": {k: knobs[k].rel_err for k in knobs},

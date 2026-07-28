@@ -101,6 +101,8 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Stage thesis (arXiv-style)** | [`docs/thesis/FSOT_NEURAL_STAGE_VERIFICATION.md`](docs/thesis/FSOT_NEURAL_STAGE_VERIFICATION.md) · `.tex` |
 | **Precision climb (≤1% attempt)** | `python run_precision_climb.py` · `python scripts/audit_lean_nosorry.py` |
 | **Full spine (consciousness / observer / yin–yang / POOF)** | [`docs/FSOT_FULL_SPINE_NEURAL.md`](docs/FSOT_FULL_SPINE_NEURAL.md) · `python run_full_spine_check.py` |
+| **Formula completeness** | [`docs/FORMULA_COMPLETENESS.md`](docs/FORMULA_COMPLETENESS.md) · `python scripts/audit_formula_completeness.py` |
+| **Timing resolution** | [`docs/TIMING_RESOLUTION.md`](docs/TIMING_RESOLUTION.md) · `python run_timing_resolution.py` |
 | Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 

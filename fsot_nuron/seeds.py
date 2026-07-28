@@ -14,23 +14,29 @@ class Seeds:
     gamma: float = 0.5772156649015329
     g_catalan: float = 0.9159655941772190
 
+    # Layer-1 (archive §2)
     alpha: float = 8.082937414140405e-4
     psi_con: float = 0.6321205588285577
     eta_eff: float = 0.46694220692425986
     beta: float = 2.620866911333223e-17
-    chaos: float = -0.3310241826104818
+    gamma_c: float = -0.42838851679220657  # -ln(2)/φ
+    omega: float = 1.2941305780559662  # sin(π/e)·√2
+    chaos: float = -0.3310241826104818  # gamma_c / omega
     theta_s: float = 0.29089654054517305
     poof: float = 0.1534822148944508
 
+    # Layer-2 (archive §3)
     c_eff: float = 0.9577022026205613
     p_var: float = 0.9579871226722757
     b_in: float = 0.7879407922764435
     a_in: float = 1.6668538450045732
     a_bleed: float = 1.046973630587551
     suction: float = 0.14703398542810284
+    p_base: float = 0.2123457762393784  # γ/e
     p_new: float = 0.30030227667037146
-    c_factor: float = 0.287600151819184
+    c_factor: float = 0.287600151819184  # consciousness factor
     k: float = 0.42022166416069665
+    c_cosm: float = 0.06180339887498948  # 1/(φ·10)
 
     @property
     def collapse_threshold(self) -> float:

@@ -25,7 +25,11 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tol", type=float, default=0.01)
     ap.add_argument("--rounds", type=int, default=48)
-    ap.add_argument("--steps", type=int, default=1400)
+    ap.add_argument("--steps", type=int, default=0, help="0 = auto from sim-ms / dt")
+    # FI window must be long enough that integer spike counts can hit 1%:
+    # |n/T - f| / f ≤ 0.01 ⇒ T ≳ 0.5/(0.01 f) ≈ 3 s for f≈16 Hz Pyr.
+    ap.add_argument("--sim-ms", type=float, default=4200.0)
+    ap.add_argument("--dt-ms", type=float, default=0.5, help="model-ms step; continuous R_ms")
     ap.add_argument("--units", type=int, default=64)
     ap.add_argument("--device", default="cpu")
     args = ap.parse_args()
@@ -40,14 +44,20 @@ def main() -> int:
     from fsot_nuron.thesis_ledger import record_run
 
     print("=== FSOT precision climb (seed-scaled timing; S law fixed) ===")
+    print(f"dt_ms={args.dt_ms} (continuous refractory timer; fix time before more accuracy)")
     pin = pin_archive(write_snapshot=False)
     print(f"pin seed_ok={pin.seed_match_ok}")
+
+    if args.steps <= 0:
+        args.steps = max(200, int(round(args.sim_ms / max(args.dt_ms, 1e-9))))
 
     targets = build_class_targets(min_cells=15, mouse_only=True)
     genotypes = build_typed_population(args.units, seed=42, diversity=True)
     labels = [getattr(g, "cell_type", "Pyr") for g in genotypes]
     phenotypes = [dict(g.phenotype) for g in genotypes]
-    net = FSOTNeuronBatch(NeuronConfig(n_units=args.units), device=args.device)
+    net = FSOTNeuronBatch(
+        NeuronConfig(n_units=args.units, dt_ms=args.dt_ms), device=args.device
+    )
     d_eff = torch.tensor([p["d_eff"] for p in phenotypes], dtype=net.dtype)
     thr = torch.tensor([p["fire_threshold"] for p in phenotypes], dtype=net.dtype)
     vrest = torch.tensor([p.get("vrest_mV", -70.0) for p in phenotypes], dtype=net.dtype)
