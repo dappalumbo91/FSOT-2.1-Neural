@@ -70,6 +70,17 @@ python run_archive_pin.py
 
 Ship the updated snapshot **with the repo** so clones stay transplantable.
 
+## Optional world media (not identity)
+
+Movies / music / shows can be **streamed as sensory injectors** for testing:
+
+```powershell
+$env:FSOT_MEDIA_ROOTS = "G:\movies;G:\showes;G:\Debut"
+python run_media_chew.py
+```
+
+See [`docs/MEDIA_SENSORY.md`](MEDIA_SENSORY.md). Missing G: drives does **not** break boot.
+
 ## Bare metal / BIOS path
 
 - Zig host: `embodiment/zig` → `fsot_trit_host` (no external paths)

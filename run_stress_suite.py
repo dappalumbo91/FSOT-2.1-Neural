@@ -888,6 +888,64 @@ class StressSuite:
                         critical=False,
                         error=str(e),
                     )
+
+            # H9 optional media sensory (soft — world injectors not required)
+            try:
+                from fsot_nuron.sensory.media_stream import (
+                    media_roots_from_env,
+                    chew_media,
+                    MediaChewConfig,
+                )
+
+                roots = media_roots_from_env()
+                if roots:
+                    mrep = chew_media(
+                        MediaChewConfig(
+                            roots=[str(r) for r in roots],
+                            max_video_files=1,
+                            max_audio_files=1,
+                            frames_per_video=8 if self.quick else 16,
+                            frame_stride=30,
+                            audio_windows=3 if self.quick else 6,
+                            profile="ai_efficient",
+                        )
+                    )
+                    self.record(
+                        "H",
+                        "media_sensory_chew",
+                        mrep.ok
+                        and (mrep.n_vision_packets + mrep.n_audio_packets) > 0,
+                        critical=False,
+                        metrics={
+                            "roots": mrep.roots_found,
+                            "vision_pkts": mrep.n_vision_packets,
+                            "audio_pkts": mrep.n_audio_packets,
+                            "luma": round(mrep.mean_vision_luma, 4),
+                            "motion": round(mrep.mean_motion, 4),
+                            "rms": round(mrep.mean_audio_rms, 4),
+                            "spikes": mrep.total_spikes,
+                            "sources": mrep.sources[:4],
+                        },
+                        note="optional media libraries — eyes/ears on world, not identity",
+                    )
+                else:
+                    self.record(
+                        "H",
+                        "media_sensory_chew",
+                        True,
+                        critical=False,
+                        note="no media roots present — skip (standalone OK)",
+                        metrics={"roots": []},
+                    )
+            except Exception as e:
+                self.record(
+                    "H",
+                    "media_sensory_chew",
+                    False,
+                    critical=False,
+                    error=str(e)[:400],
+                    note="soft — optional media path",
+                )
         except Exception as e:
             self.record(
                 "H",

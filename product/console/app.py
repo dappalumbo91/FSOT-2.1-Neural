@@ -504,6 +504,9 @@ class ConsoleApp(tk.Tk):
         ttk.Button(boot_row, text="Full spine", command=self._cmd_full_spine).pack(
             side=tk.LEFT, padx=2
         )
+        ttk.Button(boot_row, text="Media chew", command=self._cmd_media_chew).pack(
+            side=tk.LEFT, padx=2
+        )
 
         btn_row = ttk.Frame(self.tab_dash)
         btn_row.pack(fill=tk.X, padx=8, pady=6)
@@ -1374,6 +1377,21 @@ class ConsoleApp(tk.Tk):
 
     def _cmd_full_spine(self) -> None:
         self._run_async([sys.executable, str(ROOT / "run_full_spine_check.py")])
+
+    def _cmd_media_chew(self) -> None:
+        """Optional world media → vision/audio packets (G: libraries if present)."""
+        self._run_async(
+            [
+                sys.executable,
+                str(ROOT / "run_media_chew.py"),
+                "--videos",
+                "2",
+                "--frames",
+                "16",
+                "--audio",
+                "2",
+            ]
+        )
 
     def _refresh_cells(self) -> None:
         lines = [

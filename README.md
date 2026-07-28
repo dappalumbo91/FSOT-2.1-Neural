@@ -116,6 +116,9 @@ Readable boot checklist · hardware re-probe every boot · POOF/SUCTION homeosta
 
 **Stress (full):** 40/40 pass · 0 critical · 0 soft — Allen ≤1% via continuous-ms climb · intel 24@800 top-1 ~0.92 · stage H embodiment green. See [`docs/BIO_STRESS_COMPARISON.md`](docs/BIO_STRESS_COMPARISON.md) · [`docs/STRESS_STAGE_REPORT.md`](docs/STRESS_STAGE_REPORT.md).
 
+**Standalone transplant:** [`docs/STANDALONE_TRANSPLANT.md`](docs/STANDALONE_TRANSPLANT.md) — no external archive required.  
+**Optional media world:** [`docs/MEDIA_SENSORY.md`](docs/MEDIA_SENSORY.md) · `python run_media_chew.py` (G:\ movies/shows/music as eyes/ears test injectors).
+
 ```powershell
 python run_console.py
 python run_stress_suite.py          # find stage break points

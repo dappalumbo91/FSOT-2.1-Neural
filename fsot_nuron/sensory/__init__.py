@@ -18,6 +18,13 @@ from .host_senses import (
     note_log_line,
     HostSenseSnapshot,
 )
+from .media_stream import (
+    chew_media,
+    MediaChewConfig,
+    MediaChewReport,
+    media_roots_from_env,
+    discover_media_files,
+)
 
 
 def push_machine_text(
@@ -73,4 +80,9 @@ __all__ = [
     "note_hid_click",
     "note_log_line",
     "HostSenseSnapshot",
+    "chew_media",
+    "MediaChewConfig",
+    "MediaChewReport",
+    "media_roots_from_env",
+    "discover_media_files",
 ]
