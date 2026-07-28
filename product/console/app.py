@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """
-FSOT Neural Console v0.5 — product screens (tkinter, local, no web).
+FSOT Neural Console v0.6 — product screens (tkinter, local, no web).
 
 Aligned with docs/PRODUCT_UI_AND_DISPLAY.md:
-  Dashboard · Cell classes · Memory · Encode · Body · Live · Log
+  Dashboard · Cell classes · Memory · Encode · Body · Visual · Live · Log
 
 Display doctrine:
   - Human summary first (plain English)
   - Wet-lab accuracy numbers (Allen rates, probe top-1)
   - Archive FSOT pin/bridge on every claim path
+  - Hardware-adaptive body on every boot (not locked to one PC)
+  - Obsidian-style live genetic graph under Visual
 """
 
 from __future__ import annotations
@@ -98,6 +100,47 @@ def format_boot_report(
     lines.append("RESULT: " + ("BOOT PASS — system ready to run science buttons." if boot_ok else "BOOT FAIL — fix archive pin / FSOT_PHYSICAL_ARCHIVE."))
     lines.append("")
     return "\n".join(lines), boot_ok
+
+
+def format_hardware_report(body: Dict[str, Any]) -> str:
+    """Adaptive host body — re-probed every boot, not bound to one machine."""
+    hw = body.get("hardware") or {}
+    ad = body.get("adaptation") or {}
+    m = body.get("sample_metric") or {}
+    lines = [
+        "HARDWARE BODY (adaptive boot)",
+        "=============================",
+        "",
+        "What this means:",
+        "  The computer is the organism's body. Sensors are discovered at boot",
+        "  so the same mind can run on different machines (graceful degrade).",
+        "",
+        f"Host .............. {hw.get('hostname')}  ({hw.get('system')} {hw.get('machine')})",
+        f"CPU ............... logical={hw.get('cpu_count_logical')}  physical={hw.get('cpu_count_physical')}",
+        f"RAM ............... {hw.get('ram_total_gb')} GB" if hw.get("ram_total_gb") is not None else "RAM ............... ?",
+        f"Disk free ......... {hw.get('disk_free_gb'):.1f} GB" if isinstance(hw.get("disk_free_gb"), (int, float)) else "Disk free ......... ?",
+        f"CUDA .............. {_fmt_yes(hw.get('cuda_available'))}  {hw.get('cuda_device_name') or ''}".rstrip(),
+        f"psutil sensors .... {_fmt_yes(hw.get('has_psutil'))}",
+        f"Channels .......... {', '.join(hw.get('sensors_available') or [])}",
+        "",
+        "Adaptation (this boot — not hard-coded to one PC)",
+        f"  device .......... {ad.get('device')}",
+        f"  n_units ......... {ad.get('n_units')}",
+        f"  dt_ms ........... {ad.get('dt_ms')}",
+        f"  note ............ {ad.get('note')}",
+        "",
+        "Interoception sample (circulatory / autonomic analog)",
+        f"  drive scalar .... {body.get('interoception_drive')}",
+        f"  cpu_util ........ {m.get('cpu_util')}",
+        f"  mem_util ........ {m.get('mem_util')}",
+        f"  disk_util ....... {m.get('disk_util')}",
+        f"  temp_norm ....... {m.get('temp_norm')}",
+        "",
+    ]
+    for n in hw.get("notes") or []:
+        lines.append(f"  note: {n}")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def format_encode_summary(text: str, path: str, out: Dict[str, Any], frame: Dict[str, Any], fsot: Optional[Dict[str, Any]]) -> str:
@@ -327,20 +370,24 @@ def _looks_like_dna(text: str) -> bool:
 class ConsoleApp(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("FSOT Neural Console v0.5 — product screens · local · no web")
-        self.geometry("1220x840")
-        self.minsize(1000, 680)
+        self.title("FSOT Neural Console v0.6 — product · visual · adaptive body · local")
+        self.geometry("1280x880")
+        self.minsize(1040, 700)
         self.configure(bg="#1a1d23")
         self._log_q: queue.Queue[str] = queue.Queue()
         self._worker: Optional[threading.Thread] = None
         self._boot_ok = False
         self._zig_fp = False
+        self._hw_profile: Optional[Dict[str, Any]] = None
+        self._hw_body: Optional[Dict[str, Any]] = None
+        self._visual_net = None
+        self._visual_running = False
         self._build()
         self.after(100, self._drain_log)
         self._log(
-            "FSOT Neural Console v0.5 (product design screens)\n"
-            "Dashboard · Cell classes · Memory · Encode · Body · Live\n"
-            "Archive math · wet-lab scalpel · FSOT machine intel · Zig body\n"
+            "FSOT Neural Console v0.6 (product design screens)\n"
+            "Dashboard · Cell classes · Memory · Encode · Body · Visual · Live\n"
+            "Archive math · wet-lab scalpel · adaptive hardware body · Obsidian graph\n"
         )
         self.after(250, self._auto_boot)
 
@@ -392,13 +439,15 @@ class ConsoleApp(tk.Tk):
         self.tab_mem = ttk.Frame(nb)
         self.tab_enc = ttk.Frame(nb)
         self.tab_body = ttk.Frame(nb)
+        self.tab_visual = ttk.Frame(nb)
         self.tab_live = ttk.Frame(nb)
         self.tab_log = ttk.Frame(nb)
         nb.add(self.tab_dash, text="Dashboard")
         nb.add(self.tab_cells, text="Cell classes")
         nb.add(self.tab_mem, text="Memory lab")
         nb.add(self.tab_enc, text="Encode")
-        nb.add(self.tab_body, text="Body (Zig)")
+        nb.add(self.tab_body, text="Body")
+        nb.add(self.tab_visual, text="Visual")
         nb.add(self.tab_live, text="Live / stress")
         nb.add(self.tab_log, text="Engine log")
 
@@ -560,19 +609,28 @@ class ConsoleApp(tk.Tk):
         )
         self.enc_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=4)
 
-        # ----- Body (Zig / QEMU) -----
+        # ----- Body (host hardware + Zig / QEMU) -----
         ttk.Label(
             self.tab_body,
-            text="Body — Zig host executable + QEMU freestanding guest",
+            text="Body — adaptive host sensors + Zig silicon + QEMU bare metal",
             font=("Segoe UI", 11, "bold"),
         ).pack(anchor=tk.W, padx=8, pady=6)
         ttk.Label(
             self.tab_body,
-            text="Python is the lab UI. Zig is the silicon body (trinary step). QEMU proves bare metal.",
+            text=(
+                "Computer = organism body. Boot re-probes hardware (not locked to one PC). "
+                "Metrics → SYS_METRIC → thalamus (interoception). Zig proves trinary step."
+            ),
             font=("Segoe UI", 9),
         ).pack(anchor=tk.W, padx=8)
         body_btns = ttk.Frame(self.tab_body)
         body_btns.pack(fill=tk.X, padx=8, pady=6)
+        ttk.Button(body_btns, text="Re-probe hardware", command=self._refresh_hardware).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(body_btns, text="Sample interoception", command=self._sample_intero).pack(
+            side=tk.LEFT, padx=2
+        )
         ttk.Button(body_btns, text="Run Zig host exe", command=self._cmd_zig_body).pack(
             side=tk.LEFT, padx=2
         )
@@ -591,10 +649,49 @@ class ConsoleApp(tk.Tk):
         self.body_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
         self.body_out.insert(
             tk.END,
-            f"Host binary:\n  {ZIG_HOST}\n  present={ZIG_HOST.is_file()}\n\n"
-            f"QEMU script:\n  {ZIG_QEMU}\n  present={ZIG_QEMU.is_file()}\n\n"
-            "Click Run Zig host — Engine log should show FSOT_TRIT PASS.\n",
+            "Waiting for adaptive hardware probe at boot…\n\n"
+            f"Zig host binary:\n  {ZIG_HOST}\n  present={ZIG_HOST.is_file()}\n\n"
+            f"QEMU script:\n  {ZIG_QEMU}\n  present={ZIG_QEMU.is_file()}\n",
         )
+
+        # ----- Visual (Obsidian-style genetic graph) -----
+        vis_hdr = ttk.Frame(self.tab_visual)
+        vis_hdr.pack(fill=tk.X, padx=8, pady=6)
+        ttk.Label(
+            vis_hdr,
+            text="Visual — Obsidian second-brain graph · live genetic synapses · host interoception",
+            font=("Segoe UI", 11, "bold"),
+        ).pack(side=tk.LEFT)
+        vis_btns = ttk.Frame(self.tab_visual)
+        vis_btns.pack(fill=tk.X, padx=8, pady=2)
+        ttk.Button(vis_btns, text="▶ Start thinking", command=self._visual_start).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(vis_btns, text="■ Stop", command=self._visual_stop).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(vis_btns, text="Rebuild graph", command=self._visual_rebuild).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(vis_btns, text="Pulse interoception", command=self._visual_pulse_intero).pack(
+            side=tk.LEFT, padx=2
+        )
+        self.visual_status = ttk.Label(
+            vis_btns, text="graph idle", font=("Consolas", 9)
+        )
+        self.visual_status.pack(side=tk.RIGHT, padx=8)
+        try:
+            from product.console.visual_brain import VisualBrainCanvas
+
+            self.visual_canvas = VisualBrainCanvas(self.tab_visual, height=520)
+            self.visual_canvas.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        except Exception as e:
+            self.visual_canvas = None  # type: ignore[assignment]
+            ttk.Label(
+                self.tab_visual,
+                text=f"Visual canvas unavailable: {e}",
+                foreground="red",
+            ).pack(padx=8, pady=20)
 
         # ----- Live / stress -----
         live_hdr = ttk.Frame(self.tab_live)
@@ -703,6 +800,7 @@ class ConsoleApp(tk.Tk):
                     fold_diagnostics,
                 )
                 from fsot_nuron.machine_encode import verify_machine_path
+                from fsot_nuron.hardware_body import boot_body_report
 
                 pin = require_pin(write_snapshot=False)
                 folds = fold_diagnostics()
@@ -710,19 +808,40 @@ class ConsoleApp(tk.Tk):
                 mv = verify_machine_path("FSOT neural")
                 zig_ok = ZIG_HOST.is_file()
                 report, ok = format_boot_report(pin, folds, br, mv, zig_ok)
-                self._log(report + "\n")
+                body = boot_body_report()
+                hw_report = format_hardware_report(body)
+                full = report + hw_report
+                self._log(full + "\n")
 
                 def ui() -> None:
                     self._boot_ok = ok
-                    self._set_status(report)
+                    self._hw_body = body
+                    self._hw_profile = body.get("hardware")
+                    self._set_status(full)
+                    self.body_out.delete("1.0", tk.END)
+                    self.body_out.insert(
+                        tk.END,
+                        hw_report
+                        + f"Zig host binary:\n  {ZIG_HOST}\n  present={ZIG_HOST.is_file()}\n\n"
+                        f"QEMU script:\n  {ZIG_QEMU}\n  present={ZIG_QEMU.is_file()}\n",
+                    )
+                    ad = body.get("adaptation") or {}
                     if ok:
-                        self.boot_title.config(text="FSOT NEURAL  ·  ONLINE", fg="#3fb950")
+                        self.boot_title.config(
+                            text=(
+                                f"FSOT NEURAL  ·  ONLINE  ·  "
+                                f"{ad.get('device', '?')} · n={ad.get('n_units', '?')}"
+                            ),
+                            fg="#3fb950",
+                        )
                         self.boot_badge.config(text="● PIN OK", fg="#3fb950")
                     else:
                         self.boot_title.config(text="FSOT NEURAL  ·  FAULT", fg="#f85149")
                         self.boot_badge.config(text="● PIN FAIL", fg="#f85149")
                     self._refresh_banner()
                     self._refresh_live()
+                    # Prefetch visual graph sized to this host (UI-capped)
+                    self.after(100, self._visual_rebuild)
 
                 self.after(0, ui)
             except Exception as e:
@@ -739,17 +858,159 @@ class ConsoleApp(tk.Tk):
 
         threading.Thread(target=work, daemon=True).start()
 
+    def _refresh_hardware(self) -> None:
+        try:
+            from fsot_nuron.hardware_body import boot_body_report
+
+            body = boot_body_report()
+            self._hw_body = body
+            self._hw_profile = body.get("hardware")
+            rep = format_hardware_report(body)
+            self.body_out.delete("1.0", tk.END)
+            self.body_out.insert(tk.END, rep)
+            self._log(rep + "\n")
+            ad = body.get("adaptation") or {}
+            if self._boot_ok:
+                self.boot_title.config(
+                    text=(
+                        f"FSOT NEURAL  ·  ONLINE  ·  "
+                        f"{ad.get('device', '?')} · n={ad.get('n_units', '?')}"
+                    ),
+                    fg="#3fb950",
+                )
+        except Exception as e:
+            messagebox.showerror("Hardware probe", str(e))
+
+    def _sample_intero(self) -> None:
+        try:
+            from fsot_nuron.hardware_body import (
+                discover_hardware,
+                sample_metrics,
+                metrics_to_thalamic_packet,
+            )
+
+            hw = discover_hardware()
+            m = sample_metrics(hw)
+            pkt = metrics_to_thalamic_packet(m)
+            lines = [
+                "INTEROCEPTION SAMPLE",
+                "====================",
+                "",
+                f"drive scalar ...... {m.as_drive_scalar():.4f}",
+                f"cpu / mem / disk .. {m.cpu_util:.3f} / {m.mem_util:.3f} / {m.disk_util:.3f}",
+                f"temp_norm ......... {m.temp_norm:.3f}",
+                f"thalamic packet ... target={pkt.target_region}  strength={pkt.strength:.3f}",
+                f"features .......... {[round(x, 3) for x in pkt.features]}",
+                f"modality .......... {pkt.modality.value}",
+                "",
+                "Maps host plant → SensoryModality.SYS_METRIC → thalamus (autonomic analog).",
+                "",
+            ]
+            text = "\n".join(lines)
+            self.body_out.insert(tk.END, "\n" + text)
+            self._log(text)
+            if self.visual_canvas is not None:
+                self.visual_canvas.set_interoception(
+                    m.as_drive_scalar(),
+                    label=f"cpu={m.cpu_util:.2f} mem={m.mem_util:.2f}",
+                )
+        except Exception as e:
+            messagebox.showerror("Interoception", str(e))
+
+    def _visual_rebuild(self) -> None:
+        if self.visual_canvas is None:
+            return
+        try:
+            from product.console.visual_brain import build_small_genetic_visual
+            from fsot_nuron.hardware_body import discover_hardware
+
+            self._visual_stop()
+            hw = discover_hardware()
+            # UI cap: keep canvas readable; full n_units used by engine elsewhere
+            n = min(48, int(hw.recommended_n_units or 32))
+            # Prefer CPU for live UI tick so CUDA workloads don't hitch the window
+            device = "cpu"
+            dt = float(hw.recommended_dt_ms or 0.5)
+            net, labels = build_small_genetic_visual(
+                n_units=n, device=device, seed=7, dt_ms=dt
+            )
+            self._visual_net = net
+            self.visual_canvas.attach_live_net(net, labels, top_k=3)
+            self.visual_status.config(
+                text=f"graph ready · n={n} · dt={dt}ms · host={hw.recommended_device}"
+            )
+            if self._hw_body:
+                drive = float(self._hw_body.get("interoception_drive") or 0.0)
+                self.visual_canvas.set_interoception(drive, label="boot intero")
+        except Exception as e:
+            self.visual_status.config(text=f"rebuild error: {e}")
+            self._log(f"visual rebuild error: {e}\n")
+
+    def _visual_start(self) -> None:
+        if self.visual_canvas is None:
+            return
+        if self._visual_net is None:
+            self._visual_rebuild()
+        if self._visual_net is None:
+            return
+        try:
+            self._visual_pulse_intero(silent=True)
+            self.visual_canvas.start_live(interval_ms=70, stim=0.55)
+            self._visual_running = True
+            self.visual_status.config(text="thinking…")
+            self.after(2000, self._visual_intero_loop)
+        except Exception as e:
+            messagebox.showerror("Visual", str(e))
+
+    def _visual_intero_loop(self) -> None:
+        """While thinking, re-sample host plant every ~2s (circulatory analog)."""
+        if not self._visual_running:
+            return
+        self._visual_pulse_intero(silent=True)
+        self.after(2000, self._visual_intero_loop)
+
+    def _visual_stop(self) -> None:
+        if self.visual_canvas is not None:
+            self.visual_canvas.stop_live()
+        self._visual_running = False
+        if self.visual_canvas is not None:
+            self.visual_status.config(text="graph idle")
+
+    def _visual_pulse_intero(self, silent: bool = False) -> None:
+        try:
+            from fsot_nuron.hardware_body import discover_hardware, sample_metrics
+
+            hw = discover_hardware()
+            m = sample_metrics(hw)
+            if self.visual_canvas is not None:
+                self.visual_canvas.set_interoception(
+                    m.as_drive_scalar(),
+                    label=f"cpu={m.cpu_util:.2f} mem={m.mem_util:.2f}",
+                )
+            if not silent:
+                self.visual_status.config(
+                    text=f"intero drive={m.as_drive_scalar():.3f}"
+                )
+        except Exception as e:
+            if not silent:
+                messagebox.showerror("Interoception", str(e))
+
     def _refresh_banner(self) -> None:
         try:
             from fsot_nuron.fsot_bridge import fold_diagnostics
 
             f = fold_diagnostics()
+            ad = (self._hw_body or {}).get("adaptation") or {}
+            hw_bit = ""
+            if ad:
+                hw_bit = f"  ·  {ad.get('device')} n={ad.get('n_units')} dt={ad.get('dt_ms')}"
             self.fold_strip.config(
                 text=(
                     f"S_bio={f.get('S_Biology'):+.4f}    "
                     f"S_neuro={f.get('S_Neuroscience'):+.4f}    "
                     f"S_body={f.get('S_Computer_Body'):+.4f}    "
                     f"pin={'OK' if f.get('pin_ok') else 'NO'}"
+                    f"{hw_bit}"
                 )
             )
             if f.get("pin_ok"):

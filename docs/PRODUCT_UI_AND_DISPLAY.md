@@ -218,7 +218,8 @@ You **do** need the **brain calculations** able to live there — which we alrea
 
 ## 8. Proposed product milestone (next build phase)
 
-**FSOT Neural Console v0.5 (local product screens) — landed**
+**FSOT Neural Console v0.5 (local product screens) — landed**  
+**FSOT Neural Console v0.6 — adaptive body + Obsidian Visual — landed**
 
 ```powershell
 python run_console.py
@@ -228,21 +229,31 @@ python run_stress_suite.py --quick
 
 | Screen | Content |
 |--------|---------|
-| Dashboard | Boot checklist, pin, stress buttons, science jobs |
+| Dashboard | Boot checklist, pin, hardware adaptation strip, stress buttons, science jobs |
 | Cell classes | Pyr/PV/SST/VIP vs Allen wet-lab (from scalpel artifacts) |
 | Memory lab | FSOT-bridged encode/delay/retrieve scores |
 | Encode | Machine ★ / chemical / Morse + inject |
-| Body (Zig) | Host exe FP badge, parity, QEMU |
+| Body | **Adaptive host sensors** (CPU/RAM/disk/CUDA/psutil) + Zig host + QEMU |
+| **Visual** | **Obsidian-style live genetic graph** (cell-type hubs, synapse routes, interoception drive) |
 | Live / stress | Folds + stress break map |
 | Engine log | Subprocess stdout |
 
-1. Science frozen: `v0.5.0-bio-intel`  
+### v0.6 doctrine (computer as body)
+
+- **Not locked to one PC:** `fsot_nuron/hardware_body.py` re-probes on every boot (`discover_hardware`).
+- **Adaptation:** recommended `device` / `n_units` / `dt_ms` from available RAM, CPU, CUDA.
+- **Interoception:** `sample_metrics` → `MetricPacket` → `SYS_METRIC` thalamic packet (autonomic plant).
+- **Visual:** `product/console/visual_brain.py` — genetic sparse W as Obsidian graph; live `step()` with host-metric modulation.
+- Missing sensors **gracefully omit** (strength 0) — same mind, different bodies.
+
+1. Science frozen: `v0.5.0-bio-intel` (+ continuous-ms ≤1% timing path)  
 2. `product/console/` via **tkinter** (host OS fonts/windows; no web)  
 3. Stress suite: `run_stress_suite.py` → `docs/STRESS_STAGE_REPORT.md`  
 4. Later: Dear PyGui/GTK-on-Alpine upgrade without changing brain ABI  
 
 Encoding doctrine: [`docs/MACHINE_ENCODING.md`](MACHINE_ENCODING.md).  
-Application recipe: [`docs/FSOT_APPLICATION_NEURAL.md`](FSOT_APPLICATION_NEURAL.md).
+Application recipe: [`docs/FSOT_APPLICATION_NEURAL.md`](FSOT_APPLICATION_NEURAL.md).  
+Hardware body: [`docs/HARDWARE_BODY.md`](HARDWARE_BODY.md).
 
 ---
 

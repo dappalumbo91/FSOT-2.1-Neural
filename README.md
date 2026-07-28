@@ -110,8 +110,8 @@ python run_console.py
 # or: python -m product.console
 ```
 
-Console **v0.5** product screens: Dashboard · Cell classes · Memory · Encode · Body (Zig) · Live/stress.  
-Readable boot checklist · wet-lab scalpel table · stress suite break map.
+Console **v0.6** product screens: Dashboard · Cell classes · Memory · Encode · **Body** (adaptive host + Zig) · **Visual** (Obsidian-style live genetic graph) · Live/stress.  
+Readable boot checklist · hardware re-probe every boot · wet-lab scalpel table · stress suite break map.
 
 ```powershell
 python run_console.py
