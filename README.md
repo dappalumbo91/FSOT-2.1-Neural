@@ -25,6 +25,27 @@ Biologically structured **FSOT neurons** whose identity and wiring come from the
 
 > Neurological failure modes are **substrate engineering boundaries**. This is **not** a medical device, diagnosis, or treatment.
 
+### Reproducibility & multi-modal organism (current)
+
+| | |
+|--|--|
+| **Full reproduce guide** | [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) |
+| **Standalone transplant** | [`docs/STANDALONE_TRANSPLANT.md`](docs/STANDALONE_TRANSPLANT.md) — **no other folders required** |
+| **Autonomous learn** | `python run_autonomous_learn.py` — docs + optional media, minimal prompts |
+| **Episode watch / recall** | `python run_episode_watch.py` · `--recall "Brave"` |
+| **Document reading** | real PDF/MD/TXT page text → machine/trinary (not next-token LM) |
+| **Media** | AV co-stream + subtitles → symbols → knowledge → memory |
+
+```powershell
+$env:FSOT_STANDALONE = "1"
+$env:PYTHONPATH = (Get-Location).Path
+python run_archive_pin.py
+python run_autonomous_learn.py --docs-only --max-docs 6
+# optional media world:
+# $env:FSOT_MEDIA_ROOTS = "G:\movies;G:\showes;G:\Debut"
+# python run_autonomous_learn.py --videos 1 --frames 10
+```
+
 ---
 
 ## Intended architecture
