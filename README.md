@@ -91,8 +91,15 @@ python scripts/ci_smoke.py
 **Stage docs:**  
 [`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md) · [`docs/STAGE_INTELLIGENCE_PROBE.md`](docs/STAGE_INTELLIGENCE_PROBE.md) · [`docs/STAGE_RETENTION_CONSOLIDATION.md`](docs/STAGE_RETENTION_CONSOLIDATION.md)  
 
-**Next product phase:** local UI — [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md)  
-**Intel options after UI:** [`docs/INTELLIGENCE_ROADMAP_OPTIONS.md`](docs/INTELLIGENCE_ROADMAP_OPTIONS.md)  
+**Local product console (no web):**
+
+```powershell
+python run_console.py
+# or: python -m product.console
+```
+
+Uses host OS fonts/windows (tkinter). Machine encoding (not Morse) for body I/O — [`docs/MACHINE_ENCODING.md`](docs/MACHINE_ENCODING.md).  
+UI architecture: [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md).  
 **Road to a full brain design:** [`BRAIN_PATH.md`](BRAIN_PATH.md)  
 **Python → Zig body:** [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md)
 
