@@ -1,0 +1,201 @@
+{
+  "generated_at": "2026-07-24T17:07:02.131143+00:00",
+  "mission": "biologically accurate FSOT neural network from genetic codon trinary structure",
+  "pin": {
+    "connected": true,
+    "seed_match_ok": true,
+    "compute_matches_certificate": true,
+    "authority_prefix": "D1D38A185487B452"
+  },
+  "report": {
+    "mission": "biologically accurate FSOT neural network from genetic codon trinary structure",
+    "authority": {
+      "codon_map": {
+        "n_codons": 64,
+        "roundtrip_ok": 64,
+        "roundtrip_fail": [],
+        "perfect": true,
+        "map_path": "I:\\fsot nuron\\data\\64_codon_trinary_map.txt"
+      },
+      "channel_genes": {
+        "SCN": {
+          "dna": "ATGAAATTTCGTTATTGG",
+          "role": "voltage_gated_sodium",
+          "spin": 0.0,
+          "expression": 1.432850377557623,
+          "aa": "MKFRYW",
+          "n_codons": 6
+        },
+        "KCN": {
+          "dna": "ATGCTGGTTTCATCTTAG",
+          "role": "voltage_gated_potassium",
+          "spin": -0.2222222222222222,
+          "expression": 0.8985832154065969,
+          "aa": "MLVSS*",
+          "n_codons": 6
+        },
+        "CACNA": {
+          "dna": "ATGGATGAGTGTTATTGA",
+          "role": "voltage_gated_calcium",
+          "spin": 0.2222222222222222,
+          "expression": 1.356477534818874,
+          "aa": "MDECY*",
+          "n_codons": 6
+        },
+        "LEAK": {
+          "dna": "ATGGGTGCAAGCTCTTAA",
+          "role": "leak_resting",
+          "spin": 0.1111111111111111,
+          "expression": 1.0549232131785773,
+          "aa": "MGASS*",
+          "n_codons": 6
+        }
+      },
+      "canonical_phenotype": {
+        "n_channels": 4.185708585240418,
+        "p_props": 3.0,
+        "d_eff": 13.26355494369416,
+        "fire_threshold": 0.9919729476174811,
+        "refractory_steps": 13.43489957546375,
+        "adapt_step": 1.1796274194985694,
+        "adapt_gain": 0.030277730417826488,
+        "adapt_decay": 0.9865740898607245,
+        "resting_bias": 0.4635294028838356,
+        "fi_stim": 0.5591771364243731,
+        "vrest_mV": -69.5154940731993,
+        "scn_expression": 1.432850377557623,
+        "kcn_expression": 0.8985832154065969,
+        "cacna_expression": 1.356477534818874,
+        "leak_expression": 1.0549232131785773,
+        "composite_spin": 0.04616817029951439,
+        "composite_charge": 0.038186421369374446
+      },
+      "mission": "Genetic codon structure defines ion-channel programs; FSOT scalar drives dynamics; phenotype is not free-fit."
+    },
+    "structure": {
+      "n_units": 64,
+      "connectivity": "genetic_dense",
+      "n_synapses": 4032,
+      "synapse_density": 1.0,
+      "W_mean_abs": 0.11812499910593033,
+      "W_max_abs": 0.16866633296012878,
+      "spin_mean": 0.045946026139065274,
+      "spin_std": 0.002618639754090732,
+      "charge_mean": 0.056360637881398286,
+      "mean_d_eff": 13.243444852060714,
+      "mean_scn": 1.366094724344798,
+      "mean_kcn": 0.8985832154065961,
+      "mean_cacna": 1.3345750991316665,
+      "mean_leak": 1.0549232131785766,
+      "mode_name": "genetic_codon"
+    },
+    "dynamics": {
+      "population": {
+        "mean_firing_rate_Hz": 18.815104166666664,
+        "mean_adaptation_index": 0.026763429050333798,
+        "mean_isi_ms": 77.06812411546707,
+        "mean_isi_cv": 0.03908574088272925,
+        "mean_Vm_proxy_mV": -81.67617001868794,
+        "mean_emergent_fraction": 0.43158854031935334,
+        "n_units": 64.0
+      },
+      "mean_rate_Hz": 18.815101623535156,
+      "coactive_fraction": 0.2408333271741867,
+      "mean_unit_duty": 0.01881510391831398,
+      "emergent_fraction": 0.4315885305404663,
+      "mean_syn_current": 0.141953706741333
+    },
+    "allen": {
+      "ok": true,
+      "lock": {
+        "mean_ref": 67.9375,
+        "mean_adapt_step": 1.2307079220546528,
+        "isi_scale": 1.0
+      },
+      "mode": "bio_match",
+      "genetic_modulation": {
+        "ref_kcn_gain": 0.15,
+        "adapt_ca_gain": 0.25,
+        "fi_scn_gain": 0.1
+      },
+      "n_allen_cells": 64,
+      "mean_target_isi": 70.59855571638475,
+      "mean_target_adapt": 0.051153889361673456
+    },
+    "genetics": {
+      "rate_vs_scn_corr": 0.06078998578053468,
+      "n_genotypes": 64,
+      "sample_genotype": {
+        "unit_id": 12,
+        "composite_spin": 0.05047889752224239,
+        "composite_charge": -0.021335732234523785,
+        "genes": {
+          "SCN": {
+            "name": "SCN",
+            "role": "voltage_gated_sodium",
+            "dna": "GTGAAATTTCGTTATTGG",
+            "spin": 0.0,
+            "expression": 1.432850377557623,
+            "charge_balance": 2,
+            "n_codons": 6,
+            "aa_sequence": "VKFRYW"
+          },
+          "KCN": {
+            "name": "KCN",
+            "role": "voltage_gated_potassium",
+            "dna": "ATGCTAGTTTCATCTTAG",
+            "spin": -0.2222222222222222,
+            "expression": 0.8985832154065969,
+            "charge_balance": 0,
+            "n_codons": 6,
+            "aa_sequence": "MLVSS*"
+          },
+          "CACNA": {
+            "name": "CACNA",
+            "role": "voltage_gated_calcium",
+            "dna": "ATGGATGAGTATTATTGA",
+            "spin": 0.2222222222222222,
+            "expression": 1.4755218420266705,
+            "charge_balance": -2,
+            "n_codons": 6,
+            "aa_sequence": "MDEYY*"
+          },
+          "LEAK": {
+            "name": "LEAK",
+            "role": "leak_resting",
+            "dna": "ATGGGTGCAAGCTCTCAA",
+            "spin": 0.1111111111111111,
+            "expression": 1.0549232131785773,
+            "charge_balance": 0,
+            "n_codons": 6,
+            "aa_sequence": "MGASSQ"
+          }
+        },
+        "phenotype": {
+          "n_channels": 4.215469662042366,
+          "p_props": 3.0,
+          "d_eff": 13.33097115102445,
+          "fire_threshold": 0.9919729476174811,
+          "refractory_steps": 13.43489957546375,
+          "adapt_step": 1.2462922315349354,
+          "adapt_gain": 0.031706262104320045,
+          "adapt_decay": 0.9860979126318933,
+          "resting_bias": 0.4635294028838356,
+          "fi_stim": 0.5591771364243731,
+          "vrest_mV": -69.5154940731993,
+          "scn_expression": 1.432850377557623,
+          "kcn_expression": 0.8985832154065969,
+          "cacna_expression": 1.4755218420266705,
+          "leak_expression": 1.0549232131785773,
+          "composite_spin": 0.05047889752224239,
+          "composite_charge": -0.021335732234523785
+        }
+      }
+    },
+    "gates": {
+      "codon_map_perfect": true,
+      "has_synapses": true,
+      "channel_genes_ok": true
+    }
+  }
+}

@@ -2,6 +2,7 @@
 const trit = @import("trit.zig");
 const neuron = @import("neuron.zig");
 const network = @import("network.zig");
+const fingerprint = @import("fingerprint.zig");
 const scalar = @import("scalar.zig");
 const serial = @import("serial.zig");
 
@@ -88,6 +89,10 @@ fn kmain() noreturn {
     } else {
         serial.write("FSOT_NETWORK FAIL\n");
     }
+
+    serial.write("test:fingerprints...\n");
+    // Single pass: encode + retrieve log (includes FSOT_FP PASS/FAIL)
+    fingerprint.logFingerprintsSerial();
 
     if (tr.ok and pst.ok and nst.ok and (s0 == s0)) {
         serial.write("FSOT_STAGE_ZIG_NEURON_OK\n");

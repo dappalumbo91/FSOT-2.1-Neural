@@ -71,7 +71,17 @@ User requirement: **~24% Pyr error is not acceptable**; close it, then the ~8% P
 
 All four within **5%** hard tol. PV faster than Pyr preserved.
 
+### Pass 3 — 1% hard tol (2026-07-28)
+
+| Class | Allen target | Measured | Rel err |
+|-------|--------------|----------|---------|
+| **Pyr** | 16.35 Hz | **16.34 Hz** | **0.1%** |
+| **PV** | 83.35 Hz | **83.33 Hz** | **0.0%** |
+| **SST** | 29.54 Hz | **29.33 Hz** | **0.7%** |
+| **VIP** | 34.82 Hz | **34.67 Hz** | **0.4%** |
+
 ```powershell
+python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.01
 python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.05
 ```
 

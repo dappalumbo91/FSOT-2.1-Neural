@@ -2,12 +2,12 @@
 """
 Intelligence probe on wet-lab-accurate FSOT neurons.
 
-1) Multi-region brain
-2) Scalpel lock class rates to Allen (≤2% default)
-3) Encode → retrieve item memory (fingerprint)
-4) Learning-band SME-style proxies
+Climbs:
+  - more items + retention delay
+  - offline consolidation (sleep-like rest + replay)
+  - (Zig fingerprints via embodiment/zig QEMU — separate)
 
-North star: accurate neurons → intelligence dynamics (not NLP scoreboard).
+Default: scalpel ≤1% when stable else 2%.
 """
 
 from __future__ import annotations
@@ -26,39 +26,67 @@ if str(ROOT) not in sys.path:
 def main() -> int:
     ap = argparse.ArgumentParser(description="FSOT intelligence probe")
     ap.add_argument("--profile", default="ai_efficient", choices=["ai_efficient", "wetware_ref"])
-    ap.add_argument("--tol", type=float, default=0.02, help="scalpel rate tol")
-    ap.add_argument("--items", type=int, default=6)
-    ap.add_argument("--encode-steps", type=int, default=400)
-    ap.add_argument("--retrieve-steps", type=int, default=300)
+    ap.add_argument("--tol", type=float, default=0.01, help="scalpel rate tol (try 1%)")
+    ap.add_argument("--items", type=int, default=12, help="memory list length")
+    ap.add_argument("--encode-steps", type=int, default=350)
+    ap.add_argument("--retrieve-steps", type=int, default=280)
+    ap.add_argument("--delay-steps", type=int, default=500, help="retention delay (model-ms)")
+    ap.add_argument("--consolidate", action="store_true", help="offline rest+replay")
+    ap.add_argument("--no-consolidate", action="store_true", help="disable consolidate")
+    ap.add_argument("--replay-rounds", type=int, default=2)
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--skip-scalpel", action="store_true")
+    ap.add_argument("--suite", action="store_true", help="run delay + consolidate suite")
     args = ap.parse_args()
 
-    from fsot_nuron.scalpel_brain import build_scalpel_brain, scalpel_lock_brain
+    consolidate = args.consolidate or (args.suite and not args.no_consolidate)
+    if args.suite and not args.consolidate and not args.no_consolidate:
+        consolidate = True
+
+    from fsot_nuron.scalpel_brain import build_scalpel_brain
     from fsot_nuron.brain_architecture import run_brain_design_suite
     from fsot_nuron.learning_memory import learning_probe
     from fsot_nuron.thesis_ledger import record_run
     from fsot_nuron.paths import ARTIFACTS, DATA
     from fsot_nuron.archive_pin import pin_archive
+    from fsot_nuron.scalpel_rate import scalpel_calibrate
+    from fsot_nuron.class_ephys import build_class_targets
+    from fsot_nuron.cell_types import build_typed_population
+    from fsot_nuron.neuron_batch import FSOTNeuronBatch, NeuronConfig
+    import torch
 
     print("=== FSOT intelligence probe ===")
-    print("accurate neurons → multi-region brain → encode/retrieve memory")
-    print(f"profile={args.profile} scalpel_tol={args.tol:.0%} items={args.items}")
+    print("accurate neurons → multi-region brain → encode/delay/consolidate/retrieve")
+    print(
+        f"profile={args.profile} scalpel_tol={args.tol:.0%} items={args.items} "
+        f"delay={args.delay_steps} consolidate={consolidate}"
+    )
 
     pin = pin_archive(write_snapshot=False)
     print(f"archive pin seed_ok: {pin.seed_match_ok}")
 
-    if args.skip_scalpel:
+    # --- Scalpel 1% with fallback to 2% ---
+    scalpel_tol_used = args.tol
+    report = None
+    scalpel_meta = {"scalpel_ok": False}
+
+    if not args.skip_scalpel:
+        brain, report, scalpel_meta = build_scalpel_brain(
+            profile=args.profile, device=args.device, tol=args.tol
+        )
+        if not report.ok and args.tol <= 0.01:
+            print("scalpel 1% not stable — falling back to 2%")
+            scalpel_tol_used = 0.02
+            brain, report, scalpel_meta = build_scalpel_brain(
+                profile=args.profile, device=args.device, tol=0.02
+            )
+        scalpel_meta["tol_used"] = scalpel_tol_used
+    else:
         suite = run_brain_design_suite(
             steps=400, device=args.device, profile=args.profile, sensory=False
         )
         brain = suite["brain"]
-        scalpel_meta = {"scalpel_ok": False, "skipped": True}
-        report = None
-    else:
-        brain, report, scalpel_meta = build_scalpel_brain(
-            profile=args.profile, device=args.device, tol=args.tol
-        )
+        scalpel_meta = {"scalpel_ok": False, "skipped": True, "tol_used": None}
 
     print("\n--- Scalpel (Allen class rates on brain units) ---")
     if report is not None:
@@ -67,104 +95,162 @@ def main() -> int:
                 f"  {lab:4} target={st.target_Hz:6.2f} measured={st.measured_Hz:6.2f} "
                 f"err={st.rel_err:5.1%}"
             )
-        print(f"  scalpel_ok: {report.ok}")
+        print(f"  scalpel_ok: {report.ok}  tol_used={scalpel_tol_used:.0%}")
     else:
         print("  skipped")
 
-    print("\n--- Encode / retrieve ---")
-    learn = learning_probe(
-        brain,
-        n_items=args.items,
-        encode_steps=args.encode_steps,
-        retrieve_steps=args.retrieve_steps,
-        seed=7,
-    )
-    print(f"  top1_accuracy:     {learn.top1_accuracy:.3f}")
-    print(f"  mean_correct_sim:  {learn.mean_correct_sim:.3f}")
-    print(f"  mean_incorrect_sim:{learn.mean_incorrect_sim:.3f}")
-    print(f"  SME theta enc>rest:{learn.sme_theta_encode_gt_rest}")
-    print(f"  SME gamma enc>rest:{learn.sme_gamma_encode_gt_rest}")
+    def run_probe(**kw):
+        return learning_probe(
+            brain,
+            n_items=args.items,
+            encode_steps=args.encode_steps,
+            retrieve_steps=args.retrieve_steps,
+            seed=7,
+            **kw,
+        )
 
-    # Gates: bio foundation + intelligence primitive above chance
+    results = {}
+
+    # A) Immediate (baseline)
+    print("\n--- A) Immediate encode/retrieve ---")
+    learn_imm = run_probe(delay_steps=0, consolidate=False)
+    print(f"  top1={learn_imm.top1_accuracy:.3f}  sim+={learn_imm.mean_correct_sim:.3f}")
+    results["immediate"] = learn_imm.to_dict()
+
+    # B) Retention delay
+    print(f"\n--- B) Retention delay ({args.delay_steps} model-ms) ---")
+    learn_del = run_probe(delay_steps=args.delay_steps, consolidate=False)
+    print(
+        f"  top1={learn_del.top1_accuracy:.3f}  "
+        f"immediate_was={learn_del.top1_immediate:.3f}"
+    )
+    results["delay"] = learn_del.to_dict()
+
+    # C) Offline consolidation
+    if consolidate or args.suite:
+        print("\n--- C) Offline consolidation (rest + replay) ---")
+        learn_con = run_probe(
+            delay_steps=args.delay_steps // 2,
+            consolidate=True,
+            consolidate_rest_steps=400,
+            replay_rounds=args.replay_rounds,
+            replay_steps=120,
+        )
+        print(
+            f"  top1={learn_con.top1_accuracy:.3f}  "
+            f"imm={learn_con.top1_immediate:.3f}  "
+            f"after_delay={learn_con.top1_after_delay:.3f}  "
+            f"sigma_rel_replay={learn_con.consolidate_sigma_rel}"
+        )
+        results["consolidate"] = learn_con.to_dict()
+        learn_final = learn_con
+    else:
+        learn_final = learn_del
+
     chance = 1.0 / max(1, args.items)
     gates = {
-        "pin_seed_ok": bool(pin.seed_match_ok),
+        "pin_seed_ok": bool(pin.seed_ok if hasattr(pin, "seed_ok") else pin.seed_match_ok),
         "scalpel_ok": bool(scalpel_meta.get("scalpel_ok", args.skip_scalpel)),
-        "retrieve_above_chance": learn.top1_accuracy > chance + 1e-9,
-        "retrieve_ge_half": learn.top1_accuracy >= 0.5,
-        "correct_sim_gt_incorrect": learn.mean_correct_sim > learn.mean_incorrect_sim,
-        "sme_theta_direction": learn.sme_theta_encode_gt_rest,
-        "sme_gamma_direction": learn.sme_gamma_encode_gt_rest,
+        "scalpel_tol_1pct_or_fallback": bool(
+            scalpel_meta.get("tol_used") is None
+            or scalpel_meta.get("tol_used", 1) <= 0.02
+        ),
+        "immediate_above_chance": learn_imm.top1_accuracy > chance,
+        "delay_above_chance": learn_del.top1_accuracy > chance,
+        "delay_ge_half": learn_del.top1_accuracy >= 0.5,
+        "correct_sim_gt_incorrect": learn_final.mean_correct_sim
+        > learn_final.mean_incorrect_sim,
+        "sme_theta_direction": learn_final.sme_theta_encode_gt_rest,
+        "sme_gamma_direction": learn_final.sme_gamma_encode_gt_rest,
     }
+    if "consolidate" in results:
+        gates["consolidate_above_chance"] = learn_final.top1_accuracy > chance
+        gates["consolidate_ge_half"] = learn_final.top1_accuracy >= 0.5
+
     print("\n--- Gates ---")
     for k, v in gates.items():
         print(f"  {k}: {v}")
 
     out = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "mission": "accurate FSOT neurons → multi-region intelligence probe",
-        "accuracy_standard": "docs/ACCURACY_STANDARD.md",
-        "learning_alignment": "docs/LEARNING_ALIGNMENT.md",
+        "mission": "retention + consolidation on scalpel-accurate FSOT brain",
         "scalpel": scalpel_meta,
         "scalpel_detail": report.to_dict() if report is not None else None,
-        "learning": learn.to_dict(),
+        "results": results,
         "gates": gates,
         "chance_accuracy": chance,
+        "params": {
+            "items": args.items,
+            "delay_steps": args.delay_steps,
+            "consolidate": consolidate,
+            "tol": scalpel_meta.get("tol_used"),
+        },
     }
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
-    (ARTIFACTS / "intelligence_probe.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
+    (ARTIFACTS / "intelligence_probe.json").write_text(
+        json.dumps(out, indent=2), encoding="utf-8"
+    )
     res = DATA / "results"
     res.mkdir(parents=True, exist_ok=True)
-    (res / "intelligence_probe.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
+    (res / "intelligence_probe.json").write_text(
+        json.dumps(out, indent=2), encoding="utf-8"
+    )
 
     md = [
-        "# FSOT intelligence probe",
+        "# FSOT intelligence probe — retention & consolidation",
         "",
         f"Generated: `{out['generated_at']}`",
         "",
-        "## Foundation",
+        f"- Items: **{args.items}** (chance {chance:.3f})",
+        f"- Delay: **{args.delay_steps}** model-ms",
+        f"- Consolidate: **{consolidate}**",
+        f"- Scalpel tol used: **{scalpel_meta.get('tol_used')}** ok={scalpel_meta.get('scalpel_ok')}",
         "",
-        f"- Archive pin: **{gates['pin_seed_ok']}**",
-        f"- Scalpel Allen class rates (tol {args.tol:.0%}): **{gates['scalpel_ok']}**",
+        "## Accuracy ladder",
         "",
-        "## Memory (encode → retrieve)",
-        "",
-        f"- Items: {learn.n_items} (chance {chance:.2f})",
-        f"- Top-1 accuracy: **{learn.top1_accuracy:.3f}**",
-        f"- Mean sim correct / incorrect: **{learn.mean_correct_sim:.3f}** / **{learn.mean_incorrect_sim:.3f}**",
-        "",
-        "## Learning bands (SME-style direction)",
-        "",
-        f"- Theta encode > rest: **{learn.sme_theta_encode_gt_rest}**",
-        f"- Gamma encode > rest: **{learn.sme_gamma_encode_gt_rest}**",
+        f"| Condition | Top-1 |",
+        f"|-----------|------:|",
+        f"| Immediate | {learn_imm.top1_accuracy:.3f} |",
+        f"| After delay | {learn_del.top1_accuracy:.3f} |",
+    ]
+    if "consolidate" in results:
+        md.append(f"| After consolidate | {learn_final.top1_accuracy:.3f} |")
+    md += [
         "",
         "## Gates",
         "",
         *[f"- `{k}`: **{v}**" for k, v in gates.items()],
         "",
-        "Neuron accuracy first; intelligence is dynamics on that substrate.",
+        "See `docs/STAGE_INTELLIGENCE_PROBE.md`, `docs/LEARNING_ALIGNMENT.md`.",
         "",
     ]
     (res / "INTELLIGENCE_PROBE.md").write_text("\n".join(md), encoding="utf-8")
     print(f"\nWrote {res / 'INTELLIGENCE_PROBE.md'}")
 
     record_run(
-        "intelligence_probe",
+        "intelligence_probe_retention",
         profile=args.profile,
         gates=gates,
         metrics={
-            "top1": learn.top1_accuracy,
-            "correct_sim": learn.mean_correct_sim,
-            "incorrect_sim": learn.mean_incorrect_sim,
-            "scalpel": scalpel_meta.get("class_rel_err"),
+            "immediate": learn_imm.top1_accuracy,
+            "delay": learn_del.top1_accuracy,
+            "final": learn_final.top1_accuracy,
+            "items": args.items,
+            "delay_steps": args.delay_steps,
+            "scalpel_tol": scalpel_meta.get("tol_used"),
         },
-        notes="scalpel brain + encode/retrieve fingerprint memory",
+        notes="more items, retention delay, optional offline consolidate",
     )
 
-    # Must have bio lock (unless skipped) and above-chance structured retrieval
-    ok = gates["pin_seed_ok"] and (
-        gates["scalpel_ok"] or args.skip_scalpel
-    ) and gates["retrieve_above_chance"] and gates["correct_sim_gt_incorrect"]
+    ok = (
+        gates["pin_seed_ok"]
+        and (gates["scalpel_ok"] or args.skip_scalpel)
+        and gates["immediate_above_chance"]
+        and gates["delay_above_chance"]
+        and gates["correct_sim_gt_incorrect"]
+    )
+    if "consolidate" in results:
+        ok = ok and gates.get("consolidate_above_chance", False)
     print("\nPASS" if ok else "\nFAIL")
     return 0 if ok else 1
 

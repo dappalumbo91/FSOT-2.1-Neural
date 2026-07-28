@@ -1,0 +1,175 @@
+{
+  "generated_at": "2026-07-24T17:38:44.031336+00:00",
+  "mission": "FSOT multi-region brain design \u2014 mechanism fidelity, computer-native scale, trinary bare-metal destination",
+  "profile": "ai_efficient",
+  "profile_intent": "Computer-native AI: fewer units, faster trains, same motifs",
+  "isi_scale": 0.3333333333333333,
+  "formulas_ref": "docs/FORMULAS.md",
+  "thesis_ref": "docs/THESIS.md",
+  "efficiency_ref": "docs/EFFICIENCY_DOCTRINE.md",
+  "trinary_ref": "docs/TRINARY_BARE_METAL.md",
+  "sensory": {
+    "enabled": true,
+    "injections": 10,
+    "modalities": [
+      "vision",
+      "sys_metric"
+    ],
+    "trinary_edge": true,
+    "note": "features quantized to trits at edge for bare-metal path"
+  },
+  "trinary_substrate": {
+    "ok": true,
+    "errors": [],
+    "substrate": "trinary",
+    "carrier_note": "integer pack is transport only; ontology is T={-1,0,+1}",
+    "sample_ATG": [
+      1,
+      -1,
+      1
+    ],
+    "sample_word": {
+      "n": 4,
+      "pack": 77,
+      "trits": [
+        1,
+        -1,
+        0,
+        1
+      ]
+    }
+  },
+  "pin_seed_ok": true,
+  "structure": {
+    "n_units": 32,
+    "n_synapses": 324,
+    "synapse_density": 0.32661290322580644,
+    "excitatory_synaptic_mass": 35.23267215490341,
+    "inhibitory_synaptic_mass": 10.127328097820282,
+    "ei_mass_ratio": 3.4789701503288497,
+    "population": {
+      "n_units": 32,
+      "counts": {
+        "Pyr": 26,
+        "PV": 4,
+        "SST": 2
+      },
+      "fractions": {
+        "Pyr": 0.8125,
+        "PV": 0.125,
+        "SST": 0.0625
+      },
+      "n_excitatory": 26,
+      "n_inhibitory": 6,
+      "ei_count_ratio": 4.333333333333333,
+      "target_cortical_pyr_fraction": 0.8
+    },
+    "regions": {
+      "thal": {
+        "n": 4,
+        "cell_types": {
+          "Pyr": 3,
+          "PV": 1
+        }
+      },
+      "sens": {
+        "n": 12,
+        "cell_types": {
+          "Pyr": 10,
+          "PV": 1,
+          "SST": 1
+        }
+      },
+      "assoc": {
+        "n": 10,
+        "cell_types": {
+          "Pyr": 8,
+          "PV": 1,
+          "SST": 1
+        }
+      },
+      "hipp": {
+        "n": 6,
+        "cell_types": {
+          "Pyr": 5,
+          "PV": 1
+        }
+      }
+    },
+    "projections": [
+      {
+        "src": "thal",
+        "dst": "sens",
+        "kind": "feedforward",
+        "density": 0.35
+      },
+      {
+        "src": "sens",
+        "dst": "assoc",
+        "kind": "feedforward",
+        "density": 0.25
+      },
+      {
+        "src": "assoc",
+        "dst": "sens",
+        "kind": "feedback",
+        "density": 0.12
+      },
+      {
+        "src": "assoc",
+        "dst": "hipp",
+        "kind": "feedforward",
+        "density": 0.2
+      },
+      {
+        "src": "hipp",
+        "dst": "assoc",
+        "kind": "feedback",
+        "density": 0.15
+      },
+      {
+        "src": "sens",
+        "dst": "thal",
+        "kind": "feedback",
+        "density": 0.1
+      }
+    ]
+  },
+  "dynamics": {
+    "population": {
+      "mean_firing_rate_Hz": 3.359375,
+      "mean_adaptation_index": -0.37375163787105703,
+      "mean_isi_ms": 52.07291603088379,
+      "mean_isi_cv": 0.3870960040851794,
+      "mean_Vm_proxy_mV": -130.80879743509,
+      "mean_emergent_fraction": 0.10718750033993274,
+      "n_units": 32.0
+    },
+    "mean_rate_Hz": 3.359375,
+    "rate_by_region": {
+      "thal": 19.375,
+      "sens": 2.5,
+      "assoc": 0.0,
+      "hipp": 0.0
+    },
+    "rate_by_cell_type": {
+      "Pyr": 3.5576923076923075,
+      "PV": 3.125,
+      "SST": 1.25
+    },
+    "coactive_fraction": 0.02250000089406967,
+    "mean_syn": 0.0027882284484803677
+  },
+  "gates": {
+    "has_excitatory": true,
+    "has_inhibitory": true,
+    "multi_region": true,
+    "has_projections": true,
+    "has_synapses": true,
+    "ei_mass_finite": true,
+    "thal_drive_active": true,
+    "efficiency_profile_ok": true,
+    "sensory_path_ok": true
+  },
+  "n_units": 32
+}

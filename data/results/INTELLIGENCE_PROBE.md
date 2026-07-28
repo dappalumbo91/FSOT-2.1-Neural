@@ -1,31 +1,32 @@
-# FSOT intelligence probe
+# FSOT intelligence probe — retention & consolidation
 
-Generated: `2026-07-28T14:52:23.764734+00:00`
+Generated: `2026-07-28T15:00:17.659441+00:00`
 
-## Foundation
+- Items: **12** (chance 0.083)
+- Delay: **600** model-ms
+- Consolidate: **True**
+- Scalpel tol used: **0.02** ok=True
 
-- Archive pin: **True**
-- Scalpel Allen class rates (tol 2%): **True**
+## Accuracy ladder
 
-## Memory (encode → retrieve)
-
-- Items: 6 (chance 0.17)
-- Top-1 accuracy: **1.000**
-- Mean sim correct / incorrect: **0.853** / **0.540**
-
-## Learning bands (SME-style direction)
-
-- Theta encode > rest: **True**
-- Gamma encode > rest: **True**
+| Condition | Top-1 |
+|-----------|------:|
+| Immediate | 0.750 |
+| After delay | 0.750 |
+| After consolidate | 0.750 |
 
 ## Gates
 
 - `pin_seed_ok`: **True**
 - `scalpel_ok`: **True**
-- `retrieve_above_chance`: **True**
-- `retrieve_ge_half`: **True**
+- `scalpel_tol_1pct_or_fallback`: **True**
+- `immediate_above_chance`: **True**
+- `delay_above_chance`: **True**
+- `delay_ge_half`: **True**
 - `correct_sim_gt_incorrect`: **True**
 - `sme_theta_direction`: **True**
 - `sme_gamma_direction`: **True**
+- `consolidate_above_chance`: **True**
+- `consolidate_ge_half`: **True**
 
-Neuron accuracy first; intelligence is dynamics on that substrate.
+See `docs/STAGE_INTELLIGENCE_PROBE.md`, `docs/LEARNING_ALIGNMENT.md`.

@@ -19,8 +19,8 @@ def scalpel_lock_brain(
     brain: FSOTBrainDesign,
     *,
     tol: float = 0.02,
-    max_iters: int = 28,
-    steps: int = 1200,
+    max_iters: int = 36,
+    steps: int = 1600,
     focus: Optional[List[str]] = None,
 ) -> Tuple[ScalpelReport, List[str]]:
     """

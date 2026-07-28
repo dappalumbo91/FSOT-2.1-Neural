@@ -1,7 +1,7 @@
 # Scalpel class-rate targeting
 
-Generated: `2026-07-28T14:50:53.709197+00:00`  
-Tolerance: **2%** relative rate error vs Allen wet-lab means.
+Generated: `2026-07-28T15:00:56.577937+00:00`  
+Tolerance: **1%** relative rate error vs Allen wet-lab means.
 
 ## Focus order
 
@@ -11,10 +11,10 @@ Tolerance: **2%** relative rate error vs Allen wet-lab means.
 
 | Class | Target Hz | Measured Hz | Rel err | R (ms) | fi |
 |-------|-----------|-------------|---------|--------|-----|
-| PV | 83.35 | 83.85 | 0.6% | 11 | 1.400 |
-| Pyr | 16.35 | 16.15 | 1.2% | 59 | 0.569 |
-| SST | 29.54 | 29.23 | 1.0% | 32 | 1.039 |
-| VIP | 34.82 | 34.62 | 0.6% | 28 | 1.286 |
+| PV | 83.35 | 83.33 | 0.0% | 11 | 1.400 |
+| Pyr | 16.35 | 16.34 | 0.1% | 61 | 0.570 |
+| SST | 29.54 | 29.33 | 0.7% | 33 | 1.071 |
+| VIP | 34.82 | 34.67 | 0.4% | 28 | 1.262 |
 
 ## Gates
 

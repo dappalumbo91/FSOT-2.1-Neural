@@ -281,8 +281,8 @@ def scalpel_calibrate(
             if st.rel_err == st.rel_err and st.rel_err <= tol:
                 break
 
-    # Final global polish pass (all classes, fewer iters)
-    for it in range(1, max(8, max_iters // 2) + 1):
+    # Final global polish + analytical snap (R ≈ 1000/target when FI suprathreshold)
+    for it in range(1, max(12, max_iters // 2) + 1):
         dirty = False
         for lab, st in knobs.items():
             if st.target_Hz <= 1 or st.rel_err != st.rel_err:
@@ -291,16 +291,19 @@ def scalpel_calibrate(
                 continue
             dirty = True
             m, tgt = st.measured_Hz, st.target_Hz
-            ideal_R = max(3.0, 1000.0 / tgt - 0.5)
+            ideal_R = max(3.0, 1000.0 / tgt)
             if m < tgt:
-                st.refractory_steps = max(3, int(round(0.35 * st.refractory_steps + 0.65 * ideal_R)))
-                st.fi_stim = min(1.8, st.fi_stim * 1.1)
-                st.fire_threshold = max(0.80, st.fire_threshold - 0.01)
+                # Snap R so ceiling rate sits just above target, then ensure drive
+                st.refractory_steps = max(3, int(round(ideal_R * 0.97)))
+                st.fi_stim = min(1.85, max(st.fi_stim, 0.55) * 1.12)
+                st.fire_threshold = max(0.78, st.fire_threshold - 0.02)
+                st.adapt_step = 0.0
+                st.adapt_gain = min(st.adapt_gain, 0.012)
             else:
                 st.refractory_steps = min(
-                    200, int(round(0.35 * st.refractory_steps + 0.65 * ideal_R * (m / tgt)))
+                    200, int(round(ideal_R * (m / tgt) * 1.02))
                 )
-                st.fi_stim = max(0.28, st.fi_stim * 0.95)
+                st.fi_stim = max(0.28, st.fi_stim * 0.94)
         if not dirty:
             break
         _apply_class_knobs(net, labels, knobs, base_d_eff, base_vrest, base_adec)
@@ -314,6 +317,55 @@ def scalpel_calibrate(
             {
                 "iter": it,
                 "phase": "global_polish",
+                "measured": dict(measured),
+                "rel_err": {k: knobs[k].rel_err for k in knobs},
+            }
+        )
+
+    # Binary-search R per class still outside tol (scalpel micro-pass)
+    for lab, st in list(knobs.items()):
+        if lab not in (require_classes or focus_order or knobs.keys()):
+            continue
+        if st.target_Hz <= 1 or (st.rel_err == st.rel_err and st.rel_err <= tol):
+            continue
+        tgt = st.target_Hz
+        lo_r, hi_r = 3, min(200, int(2000.0 / max(tgt, 1.0)))
+        st.fi_stim = min(1.85, max(st.fi_stim, 0.7))
+        st.adapt_step = 0.0
+        best_R, best_err = st.refractory_steps, st.rel_err
+        for _ in range(14):
+            mid = (lo_r + hi_r) // 2
+            st.refractory_steps = max(3, mid)
+            _apply_class_knobs(net, labels, knobs, base_d_eff, base_vrest, base_adec)
+            measured = _measure(net, labels, steps)
+            m = measured.get(lab, float("nan"))
+            st.measured_Hz = m
+            if m != m or m <= 0:
+                hi_r = mid - 1
+                continue
+            err = abs(m - tgt) / tgt
+            st.rel_err = err
+            if err < best_err or best_err != best_err:
+                best_err, best_R = err, st.refractory_steps
+            if err <= tol:
+                break
+            if m < tgt:
+                hi_r = mid - 1  # need shorter R
+            else:
+                lo_r = mid + 1
+        st.refractory_steps = best_R
+        st.rel_err = best_err
+        _apply_class_knobs(net, labels, knobs, base_d_eff, base_vrest, base_adec)
+        measured = _measure(net, labels, steps)
+        for lab2, ks in knobs.items():
+            mm = measured.get(lab2, float("nan"))
+            ks.measured_Hz = mm
+            if ks.target_Hz > 1 and mm == mm:
+                ks.rel_err = abs(mm - ks.target_Hz) / ks.target_Hz
+        report.history.append(
+            {
+                "iter": 0,
+                "phase": f"binary_R:{lab}",
                 "measured": dict(measured),
                 "rel_err": {k: knobs[k].rel_err for k in knobs},
             }

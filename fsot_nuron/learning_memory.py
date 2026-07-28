@@ -72,6 +72,14 @@ class LearningReport:
     mean_incorrect_sim: float
     sme_theta_encode_gt_rest: bool
     sme_gamma_encode_gt_rest: bool
+    delay_steps: int = 0
+    consolidate: bool = False
+    consolidate_steps: int = 0
+    replay_rounds: int = 0
+    top1_immediate: float = float("nan")  # accuracy if probed before delay (optional)
+    top1_after_delay: float = float("nan")
+    top1_after_consolidate: float = float("nan")
+    consolidate_sigma_rel: float = float("nan")
     per_item: List[Dict[str, Any]] = field(default_factory=list)
     notes: str = ""
 
@@ -202,43 +210,103 @@ def run_retrieve_epoch(
     return fingerprint_from_hist(hist, brain.region_index, onset=40)
 
 
-def learning_probe(
-    brain,
-    *,
-    n_items: int = 6,
-    encode_steps: int = 400,
-    retrieve_steps: int = 300,
-    seed: int = 7,
-) -> LearningReport:
-    """
-    Full encode-all → retrieve-each probe. Intelligence primitive on accurate neurons.
-    """
-    items = make_item_patterns(n_items, seed=seed)
-    memories: List[MemoryTrace] = []
-    encode_hists = []
-
-    for it in items:
-        hist, tr = run_encode_epoch(brain, it, steps=encode_steps)
-        memories.append(tr)
-        encode_hists.append(hist)
-
-    # rest baseline for SME-style bands (last encode hist vs pure rest)
+def _run_rest(brain, steps: int) -> torch.Tensor:
+    """Pure rest (external 0). Returns fired [T,B]."""
     brain.reset()
-    rest_steps = 300
     n = brain.n_units
-    rest_f = torch.empty(rest_steps, n, device=brain.device, dtype=torch.bool)
-    for t in range(rest_steps):
+    rest_f = torch.empty(steps, n, device=brain.device, dtype=torch.bool)
+    for t in range(steps):
         _, fired, _, _, _ = brain.step(0.0)
         rest_f[t] = fired
-    # concatenate encode fires for SME contrast
-    enc_fire = torch.cat([h["fired"] for h in encode_hists], dim=0)
-    sme = encoding_vs_rest_report(enc_fire, rest_f)
+    return rest_f
 
+
+def offline_consolidate(
+    brain,
+    items: List[Dict[str, Any]],
+    *,
+    rest_steps: int = 400,
+    replay_rounds: int = 2,
+    replay_steps: int = 120,
+    replay_strength: float = 0.22,
+) -> Dict[str, Any]:
+    """
+    Sleep-like offline consolidation (Creery-style direction, computational):
+
+    1) Quiet rest (low drive)
+    2) Soft replay of stored item patterns (hipp/assoc bias)
+    3) Optional second rest
+
+    Does not free-fit W; uses existing recurrent structure + weak re-inject.
+    """
+    n = brain.n_units
+    sens_ids = brain.region_index.get("sens", [])
+    assoc_ids = brain.region_index.get("assoc", [])
+    hipp_ids = brain.region_index.get("hipp", [])
+    thal_ids = brain.region_index.get("thal", [])
+
+    # Rest epoch 1
+    rest1 = _run_rest(brain, rest_steps)
+    bands_rest1 = band_powers_from_fired(rest1)
+
+    # Replay rounds (offline reactivation)
+    replay_fires = []
+    for _rnd in range(max(0, replay_rounds)):
+        for it in items:
+            feats = it["features"]
+            brain.reset()
+            hist_f = torch.empty(replay_steps, n, device=brain.device, dtype=torch.bool)
+            for t in range(replay_steps):
+                ext = torch.zeros(n, device=brain.device, dtype=brain.net.dtype)
+                # sparse thalamic "spindle-like" packets
+                if (t % 90) < 12:
+                    for i in thal_ids:
+                        if brain.units[i].synapse_sign > 0:
+                            ext[i] = 0.28
+                # soft pattern into hipp + assoc (reactivation)
+                for k, uid in enumerate(hipp_ids):
+                    ext[uid] = ext[uid] + replay_strength * float(feats[k % len(feats)])
+                for k, uid in enumerate(assoc_ids):
+                    ext[uid] = ext[uid] + 0.8 * replay_strength * float(feats[k % len(feats)])
+                for k, uid in enumerate(sens_ids):
+                    ext[uid] = ext[uid] + 0.35 * replay_strength * float(feats[k % len(feats)])
+                _, fired, _, _, _ = brain.step(ext.clamp(-0.8, 1.2))
+                hist_f[t] = fired
+            replay_fires.append(hist_f)
+
+    bands_replay = {}
+    if replay_fires:
+        rf = torch.cat(replay_fires, dim=0)
+        bands_replay = band_powers_from_fired(rf)
+
+    rest2 = _run_rest(brain, max(100, rest_steps // 2))
+    bands_rest2 = band_powers_from_fired(rest2)
+
+    return {
+        "rest_steps": rest_steps,
+        "replay_rounds": replay_rounds,
+        "replay_steps": replay_steps,
+        "bands_rest1": bands_rest1,
+        "bands_replay": bands_replay,
+        "bands_rest2": bands_rest2,
+        "sigma_rel_replay": bands_replay.get("sigma_rel", float("nan")),
+        "gamma_rel_replay": bands_replay.get("gamma_rel", float("nan")),
+        "theta_rel_replay": bands_replay.get("theta_rel", float("nan")),
+    }
+
+
+def _retrieve_all(
+    brain,
+    items: List[Dict[str, Any]],
+    memories: List[MemoryTrace],
+    retrieve_steps: int,
+) -> Tuple[float, float, float, List[Dict[str, Any]]]:
+    """Returns top1, mean_correct_sim, mean_incorrect_sim, per_item."""
     per_item = []
     correct = 0
-    correct_sims = []
-    incorrect_sims = []
-
+    correct_sims: List[float] = []
+    incorrect_sims: List[float] = []
+    n_items = len(items)
     for true_i, it in enumerate(items):
         q = run_retrieve_epoch(brain, it, steps=retrieve_steps)
         sims = [_cosine(q, m.fingerprint) for m in memories]
@@ -262,15 +330,125 @@ def learning_probe(
                 "encode_gamma_rel": memories[true_i].encode_bands.get("gamma_rel"),
             }
         )
-
     n = max(1, n_items)
+    return (
+        correct / n,
+        sum(correct_sims) / len(correct_sims) if correct_sims else 0.0,
+        sum(incorrect_sims) / len(incorrect_sims) if incorrect_sims else 0.0,
+        per_item,
+    )
+
+
+def learning_probe(
+    brain,
+    *,
+    n_items: int = 6,
+    encode_steps: int = 400,
+    retrieve_steps: int = 300,
+    seed: int = 7,
+    delay_steps: int = 0,
+    consolidate: bool = False,
+    consolidate_rest_steps: int = 400,
+    replay_rounds: int = 2,
+    replay_steps: int = 120,
+    probe_immediate: bool = False,
+) -> LearningReport:
+    """
+    Encode-all → [optional immediate probe] → delay and/or offline consolidate
+    → retrieve-each.
+
+    delay_steps: pure rest after encoding (retention delay in model-ms).
+    consolidate: sleep-like rest + soft replay before final retrieve.
+    """
+    items = make_item_patterns(n_items, seed=seed)
+    memories: List[MemoryTrace] = []
+    encode_hists = []
+
+    for it in items:
+        hist, tr = run_encode_epoch(brain, it, steps=encode_steps)
+        memories.append(tr)
+        encode_hists.append(hist)
+
+    # rest baseline for SME-style bands
+    rest_f = _run_rest(brain, 300)
+    enc_fire = torch.cat([h["fired"] for h in encode_hists], dim=0)
+    sme = encoding_vs_rest_report(enc_fire, rest_f)
+
+    top1_imm = float("nan")
+    if probe_immediate or (delay_steps > 0 or consolidate):
+        # baseline immediate accuracy when testing retention/consolidation
+        top1_imm, _, _, _ = _retrieve_all(brain, items, memories, retrieve_steps)
+
+    # Retention delay (wake-like idle)
+    top1_delay = float("nan")
+    if delay_steps > 0:
+        _run_rest(brain, delay_steps)
+        if not consolidate:
+            top1_delay, csim, isim, per_item = _retrieve_all(
+                brain, items, memories, retrieve_steps
+            )
+            return LearningReport(
+                n_items=n_items,
+                top1_accuracy=top1_delay,
+                mean_correct_sim=csim,
+                mean_incorrect_sim=isim,
+                sme_theta_encode_gt_rest=bool(sme.get("theta_encode_gt_rest")),
+                sme_gamma_encode_gt_rest=bool(sme.get("gamma_encode_gt_rest")),
+                delay_steps=delay_steps,
+                consolidate=False,
+                top1_immediate=top1_imm,
+                top1_after_delay=top1_delay,
+                per_item=per_item,
+                notes=f"Retention delay {delay_steps} model-ms (no offline replay).",
+            )
+        # if consolidate after delay, record mid-probe optionally cheap skip
+        top1_delay, _, _, _ = _retrieve_all(brain, items, memories, retrieve_steps)
+
+    if consolidate:
+        consol_meta = offline_consolidate(
+            brain,
+            items,
+            rest_steps=consolidate_rest_steps,
+            replay_rounds=replay_rounds,
+            replay_steps=replay_steps,
+        )
+        top1_cons, csim, isim, per_item = _retrieve_all(
+            brain, items, memories, retrieve_steps
+        )
+        return LearningReport(
+            n_items=n_items,
+            top1_accuracy=top1_cons,
+            mean_correct_sim=csim,
+            mean_incorrect_sim=isim,
+            sme_theta_encode_gt_rest=bool(sme.get("theta_encode_gt_rest")),
+            sme_gamma_encode_gt_rest=bool(sme.get("gamma_encode_gt_rest")),
+            delay_steps=delay_steps,
+            consolidate=True,
+            consolidate_steps=consolidate_rest_steps,
+            replay_rounds=replay_rounds,
+            top1_immediate=top1_imm,
+            top1_after_delay=top1_delay,
+            top1_after_consolidate=top1_cons,
+            consolidate_sigma_rel=float(consol_meta.get("sigma_rel_replay") or float("nan")),
+            per_item=per_item,
+            notes=(
+                "Offline consolidate: rest + soft replay; "
+                f"sigma_rel_replay={consol_meta.get('sigma_rel_replay')}"
+            ),
+        )
+
+    # Immediate retrieve (default path)
+    top1, csim, isim, per_item = _retrieve_all(brain, items, memories, retrieve_steps)
     return LearningReport(
         n_items=n_items,
-        top1_accuracy=correct / n,
-        mean_correct_sim=sum(correct_sims) / len(correct_sims) if correct_sims else 0.0,
-        mean_incorrect_sim=sum(incorrect_sims) / len(incorrect_sims) if incorrect_sims else 0.0,
+        top1_accuracy=top1,
+        mean_correct_sim=csim,
+        mean_incorrect_sim=isim,
         sme_theta_encode_gt_rest=bool(sme.get("theta_encode_gt_rest")),
         sme_gamma_encode_gt_rest=bool(sme.get("gamma_encode_gt_rest")),
+        delay_steps=0,
+        consolidate=False,
+        top1_immediate=top1,
         per_item=per_item,
         notes=(
             "Fingerprint retrieval on multi-region FSOT brain; "
