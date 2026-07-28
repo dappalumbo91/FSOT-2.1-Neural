@@ -403,6 +403,116 @@ def iter_video_frames(
         return
 
 
+def sample_frames_at_times(
+    path: Path,
+    times_s: Sequence[float],
+    *,
+    max_side: int = 72,
+    tol_s: float = 1.5,
+) -> List[Tuple[np.ndarray, float]]:
+    """
+    Seek/decode frames nearest to requested timestamps (caption midpoints).
+    Returns list of (rgb, actual_t_sec). Graceful empty if no backend.
+    """
+    out: List[Tuple[np.ndarray, float]] = []
+    want = sorted(float(t) for t in times_s if t >= 0)
+    if not want:
+        return out
+    backend, reader = _open_video_reader(path)
+    if backend == "av":
+        container, stream = reader
+        try:
+            fps = float(stream.average_rate) if stream.average_rate else 24.0
+            tb = stream.time_base
+            for t_sec in want:
+                try:
+                    # seek near target (backward keyframe)
+                    offset = int(t_sec / float(tb)) if tb else int(t_sec * 1_000_000)
+                    container.seek(offset, any_frame=False, backward=True, stream=stream)
+                except Exception:
+                    pass
+                best = None
+                best_dt = 1e9
+                n = 0
+                for frame in container.decode(video=0):
+                    n += 1
+                    pts = frame.pts
+                    if pts is not None and tb is not None:
+                        ft = float(pts * tb)
+                    else:
+                        ft = t_sec
+                    dt = abs(ft - t_sec)
+                    if dt < best_dt:
+                        img = frame.to_ndarray(format="rgb24")
+                        h, w = img.shape[:2]
+                        scale = max_side / max(h, w)
+                        if scale < 1.0:
+                            nh, nw = max(1, int(h * scale)), max(1, int(w * scale))
+                            ys = (np.linspace(0, h - 1, nh)).astype(np.int32)
+                            xs = (np.linspace(0, w - 1, nw)).astype(np.int32)
+                            img = img[ys][:, xs]
+                        best = (img, ft)
+                        best_dt = dt
+                    if dt <= tol_s or n > int(fps * 3):
+                        break
+                if best is not None:
+                    out.append(best)
+        finally:
+            try:
+                container.close()
+            except Exception:
+                pass
+        return out
+    # Fallback: span-decode whole file coarsely and pick nearest
+    bank: List[Tuple[np.ndarray, float]] = []
+    for img, t in iter_video_frames(path, max_frames=max(48, len(want) * 4), stride=30, max_side=max_side):
+        bank.append((img, t))
+    for t_sec in want:
+        if not bank:
+            break
+        img, ft = min(bank, key=lambda x: abs(x[1] - t_sec))
+        out.append((img, ft))
+    return out
+
+
+def iter_video_frames_span(
+    path: Path,
+    *,
+    max_frames: int = 24,
+    max_side: int = 72,
+) -> Iterator[Tuple[np.ndarray, float]]:
+    """
+    Subsample ~max_frames evenly across the *full* video duration
+    (not just the opening seconds).
+    """
+    backend, reader = _open_video_reader(path)
+    if backend == "av":
+        container, stream = reader
+        try:
+            fps = float(stream.average_rate) if stream.average_rate else 24.0
+            dur = None
+            if stream.duration is not None and stream.time_base is not None:
+                dur = float(stream.duration * stream.time_base)
+            if dur is None or dur <= 0:
+                # fallback sequential
+                yield from iter_video_frames(
+                    path, max_frames=max_frames, stride=max(15, 120 // max(1, max_frames)), max_side=max_side
+                )
+                return
+            times = [dur * (i + 0.5) / max_frames for i in range(max_frames)]
+            for img, t in sample_frames_at_times(path, times, max_side=max_side):
+                yield img, t
+        finally:
+            try:
+                container.close()
+            except Exception:
+                pass
+        return
+    yield from iter_video_frames(
+        path, max_frames=max_frames, stride=40, max_side=max_side
+    )
+
+
 def vision_packet_from_frame(
     rgb: np.ndarray,
     prev_gray: Optional[np.ndarray] = None,

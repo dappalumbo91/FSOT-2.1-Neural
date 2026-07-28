@@ -60,6 +60,9 @@ class ShortHorizonReport:
     recall_k: int
     pixel_id_top1: float
     pixel_id_synthetic: bool
+    caption_bind_top1: float
+    caption_bind_names: int
+    caption_bind_pairs: int
     learning_probe_top1: float
     learning_probe_margin: float
     sme_theta: bool
@@ -111,19 +114,20 @@ def _score_recall(
 
 def run_short_horizon_learn(
     *,
-    max_docs: int = 3,
-    max_videos: int = 3,
-    media_frames: int = 8,
+    max_docs: int = 4,
+    max_videos: int = 5,
+    media_frames: int = 12,
     profile: str = "ai_efficient",
     device: str = "cpu",
     seed: int = 7,
     memory_root: Optional[Path] = None,
     run_pixel_id: bool = True,
     run_learning_probe: bool = True,
+    run_caption_bind: bool = True,
 ) -> ShortHorizonReport:
     """
-    Short encode → immediate test. Designed to finish in ~1–3 minutes on CPU
-    when media decode is available.
+    Short encode → immediate test. Expanded window (more videos/frames) plus
+    optional subtitle↔pixel co-occurrence binding. Still minutes-scale on CPU.
     """
     notes: List[str] = []
     started = datetime.now(timezone.utc)
@@ -243,15 +247,30 @@ def run_short_horizon_learn(
                     )
                     brain.step(ext.clamp(-0.5, 1.4))
                 title = vp.stem[:60]
+                # Prefer subtitles into episode if present (for recall + bind)
+                cap_src = "none"
+                cap_text = ""
+                cap_n = 0
+                try:
+                    from ..knowledge.subtitles import load_subtitles, flatten_caption_text
+
+                    cues = load_subtitles(vp)
+                    if cues:
+                        cap_src = cues[0].source if cues else "srt"
+                        cap_text = flatten_caption_text(cues, max_chars=400)
+                        cap_n = len(cues)
+                except Exception:
+                    pass
                 mem = EpisodeMemory(
                     episode_id=_eid(title, str(vp)),
                     title=title,
                     path=str(vp),
                     kind="media:video_short",
-                    symbols=["moving_image", "movie", "scene"],
-                    caption_source="none",
-                    caption_text="",
-                    caption_cues_n=0,
+                    symbols=["moving_image", "movie", "scene"]
+                    + (["dialogue"] if cap_n else []),
+                    caption_source=cap_src,
+                    caption_text=cap_text,
+                    caption_cues_n=cap_n,
                     plain_english=(
                         f"Short-horizon visual encode of “{title}”: "
                         f"{len(feats_acc)} frames through RF cascade retina features."
@@ -294,7 +313,12 @@ def run_short_horizon_learn(
     pix_detail: Dict[str, Any] = {}
     if run_pixel_id:
         try:
-            pix = probe_real_media_pixel_id(n_classes=min(4, max(2, max_videos + 1)), n_train=5, n_test=3, seed=seed)
+            pix = probe_real_media_pixel_id(
+                n_classes=min(4, max(2, max_videos)),
+                n_train=8,
+                n_test=4,
+                seed=seed,
+            )
             pix_top1 = pix.pixel_id_top1
             pix_syn = pix.synthetic
             pix_detail = pix.to_dict()
@@ -304,6 +328,70 @@ def run_short_horizon_learn(
             )
         except Exception as e:
             notes.append(f"pixel_id skip: {e}")
+
+    # --- Subtitle ↔ pixel co-occurrence (name with look) ---
+    cap_top1 = 0.0
+    cap_names = 0
+    cap_pairs = 0
+    cap_detail: Dict[str, Any] = {}
+    if run_caption_bind:
+        try:
+            from ..knowledge.vision_caption_bind import run_vision_caption_bind
+
+            cap = run_vision_caption_bind(
+                max_videos=min(5, max(2, max_videos)),
+                max_frames=max(12, media_frames),
+                stride=22,
+                seed=seed,
+            )
+            cap_top1 = float(cap.pixel_to_name_top1)
+            cap_names = int(cap.n_names)
+            cap_pairs = int(cap.n_caption_binds)
+            cap_detail = cap.to_dict()
+            notes.append(
+                f"caption_bind binds={cap.n_caption_binds} names={cap.n_names} "
+                f"pixel→name top1={cap.pixel_to_name_top1:.3f} "
+                f"heldout={cap.n_heldout}"
+            )
+            # Store a memory summary of caption-name clusters for recall
+            if cap.top_names:
+                mem = EpisodeMemory(
+                    episode_id=_eid("vision_caption_clusters", "bind"),
+                    title="Vision–caption name clusters",
+                    path=cap.clusters_path or "vision_caption_clusters",
+                    kind="bind:vision_caption",
+                    symbols=["dialogue", "person", "face"] + list(cap.top_names[:6]),
+                    caption_source="srt_cooccurrence",
+                    caption_text=" ".join(cap.top_names[:20]),
+                    caption_cues_n=cap.n_caption_binds,
+                    plain_english=(
+                        f"Bound {cap.n_caption_binds} caption–frame pairs into "
+                        f"{cap.n_names} name clusters. Top names: "
+                        f"{', '.join(cap.top_names[:8])}."
+                    ),
+                    knowledge_keys=list(cap.top_names[:12]),
+                    n_trits=cap.n_names * 16,
+                    sample_lines=list(cap.top_names[:6]),
+                    notes=["short_horizon", "vision_caption_bind"],
+                )
+                save_episode(mem, root=mem_root)
+                n_mem += 1
+                queries.append(("vision caption clusters", "Vision–caption name clusters"))
+                if cap.top_names:
+                    queries.append((cap.top_names[0], "Vision–caption name clusters"))
+        except Exception as e:
+            notes.append(f"caption_bind skip: {e}")
+
+    # Recompute recall if we added caption-cluster queries
+    seen_q = set()
+    uniq_q = []
+    for q, e in queries:
+        key = (q.lower(), e.lower())
+        if key in seen_q:
+            continue
+        seen_q.add(key)
+        uniq_q.append((q, e))
+    top1, atk, recall_rows = _score_recall(uniq_q, root=mem_root, k=3)
 
     # --- Learning probe (machine items) — short delay ---
     lp_top1 = 0.0
@@ -316,12 +404,12 @@ def run_short_horizon_learn(
             )
             learn = learning_probe(
                 br,
-                n_items=8,
-                encode_steps=200,
-                retrieve_steps=160,
-                delay_steps=80,
+                n_items=10,
+                encode_steps=220,
+                retrieve_steps=180,
+                delay_steps=100,
                 consolidate=True,
-                consolidate_rest_steps=120,
+                consolidate_rest_steps=140,
                 item_mode="fsot_machine",
                 seed=seed,
             )
@@ -340,7 +428,7 @@ def run_short_horizon_learn(
 
     finished = datetime.now(timezone.utc)
     elapsed_min = (finished - started).total_seconds() / 60.0
-    # Success: recall above chance-ish and learning probe healthy
+    # Success: recall + learning probe healthy; caption bind optional bonus
     ok = (
         (top1 >= 0.4 or atk >= 0.55)
         and (lp_top1 >= 0.5 or not run_learning_probe)
@@ -359,6 +447,9 @@ def run_short_horizon_learn(
         recall_k=3,
         pixel_id_top1=pix_top1,
         pixel_id_synthetic=pix_syn,
+        caption_bind_top1=cap_top1,
+        caption_bind_names=cap_names,
+        caption_bind_pairs=cap_pairs,
         learning_probe_top1=lp_top1,
         learning_probe_margin=lp_margin,
         sme_theta=sme_th,
@@ -368,6 +459,7 @@ def run_short_horizon_learn(
         details={
             "recall_rows": recall_rows,
             "pixel_id": pix_detail,
+            "caption_bind": cap_detail,
             "queries_n": len(uniq_q),
             "memory_root": str(mem_root),
         },
@@ -392,6 +484,8 @@ def run_short_horizon_learn(
         f"- docs={rep.n_docs} media={rep.n_media} memories={rep.n_memory}",
         f"- recall top1=**{rep.recall_top1:.3f}** recall@3=**{rep.recall_at_k:.3f}**",
         f"- pixel_id top1=**{rep.pixel_id_top1:.3f}** synthetic={rep.pixel_id_synthetic}",
+        f"- caption↔pixel binds=**{rep.caption_bind_pairs}** names=**{rep.caption_bind_names}** "
+        f"pixel→name top1=**{rep.caption_bind_top1:.3f}**",
         f"- learning_probe top1=**{rep.learning_probe_top1:.3f}** margin={rep.learning_probe_margin:.3f}",
         f"- SME θ/γ: {rep.sme_theta} / {rep.sme_gamma}",
         "",

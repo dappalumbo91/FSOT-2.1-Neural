@@ -600,10 +600,17 @@ def score_free_monologue() -> LayerScore:
 
 
 def score_self_curriculum() -> LayerScore:
-    """Gap-driven self-authored plan + metric_delta; execute claim still open."""
+    """
+    Gap-driven self-authored plan + optional short-horizon execute chain.
+    Soft ceiling 78 when execute artifact shows held metrics.
+    """
     measured: Dict[str, Any] = {}
     score = 15.0
+    design_ceiling = 72.0
     try:
+        from pathlib import Path
+        import json
+        from ..paths import ARTIFACTS
         from ..benchmarks.frontier_probes import probe_curriculum_gap
 
         cur = probe_curriculum_gap()
@@ -611,19 +618,34 @@ def score_self_curriculum() -> LayerScore:
         steps = int(cur.get("curriculum_steps_planned") or 0)
         self_auth = bool(cur.get("curriculum_self_authored"))
         delta = cur.get("metric_delta_vs_fixed_order")
-        score = 10.0 + 20.0 * gap_f + 2.5 * min(6, steps)
+        score = 10.0 + 18.0 * gap_f + 2.0 * min(6, steps)
         if self_auth:
-            score += 15.0
+            score += 12.0
         if delta is not None:
-            # reward positive gap advantage (clamped)
-            score += 12.0 * min(1.0, max(0.0, float(delta) * 3.0))
-            score += 8.0  # measured A/B synthetic delta exists
-        # Soft ceiling: plan+delta without real execute → 68; full claim → 72
-        design_ceiling = 68.0 if self_auth and delta is not None else 42.0
-        if self_auth and delta is not None and float(delta) > 0:
-            design_ceiling = 72.0
+            score += 10.0 * min(1.0, max(0.0, float(delta) * 3.0))
+            score += 6.0
+        # Bonus if curriculum was *executed* as short-horizon units
+        ex_path = ARTIFACTS / "curriculum_execute_last.json"
+        if ex_path.is_file():
+            ex = json.loads(ex_path.read_text(encoding="utf-8"))
+            measured["execute"] = {
+                "ok": ex.get("ok"),
+                "n_steps": ex.get("n_steps"),
+                "delta_recall": ex.get("metric_delta_recall"),
+                "delta_pixel": ex.get("metric_delta_pixel"),
+                "after_recall": ex.get("after_recall"),
+            }
+            if ex.get("ok"):
+                score += 10.0
+                design_ceiling = 78.0
+            if float(ex.get("metric_delta_recall") or 0) >= 0:
+                score += 4.0
+            if float(ex.get("after_pixel") or 0) >= 0.5:
+                score += 4.0
+        else:
+            design_ceiling = 72.0 if self_auth and delta is not None else 42.0
         score = _clamp(min(score, design_ceiling))
-        measured = {**cur, "design_ceiling": design_ceiling}
+        measured = {**cur, **measured, "design_ceiling": design_ceiling}
     except Exception as e:
         measured = {"error": str(e)}
     return LayerScore(
@@ -633,7 +655,7 @@ def score_self_curriculum() -> LayerScore:
         threshold=70.0,
         below_threshold=score < 70.0,
         measured=measured,
-        limiting_factor="self-authored plan+synthetic delta; real execute budget unclaimed",
+        limiting_factor="short-horizon unit chain; open-world self-agency still unclaimed",
         refine_hook="refine_curriculum",
     )
 

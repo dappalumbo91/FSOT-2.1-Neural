@@ -54,11 +54,27 @@ test → log → fix → retest → log → next target
 
 | Layer | Typical ceiling until… |
 |-------|------------------------|
-| retina_like_decode | 72 — multi-scale CS/ON-OFF/orient; full RF library still missing |
+| retina_like_decode | 78 — RF cascade (local ON/OFF, fine orient, DoG) |
 | language_dialogue | 72 — SRT bind + trit + lexicon; open-vocab VL unclaimed |
 | free_monologue | 72 — multi-turn memory monologue; free LLM monologue unclaimed |
-| self_curriculum | 72 — self-authored gap plan + synthetic Δ; real execute budget unclaimed |
-| open_world_pixel_id | **~70** real-media entity ID (RF cascade, tutor-ablated); **named-character claim** still unclaimed |
+| self_curriculum | 78 — gap plan + **short-horizon unit chain** (`run_curriculum_execute.py`) |
+| open_world_pixel_id | **~70+** real-media entity ID; caption↔pixel co-occurrence stored; **named-character claim** still unclaimed |
+
+## Snowball path
+
+```text
+short_horizon  (atom: encode docs+media → recall in minutes)
+      ↓
+vision_caption_bind  (subtitle midpoints ↔ RF features → name clusters)
+      ↓
+curriculum_execute  (gap plan → chain of short_horizon units → Δ metrics)
+```
+
+```powershell
+python run_short_horizon_learn.py --docs 4 --videos 5 --frames 12
+python run_curriculum_execute.py --steps 3 --docs 2 --videos 2
+python run_wetlab_accuracy_battery.py
+```
 
 ## FSOT rule
 
