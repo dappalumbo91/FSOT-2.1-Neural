@@ -190,6 +190,10 @@ def main() -> int:
             "_cmd_parity",
             "_cmd_qemu",
             "_cmd_zig_body",
+            "_cmd_stress",
+            "_cmd_stress_quick",
+            "_refresh_cells",
+            "_refresh_memory",
         ]
         missing = [r for r in required if not hasattr(ConsoleApp, r)]
         ok("console_methods", len(missing) == 0, f"missing={missing}")

@@ -218,20 +218,31 @@ You **do** need the **brain calculations** able to live there — which we alrea
 
 ## 8. Proposed product milestone (next build phase)
 
-**FSOT Neural Console v0.1 (local, scavenged stack) — landed**
+**FSOT Neural Console v0.5 (local product screens) — landed**
 
 ```powershell
 python run_console.py
+python run_stress_suite.py          # stage break map
+python run_stress_suite.py --quick
 ```
 
-1. Science frozen: `v0.5.0-bio-intel`  
-2. `product/console/` via **tkinter** (host OS fonts/windows; no custom engine; no web)  
-3. Buttons: Pin · Scalpel 1% · Intel probe suite · Zig parity · QEMU body  
-4. **Machine encode** tab (UTF-8/T1 primary; chemical; Morse secondary)  
-5. Engine log pane (subprocess stdout)  
-6. Later: Dear PyGui/GTK-on-Alpine upgrade without changing brain ABI  
+| Screen | Content |
+|--------|---------|
+| Dashboard | Boot checklist, pin, stress buttons, science jobs |
+| Cell classes | Pyr/PV/SST/VIP vs Allen wet-lab (from scalpel artifacts) |
+| Memory lab | FSOT-bridged encode/delay/retrieve scores |
+| Encode | Machine ★ / chemical / Morse + inject |
+| Body (Zig) | Host exe FP badge, parity, QEMU |
+| Live / stress | Folds + stress break map |
+| Engine log | Subprocess stdout |
 
-Encoding doctrine: [`docs/MACHINE_ENCODING.md`](MACHINE_ENCODING.md).
+1. Science frozen: `v0.5.0-bio-intel`  
+2. `product/console/` via **tkinter** (host OS fonts/windows; no web)  
+3. Stress suite: `run_stress_suite.py` → `docs/STRESS_STAGE_REPORT.md`  
+4. Later: Dear PyGui/GTK-on-Alpine upgrade without changing brain ABI  
+
+Encoding doctrine: [`docs/MACHINE_ENCODING.md`](MACHINE_ENCODING.md).  
+Application recipe: [`docs/FSOT_APPLICATION_NEURAL.md`](FSOT_APPLICATION_NEURAL.md).
 
 ---
 

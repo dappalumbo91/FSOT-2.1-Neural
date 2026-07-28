@@ -335,9 +335,10 @@ def path_recommendation() -> Dict[str, str]:
 # ---------------------------------------------------------------------------
 #
 # Layout mirrors how kernels move machine words:
-#   magic[4] | version u8 | path_id u8 | n_trits u16 LE | words[] u64 LE
+#   magic[4] | version u8 | path_id u8 | n_trits u32 LE | words[] (u64 pack + n_u8 + pad3)
 # Path ids: 1=machine  2=chemical  3=morse(secondary)
 # Word packing matches Zig TritWord (little-endian T1, ≤32 trits / u64).
+# n_trits is u32 (stress: u16 overflowed above 65535 trits).
 
 ABI_MAGIC = b"FSOT"
 ABI_VERSION = 1
@@ -365,9 +366,18 @@ class MachineFrame:
     version: int = ABI_VERSION
 
     def to_bytes(self) -> bytes:
+        """
+        Header v1: magic[4] | version u8 | path_id u8 | n_trits u32 LE
+        (u32 — stress suite found u16 overflow above 65535 trits.)
+        Word records: pack u64 LE | n_trits u8 | pad 3
+        """
         path_id = _PATH_ID.get(self.path, 1)
-        n = max(0, min(0xFFFF, int(self.n_trits)))
-        hdr = ABI_MAGIC + bytes([self.version & 0xFF, path_id & 0xFF]) + n.to_bytes(2, "little")
+        n = max(0, min(0xFFFFFFFF, int(self.n_trits)))
+        hdr = (
+            ABI_MAGIC
+            + bytes([self.version & 0xFF, path_id & 0xFF])
+            + n.to_bytes(4, "little")
+        )
         body = bytearray()
         for w in self.words:
             # u64 LE carrier (Zig TritWord.pack style)
@@ -394,13 +404,19 @@ class MachineFrame:
 
     @classmethod
     def from_bytes(cls, data: bytes) -> "MachineFrame":
+        # Accept v1 header with u32 n_trits (10-byte header) or legacy u16 (8-byte)
         if len(data) < 8 or data[:4] != ABI_MAGIC:
             raise ValueError("not an FSOT machine frame")
         version = data[4]
         path = _ID_PATH.get(data[5], EncodePath.MACHINE)
-        n_trits = int.from_bytes(data[6:8], "little")
+        # Prefer u32 layout when enough bytes remain for at least empty body
+        if len(data) >= 10:
+            n_trits = int.from_bytes(data[6:10], "little")
+            off = 10
+        else:
+            n_trits = int.from_bytes(data[6:8], "little")
+            off = 8
         words: List[MachineWord] = []
-        off = 8
         while off + 12 <= len(data):
             pack = int.from_bytes(data[off : off + 8], "little")
             nw = data[off + 8]
@@ -412,7 +428,12 @@ class MachineFrame:
                 )
             )
             off += 12
-        return cls(path=path if isinstance(path, EncodePath) else EncodePath.MACHINE, n_trits=n_trits, words=words, version=version)
+        return cls(
+            path=path if isinstance(path, EncodePath) else EncodePath.MACHINE,
+            n_trits=n_trits,
+            words=words,
+            version=version,
+        )
 
 
 def chemical_signals_to_machine(dna_or_codons: str) -> Dict[str, Any]:

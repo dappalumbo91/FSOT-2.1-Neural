@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-FSOT Neural Console v0.4 — readable local product shell (tkinter, no web).
+FSOT Neural Console v0.5 — product screens (tkinter, local, no web).
+
+Aligned with docs/PRODUCT_UI_AND_DISPLAY.md:
+  Dashboard · Cell classes · Memory · Encode · Body · Live · Log
 
 Display doctrine:
   - Human summary first (plain English)
-  - Numbers that matter (S folds, pass/fail, top-1)
-  - Full JSON only as secondary detail
-  - All paths go through archive FSOT pin/bridge when claim-sensitive
+  - Wet-lab accuracy numbers (Allen rates, probe top-1)
+  - Archive FSOT pin/bridge on every claim path
 """
 
 from __future__ import annotations
@@ -325,19 +327,20 @@ def _looks_like_dna(text: str) -> bool:
 class ConsoleApp(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("FSOT Neural Console v0.4 — readable · local · no web")
-        self.geometry("1200x820")
-        self.minsize(980, 660)
+        self.title("FSOT Neural Console v0.5 — product screens · local · no web")
+        self.geometry("1220x840")
+        self.minsize(1000, 680)
         self.configure(bg="#1a1d23")
         self._log_q: queue.Queue[str] = queue.Queue()
         self._worker: Optional[threading.Thread] = None
         self._boot_ok = False
+        self._zig_fp = False
         self._build()
         self.after(100, self._drain_log)
         self._log(
-            "FSOT Neural Console v0.4\n"
-            "Readable summaries first · archive math on every claim path\n"
-            "Machine body primary · Zig host is the silicon body · Python is the lab UI\n"
+            "FSOT Neural Console v0.5 (product design screens)\n"
+            "Dashboard · Cell classes · Memory · Encode · Body · Live\n"
+            "Archive math · wet-lab scalpel · FSOT machine intel · Zig body\n"
         )
         self.after(250, self._auto_boot)
 
@@ -385,23 +388,29 @@ class ConsoleApp(tk.Tk):
         nb.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
 
         self.tab_dash = ttk.Frame(nb)
+        self.tab_cells = ttk.Frame(nb)
+        self.tab_mem = ttk.Frame(nb)
         self.tab_enc = ttk.Frame(nb)
+        self.tab_body = ttk.Frame(nb)
         self.tab_live = ttk.Frame(nb)
         self.tab_log = ttk.Frame(nb)
-        nb.add(self.tab_dash, text="1 · Dashboard")
-        nb.add(self.tab_enc, text="2 · Encode / inject")
-        nb.add(self.tab_live, text="3 · Live metrics")
-        nb.add(self.tab_log, text="4 · Engine log")
+        nb.add(self.tab_dash, text="Dashboard")
+        nb.add(self.tab_cells, text="Cell classes")
+        nb.add(self.tab_mem, text="Memory lab")
+        nb.add(self.tab_enc, text="Encode")
+        nb.add(self.tab_body, text="Body (Zig)")
+        nb.add(self.tab_live, text="Live / stress")
+        nb.add(self.tab_log, text="Engine log")
 
-        # Dashboard
+        # ----- Dashboard (design §6) -----
         ttk.Label(
             self.tab_dash,
-            text="What am I looking at?  Lab UI (Python) + body (Zig) + math (archive FSOT).",
+            text="Dashboard — pin · wet-lab accuracy · last probe · stress",
             font=("Segoe UI", 11, "bold"),
         ).pack(anchor=tk.W, padx=8, pady=(8, 2))
         ttk.Label(
             self.tab_dash,
-            text="Boot checks the archive. Buttons run real science. Encode tab speaks machine language.",
+            text="Lab UI (Python) + body (Zig) + math (I:\\FSOT-Physical-Archive). No web.",
             font=("Segoe UI", 9),
         ).pack(anchor=tk.W, padx=8, pady=(0, 6))
 
@@ -413,7 +422,10 @@ class ConsoleApp(tk.Tk):
         ttk.Button(boot_row, text="Refresh S folds", command=self._refresh_banner).pack(
             side=tk.LEFT, padx=2
         )
-        ttk.Button(boot_row, text="Zig body (exe)", command=self._cmd_zig_body).pack(
+        ttk.Button(boot_row, text="STRESS SUITE", command=self._cmd_stress).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(boot_row, text="Stress (quick)", command=self._cmd_stress_quick).pack(
             side=tk.LEFT, padx=2
         )
 
@@ -427,7 +439,7 @@ class ConsoleApp(tk.Tk):
             ("Machine ABI", self._cmd_machine_verify),
             ("FSOT bridge", self._cmd_fsot_bridge),
             ("Zig parity", self._cmd_parity),
-            ("QEMU guest", self._cmd_qemu),
+            ("Zig body", self._cmd_zig_body),
         ]
         for i, (label, cmd) in enumerate(actions):
             ttk.Button(btn_row, text=label, command=cmd).grid(
@@ -438,13 +450,62 @@ class ConsoleApp(tk.Tk):
         info = ttk.LabelFrame(self.tab_dash, text="Readable status (boot / last report)")
         info.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
         self.status = scrolledtext.ScrolledText(
-            info, height=22, wrap=tk.WORD, font=("Consolas", 10), bg="#0d1117", fg="#e6edf3",
+            info, height=20, wrap=tk.WORD, font=("Consolas", 10), bg="#0d1117", fg="#e6edf3",
             insertbackground="#e6edf3",
         )
         self.status.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
         self.status.insert(tk.END, "Waiting for boot…\n")
 
-        # Encode
+        # ----- Cell classes (Allen wet-lab) -----
+        ttk.Label(
+            self.tab_cells,
+            text="Cell classes — Pyr / PV / SST / VIP vs Allen wet-lab rates",
+            font=("Segoe UI", 11, "bold"),
+        ).pack(anchor=tk.W, padx=8, pady=6)
+        cell_btns = ttk.Frame(self.tab_cells)
+        cell_btns.pack(fill=tk.X, padx=8)
+        ttk.Button(cell_btns, text="Run scalpel 1%", command=self._cmd_scalpel).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(cell_btns, text="Refresh from artifacts", command=self._refresh_cells).pack(
+            side=tk.LEFT, padx=2
+        )
+        self.cells_out = scrolledtext.ScrolledText(
+            self.tab_cells, wrap=tk.WORD, font=("Consolas", 10), bg="#0d1117", fg="#e6edf3",
+            insertbackground="#e6edf3",
+        )
+        self.cells_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        self.cells_out.insert(tk.END, "Run Scalpel or Stress to fill Allen class table.\n")
+
+        # ----- Memory lab -----
+        ttk.Label(
+            self.tab_mem,
+            text="Memory lab — encode / delay / retrieve (FSOT machine items)",
+            font=("Segoe UI", 11, "bold"),
+        ).pack(anchor=tk.W, padx=8, pady=6)
+        mem_btns = ttk.Frame(self.tab_mem)
+        mem_btns.pack(fill=tk.X, padx=8)
+        ttk.Button(mem_btns, text="Quick intel", command=self._cmd_intel_quick).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(mem_btns, text="Full suite (slow)", command=self._cmd_intel).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(mem_btns, text="Refresh results", command=self._refresh_memory).pack(
+            side=tk.LEFT, padx=2
+        )
+        self.mem_out = scrolledtext.ScrolledText(
+            self.tab_mem, wrap=tk.WORD, font=("Consolas", 10), bg="#0d1117", fg="#e6edf3",
+            insertbackground="#e6edf3",
+        )
+        self.mem_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        self.mem_out.insert(
+            tk.END,
+            "Items are FSOT-bridged text labels (machine path), not Morse.\n"
+            "Run Quick intel to see top-1 after delay.\n",
+        )
+
+        # ----- Encode -----
         ttk.Label(
             self.tab_enc,
             text="Body language: MACHINE (bytes → trits → OS words). Coupled through FSOT S on inject.",
@@ -484,15 +545,54 @@ class ConsoleApp(tk.Tk):
         )
         self.enc_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=4)
 
-        # Live
+        # ----- Body (Zig / QEMU) -----
+        ttk.Label(
+            self.tab_body,
+            text="Body — Zig host executable + QEMU freestanding guest",
+            font=("Segoe UI", 11, "bold"),
+        ).pack(anchor=tk.W, padx=8, pady=6)
+        ttk.Label(
+            self.tab_body,
+            text="Python is the lab UI. Zig is the silicon body (trinary step). QEMU proves bare metal.",
+            font=("Segoe UI", 9),
+        ).pack(anchor=tk.W, padx=8)
+        body_btns = ttk.Frame(self.tab_body)
+        body_btns.pack(fill=tk.X, padx=8, pady=6)
+        ttk.Button(body_btns, text="Run Zig host exe", command=self._cmd_zig_body).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(body_btns, text="Zig ↔ Python parity", command=self._cmd_parity).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(body_btns, text="QEMU guest", command=self._cmd_qemu).pack(
+            side=tk.LEFT, padx=2
+        )
+        self.zig_badge = ttk.Label(body_btns, text="FP: unknown", font=("Consolas", 10))
+        self.zig_badge.pack(side=tk.RIGHT, padx=8)
+        self.body_out = scrolledtext.ScrolledText(
+            self.tab_body, wrap=tk.WORD, font=("Consolas", 10), bg="#0d1117", fg="#e6edf3",
+            insertbackground="#e6edf3",
+        )
+        self.body_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        self.body_out.insert(
+            tk.END,
+            f"Host binary:\n  {ZIG_HOST}\n  present={ZIG_HOST.is_file()}\n\n"
+            f"QEMU script:\n  {ZIG_QEMU}\n  present={ZIG_QEMU.is_file()}\n\n"
+            "Click Run Zig host — Engine log should show FSOT_TRIT PASS.\n",
+        )
+
+        # ----- Live / stress -----
         live_hdr = ttk.Frame(self.tab_live)
         live_hdr.pack(fill=tk.X, padx=8, pady=4)
         ttk.Label(
             live_hdr,
-            text="Live pin / folds / last probe results (plain English).",
+            text="Live pin / folds / stress break map (plain English).",
             font=("Segoe UI", 10),
         ).pack(side=tk.LEFT)
         ttk.Button(live_hdr, text="Refresh", command=self._refresh_live).pack(side=tk.RIGHT)
+        ttk.Button(live_hdr, text="STRESS SUITE", command=self._cmd_stress).pack(
+            side=tk.RIGHT, padx=4
+        )
 
         self.live_out = scrolledtext.ScrolledText(
             self.tab_live, wrap=tk.WORD, font=("Consolas", 10), bg="#0d1117", fg="#e6edf3",
@@ -654,10 +754,32 @@ class ConsoleApp(tk.Tk):
             mv = verify_machine_path("FSOT")
             arts = _load_artifact_summaries()
             text = format_live_metrics(f, br, mv, arts)
+            # Append stress report if present
+            sp = ROOT / "artifacts" / "stress_suite_report.json"
+            if sp.is_file():
+                try:
+                    sr = json.loads(sp.read_text(encoding="utf-8"))
+                    text += "\nSTRESS SUITE\n============\n"
+                    text += f"pass {sr.get('n_pass')}/{sr.get('n_tests')}  duration={sr.get('duration_s')}s\n"
+                    text += f"critical breaks: {len(sr.get('critical_breaks') or [])}\n"
+                    text += f"soft breaks: {len(sr.get('soft_breaks') or [])}\n"
+                    for b in (sr.get("critical_breaks") or [])[:8]:
+                        text += f"  CRITICAL {b.get('stage')}/{b.get('name')}\n"
+                    for b in (sr.get("soft_breaks") or [])[:8]:
+                        text += f"  soft     {b.get('stage')}/{b.get('name')}\n"
+                    text += "\nSee docs/STRESS_STAGE_REPORT.md\n"
+                except Exception as e:
+                    text += f"\nstress report read error: {e}\n"
         except Exception as e:
             text = f"LIVE METRICS ERROR\n==================\n{e}\n"
         self.live_out.delete("1.0", tk.END)
         self.live_out.insert(tk.END, text)
+        # Also refresh product screens that show artifacts
+        try:
+            self._refresh_cells()
+            self._refresh_memory()
+        except Exception:
+            pass
 
     # ----- engine commands -----
 
@@ -735,8 +857,48 @@ class ConsoleApp(tk.Tk):
                 f"Expected: {ZIG_HOST}\n"
                 "Build with: cd embodiment\\zig ; zig build\n"
             )
+            if hasattr(self, "zig_badge"):
+                self.zig_badge.config(text="FP: missing")
             return
-        self._run_async([str(ZIG_HOST)], cwd=ZIG_HOST.parent)
+
+        def work() -> None:
+            self._log(f"\n$ {ZIG_HOST}\n")
+            try:
+                p = subprocess.run(
+                    [str(ZIG_HOST)],
+                    cwd=str(ZIG_HOST.parent),
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
+                out = (p.stdout or "") + (p.stderr or "")
+                self._log(out + f"\n[exit {p.returncode}]\n")
+                ok = p.returncode == 0 and "FSOT_TRIT PASS" in out
+
+                def ui() -> None:
+                    self._zig_fp = ok
+                    if hasattr(self, "zig_badge"):
+                        self.zig_badge.config(
+                            text="FP: PASS" if ok else "FP: FAIL"
+                        )
+                    if hasattr(self, "body_out"):
+                        self.body_out.delete("1.0", tk.END)
+                        self.body_out.insert(
+                            tk.END,
+                            f"ZIG HOST RUN\n============\n"
+                            f"Result: {'PASS' if ok else 'FAIL'}\n"
+                            f"returncode={p.returncode}\n\n{out[:4000]}\n",
+                        )
+
+                self.after(0, ui)
+            except Exception as e:
+                self._log(f"ERROR: {e}\n")
+
+        if self._worker and self._worker.is_alive():
+            messagebox.showinfo("Busy", "An engine job is already running.")
+            return
+        self._worker = threading.Thread(target=work, daemon=True)
+        self._worker.start()
 
     def _cmd_qemu(self) -> None:
         if not ZIG_QEMU.is_file():
@@ -746,6 +908,112 @@ class ConsoleApp(tk.Tk):
             ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ZIG_QEMU)],
             cwd=ROOT / "embodiment" / "zig",
         )
+
+    def _cmd_stress(self) -> None:
+        self._run_async([sys.executable, str(ROOT / "run_stress_suite.py")])
+
+    def _cmd_stress_quick(self) -> None:
+        self._run_async([sys.executable, str(ROOT / "run_stress_suite.py"), "--quick"])
+
+    def _refresh_cells(self) -> None:
+        lines = [
+            "CELL CLASSES vs ALLEN WET-LAB",
+            "=============================",
+            "",
+        ]
+        path = None
+        for base in (ROOT / "artifacts", ROOT / "data" / "results"):
+            p = base / "scalpel_rates.json"
+            if p.is_file():
+                path = p
+                break
+        if path is None:
+            lines.append("No scalpel_rates.json yet. Run Scalpel 1% or Stress suite.\n")
+            self.cells_out.delete("1.0", tk.END)
+            self.cells_out.insert(tk.END, "\n".join(lines))
+            return
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            tol = data.get("tol")
+            lines.append(f"Source: {path}")
+            lines.append(f"Tolerance: {tol}")
+            lines.append(f"scalpel_ok: {(data.get('gates') or {}).get('scalpel_ok')}")
+            lines.append("")
+            lines.append(f"{'Class':6} {'Target Hz':>10} {'Measured':>10} {'Rel err':>10}  OK?")
+            lines.append("-" * 48)
+            classes = {}
+            rep = data.get("report") or {}
+            if isinstance(rep, dict):
+                classes = rep.get("classes") or {}
+            for lab, st in sorted(classes.items()):
+                if not isinstance(st, dict):
+                    continue
+                err = st.get("rel_err")
+                ok = err is not None and err == err and tol is not None and err <= tol
+                lines.append(
+                    f"{lab:6} {st.get('target_Hz', 0):10.2f} {st.get('measured_Hz', 0):10.2f} "
+                    f"{(err or 0):10.1%}  {'YES' if ok else 'NO'}"
+                )
+            folds = data.get("fsot_folds") or {}
+            if folds:
+                lines += [
+                    "",
+                    f"FSOT S_bio={folds.get('S_Biology')}  S_neuro={folds.get('S_Neuroscience')}",
+                ]
+            lines.append("")
+            lines.append("Authority: Allen Cell Types Cre-line means (public wet-lab data).")
+        except Exception as e:
+            lines.append(f"Error: {e}")
+        self.cells_out.delete("1.0", tk.END)
+        self.cells_out.insert(tk.END, "\n".join(lines))
+
+    def _refresh_memory(self) -> None:
+        lines = [
+            "MEMORY LAB RESULTS",
+            "==================",
+            "",
+            "Items use FSOT machine bridge (not Morse).",
+            "",
+        ]
+        path = None
+        for base in (ROOT / "artifacts", ROOT / "data" / "results"):
+            p = base / "intelligence_probe.json"
+            if p.is_file():
+                path = p
+                break
+        if path is None:
+            lines.append("No intelligence_probe.json yet. Run Quick intel.\n")
+            self.mem_out.delete("1.0", tk.END)
+            self.mem_out.insert(tk.END, "\n".join(lines))
+            return
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            lines.append(f"Source: {path}")
+            lines.append(f"Generated: {data.get('generated_at')}")
+            params = data.get("params") or {}
+            lines.append(f"Items: {params.get('items')}  delay: {params.get('delay_steps')}  mode: {params.get('item_mode')}")
+            lines.append("")
+            for k, v in (data.get("results") or {}).items():
+                if isinstance(v, dict) and "top1_accuracy" in v:
+                    lines.append(
+                        f"  {k:16} top-1 = {v['top1_accuracy']:.3f}  "
+                        f"sim+={v.get('mean_correct_sim')}  sim-={v.get('mean_incorrect_sim')}"
+                    )
+            gates = data.get("gates") or {}
+            if gates:
+                lines.append("")
+                lines.append("Gates:")
+                for gk, gv in gates.items():
+                    lines.append(f"  {gk}: {gv}")
+            folds = data.get("fsot_folds") or {}
+            if folds.get("S_Biology") is not None:
+                lines.append(
+                    f"\nFSOT S_bio={folds.get('S_Biology')}  S_neuro={folds.get('S_Neuroscience')}"
+                )
+        except Exception as e:
+            lines.append(f"Error: {e}")
+        self.mem_out.delete("1.0", tk.END)
+        self.mem_out.insert(tk.END, "\n".join(lines))
 
     # ----- encode tab (readable outcomes) -----
 

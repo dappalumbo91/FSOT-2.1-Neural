@@ -33,9 +33,11 @@ Machine path is how the **computer body** talks — same idea as how Linux and W
 ## OS-native ABI frame
 
 ```text
-magic[4]="FSOT" | version u8 | path_id u8 | n_trits u16 LE
+magic[4]="FSOT" | version u8 | path_id u8 | n_trits u32 LE
 then word records: pack u64 LE | n_trits u8 | pad 3
 ```
+
+(`n_trits` is **u32** — stage stress found u16 overflow above 65535 trits.)
 
 | path_id | meaning |
 |---------|---------|
