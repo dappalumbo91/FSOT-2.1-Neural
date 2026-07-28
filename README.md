@@ -98,7 +98,8 @@ python run_console.py
 # or: python -m product.console
 ```
 
-Uses host OS fonts/windows (tkinter). Machine encoding (not Morse) for body I/O — [`docs/MACHINE_ENCODING.md`](docs/MACHINE_ENCODING.md).  
+Uses host OS fonts/windows (tkinter v0.2). **Machine encoding** (UTF-8/T1 packs / OS ABI words) is primary body I/O — Morse is secondary only.  
+[`docs/MACHINE_ENCODING.md`](docs/MACHINE_ENCODING.md) · `python run_machine_encode.py --verify`  
 UI architecture: [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md).  
 **Road to a full brain design:** [`BRAIN_PATH.md`](BRAIN_PATH.md)  
 **Python → Zig body:** [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md)
@@ -141,10 +142,14 @@ fsot_nuron/
   allen_data.py         # ephys CSV / API
   bio_metrics.py        # ISI, adaptation, bands
   failure_boundaries.py # lesion catalog (engineering)
+  machine_encode.py     # PRIMARY body I/O: UTF-8/bytes → T1 machine words / ABI
+  sensory/              # packet bus; machine inject helpers
   # --- secondary / demos ---
-  morse_itu.py          # optional symbolic readout
-  language_loop.py      # Morse + codon demo loop
+  morse_itu.py          # optional human telegraphy readout
+  language_loop.py      # Morse + codon demo loop (legacy path)
   multi_dataset.py      # NLP/EEG scoreboard (non-mission)
+product/console/        # local Neural Console (no web)
+run_machine_encode.py   # machine path smoke + chem→machine bridge
 run_genetic_bio.py      # primary entrypoint
 run_bio_validate.py     # Allen-facing batch (non-genetic legacy path)
 run_archive_pin.py

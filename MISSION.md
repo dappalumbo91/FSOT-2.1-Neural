@@ -24,7 +24,7 @@ codon map (authority)
 | Drift that happened | Status |
 |---------------------|--------|
 | IMDB / sentiment / SMS NLP scoreboard as the product | **Secondary demo only** |
-| Morse as the main “language” of the net | Optional readout path |
+| Morse as the main “language” of the net | **Secondary only** — body I/O is **machine** (UTF-8/T1/OS words); see `docs/MACHINE_ENCODING.md` |
 | Free-parameter transformer-style climbing | Forbidden on theory path |
 
 Those demos may remain under `run_climb.py` / `run_sota_fronts.py` for exploration, but they are **not** the mission.

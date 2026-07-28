@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-FSOT Neural Console v0.1 — local desktop UI (tkinter, no web server).
+FSOT Neural Console v0.2 — local desktop UI (tkinter, no web server).
 
-Scavenges the host OS windowing/fonts via tkinter (and optionally Dear PyGui later).
-Drives checkpoint science: pin, scalpel, intelligence probe, encoding playground, QEMU.
+Scavenges the host OS windowing/fonts via tkinter (Dear PyGui / GTK later).
+Drives checkpoint science: pin, scalpel, intelligence probe, encoding, inject, QEMU.
+
+Encoding doctrine: MACHINE (UTF-8 / T1 packs / OS words) is primary.
+Morse is secondary (human telegraphy demos only).
 """
 
 from __future__ import annotations
 
+import json
 import os
 import queue
 import subprocess
@@ -29,18 +33,20 @@ os.environ.setdefault("FSOT_PHYSICAL_ARCHIVE", r"I:\FSOT-Physical-Archive")
 class ConsoleApp(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("FSOT Neural Console v0.1 — local (no web)")
-        self.geometry("1100x720")
-        self.minsize(900, 600)
+        self.title("FSOT Neural Console v0.2 — local (no web)")
+        self.geometry("1140x760")
+        self.minsize(920, 620)
         self._log_q: queue.Queue[str] = queue.Queue()
         self._worker: Optional[threading.Thread] = None
         self._build()
         self.after(100, self._drain_log)
         self._log(
-            "FSOT Neural Console — checkpoint v0.5 science floor.\n"
+            "FSOT Neural Console v0.2 — checkpoint v0.5 science floor.\n"
             "UI uses host OS fonts/windows (tkinter). Brain stays local IPC/subprocess.\n"
-            "Encoding default: MACHINE (UTF-8/T1 packs), not Morse.\n"
+            "Encoding default: MACHINE (UTF-8/T1 packs / OS ABI words), not Morse.\n"
+            "Chem → machine bridge available for DNA/codon into the body.\n"
         )
+        self.after(200, self._refresh_live)
 
     def _build(self) -> None:
         nb = ttk.Notebook(self)
@@ -48,15 +54,17 @@ class ConsoleApp(tk.Tk):
 
         self.tab_dash = ttk.Frame(nb)
         self.tab_enc = ttk.Frame(nb)
+        self.tab_live = ttk.Frame(nb)
         self.tab_log = ttk.Frame(nb)
         nb.add(self.tab_dash, text="Dashboard")
         nb.add(self.tab_enc, text="Machine encode")
+        nb.add(self.tab_live, text="Live metrics")
         nb.add(self.tab_log, text="Engine log")
 
         # --- Dashboard ---
         hdr = ttk.Label(
             self.tab_dash,
-            text="Accurate neurons → intelligence · local product shell",
+            text="Accurate neurons → intelligence · local product shell · machine body I/O",
             font=("Segoe UI", 12, "bold"),
         )
         hdr.pack(anchor=tk.W, padx=8, pady=(8, 4))
@@ -66,13 +74,14 @@ class ConsoleApp(tk.Tk):
         actions = [
             ("Archive pin", self._cmd_pin),
             ("Scalpel 1%", self._cmd_scalpel),
-            ("Intel probe (suite)", self._cmd_intel),
+            ("Intel probe", self._cmd_intel),
+            ("Machine encode ✓", self._cmd_machine_verify),
             ("Zig parity", self._cmd_parity),
-            ("QEMU body check", self._cmd_qemu),
+            ("QEMU body", self._cmd_qemu),
         ]
         for i, (label, cmd) in enumerate(actions):
             b = ttk.Button(btn_row, text=label, command=cmd)
-            b.grid(row=0, column=i, padx=4, pady=4, sticky="ew")
+            b.grid(row=0, column=i, padx=3, pady=4, sticky="ew")
             btn_row.columnconfigure(i, weight=1)
 
         info = ttk.LabelFrame(self.tab_dash, text="Status / quick facts")
@@ -83,14 +92,16 @@ class ConsoleApp(tk.Tk):
             tk.END,
             "Checkpoint: v0.5.0-bio-intel\n"
             "Allen class rates ≤1% · encode/delay/consolidate probe · Zig@QEMU FP\n"
-            "Docs: CHECKPOINT_v0.5.md · PRODUCT_UI_AND_DISPLAY.md · machine_encode.py\n\n"
-            "Use buttons above to run local engines (subprocess). Log tab shows output.\n",
+            "Body I/O: MACHINE words (Linux/Windows-style LE packs) — Morse secondary\n"
+            "Docs: CHECKPOINT_v0.5.md · MACHINE_ENCODING.md · PRODUCT_UI_AND_DISPLAY.md\n\n"
+            "Buttons run local engines (subprocess). Log tab streams stdout.\n"
+            "Machine encode tab: translate + inject into sensory bus demo.\n",
         )
 
         # --- Encoding playground ---
         ttk.Label(
             self.tab_enc,
-            text="Translate text for the neural body — MACHINE path preferred (OS-native).",
+            text="OS-native body language: MACHINE (UTF-8 / T1 packs / ABI frame). Morse = demos only.",
             font=("Segoe UI", 10),
         ).pack(anchor=tk.W, padx=8, pady=4)
 
@@ -100,22 +111,47 @@ class ConsoleApp(tk.Tk):
         self.path_var = tk.StringVar(value="machine")
         for p, lab in (
             ("machine", "Machine (UTF-8 / T1) ★"),
-            ("chemical", "Chemical codon"),
+            ("chemical", "Chemical → machine"),
             ("morse", "Morse (secondary)"),
         ):
             ttk.Radiobutton(path_row, text=lab, variable=self.path_var, value=p).pack(
                 side=tk.LEFT, padx=6
             )
 
-        self.enc_in = scrolledtext.ScrolledText(self.tab_enc, height=6, font=("Consolas", 10))
+        self.enc_in = scrolledtext.ScrolledText(self.tab_enc, height=5, font=("Consolas", 10))
         self.enc_in.pack(fill=tk.X, padx=8, pady=4)
         self.enc_in.insert(tk.END, "FSOT neural intelligence")
 
-        ttk.Button(self.tab_enc, text="Translate → machine words / trits", command=self._do_encode).pack(
-            anchor=tk.W, padx=8, pady=4
+        btn_enc = ttk.Frame(self.tab_enc)
+        btn_enc.pack(fill=tk.X, padx=8, pady=2)
+        ttk.Button(btn_enc, text="Translate → machine words / ABI frame", command=self._do_encode).pack(
+            side=tk.LEFT, padx=2
         )
-        self.enc_out = scrolledtext.ScrolledText(self.tab_enc, height=16, font=("Consolas", 9))
+        ttk.Button(btn_enc, text="Chem→machine (DNA sample)", command=self._do_chem_bridge).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(btn_enc, text="Inject → sensory bus demo", command=self._do_inject).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(btn_enc, text="Compare all paths", command=self._do_compare_paths).pack(
+            side=tk.LEFT, padx=2
+        )
+
+        self.enc_out = scrolledtext.ScrolledText(self.tab_enc, height=18, font=("Consolas", 9))
         self.enc_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=4)
+
+        # --- Live metrics ---
+        live_hdr = ttk.Frame(self.tab_live)
+        live_hdr.pack(fill=tk.X, padx=8, pady=4)
+        ttk.Label(
+            live_hdr,
+            text="Lightweight live panel (no web). Refresh pulls pin + encode ABI locally.",
+            font=("Segoe UI", 10),
+        ).pack(side=tk.LEFT)
+        ttk.Button(live_hdr, text="Refresh", command=self._refresh_live).pack(side=tk.RIGHT)
+
+        self.live_out = scrolledtext.ScrolledText(self.tab_live, wrap=tk.WORD, font=("Consolas", 9))
+        self.live_out.pack(fill=tk.BOTH, expand=True, padx=8, pady=4)
 
         # --- Log ---
         self.log = scrolledtext.ScrolledText(self.tab_log, wrap=tk.WORD, font=("Consolas", 9))
@@ -124,6 +160,9 @@ class ConsoleApp(tk.Tk):
         foot = ttk.Frame(self)
         foot.pack(fill=tk.X, padx=8, pady=4)
         ttk.Label(foot, text=f"ROOT: {ROOT}", font=("Segoe UI", 8)).pack(side=tk.LEFT)
+        ttk.Button(foot, text="Open MACHINE_ENCODING.md", command=self._open_machine_doc).pack(
+            side=tk.RIGHT, padx=4
+        )
         ttk.Button(foot, text="Open checkpoint doc", command=self._open_checkpoint).pack(side=tk.RIGHT)
 
     def _log(self, msg: str) -> None:
@@ -200,6 +239,11 @@ class ConsoleApp(tk.Tk):
             ]
         )
 
+    def _cmd_machine_verify(self) -> None:
+        self._run_async(
+            [sys.executable, str(ROOT / "run_machine_encode.py"), "--verify", "--inject-demo"]
+        )
+
     def _cmd_parity(self) -> None:
         self._run_async([sys.executable, str(ROOT / "scripts" / "parity_zig_neuron.py")])
 
@@ -211,23 +255,151 @@ class ConsoleApp(tk.Tk):
         )
 
     def _do_encode(self) -> None:
-        from fsot_nuron.machine_encode import EncodePath, translate, path_recommendation
-        import json
+        from fsot_nuron.machine_encode import (
+            EncodePath,
+            translate,
+            path_recommendation,
+            build_machine_frame,
+        )
 
         text = self.enc_in.get("1.0", tk.END).strip()
         path = EncodePath(self.path_var.get())
         out = translate(text, path=path)
+        frame = build_machine_frame(text, path=path)
         rec = path_recommendation()
+        payload = {
+            "recommendation": rec,
+            "result": out,
+            "abi_frame": frame.to_dict(),
+        }
+        self.enc_out.delete("1.0", tk.END)
+        self.enc_out.insert(tk.END, json.dumps(payload, indent=2)[:14000])
+
+    def _do_chem_bridge(self) -> None:
+        from fsot_nuron.machine_encode import chemical_signals_to_machine
+
+        text = self.enc_in.get("1.0", tk.END).strip()
+        # If user typed DNA-ish, use it; else demo codon string
+        dna = text if all(c in "ACGTacgtUuNn \n" for c in text[:80]) else "ATGAAACGGTTTGCG"
+        out = chemical_signals_to_machine(dna)
         self.enc_out.delete("1.0", tk.END)
         self.enc_out.insert(
             tk.END,
-            json.dumps({"recommendation": rec, "result": out}, indent=2)[:12000],
+            "Chemical signals → machine words (genetics into OS body)\n"
+            + json.dumps(out, indent=2)[:14000],
         )
+
+    def _do_inject(self) -> None:
+        from fsot_nuron.machine_encode import EncodePath
+        from fsot_nuron.sensory import SensoryBus, push_machine_text
+
+        text = self.enc_in.get("1.0", tk.END).strip()
+        path = self.path_var.get()
+        bus = SensoryBus()
+        pkt = push_machine_text(bus, text, path=path)
+        region_index = {
+            "sens": list(range(0, 32)),
+            "thal": list(range(32, 48)),
+            "assoc": list(range(48, 80)),
+            "hipp": list(range(80, 96)),
+        }
+        ext = bus.build_external(96, region_index)
+        report = {
+            "encode_path": path,
+            "primary": path != "morse",
+            "packet": pkt.to_dict(),
+            "external_drive": {
+                "n_units": int(ext.numel()),
+                "nonzero": int((ext != 0).sum()),
+                "mean": float(ext.mean()),
+                "max": float(ext.max()),
+                "sens_slice_head": ext[:8].tolist(),
+            },
+            "note": "Packet enqueued and folded like a Linux process writing into a buffer the brain reads.",
+        }
+        self.enc_out.delete("1.0", tk.END)
+        self.enc_out.insert(tk.END, json.dumps(report, indent=2)[:12000])
+        self._log(f"[inject] path={path} nonzero_drive={report['external_drive']['nonzero']}\n")
+
+    def _do_compare_paths(self) -> None:
+        from fsot_nuron.machine_encode import EncodePath, translate, build_machine_frame
+
+        text = self.enc_in.get("1.0", tk.END).strip() or "FSOT"
+        rows = {}
+        for p in (EncodePath.MACHINE, EncodePath.CHEMICAL, EncodePath.MORSE):
+            r = translate(text, path=p)
+            fr = build_machine_frame(text, path=p)
+            rows[p.value] = {
+                "primary": r.get("primary"),
+                "n_trits": r.get("n_trits"),
+                "n_words": len(r.get("words") or []),
+                "note": r.get("note"),
+                "frame_bytes": fr.to_dict()["byte_len"],
+                "hex_head": fr.to_dict()["hex_head"][:48],
+            }
+        self.enc_out.delete("1.0", tk.END)
+        self.enc_out.insert(
+            tk.END,
+            "Path comparison (prefer machine for OS-native body)\n"
+            + json.dumps(rows, indent=2),
+        )
+
+    def _refresh_live(self) -> None:
+        lines = ["=== Live metrics (local) ===\n"]
+        try:
+            from fsot_nuron.machine_encode import path_recommendation, verify_machine_path
+
+            rec = path_recommendation()
+            ver = verify_machine_path("FSOT")
+            lines.append("Encoding recommendation:\n")
+            lines.append(json.dumps(rec, indent=2) + "\n\n")
+            lines.append("Machine path verify:\n")
+            lines.append(
+                json.dumps(
+                    {
+                        "frame_roundtrip_ok": ver.get("frame_roundtrip_ok"),
+                        "chem_bridge_ok": ver.get("chem_bridge_ok"),
+                        "n_trits": ver.get("n_trits"),
+                        "frame_byte_len": ver.get("frame_byte_len"),
+                        "abi": ver.get("abi"),
+                    },
+                    indent=2,
+                )
+                + "\n\n"
+            )
+        except Exception as e:
+            lines.append(f"machine_encode error: {e}\n")
+
+        try:
+            from fsot_nuron.archive_pin import pin_archive
+
+            pin = pin_archive(write_snapshot=False)
+            # pin may be dataclass or dict-like
+            if hasattr(pin, "__dict__"):
+                pd = {k: getattr(pin, k) for k in dir(pin) if not k.startswith("_") and not callable(getattr(pin, k))}
+            else:
+                pd = dict(pin) if isinstance(pin, dict) else {"pin": str(pin)}
+            slim = {k: pd[k] for k in list(pd)[:20]}
+            lines.append("Archive pin (head):\n")
+            lines.append(json.dumps(slim, indent=2, default=str)[:2500] + "\n")
+        except Exception as e:
+            lines.append(f"archive pin: {e}\n")
+
+        lines.append(f"\nROOT: {ROOT}\n")
+        self.live_out.delete("1.0", tk.END)
+        self.live_out.insert(tk.END, "".join(lines))
 
     def _open_checkpoint(self) -> None:
         p = ROOT / "CHECKPOINT_v0.5.md"
         if p.is_file():
             os.startfile(str(p))  # Windows
+        else:
+            messagebox.showinfo("Missing", str(p))
+
+    def _open_machine_doc(self) -> None:
+        p = ROOT / "docs" / "MACHINE_ENCODING.md"
+        if p.is_file():
+            os.startfile(str(p))
         else:
             messagebox.showinfo("Missing", str(p))
 
