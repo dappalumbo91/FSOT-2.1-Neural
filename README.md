@@ -78,6 +78,9 @@ python run_obsidian_brain.py
 # 4) Lean formal panel + wet-lab scientific certificate
 python scripts/verify_formal.py
 python scripts/export_lean_wetlab_certificate.py
+python scripts/audit_lean_nosorry.py
+python run_precision_climb.py
+# Thesis: docs/thesis/FSOT_NEURAL_STAGE_VERIFICATION.md (+ .tex for PDF)
 # → docs/LEAN_WETLAB_CROSSREF.md · data/results/LEAN_WETLAB_CERTIFICATE.md
 
 # 5) Zig neuron step parity vs Python + Allen bio card

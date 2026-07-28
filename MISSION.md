@@ -98,6 +98,8 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Wet-lab battery** | [`docs/WETLAB_ACCURACY_BATTERY.md`](docs/WETLAB_ACCURACY_BATTERY.md) · `python run_wetlab_accuracy_battery.py` |
 | **Genome as code** | [`docs/GENOME_AS_CODE.md`](docs/GENOME_AS_CODE.md) · `python run_cellular_expand.py --check` |
 | **Lean × wet-lab certificate** | [`docs/LEAN_WETLAB_CROSSREF.md`](docs/LEAN_WETLAB_CROSSREF.md) · `python scripts/export_lean_wetlab_certificate.py` |
+| **Stage thesis (arXiv-style)** | [`docs/thesis/FSOT_NEURAL_STAGE_VERIFICATION.md`](docs/thesis/FSOT_NEURAL_STAGE_VERIFICATION.md) · `.tex` |
+| **Precision climb (≤1% attempt)** | `python run_precision_climb.py` · `python scripts/audit_lean_nosorry.py` |
 | Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 
