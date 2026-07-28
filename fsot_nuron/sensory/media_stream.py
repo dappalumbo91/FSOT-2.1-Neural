@@ -387,6 +387,8 @@ class MediaChewConfig:
     associate: bool = True  # bind metadata + symbols after chew
     av_costream: bool = True  # movies/shows: simultaneous audio+visual binding
     use_metadata_tutor: bool = True  # optional labels; not required for AV binding
+    knowledge_crossfeed: bool = True  # lexicon + machine/trinary knowledge packets
+    speech_to_text: bool = False  # optional local STT (faster-whisper); slower
 
 
 @dataclass
@@ -729,6 +731,79 @@ def chew_media(
                 ep["meta"], sig, seed=cfg.seed, rival_metas=rivals or None
             )
             reports.append(arep)
+            # Knowledge cross-feed: symbols (+ optional STT) → definitions → trinary
+            kf: Dict[str, Any] = {}
+            if cfg.knowledge_crossfeed:
+                try:
+                    from ..knowledge.cross_feed import cross_feed_episode
+                    from ..knowledge.speech_text import transcribe_audio_file
+
+                    syms = [a["symbol"] for a in arep.top_anchors[:8]]
+                    # pull AV cluster symbols
+                    av = ep.get("av_cross_modal") or {}
+                    for c in (av.get("clusters") or [])[:3]:
+                        for s in c.get("top_symbols") or []:
+                            if isinstance(s, dict) and s.get("symbol"):
+                                syms.append(s["symbol"])
+                    for s in av.get("cross_modal_symbols") or []:
+                        if isinstance(s, dict) and s.get("symbol"):
+                            syms.append(s["symbol"])
+                    # path/title symbols (Finn/Jake if Adventure Time, etc.)
+                    title = ep["meta"].title
+                    transcript = ""
+                    if cfg.speech_to_text and ep["meta"].kind in ("video", "audio"):
+                        stt = transcribe_audio_file(ep["meta"].path, max_s=40.0)
+                        if stt.ok:
+                            transcript = stt.text
+                            notes.append(f"STT {ep['meta'].title[:40]}: {stt.backend}")
+                        else:
+                            notes.append(
+                                f"STT skip {ep['meta'].title[:40]}: {'; '.join(stt.notes[:1])}"
+                            )
+                    sensory_notes = (
+                        f"Observed stream: luma/motion patterns; "
+                        f"AV bind={float((av or {}).get('mean_bind') or 0):.2f}; "
+                        f"speech_band={float((av or {}).get('mean_speech_band') or 0):.2f}."
+                    )
+                    cf = cross_feed_episode(
+                        symbols=syms,
+                        title=title,
+                        transcript=transcript,
+                        sensory_notes=sensory_notes,
+                        path_hint=str(ep["meta"].path),
+                    )
+                    kf = cf.to_dict()
+                    # inject knowledge packets into living brain
+                    from ..sensory.packets import SensoryPacket as _SP
+                    from ..sensory.packets import SensoryModality as _SM
+
+                    kpkts = []
+                    for pd in cf.packets[:16]:
+                        try:
+                            kpkts.append(
+                                _SP(
+                                    modality=_SM(pd["modality"])
+                                    if not isinstance(pd["modality"], _SM)
+                                    else pd["modality"],
+                                    target_region=pd.get("target_region") or "assoc",
+                                    features=list(pd.get("features") or []),
+                                    strength=float(pd.get("strength") or 0.4),
+                                    timestamp_ms=float(pd.get("timestamp_ms") or 0.0),
+                                    meta=dict(pd.get("meta") or {}),
+                                )
+                            )
+                        except Exception:
+                            pass
+                    if kpkts:
+                        _drive_packets(kpkts)
+                        notes.append(
+                            f"knowledge cross-feed {title[:40]}: "
+                            f"{len(cf.entries_used)} defs, {cf.n_trits} trits, S={cf.S_couple}"
+                        )
+                except Exception as e:
+                    notes.append(f"knowledge cross-feed error: {e}")
+                    kf = {"error": str(e)}
+
             episodes_out.append(
                 {
                     "title": ep["meta"].title,
@@ -738,6 +813,8 @@ def chew_media(
                     "top_symbols": [a["symbol"] for a in arep.top_anchors[:6]],
                     "meta_bind_score": arep.meta_bind_score,
                     "av_cross_modal": ep.get("av_cross_modal") or {},
+                    "knowledge_crossfeed": kf,
+                    "plain_english": (kf or {}).get("plain_english") or "",
                 }
             )
         assoc_summary = summarize_associations(reports)

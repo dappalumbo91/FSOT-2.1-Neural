@@ -1,0 +1,175 @@
+{
+  "doctrine": "Local symbolic knowledge for cross-feed. Optional online expand. Standalone brain boots without this file's presence on other machines if copied with repo.",
+  "entries": {
+    "person": {
+      "kind": "category",
+      "definition": "A human being; bipedal primate capable of language and culture.",
+      "examples": ["child", "adult", "human character", "Finn the human"],
+      "related": ["face", "human", "dialogue"]
+    },
+    "human": {
+      "kind": "category",
+      "definition": "Member of Homo sapiens; often the viewpoint character in stories.",
+      "examples": ["Finn", "person", "boy", "girl"],
+      "related": ["person", "face"]
+    },
+    "face": {
+      "kind": "percept",
+      "definition": "Pattern of eyes, nose, mouth used for recognition; brains over-detect faces (pareidolia).",
+      "examples": ["portrait", "cartoon face", "cloud face"],
+      "related": ["person", "animal"]
+    },
+    "animal": {
+      "kind": "category",
+      "definition": "Living organism that is not a plant or fungus; moves and senses.",
+      "examples": ["dog", "cat", "bird", "Jake the dog"],
+      "related": ["dog", "cat", "creature"]
+    },
+    "dog": {
+      "kind": "category",
+      "definition": "Domestic canid; companion animal; in stories often loyal and shape-shifting or comic.",
+      "examples": ["Jake", "pet dog", "hound"],
+      "related": ["animal", "pet"]
+    },
+    "cat": {
+      "kind": "category",
+      "definition": "Feline animal; includes house cats and big cats; cartoons like Garfield still read as cat via whiskers, ears, body plan.",
+      "examples": ["house cat", "lion", "tiger", "Garfield"],
+      "related": ["animal", "face"]
+    },
+    "dialogue": {
+      "kind": "event",
+      "definition": "Spoken language between characters; audio speech co-occurring with visible speakers.",
+      "examples": ["conversation", "voice-over", "argument"],
+      "related": ["person", "sound", "music"]
+    },
+    "music": {
+      "kind": "event",
+      "definition": "Structured sound with rhythm, pitch, and energy; soundtrack or song.",
+      "examples": ["score", "theme", "rock song"],
+      "related": ["sound", "energy", "emotion"]
+    },
+    "action": {
+      "kind": "event",
+      "definition": "High motion, conflict, or physical activity in a scene.",
+      "examples": ["fight", "chase", "battle"],
+      "related": ["moving_image", "war"]
+    },
+    "cartoon": {
+      "kind": "medium",
+      "definition": "Drawn or animated representation; simplified shapes still map to real categories.",
+      "examples": ["Adventure Time", "The Simpsons", "animation"],
+      "related": ["animation", "drawing"]
+    },
+    "animation": {
+      "kind": "medium",
+      "definition": "Moving drawings or CGI; symbolic forms of people, animals, places.",
+      "examples": ["2D cartoon", "CGI film"],
+      "related": ["cartoon", "moving_image"]
+    },
+    "movie": {
+      "kind": "medium",
+      "definition": "Long-form audiovisual story, usually one continuous work.",
+      "examples": ["feature film", "cinema"],
+      "related": ["scene", "moving_image"]
+    },
+    "tv_show": {
+      "kind": "medium",
+      "definition": "Serialized audiovisual episodes with recurring characters.",
+      "examples": ["series", "episode"],
+      "related": ["episode", "cartoon"]
+    },
+    "place": {
+      "kind": "category",
+      "definition": "Location or setting where events happen.",
+      "examples": ["room", "city", "forest", "Land of Ooo"],
+      "related": ["indoor", "outdoor", "building"]
+    },
+    "thing": {
+      "kind": "category",
+      "definition": "Inanimate object or prop in a scene.",
+      "examples": ["couch", "sword", "cup"],
+      "related": ["building", "vehicle"]
+    },
+    "finn": {
+      "kind": "character",
+      "definition": "Finn the Human: main human boy protagonist of Adventure Time; adventurous, wears a white hat.",
+      "examples": ["Finn Mertens", "human boy hero"],
+      "related": ["human", "person", "adventure", "cartoon"],
+      "show": "Adventure Time"
+    },
+    "jake": {
+      "kind": "character",
+      "definition": "Jake the Dog: Finn's best friend in Adventure Time; a magical shape-shifting dog, not a human.",
+      "examples": ["Jake the Dog", "stretchy yellow dog"],
+      "related": ["dog", "animal", "cartoon", "adventure"],
+      "show": "Adventure Time"
+    },
+    "adventure time": {
+      "kind": "show",
+      "definition": "Animated series set in the Land of Ooo following Finn the Human and Jake the Dog.",
+      "examples": ["Ooo", "Cartoon Network series"],
+      "related": ["cartoon", "finn", "jake", "tv_show"]
+    },
+    "night": {
+      "kind": "scene",
+      "definition": "Low light / dark visual conditions.",
+      "examples": ["dark scene", "evening"],
+      "related": ["dark", "scene"]
+    },
+    "day": {
+      "kind": "scene",
+      "definition": "Bright / high-luma visual conditions.",
+      "examples": ["daylight", "outdoor day"],
+      "related": ["bright", "outdoor"]
+    },
+    "sound": {
+      "kind": "percept",
+      "definition": "Auditory sensation; pressure waves interpreted as speech, music, or noise.",
+      "examples": ["voice", "noise", "score"],
+      "related": ["music", "dialogue"]
+    },
+    "moving_image": {
+      "kind": "percept",
+      "definition": "Changing visual frame sequence over time (film/video).",
+      "examples": ["video", "animation frame"],
+      "related": ["scene", "movie"]
+    },
+    "scene": {
+      "kind": "structure",
+      "definition": "A continuous stretch of audiovisual story in one setting.",
+      "examples": ["act", "shot sequence"],
+      "related": ["place", "moving_image"]
+    },
+    "energy": {
+      "kind": "quality",
+      "definition": "High intensity in sound or motion.",
+      "examples": ["loud music", "fast action"],
+      "related": ["music", "action"]
+    },
+    "emotion": {
+      "kind": "quality",
+      "definition": "Affective tone carried by face, music, or dialogue.",
+      "examples": ["sad score", "angry voice"],
+      "related": ["music", "dialogue", "face"]
+    },
+    "war": {
+      "kind": "event",
+      "definition": "Large-scale conflict; often dark, action-heavy audiovisual patterns.",
+      "examples": ["battle", "empire war film"],
+      "related": ["action", "movie"]
+    },
+    "dark": {
+      "kind": "quality",
+      "definition": "Low luminance; often night, drama, or threat.",
+      "examples": ["underexposed frame", "night scene"],
+      "related": ["night", "horror"]
+    },
+    "bright": {
+      "kind": "quality",
+      "definition": "High luminance; day or high-key lighting.",
+      "examples": ["daylight", "white background"],
+      "related": ["day"]
+    }
+  }
+}
