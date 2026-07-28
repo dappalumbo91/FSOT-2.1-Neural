@@ -8,6 +8,16 @@ from .cross_feed import (
     regurgitate_plain_english,
 )
 from .speech_text import transcribe_audio_file, STTResult
+from .subtitles import load_subtitles, CaptionCue, find_sidecar_subtitles
+from .dialogue_bind import process_episode_with_subtitles, DialogueBindReport
+from .episode_memory import (
+    save_episode,
+    load_episode,
+    list_episodes,
+    retrieve_by_query,
+    recall_plain_english,
+    EpisodeMemory,
+)
 
 __all__ = [
     "KnowledgeLexicon",
@@ -19,4 +29,15 @@ __all__ = [
     "regurgitate_plain_english",
     "transcribe_audio_file",
     "STTResult",
+    "load_subtitles",
+    "CaptionCue",
+    "find_sidecar_subtitles",
+    "process_episode_with_subtitles",
+    "DialogueBindReport",
+    "save_episode",
+    "load_episode",
+    "list_episodes",
+    "retrieve_by_query",
+    "recall_plain_english",
+    "EpisodeMemory",
 ]

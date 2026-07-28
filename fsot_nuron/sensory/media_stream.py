@@ -389,6 +389,8 @@ class MediaChewConfig:
     use_metadata_tutor: bool = True  # optional labels; not required for AV binding
     knowledge_crossfeed: bool = True  # lexicon + machine/trinary knowledge packets
     speech_to_text: bool = False  # optional local STT (faster-whisper); slower
+    use_subtitles: bool = True  # dialogue-as-captions (.srt/.vtt preferred)
+    save_episode_memory: bool = True  # local episodic store for later recall
 
 
 @dataclass
@@ -596,11 +598,44 @@ def chew_media(
                         f"mean_bind={av_report.get('mean_bind', 0):.3f} "
                         f"speech={av_report.get('mean_speech_band', 0):.3f}"
                     )
+                    # Dialogue as subtitles (lightweight captions aligned to moments)
+                    if cfg.use_subtitles or cfg.speech_to_text:
+                        try:
+                            from ..knowledge.dialogue_bind import (
+                                resolve_captions,
+                                bind_dialogue_to_moments,
+                                dialogue_packets_for_bindings,
+                            )
+
+                            cues, cap_src, cap_notes = resolve_captions(
+                                vp, prefer_stt=bool(cfg.speech_to_text)
+                            )
+                            notes.extend(cap_notes)
+                            if cues:
+                                bindings = bind_dialogue_to_moments(moments, cues)
+                                sub_pkts = dialogue_packets_for_bindings(
+                                    bindings, source=str(vp), max_lines=24
+                                )
+                                file_pkts.extend(sub_pkts)
+                                av_report["subtitle_source"] = cap_src
+                                av_report["subtitle_cues"] = len(cues)
+                                av_report["moments_with_dialogue"] = sum(
+                                    1 for b in bindings if b.get("dialogue")
+                                )
+                                notes.append(
+                                    f"subtitles {vp.name}: source={cap_src} "
+                                    f"cues={len(cues)} dialogue_moments="
+                                    f"{av_report['moments_with_dialogue']}"
+                                )
+                        except Exception as e:
+                            notes.append(f"subtitle bind skip: {e}")
             except Exception as e:
                 notes.append(f"AV co-stream fallback ({vp.name}): {e}")
                 used_av = False
+                moments = []
 
         if not used_av:
+            moments = []
             # vision-only fallback
             prev_gray = None
             for rgb, t_sec in iter_video_frames(
@@ -634,6 +669,7 @@ def chew_media(
                 "n_vision": len(file_vis_stats),
                 "n_audio": len(file_rms),
                 "av_cross_modal": av_report,
+                "av_moments": moments,  # in-memory only for subtitle memory stage
             }
         )
 
@@ -804,6 +840,54 @@ def chew_media(
                     notes.append(f"knowledge cross-feed error: {e}")
                     kf = {"error": str(e)}
 
+            # Episodic memory with subtitle-style dialogue (if we have AV moments)
+            dialogue_mem: Dict[str, Any] = {}
+            moments = ep.get("av_moments") or []
+            if (
+                cfg.save_episode_memory
+                and moments
+                and ep["meta"].kind == "video"
+                and (cfg.use_subtitles or cfg.speech_to_text)
+            ):
+                try:
+                    from ..knowledge.dialogue_bind import process_episode_with_subtitles
+
+                    drep = process_episode_with_subtitles(
+                        ep["meta"].path,
+                        moments=moments,
+                        symbols=syms if cfg.knowledge_crossfeed else [
+                            a["symbol"] for a in arep.top_anchors[:8]
+                        ],
+                        title=ep["meta"].title,
+                        prefer_stt=bool(cfg.speech_to_text),
+                        save_memory=True,
+                        av_stats=ep.get("av_cross_modal") or {},
+                    )
+                    dialogue_mem = {
+                        "caption_source": drep.caption_source,
+                        "n_cues": drep.n_cues,
+                        "moments_with_dialogue": drep.n_moments_with_dialogue,
+                        "sample_lines": drep.sample_lines,
+                        "episode_id": drep.episode_id,
+                        "memory_path": drep.memory_path,
+                        "plain_english": drep.plain_english,
+                    }
+                    # prefer subtitle-enriched plain English
+                    if drep.plain_english:
+                        kf = kf or {}
+                        kf["plain_english"] = drep.plain_english
+                        kf["from_subtitles"] = True
+                    notes.append(
+                        f"episode memory {drep.episode_id}: "
+                        f"captions={drep.caption_source} cues={drep.n_cues}"
+                    )
+                except Exception as e:
+                    notes.append(f"episode memory skip: {e}")
+
+            # strip non-serializable moments before report
+            av_out = dict(ep.get("av_cross_modal") or {})
+            av_out.pop("_moments_ref", None)
+
             episodes_out.append(
                 {
                     "title": ep["meta"].title,
@@ -812,9 +896,12 @@ def chew_media(
                     "association": arep.to_dict(),
                     "top_symbols": [a["symbol"] for a in arep.top_anchors[:6]],
                     "meta_bind_score": arep.meta_bind_score,
-                    "av_cross_modal": ep.get("av_cross_modal") or {},
+                    "av_cross_modal": av_out,
                     "knowledge_crossfeed": kf,
-                    "plain_english": (kf or {}).get("plain_english") or "",
+                    "dialogue_memory": dialogue_mem,
+                    "plain_english": (kf or {}).get("plain_english")
+                    or dialogue_mem.get("plain_english")
+                    or "",
                 }
             )
         assoc_summary = summarize_associations(reports)

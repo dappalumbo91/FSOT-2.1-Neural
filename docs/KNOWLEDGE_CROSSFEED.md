@@ -67,6 +67,25 @@ Local lexicon includes Adventure Time anchors:
 
 If the title/path or transcript mentions them, cross-feed attaches those definitions and encodes them as trits. More episodes tighten **co-occurrence** of their audiovisual patterns with those text bindings — that is training-by-experience, not a separate offline ImageNet stage.
 
+## Dialogue as subtitles (lightweight)
+
+Dialogue-heavy clusters are treated like **TV captions**, not a heavy continuous STT job:
+
+1. Prefer sidecar **`.srt` / `.vtt`** next to the media file  
+2. Else optional **STT → same cue shape** (`start` / `end` / `text`)  
+3. **Sample AV moments at caption times** (dialogue-aligned, not only t=0)  
+4. Bind caption line ↔ vision/audio at *t* → machine packets + knowledge  
+5. **Save episode memory** → recall later in plain English  
+
+```powershell
+python run_episode_watch.py --path "G:\movies\Brave (2012) [1080p]\Brave....mp4"
+python run_episode_watch.py --recall "Brave"
+python run_episode_watch.py --list
+# if no sidecar:  python run_episode_watch.py --path "...mp4" --stt
+```
+
+Modules: `subtitles.py`, `dialogue_bind.py`, `episode_memory.py`.
+
 ## Accuracy honesty
 
 | Claim | Status |
@@ -74,4 +93,6 @@ If the title/path or transcript mentions them, cross-feed attaches those definit
 | Patterns associate in real time without pre-training | Yes (AV joint + symbols) |
 | Open-world “Garfield = cat” | Not yet — needs more episodes + stronger prototypes / STT |
 | Text is body language via trinary | Yes (`text_to_utf8_trits` / machine packets) |
+| Subtitle-style dialogue binding | Yes (sidecar SRT/VTT preferred; STT fallback) |
+| Episodic recall in plain English | Yes (local `artifacts/episode_memory/`) |
 | Full LLM inner monologue | No — compositional regurgitation from lexicon + stream stats |
