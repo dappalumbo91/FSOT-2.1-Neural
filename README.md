@@ -32,6 +32,7 @@ Biologically structured **FSOT neurons** whose identity and wiring come from the
 | **Full reproduce guide** | [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) |
 | **Standalone transplant** | [`docs/STANDALONE_TRANSPLANT.md`](docs/STANDALONE_TRANSPLANT.md) — **no other folders required** |
 | **Autonomous learn** | `python run_autonomous_learn.py` — docs + optional media, minimal prompts |
+| **Capability frontier** | [`docs/CAPABILITY_FRONTIER.md`](docs/CAPABILITY_FRONTIER.md) — **unclaimed** gaps we track (pixel ID, curriculum, monologue) |
 | **Episode watch / recall** | `python run_episode_watch.py` · `--recall "Brave"` |
 | **Document reading** | real PDF/MD/TXT page text → machine/trinary (not next-token LM) |
 | **Media** | AV co-stream + subtitles → symbols → knowledge → memory |

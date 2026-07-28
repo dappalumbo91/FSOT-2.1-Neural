@@ -328,4 +328,12 @@ def run_autonomous_learn(
     (ARTIFACTS / "autonomous_learn_last.json").write_text(
         json.dumps(report.to_dict(), indent=2), encoding="utf-8"
     )
+    # Track capability frontier gaps (open-world / curriculum / monologue)
+    try:
+        from ..capability_frontier import snapshot_from_autonomous
+
+        snapshot_from_autonomous(report)
+        notes.append("capability_frontier: snapshot logged")
+    except Exception as e:
+        notes.append(f"capability_frontier log skip: {e}")
     return report

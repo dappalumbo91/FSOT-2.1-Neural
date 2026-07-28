@@ -142,6 +142,21 @@ artifacts/              # runtime: episode_memory, reports (gitignored mostly)
 | Readable multi-modal experience | Claim of full open-world AGI vision |
 | Standalone GitHub clone | Tied to one developer’s drive letters |
 
+### Tracked unclaimed gaps (capability frontier)
+
+We **log and keep** these as we climb — see [`docs/CAPABILITY_FRONTIER.md`](CAPABILITY_FRONTIER.md):
+
+1. **Open-world pixel identity** — “that is Jake” from pixels alone  
+2. **Self-directed curriculum design** — full autonomous learning plan  
+3. **LLM-style free monologue** — open generative language  
+
+```powershell
+python run_capability_frontier.py
+python run_capability_frontier.py --history 10
+```
+
+Live status: `data/capability_frontier/STATUS.md`
+
 ---
 
 ## 8. Suggested first-hour path for reviewers
