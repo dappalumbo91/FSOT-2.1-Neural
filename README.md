@@ -102,7 +102,7 @@ python run_console.py
 # or: python -m product.console
 ```
 
-Console **v0.3** auto-boots: pin archive → fold S strip → machine ABI. Buttons for scalpel, **FSOT-bridged** intel probe, Zig/QEMU.  
+Console **v0.4** auto-boots with **readable** checklists (not JSON walls): pin → fold S strip → machine ABI. Buttons for scalpel, FSOT-bridged intel, **Zig body exe**, QEMU.  
 [`docs/FSOT_APPLICATION_NEURAL.md`](docs/FSOT_APPLICATION_NEURAL.md) · [`docs/MACHINE_ENCODING.md`](docs/MACHINE_ENCODING.md) · `python run_fsot_bridge.py`  
 UI architecture: [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md).  
 **Road to a full brain design:** [`BRAIN_PATH.md`](BRAIN_PATH.md)  
