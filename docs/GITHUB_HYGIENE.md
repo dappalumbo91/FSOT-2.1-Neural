@@ -61,6 +61,7 @@ git status                              # no secrets / huge dumps
 
 ## Policy
 
-- **Mission path** is genetic + Allen + study EEG + machine body — not IMDB/Morse scoreboards.  
-- Secondary demos may remain in-tree but must not be required for `ci_smoke` / stress / console boot.  
-- If a file is not in `docs/RUNTIME_INVENTORY.md` mission core and not a doc, treat it as cleanup candidate.
+- **Mission path** is genetic + Allen + study EEG + machine body.  
+- **Keep** NLP externals (IMDB, etc.) and **Shakespeare** for future language/intelligence bridges — see `docs/LANGUAGE_AND_NLP_BRIDGE.md`.  
+- **Do not restore** deleted Morse legacy dump (`files-3ccbc49e`, old Morse theses). Optional `morse_itu` remains secondary demos only.  
+- Secondary runners must not be required for `ci_smoke` / stress / console boot.

@@ -148,27 +148,26 @@ def classify_workspace() -> Dict[str, Any]:
             "requirements.txt",
             "pyproject.toml",
         ],
-        "secondary_demo_keep_optional": [
-            "run_language_loop.py / morse_itu (secondary Morse)",
-            "run_climb.py / multi_dataset NLP scoreboards",
-            "data/itu_morse.json",
-            "data/literature/*",
+        "keep_for_future_language_bridge": [
+            "data/external/nlp/* (IMDB, sentiment) — intelligence benchmarks later",
+            "data/literature/shakespeare/ — classical English literature foundation",
+            "docs/LANGUAGE_AND_NLP_BRIDGE.md",
+        ],
+        "secondary_optional": [
+            "morse_itu + data/itu_morse.json — optional telegraphy demos only (legacy dumps removed)",
+            "run_climb / multi_dataset scoreboards — until language bridge",
         ],
         "local_only_not_github_payload": [
-            "data/external/** (NLP/IMDB downloads — gitignored)",
-            "data/kaggle_datasets/**/*.csv (large — gitignored)",
-            "data/eeg/allen_ephys/*.nwb (gitignored)",
-            "artifacts/ (runtime — gitignored json)",
-            "embodiment/zig/.zig-cache / zig-out (gitignored)",
-            "files-3ccbc49e/ (legacy dump — should NOT be on GitHub)",
+            "data/external/** large CSVs (gitignored; DOWNLOAD_MANIFEST only)",
+            "data/kaggle_datasets/**/*.csv",
+            "data/eeg/allen_ephys/*.nwb",
+            "artifacts/",
+            "embodiment/zig/.zig-cache / zig-out",
             "__pycache__/",
         ],
-        "cleanup_candidates_workspace": [
-            "files-3ccbc49e/ — old morse/shakespeare experiments; not imported by mission",
-            "data/external/nlp/* — IMDB/sentiment; mission says NLP secondary only",
-            "data/results/* deep_nlp_*, multi_dataset_scoreboard, sota_fronts — demo scoreboards",
-            "notebooks/ if empty or outdated",
-            "dist/ build leftovers",
+        "removed_do_not_restore": [
+            "files-3ccbc49e/ (deleted — legacy Morse dump)",
+            "data/literature FSOT_MORSE_* theses (deleted)",
         ],
     }
 

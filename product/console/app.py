@@ -491,6 +491,9 @@ class ConsoleApp(tk.Tk):
         ttk.Button(mem_btns, text="Study EEG path", command=self._cmd_learning_eeg).pack(
             side=tk.LEFT, padx=2
         )
+        ttk.Button(mem_btns, text="Consolidate ladder", command=self._cmd_consolidate).pack(
+            side=tk.LEFT, padx=2
+        )
         ttk.Button(mem_btns, text="Full suite (slow)", command=self._cmd_intel).pack(
             side=tk.LEFT, padx=2
         )
@@ -920,6 +923,18 @@ class ConsoleApp(tk.Tk):
 
     def _cmd_learning_eeg(self) -> None:
         self._run_async([sys.executable, str(ROOT / "run_learning_eeg_study.py")])
+
+    def _cmd_consolidate(self) -> None:
+        self._run_async(
+            [
+                sys.executable,
+                str(ROOT / "run_consolidate_study.py"),
+                "--items",
+                "8",
+                "--delay-steps",
+                "300",
+            ]
+        )
 
     def _refresh_cells(self) -> None:
         lines = [

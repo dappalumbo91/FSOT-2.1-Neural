@@ -6,6 +6,7 @@ const neuron = @import("neuron.zig");
 const network = @import("network.zig");
 const fingerprint = @import("fingerprint.zig");
 const seeds = @import("seeds.zig");
+const frame_inject = @import("frame_inject.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     // Zig 0.15: scientific via {e}
@@ -67,5 +68,26 @@ pub fn main() !void {
     std.debug.print("FSOT_FP PASS correct={d}/{d}\n", .{ fp.correct, fp.n });
 
     printF64("SEEDS_K=", seeds.k);
+
+    // MachineFrame ABI scaffold (Python machine_encode → Zig body seam)
+    var demo: [22]u8 = undefined;
+    @memcpy(demo[0..4], &frame_inject.magic);
+    demo[4] = 1;
+    demo[5] = 1; // machine path
+    std.mem.writeInt(u32, demo[6..10], 4, .little);
+    // one word: pack=0, n=4
+    std.mem.writeInt(u64, demo[10..18], 0, .little);
+    demo[18] = 4;
+    demo[19] = 0;
+    demo[20] = 0;
+    demo[21] = 0;
+    if (frame_inject.parseHeader(demo[0..])) |h| {
+        std.debug.print("FSOT_FRAME path={d} n_trits={d}\n", .{ h.path_id, h.n_trits });
+    } else {
+        std.debug.print("FSOT_FRAME FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FRAME PASS\n", .{});
+
     std.debug.print("FSOT_STAGE_ZIG_NEURON_OK\n", .{});
 }

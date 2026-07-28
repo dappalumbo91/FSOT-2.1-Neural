@@ -1,0 +1,570 @@
+{
+  "generated_at": "2026-07-28T16:02:29.777649+00:00",
+  "params": {
+    "items": 8,
+    "delay_steps": 300,
+    "encode_steps": 250,
+    "retrieve_steps": 200,
+    "replay_rounds": 2,
+    "device": "cpu"
+  },
+  "study_eeg": {
+    "mental_ok": true,
+    "contrast": {
+      "theta_concentrate_over_relax": 1.573884113069094,
+      "alpha_concentrate_over_relax": 1.4428702552853194,
+      "beta_concentrate_over_relax": 0.45627696347433705,
+      "gamma_concentrate_over_relax": 0.6936213116817332
+    },
+    "couple": {
+      "fold": "Neuroscience",
+      "drivers": {
+        "theta_ratio": 1.573884113069094,
+        "gamma_ratio": 0.6936213116817332,
+        "beta_ratio": 0.45627696347433705,
+        "amplitude": 0.9954262424938937,
+        "P": 1.0928564000549381
+      },
+      "S": 0.5434955588701018,
+      "trit": 1,
+      "sensory_strength": 0.7971405109018448,
+      "source": "authority_mpmath",
+      "formula": "S = K(T1+T2+T3)",
+      "free_parameters": 0
+    }
+  },
+  "fsot_folds": {
+    "pin_ok": true,
+    "pin_sha256": "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70",
+    "pin_error": null,
+    "authority_sha256": "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70",
+    "formula": "S = K * (T1 + T2 + T3)",
+    "free_parameters": 0,
+    "folds": {
+      "Biology": {
+        "S": 0.4447250077038458,
+        "trit": 1,
+        "D_eff": 12.0,
+        "delta_psi": 0.08,
+        "observed": false,
+        "source": "authority_mpmath"
+      },
+      "Neuroscience": {
+        "S": 0.5143619629083619,
+        "trit": 1,
+        "D_eff": 14.0,
+        "delta_psi": 0.7,
+        "observed": true,
+        "source": "authority_mpmath"
+      },
+      "Biochemistry": {
+        "S": 0.3062212293865662,
+        "trit": 0,
+        "D_eff": 13.0,
+        "delta_psi": 0.35,
+        "observed": true,
+        "source": "authority_mpmath"
+      },
+      "Neural_Substrate": {
+        "S": 0.43231972120140144,
+        "trit": 1,
+        "D_eff": 13.0,
+        "delta_psi": 0.1,
+        "observed": true,
+        "source": "authority_mpmath"
+      },
+      "Computer_Body": {
+        "S": -0.14767310363368644,
+        "trit": 0,
+        "D_eff": 11.0,
+        "delta_psi": 0.5,
+        "observed": false,
+        "source": "authority_mpmath"
+      }
+    },
+    "S_Biology": 0.4447250077038458,
+    "S_Neuroscience": 0.5143619629083619,
+    "S_Computer_Body": -0.14767310363368644
+  },
+  "results": {
+    "immediate": {
+      "n_items": 8,
+      "top1_accuracy": 0.625,
+      "mean_correct_sim": 0.9155370712280273,
+      "mean_incorrect_sim": 0.8754478329319065,
+      "sme_theta_encode_gt_rest": true,
+      "sme_gamma_encode_gt_rest": true,
+      "delay_steps": 0,
+      "consolidate": false,
+      "consolidate_steps": 0,
+      "replay_rounds": 0,
+      "top1_immediate": 0.625,
+      "top1_after_delay": NaN,
+      "top1_after_consolidate": NaN,
+      "consolidate_sigma_rel": NaN,
+      "per_item": [
+        {
+          "item_id": 0,
+          "predicted": 0,
+          "correct": true,
+          "sims": [
+            0.8947886824607849,
+            0.8607276678085327,
+            0.8821102976799011,
+            0.8613736033439636,
+            0.8491278290748596,
+            0.8492462038993835,
+            0.883657693862915,
+            0.8684903979301453
+          ],
+          "encode_theta_rel": 0.005939646693259559,
+          "encode_gamma_rel": 0.33252048034587184
+        },
+        {
+          "item_id": 1,
+          "predicted": 4,
+          "correct": false,
+          "sims": [
+            0.865493655204773,
+            0.9043728113174438,
+            0.8863182067871094,
+            0.9049775004386902,
+            0.9112426042556763,
+            0.8627598881721497,
+            0.9075005054473877,
+            0.878053605556488
+          ],
+          "encode_theta_rel": 0.006700589640371261,
+          "encode_gamma_rel": 0.4234982680482771
+        },
+        {
+          "item_id": 2,
+          "predicted": 2,
+          "correct": true,
+          "sims": [
+            0.8824697136878967,
+            0.8645268678665161,
+            0.9131614565849304,
+            0.8722834587097168,
+            0.8561851382255554,
+            0.8529328107833862,
+            0.8904458284378052,
+            0.8857055902481079
+          ],
+          "encode_theta_rel": 0.001906108170416789,
+          "encode_gamma_rel": 0.32635123603693417
+        },
+        {
+          "item_id": 3,
+          "predicted": 3,
+          "correct": true,
+          "sims": [
+            0.8342947363853455,
+            0.8668524026870728,
+            0.8526617884635925,
+            0.9323896169662476,
+            0.8812381625175476,
+            0.8721591830253601,
+            0.8624075055122375,
+            0.8709936141967773
+          ],
+          "encode_theta_rel": 0.0007025358750588288,
+          "encode_gamma_rel": 0.2891583679040508
+        },
+        {
+          "item_id": 4,
+          "predicted": 4,
+          "correct": true,
+          "sims": [
+            0.8396585583686829,
+            0.889136791229248,
+            0.8695698976516724,
+            0.916876494884491,
+            0.9249396324157715,
+            0.8746200203895569,
+            0.8881692886352539,
+            0.8718225359916687
+          ],
+          "encode_theta_rel": 0.0004911668488185392,
+          "encode_gamma_rel": 0.3712909646389408
+        },
+        {
+          "item_id": 5,
+          "predicted": 3,
+          "correct": false,
+          "sims": [
+            0.8367924094200134,
+            0.8578433990478516,
+            0.86263507604599,
+            0.9398446679115295,
+            0.9000011682510376,
+            0.8970758318901062,
+            0.8931031227111816,
+            0.8790046572685242
+          ],
+          "encode_theta_rel": 0.006222717664336634,
+          "encode_gamma_rel": 0.21856783561430115
+        },
+        {
+          "item_id": 6,
+          "predicted": 6,
+          "correct": true,
+          "sims": [
+            0.8665536046028137,
+            0.8769153952598572,
+            0.8899664878845215,
+            0.8926777839660645,
+            0.8937243819236755,
+            0.862767219543457,
+            0.9124059677124023,
+            0.8782918453216553
+          ],
+          "encode_theta_rel": 0.0021467183320910657,
+          "encode_gamma_rel": 0.3105859536948482
+        },
+        {
+          "item_id": 7,
+          "predicted": 3,
+          "correct": false,
+          "sims": [
+            0.8512518405914307,
+            0.873638391494751,
+            0.883029043674469,
+            0.8977261781692505,
+            0.8434423804283142,
+            0.8555201888084412,
+            0.8680216670036316,
+            0.8811325430870056
+          ],
+          "encode_theta_rel": 0.005326607398803539,
+          "encode_gamma_rel": 0.3674823255204884
+        }
+      ],
+      "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Fingerprint retrieval on multi-region FSOT brain; not a transformer LM. Wet-lab class rates locked separately via scalpel."
+    },
+    "delay": {
+      "n_items": 8,
+      "top1_accuracy": 0.625,
+      "mean_correct_sim": 0.9155370712280273,
+      "mean_incorrect_sim": 0.8754478329319065,
+      "sme_theta_encode_gt_rest": true,
+      "sme_gamma_encode_gt_rest": true,
+      "delay_steps": 300,
+      "consolidate": false,
+      "consolidate_steps": 0,
+      "replay_rounds": 0,
+      "top1_immediate": 0.625,
+      "top1_after_delay": 0.625,
+      "top1_after_consolidate": NaN,
+      "consolidate_sigma_rel": NaN,
+      "per_item": [
+        {
+          "item_id": 0,
+          "predicted": 0,
+          "correct": true,
+          "sims": [
+            0.8947886824607849,
+            0.8607276678085327,
+            0.8821102976799011,
+            0.8613736033439636,
+            0.8491278290748596,
+            0.8492462038993835,
+            0.883657693862915,
+            0.8684903979301453
+          ],
+          "encode_theta_rel": 0.005939646693259559,
+          "encode_gamma_rel": 0.33252048034587184
+        },
+        {
+          "item_id": 1,
+          "predicted": 4,
+          "correct": false,
+          "sims": [
+            0.865493655204773,
+            0.9043728113174438,
+            0.8863182067871094,
+            0.9049775004386902,
+            0.9112426042556763,
+            0.8627598881721497,
+            0.9075005054473877,
+            0.878053605556488
+          ],
+          "encode_theta_rel": 0.006700589640371261,
+          "encode_gamma_rel": 0.4234982680482771
+        },
+        {
+          "item_id": 2,
+          "predicted": 2,
+          "correct": true,
+          "sims": [
+            0.8824697136878967,
+            0.8645268678665161,
+            0.9131614565849304,
+            0.8722834587097168,
+            0.8561851382255554,
+            0.8529328107833862,
+            0.8904458284378052,
+            0.8857055902481079
+          ],
+          "encode_theta_rel": 0.001906108170416789,
+          "encode_gamma_rel": 0.32635123603693417
+        },
+        {
+          "item_id": 3,
+          "predicted": 3,
+          "correct": true,
+          "sims": [
+            0.8342947363853455,
+            0.8668524026870728,
+            0.8526617884635925,
+            0.9323896169662476,
+            0.8812381625175476,
+            0.8721591830253601,
+            0.8624075055122375,
+            0.8709936141967773
+          ],
+          "encode_theta_rel": 0.0007025358750588288,
+          "encode_gamma_rel": 0.2891583679040508
+        },
+        {
+          "item_id": 4,
+          "predicted": 4,
+          "correct": true,
+          "sims": [
+            0.8396585583686829,
+            0.889136791229248,
+            0.8695698976516724,
+            0.916876494884491,
+            0.9249396324157715,
+            0.8746200203895569,
+            0.8881692886352539,
+            0.8718225359916687
+          ],
+          "encode_theta_rel": 0.0004911668488185392,
+          "encode_gamma_rel": 0.3712909646389408
+        },
+        {
+          "item_id": 5,
+          "predicted": 3,
+          "correct": false,
+          "sims": [
+            0.8367924094200134,
+            0.8578433990478516,
+            0.86263507604599,
+            0.9398446679115295,
+            0.9000011682510376,
+            0.8970758318901062,
+            0.8931031227111816,
+            0.8790046572685242
+          ],
+          "encode_theta_rel": 0.006222717664336634,
+          "encode_gamma_rel": 0.21856783561430115
+        },
+        {
+          "item_id": 6,
+          "predicted": 6,
+          "correct": true,
+          "sims": [
+            0.8665536046028137,
+            0.8769153952598572,
+            0.8899664878845215,
+            0.8926777839660645,
+            0.8937243819236755,
+            0.862767219543457,
+            0.9124059677124023,
+            0.8782918453216553
+          ],
+          "encode_theta_rel": 0.0021467183320910657,
+          "encode_gamma_rel": 0.3105859536948482
+        },
+        {
+          "item_id": 7,
+          "predicted": 3,
+          "correct": false,
+          "sims": [
+            0.8512518405914307,
+            0.873638391494751,
+            0.883029043674469,
+            0.8977261781692505,
+            0.8434423804283142,
+            0.8555201888084412,
+            0.8680216670036316,
+            0.8811325430870056
+          ],
+          "encode_theta_rel": 0.005326607398803539,
+          "encode_gamma_rel": 0.3674823255204884
+        }
+      ],
+      "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 300 model-ms (no offline replay)."
+    },
+    "consolidate": {
+      "n_items": 8,
+      "top1_accuracy": 0.625,
+      "mean_correct_sim": 0.9155370712280273,
+      "mean_incorrect_sim": 0.8754478329319065,
+      "sme_theta_encode_gt_rest": true,
+      "sme_gamma_encode_gt_rest": true,
+      "delay_steps": 150,
+      "consolidate": true,
+      "consolidate_steps": 350,
+      "replay_rounds": 2,
+      "top1_immediate": 0.625,
+      "top1_after_delay": 0.625,
+      "top1_after_consolidate": 0.625,
+      "consolidate_sigma_rel": 0.0059740771803056735,
+      "per_item": [
+        {
+          "item_id": 0,
+          "predicted": 0,
+          "correct": true,
+          "sims": [
+            0.8947886824607849,
+            0.8607276678085327,
+            0.8821102976799011,
+            0.8613736033439636,
+            0.8491278290748596,
+            0.8492462038993835,
+            0.883657693862915,
+            0.8684903979301453
+          ],
+          "encode_theta_rel": 0.005939646693259559,
+          "encode_gamma_rel": 0.33252048034587184
+        },
+        {
+          "item_id": 1,
+          "predicted": 4,
+          "correct": false,
+          "sims": [
+            0.865493655204773,
+            0.9043728113174438,
+            0.8863182067871094,
+            0.9049775004386902,
+            0.9112426042556763,
+            0.8627598881721497,
+            0.9075005054473877,
+            0.878053605556488
+          ],
+          "encode_theta_rel": 0.006700589640371261,
+          "encode_gamma_rel": 0.4234982680482771
+        },
+        {
+          "item_id": 2,
+          "predicted": 2,
+          "correct": true,
+          "sims": [
+            0.8824697136878967,
+            0.8645268678665161,
+            0.9131614565849304,
+            0.8722834587097168,
+            0.8561851382255554,
+            0.8529328107833862,
+            0.8904458284378052,
+            0.8857055902481079
+          ],
+          "encode_theta_rel": 0.001906108170416789,
+          "encode_gamma_rel": 0.32635123603693417
+        },
+        {
+          "item_id": 3,
+          "predicted": 3,
+          "correct": true,
+          "sims": [
+            0.8342947363853455,
+            0.8668524026870728,
+            0.8526617884635925,
+            0.9323896169662476,
+            0.8812381625175476,
+            0.8721591830253601,
+            0.8624075055122375,
+            0.8709936141967773
+          ],
+          "encode_theta_rel": 0.0007025358750588288,
+          "encode_gamma_rel": 0.2891583679040508
+        },
+        {
+          "item_id": 4,
+          "predicted": 4,
+          "correct": true,
+          "sims": [
+            0.8396585583686829,
+            0.889136791229248,
+            0.8695698976516724,
+            0.916876494884491,
+            0.9249396324157715,
+            0.8746200203895569,
+            0.8881692886352539,
+            0.8718225359916687
+          ],
+          "encode_theta_rel": 0.0004911668488185392,
+          "encode_gamma_rel": 0.3712909646389408
+        },
+        {
+          "item_id": 5,
+          "predicted": 3,
+          "correct": false,
+          "sims": [
+            0.8367924094200134,
+            0.8578433990478516,
+            0.86263507604599,
+            0.9398446679115295,
+            0.9000011682510376,
+            0.8970758318901062,
+            0.8931031227111816,
+            0.8790046572685242
+          ],
+          "encode_theta_rel": 0.006222717664336634,
+          "encode_gamma_rel": 0.21856783561430115
+        },
+        {
+          "item_id": 6,
+          "predicted": 6,
+          "correct": true,
+          "sims": [
+            0.8665536046028137,
+            0.8769153952598572,
+            0.8899664878845215,
+            0.8926777839660645,
+            0.8937243819236755,
+            0.862767219543457,
+            0.9124059677124023,
+            0.8782918453216553
+          ],
+          "encode_theta_rel": 0.0021467183320910657,
+          "encode_gamma_rel": 0.3105859536948482
+        },
+        {
+          "item_id": 7,
+          "predicted": 3,
+          "correct": false,
+          "sims": [
+            0.8512518405914307,
+            0.873638391494751,
+            0.883029043674469,
+            0.8977261781692505,
+            0.8434423804283142,
+            0.8555201888084412,
+            0.8680216670036316,
+            0.8811325430870056
+          ],
+          "encode_theta_rel": 0.005326607398803539,
+          "encode_gamma_rel": 0.3674823255204884
+        }
+      ],
+      "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Offline consolidate: rest + soft replay; sigma_rel_replay=0.0059740771803056735"
+    }
+  },
+  "gates": {
+    "pin_seed_ok": true,
+    "mental_eeg_loaded": true,
+    "study_theta_or_beta_up": true,
+    "immediate_ge_half": true,
+    "delay_ge_half": true,
+    "consolidate_ge_half": true,
+    "consolidate_above_chance": true,
+    "sme_theta": true,
+    "sme_gamma": true,
+    "delay_not_worse_than_chance": true
+  },
+  "chance": 0.125,
+  "target": "top-1 \u2265 0.5 after consolidate; study EEG wet-lab couple"
+}

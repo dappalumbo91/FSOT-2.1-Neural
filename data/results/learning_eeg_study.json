@@ -1,0 +1,269 @@
+{
+  "generated_at": "2026-07-28T15:56:15.820678+00:00",
+  "pin_seed_ok": true,
+  "fsot_folds": {
+    "pin_ok": true,
+    "pin_sha256": "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70",
+    "pin_error": null,
+    "authority_sha256": "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70",
+    "formula": "S = K * (T1 + T2 + T3)",
+    "free_parameters": 0,
+    "folds": {
+      "Biology": {
+        "S": 0.4447250077038458,
+        "trit": 1,
+        "D_eff": 12.0,
+        "delta_psi": 0.08,
+        "observed": false,
+        "source": "authority_mpmath"
+      },
+      "Neuroscience": {
+        "S": 0.5143619629083619,
+        "trit": 1,
+        "D_eff": 14.0,
+        "delta_psi": 0.7,
+        "observed": true,
+        "source": "authority_mpmath"
+      },
+      "Biochemistry": {
+        "S": 0.3062212293865662,
+        "trit": 0,
+        "D_eff": 13.0,
+        "delta_psi": 0.35,
+        "observed": true,
+        "source": "authority_mpmath"
+      },
+      "Neural_Substrate": {
+        "S": 0.43231972120140144,
+        "trit": 1,
+        "D_eff": 13.0,
+        "delta_psi": 0.1,
+        "observed": true,
+        "source": "authority_mpmath"
+      },
+      "Computer_Body": {
+        "S": -0.14767310363368644,
+        "trit": 0,
+        "D_eff": 11.0,
+        "delta_psi": 0.5,
+        "observed": false,
+        "source": "authority_mpmath"
+      }
+    },
+    "S_Biology": 0.4447250077038458,
+    "S_Neuroscience": 0.5143619629083619,
+    "S_Computer_Body": -0.14767310363368644
+  },
+  "study_eeg": {
+    "mental_state_path": "I:\\fsot nuron\\data\\kaggle_datasets\\eeg_mental_state\\mental-state.csv",
+    "emotions_path": "I:\\fsot nuron\\data\\kaggle_datasets\\eeg_emotions\\emotions.csv",
+    "mental_state_ok": true,
+    "emotions_ok": true,
+    "n_mental_rows": 2479,
+    "n_emotions_rows": 2132,
+    "mental_label_counts": {
+      "concentrating": 830,
+      "neutral": 830,
+      "relaxed": 819
+    },
+    "concentrate_vs_relax": {
+      "theta_concentrate_over_relax": 1.573884113069094,
+      "alpha_concentrate_over_relax": 1.4428702552853194,
+      "beta_concentrate_over_relax": 0.45627696347433705,
+      "gamma_concentrate_over_relax": 0.6936213116817332
+    },
+    "literature": {
+      "sederberg_2003_sme": {
+        "citation": "Sederberg et al., 2003, J Neurosci \u2014 successful encoding \u2191 theta + gamma (iEEG)",
+        "expect_theta_encode_gt_rest": true,
+        "expect_gamma_encode_gt_rest": true,
+        "bands_Hz": {
+          "theta": [
+            4.0,
+            8.0
+          ],
+          "gamma": [
+            28.0,
+            64.0
+          ]
+        }
+      },
+      "creery_2022_consolidation": {
+        "citation": "Creery et al., 2022, PNAS \u2014 offline rest/reactivation sigma/theta/gamma",
+        "expect_offline_sigma_or_theta": true,
+        "bands_Hz": {
+          "sigma": [
+            12.0,
+            16.0
+          ],
+          "theta": [
+            4.0,
+            8.0
+          ]
+        }
+      },
+      "alpha_ideation": {
+        "citation": "EEG ideation literature \u2014 \u2191 alpha (8\u201312) during flexible reconfigure",
+        "expect_alpha_reconfigure": true,
+        "bands_Hz": {
+          "alpha": [
+            8.0,
+            12.0
+          ]
+        }
+      }
+    },
+    "fsot_couple": {
+      "fold": "Neuroscience",
+      "drivers": {
+        "theta_ratio": 1.573884113069094,
+        "gamma_ratio": 0.6936213116817332,
+        "beta_ratio": 0.45627696347433705,
+        "amplitude": 0.9954262424938937,
+        "P": 1.0928564000549381
+      },
+      "S": 0.5434955588701018,
+      "trit": 1,
+      "sensory_strength": 0.7971405109018448,
+      "source": "authority_mpmath",
+      "formula": "S = K(T1+T2+T3)",
+      "free_parameters": 0
+    },
+    "gates": {
+      "mental_data_loaded": true,
+      "concentrate_theta_or_beta_elevated": true,
+      "literature_sme_priors_present": true,
+      "emotions_optional_ok": true
+    },
+    "notes": [
+      "emotions EEG feature matrix available"
+    ]
+  },
+  "learning": {
+    "n_items": 6,
+    "top1_accuracy": 0.6666666666666666,
+    "mean_correct_sim": 0.9174556136131287,
+    "mean_incorrect_sim": 0.8667194787412882,
+    "sme_theta_encode_gt_rest": true,
+    "sme_gamma_encode_gt_rest": true,
+    "delay_steps": 200,
+    "consolidate": false,
+    "consolidate_steps": 0,
+    "replay_rounds": 0,
+    "top1_immediate": 0.6666666666666666,
+    "top1_after_delay": 0.6666666666666666,
+    "top1_after_consolidate": NaN,
+    "consolidate_sigma_rel": NaN,
+    "per_item": [
+      {
+        "item_id": 0,
+        "predicted": 2,
+        "correct": false,
+        "sims": [
+          0.8812367916107178,
+          0.8627442717552185,
+          0.8875368237495422,
+          0.8633242249488831,
+          0.8411091566085815,
+          0.8513983488082886
+        ],
+        "encode_theta_rel": 0.0037484632949686047,
+        "encode_gamma_rel": 0.33391011143740823
+      },
+      {
+        "item_id": 1,
+        "predicted": 1,
+        "correct": true,
+        "sims": [
+          0.8453762531280518,
+          0.9054988622665405,
+          0.8853390216827393,
+          0.884885311126709,
+          0.8904435038566589,
+          0.8586441278457642
+        ],
+        "encode_theta_rel": 0.0021966073878378124,
+        "encode_gamma_rel": 0.36494728979650914
+      },
+      {
+        "item_id": 2,
+        "predicted": 2,
+        "correct": true,
+        "sims": [
+          0.8601258397102356,
+          0.8604798913002014,
+          0.9158992171287537,
+          0.8742741942405701,
+          0.8448377251625061,
+          0.8425753712654114
+        ],
+        "encode_theta_rel": 0.003888138609551178,
+        "encode_gamma_rel": 0.41040792982286467
+      },
+      {
+        "item_id": 3,
+        "predicted": 3,
+        "correct": true,
+        "sims": [
+          0.8134344816207886,
+          0.8472945690155029,
+          0.8524450063705444,
+          0.9392330646514893,
+          0.8627892732620239,
+          0.875333309173584
+        ],
+        "encode_theta_rel": 0.0007587523770774154,
+        "encode_gamma_rel": 0.35984296578183106
+      },
+      {
+        "item_id": 4,
+        "predicted": 4,
+        "correct": true,
+        "sims": [
+          0.8268058896064758,
+          0.8878244161605835,
+          0.8725754022598267,
+          0.902603030204773,
+          0.9091913104057312,
+          0.8839933276176453
+        ],
+        "encode_theta_rel": 0.00022750383722531446,
+        "encode_gamma_rel": 0.33605257314102227
+      },
+      {
+        "item_id": 5,
+        "predicted": 3,
+        "correct": false,
+        "sims": [
+          0.8261716961860657,
+          0.8588863015174866,
+          0.855791449546814,
+          0.9330166578292847,
+          0.8930251002311707,
+          0.908702552318573
+        ],
+        "encode_theta_rel": 0.0020768782651161746,
+        "encode_gamma_rel": 0.2644921219816726
+      }
+    ],
+    "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 200 model-ms (no offline replay)."
+  },
+  "gates": {
+    "mental_data_loaded": true,
+    "concentrate_theta_or_beta_elevated": true,
+    "literature_sme_priors_present": true,
+    "emotions_optional_ok": true,
+    "sme_theta_encode_gt_rest": true,
+    "sme_gamma_encode_gt_rest": true,
+    "top1_above_chance": true,
+    "top1_ge_half": true,
+    "literature_sme_direction_ok": true
+  },
+  "params": {
+    "n_items": 6,
+    "delay_steps": 200,
+    "study_drive_strength": 0.7971405109018448,
+    "item_mode": "fsot_machine"
+  },
+  "doctrine": "Allen cell rates separate; study EEG = learning band authority; FSOT couple zero free params"
+}

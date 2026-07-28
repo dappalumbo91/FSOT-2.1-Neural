@@ -1,0 +1,37 @@
+{
+  "emotions_csv": "I:\\fsot nuron\\data\\eeg\\kaggle_emotions\\emotions.csv",
+  "n": 2132,
+  "labels": {
+    "NEUTRAL": 716,
+    "NEGATIVE": 708,
+    "POSITIVE": 708
+  },
+  "energy_cv": 0.940613564291629,
+  "package_templates": {
+    "POSITIVE": {
+      "fi_stim_scale": 1.2991295291807483,
+      "fire_thr_delta": -0.06,
+      "adapt_step_scale": 0.85,
+      "isi_jitter": 0.15,
+      "silence_fraction": 0.0
+    },
+    "NEUTRAL": {
+      "fi_stim_scale": 1.0,
+      "fire_thr_delta": 0.0,
+      "adapt_step_scale": 1.0,
+      "isi_jitter": 0.1,
+      "silence_fraction": 0.0
+    },
+    "NEGATIVE": {
+      "fi_stim_scale": 1.2,
+      "fire_thr_delta": 0.05,
+      "adapt_step_scale": 1.6703067821458144,
+      "isi_jitter": 0.6,
+      "silence_fraction": 0.05,
+      "phase_lock_strength": 0.35
+    }
+  },
+  "morse_ok": true,
+  "query_ok": true,
+  "answer_head": "QUERY (Morse-exact): WHAT IS FLUID SPACETIME OMNI-THEORY?\nARTICULATION:\n  into a three-tier software architecture. This architecture (Ada $\\rightarrow$ Python $\\rightarrow$ Zig) applies the exact zero-free-parameter mathematics of the Fluid Spacetime Omni Theory directly to existing local hard # Fluid Spacetime Omni Theory (FSOT 2.0): Complete Mathematical Framework, Translation Registry, & Correction Engine **Author:** DAMIAn ARTHUR. PALUMBO.\nEVIDENCE (2 memories; fluid+keyword match):\n  \u2022 [FSO"
+}

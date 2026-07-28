@@ -1,0 +1,52 @@
+{
+  "source_csv": "/kaggle/input/datasets/birdy654/eeg-brainwave-dataset-feeling-emotions/emotions.csv",
+  "n_samples": 2132,
+  "labels": {
+    "NEUTRAL": 716,
+    "NEGATIVE": 708,
+    "POSITIVE": 708
+  },
+  "energy_cv": 0.9406135642916288,
+  "by_label": {
+    "NEGATIVE": {
+      "n": 708,
+      "mean_abs": 197.70436506422143,
+      "std_mean": 184.60033814613962,
+      "energy_mean": 197.70436506422138
+    },
+    "NEUTRAL": {
+      "n": 716,
+      "mean_abs": 38.18056227727229,
+      "std_mean": 28.029141742460432,
+      "energy_mean": 38.18056227727228
+    },
+    "POSITIVE": {
+      "n": 708,
+      "mean_abs": 76.22818429324461,
+      "std_mean": 122.17773194404216,
+      "energy_mean": 76.22818429324462
+    }
+  },
+  "templates": {
+    "POSITIVE": {
+      "fi_stim_scale": 1.2991295291807483,
+      "fire_thr_delta": -0.06,
+      "adapt_step_scale": 0.85,
+      "isi_jitter": 0.15
+    },
+    "NEUTRAL": {
+      "fi_stim_scale": 1.0,
+      "fire_thr_delta": 0.0,
+      "adapt_step_scale": 1.0,
+      "isi_jitter": 0.1
+    },
+    "NEGATIVE": {
+      "fi_stim_scale": 1.2,
+      "fire_thr_delta": 0.05,
+      "adapt_step_scale": 1.6703067821458144,
+      "isi_jitter": 0.6,
+      "silence_fraction": 0.05
+    }
+  },
+  "dataset_ref": "birdy654/eeg-brainwave-dataset-feeling-emotions"
+}

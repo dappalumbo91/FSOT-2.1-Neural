@@ -60,6 +60,7 @@ python run_archive_pin.py
 python run_fsot_bridge.py   # pin → fold → bridge → couple (not random stitch)
 python scripts/runtime_audit.py   # → docs/RUNTIME_INVENTORY.md
 python run_learning_eeg_study.py  # study EEG wet-lab + SME memory
+python run_consolidate_study.py   # delay + offline consolidate ladder
 
 # 1) Genetic-codon network (mission)
 python run_genetic_bio.py --units 64 --steps 1200

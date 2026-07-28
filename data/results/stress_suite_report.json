@@ -1,0 +1,414 @@
+{
+  "generated_at": "2026-07-28T15:50:03.621928+00:00",
+  "quick": true,
+  "duration_s": 13.8,
+  "n_tests": 25,
+  "n_pass": 25,
+  "n_fail": 0,
+  "critical_breaks": [],
+  "soft_breaks": [],
+  "results": [
+    {
+      "stage": "A",
+      "name": "seeds_vs_archive",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "max_rel_err": 7.172083472051352e-15,
+        "bad": []
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.26
+    },
+    {
+      "stage": "A",
+      "name": "archive_pin",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "connected": true,
+        "seed_match_ok": true,
+        "sha": "D1D38A185487B452",
+        "seven_way": true
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.27
+    },
+    {
+      "stage": "A",
+      "name": "codon_64_map",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "roundtrip": "64/64"
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.27
+    },
+    {
+      "stage": "A",
+      "name": "atlas_domain_S",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "S_Biology": 0.4447250077038458,
+        "S_Neuroscience": 0.5143619629083619
+      },
+      "error": "",
+      "note": "Biology\u22480.445 Neuroscience\u22480.514",
+      "t_s": 1.29
+    },
+    {
+      "stage": "A",
+      "name": "fsot_bridge",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "free_parameters": 0,
+        "atlas_ok": true
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.3
+    },
+    {
+      "stage": "B",
+      "name": "machine_verify",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "utf8_roundtrip_ok": true,
+        "utf8_preview": "FSOT neural stress",
+        "n_trits": 144,
+        "trits_per_byte": 8,
+        "frame_roundtrip_ok": true,
+        "frame_byte_len": 70,
+        "frame_hex_head": "46534f5401019000000014100511551010112000000000045414111411152000",
+        "chem_bridge_n_trits": 12,
+        "chem_bridge_ok": true,
+        "bytes_roundtrip_ok": true,
+        "recommendation": {
+          "default": "machine",
+          "for_os_body": "machine",
+          "for_genetics": "chemical",
+          "for_legacy_demo": "morse",
+          "summary": "Prefer machine (UTF-8/bytes/T1 packs) for computer-native intelligence; chemical for DNA/codon biology; Morse only for optional human telegraphy demos."
+        },
+        "abi": {
+          "magic": "FSOT",
+          "version": 1,
+          "word_record": "u64 LE pack + u8 n_trits + 3 pad",
+          "word_trits_default": 32,
+          "matches_zig_TritWord": true,
+          "encode_style": "lossless bit\u2192trit (0\u21920, 1\u2192+1) \u2014 OS buffer style, not Morse"
+        }
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.3
+    },
+    {
+      "stage": "B",
+      "name": "payload_1B",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "n_trits": 8,
+        "frame_bytes": 22,
+        "roundtrip": true
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.3
+    },
+    {
+      "stage": "B",
+      "name": "payload_16B",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "n_trits": 216,
+        "frame_bytes": 94,
+        "roundtrip": true
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.3
+    },
+    {
+      "stage": "B",
+      "name": "payload_256B",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "n_trits": 3736,
+        "frame_bytes": 394,
+        "roundtrip": true
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.3
+    },
+    {
+      "stage": "B",
+      "name": "payload_4096B",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "n_trits": 59856,
+        "frame_bytes": 394,
+        "roundtrip": true
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.33
+    },
+    {
+      "stage": "B",
+      "name": "morse_secondary",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "n_trits": 27
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.33
+    },
+    {
+      "stage": "B",
+      "name": "inject_50_packets",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "nonzero": 64,
+        "mean": 0.329016774892807
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.37
+    },
+    {
+      "stage": "B",
+      "name": "bridge_large_text",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "S": -0.11350198352091319,
+        "strength": 0.5629567901587144
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.37
+    },
+    {
+      "stage": "C",
+      "name": "genetic_net_n32",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "spikes_total": 64,
+        "S_mean": -0.3054293096065521,
+        "synapses": 128,
+        "wall_s": 0.07
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.44
+    },
+    {
+      "stage": "C",
+      "name": "genetic_net_n64",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "spikes_total": 128,
+        "S_mean": -0.47125157713890076,
+        "synapses": 576,
+        "wall_s": 0.05
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.48
+    },
+    {
+      "stage": "C",
+      "name": "multi_region_brain",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "n_units": 32,
+        "wall_s": 0.06,
+        "keys": [
+          "mission",
+          "profile",
+          "profile_intent",
+          "isi_scale",
+          "structure",
+          "dynamics",
+          "gates",
+          "brain",
+          "n_units",
+          "sensory",
+          "formulas_ref",
+          "thesis_ref"
+        ]
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.54
+    },
+    {
+      "stage": "D",
+      "name": "allen_targets_loaded",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "PV": {
+          "n": 222,
+          "rate_Hz": 83.3504049172855
+        },
+        "Pyr": {
+          "n": 723,
+          "rate_Hz": 16.35121532610921
+        },
+        "SST": {
+          "n": 155,
+          "rate_Hz": 29.538052683455557
+        },
+        "VIP": {
+          "n": 149,
+          "rate_Hz": 34.81541758294487
+        }
+      },
+      "error": "",
+      "note": "",
+      "t_s": 1.57
+    },
+    {
+      "stage": "D",
+      "name": "scalpel_tol_2%",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "scalpel_ok": true,
+        "classes_within": "4/4",
+        "wall_s": 3.11,
+        "Pyr_err": 0.006190079702980287,
+        "PV_err": 0.004794158865947256,
+        "SST_err": 0.015639057912682986,
+        "VIP_err": 0.005301743591481562
+      },
+      "error": "",
+      "note": "1% is stretch; 2% wet-lab floor if 1% fails",
+      "t_s": 4.7
+    },
+    {
+      "stage": "E",
+      "name": "scalpel_brain_build",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "scalpel_ok": true,
+        "meta": "{'profile': 'ai_efficient', 'scalpel_ok': True, 'tol': 0.02, 'class_rel_err': {'Pyr': 0.019292187062748573, 'PV': 0.0002"
+      },
+      "error": "",
+      "note": "",
+      "t_s": 9.5
+    },
+    {
+      "stage": "E",
+      "name": "intel_items4_delay50",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "top1": 1.0,
+        "chance": 0.25,
+        "sim+": 0.5508680492639542,
+        "sim-": 0.35328321655591327,
+        "sme_theta": true,
+        "sme_gamma": true,
+        "wall_s": 0.9,
+        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 50 mod"
+      },
+      "error": "",
+      "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
+      "t_s": 10.4
+    },
+    {
+      "stage": "E",
+      "name": "intel_items6_delay100",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "top1": 0.8333333333333334,
+        "chance": 0.16666666666666666,
+        "sim+": 0.6005146265029907,
+        "sim-": 0.4122624623198663,
+        "sme_theta": true,
+        "sme_gamma": true,
+        "wall_s": 1.51,
+        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 100 mo"
+      },
+      "error": "",
+      "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
+      "t_s": 11.91
+    },
+    {
+      "stage": "E",
+      "name": "ladder_summary",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "last_ok": [
+          6,
+          0.8333333333333334
+        ]
+      },
+      "error": "",
+      "note": "",
+      "t_s": 11.91
+    },
+    {
+      "stage": "F",
+      "name": "zig_host_present",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "path": "I:\\fsot nuron\\embodiment\\zig\\zig-out\\bin\\fsot_trit_host.exe"
+      },
+      "error": "",
+      "note": "",
+      "t_s": 11.91
+    },
+    {
+      "stage": "F",
+      "name": "zig_host_run",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "returncode": 0,
+        "head": "FSOT_TRIT PASS | SCALAR_NEURO_DPI0.1=4.3231972120140144e-1 | NEURON_SPIKES=6 | NEURON_LAST_S=1.3384315124555068e0 | NEURON_S0=2.0476209142641238e-1 | NEURON_S19=-6.644128754607758e-1 | NEURON_S80=-6.2501067001067"
+      },
+      "error": "",
+      "note": "",
+      "t_s": 11.98
+    },
+    {
+      "stage": "G",
+      "name": "console_displays",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "returncode": 0
+      },
+      "error": "",
+      "note": "iment\\zig\\zig-out\\bin\\fsot_trit_host.exe | PASS path_default_machine {'default': 'machine', 'for_os_body': 'machine', 'for_genetics': 'chemical', 'for_legacy_demo': 'morse', 'summary': 'Prefer machine (UTF-8/b | --- | FAILED: none | TOTAL 15 PASS 15 | Wrote I:\\fsot nuron\\artifacts\\console_display_review.json | ",
+      "t_s": 13.8
+    }
+  ],
+  "doctrine": "wet-lab accuracy first; pin D1D38A; machine body; FSOT bridge"
+}

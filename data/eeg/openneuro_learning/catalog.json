@@ -1,0 +1,32 @@
+{
+  "generated_for": "FSOT-2.1-Neural learning path",
+  "policy": "CREDENTIAL_FREE_PUBLIC",
+  "local_root": "data/eeg/openneuro_learning/",
+  "datasets": [
+    {
+      "id": "ds002778",
+      "url": "https://openneuro.org/datasets/ds002778",
+      "modality": "EEG",
+      "role": "pipeline_test_existing_mirror",
+      "local_meta": "data/eeg/openneuro_pd/"
+    },
+    {
+      "id": "search_working_memory_eeg",
+      "url": "https://openneuro.org/public/datasets?query=working%20memory%20eeg",
+      "modality": "EEG",
+      "role": "encoding_load_candidates",
+      "note": "Pick BIDS EEG with task labels; do not auto-download in CI"
+    },
+    {
+      "id": "search_memory_encoding",
+      "url": "https://openneuro.org/public/datasets?query=memory%20encoding%20eeg",
+      "modality": "EEG/iEEG",
+      "role": "SME_style_candidates",
+      "note": "Prefer subsequent-memory or study/test designs"
+    }
+  ],
+  "kaggle_local": {
+    "mental_state": "data/kaggle_datasets/eeg_mental_state/mental-state.csv",
+    "emotions": "data/kaggle_datasets/eeg_emotions/emotions.csv"
+  }
+}
