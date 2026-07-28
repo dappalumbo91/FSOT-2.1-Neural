@@ -76,6 +76,7 @@ class ConsoleApp(tk.Tk):
             ("Scalpel 1%", self._cmd_scalpel),
             ("Intel probe", self._cmd_intel),
             ("Machine encode ✓", self._cmd_machine_verify),
+            ("FSOT bridge", self._cmd_fsot_bridge),
             ("Zig parity", self._cmd_parity),
             ("QEMU body", self._cmd_qemu),
         ]
@@ -244,6 +245,9 @@ class ConsoleApp(tk.Tk):
             [sys.executable, str(ROOT / "run_machine_encode.py"), "--verify", "--inject-demo"]
         )
 
+    def _cmd_fsot_bridge(self) -> None:
+        self._run_async([sys.executable, str(ROOT / "run_fsot_bridge.py")])
+
     def _cmd_parity(self) -> None:
         self._run_async([sys.executable, str(ROOT / "scripts" / "parity_zig_neuron.py")])
 
@@ -348,27 +352,44 @@ class ConsoleApp(tk.Tk):
         lines = ["=== Live metrics (local) ===\n"]
         try:
             from fsot_nuron.machine_encode import path_recommendation, verify_machine_path
+            from fsot_nuron.fsot_bridge import verify_fsot_bridge
 
             rec = path_recommendation()
             ver = verify_machine_path("FSOT")
+            br = verify_fsot_bridge()
             lines.append("Encoding recommendation:\n")
             lines.append(json.dumps(rec, indent=2) + "\n\n")
-            lines.append("Machine path verify:\n")
+            lines.append("Machine ABI verify:\n")
             lines.append(
                 json.dumps(
                     {
                         "frame_roundtrip_ok": ver.get("frame_roundtrip_ok"),
+                        "utf8_roundtrip_ok": ver.get("utf8_roundtrip_ok"),
                         "chem_bridge_ok": ver.get("chem_bridge_ok"),
                         "n_trits": ver.get("n_trits"),
-                        "frame_byte_len": ver.get("frame_byte_len"),
-                        "abi": ver.get("abi"),
+                    },
+                    indent=2,
+                )
+                + "\n\n"
+            )
+            lines.append("FSOT bridge (through archive math):\n")
+            lines.append(
+                json.dumps(
+                    {
+                        "ok": br.get("ok"),
+                        "S_Biology": br.get("S_Biology"),
+                        "S_Neuroscience": br.get("S_Neuroscience"),
+                        "atlas_ok": br.get("atlas_ok"),
+                        "authority_sha256": (br.get("authority_sha256") or "")[:20] + "…",
+                        "formula": br.get("formula"),
+                        "free_parameters": br.get("free_parameters"),
                     },
                     indent=2,
                 )
                 + "\n\n"
             )
         except Exception as e:
-            lines.append(f"machine_encode error: {e}\n")
+            lines.append(f"machine/fsot bridge error: {e}\n")
 
         try:
             from fsot_nuron.archive_pin import pin_archive

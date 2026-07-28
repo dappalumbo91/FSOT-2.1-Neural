@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, asdict
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 from .chemical_codon import (
     DNA_TO_AA,
@@ -464,19 +464,59 @@ def encode_to_sensory_packet(
     *,
     path: EncodePath = EncodePath.MACHINE,
     target_region: str = "sens",
-    strength: float = 0.55,
+    strength: Optional[float] = None,
     n_features: int = 32,
+    use_fsot_bridge: bool = True,
 ) -> Any:
     """
     Translate payload → SensoryPacket ready for SensoryBus.push.
 
-    Machine path is default (OS-native). Morse is available but secondary.
+    When use_fsot_bridge=True (default), drive strength and features are
+    **coupled through FSOT** (pin → domain fold → ScalarInput → S/trinary),
+    not ad-hoc constants. Machine path is body default; Morse secondary.
+
+    See fsot_nuron.fsot_bridge and docs/FSOT_APPLICATION_NEURAL.md.
     """
     from .sensory.packets import SensoryModality, SensoryPacket
 
+    path = EncodePath(path) if not isinstance(path, EncodePath) else path
     result = translate(payload, path=path)
     trits = result.get("trits") or []
     features = trits_to_drive_features(trits, n_features=n_features)
+
+    bridge_meta: Dict[str, Any] = {}
+    strength_use = 0.55 if strength is None else float(strength)
+
+    if use_fsot_bridge and path is not EncodePath.MORSE:
+        try:
+            from .fsot_bridge import (
+                bridge_machine_payload,
+                bridge_chemical_dna,
+                couple_features_with_S,
+            )
+
+            if path is EncodePath.CHEMICAL and isinstance(payload, str):
+                br = bridge_chemical_dna(payload)
+            elif isinstance(payload, (bytes, bytearray)):
+                br = bridge_machine_payload(bytes(payload))
+            else:
+                br = bridge_machine_payload(str(payload))
+            mods = br["modulators"]
+            if strength is None:
+                strength_use = float(mods["sensory_strength"])
+            features = couple_features_with_S(features, mods)
+            bridge_meta = {
+                "fsot_bridge": br["bridge"],
+                "fold": br["fold"],
+                "S": mods["S"],
+                "trit": mods["trit"],
+                "feature_gain": mods["feature_gain"],
+                "snapshot_source": br["snapshot"].get("source"),
+                "doctrine": br.get("doctrine"),
+            }
+        except Exception as e:
+            bridge_meta = {"fsot_bridge_error": str(e)}
+
     modality = SensoryModality.TEXT
     if path is EncodePath.CHEMICAL:
         modality = SensoryModality.CUSTOM
@@ -486,12 +526,13 @@ def encode_to_sensory_packet(
         modality=modality,
         target_region=target_region,
         features=features,
-        strength=float(strength),
+        strength=float(strength_use),
         meta={
-            "encode_path": path.value if isinstance(path, EncodePath) else str(path),
+            "encode_path": path.value,
             "n_trits": result.get("n_trits"),
             "primary": result.get("primary", True),
             "note": result.get("note", ""),
+            **bridge_meta,
         },
     )
 

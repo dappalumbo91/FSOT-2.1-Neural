@@ -55,8 +55,9 @@ pip install -r requirements.txt
 $env:PYTHONPATH = "I:\fsot nuron"
 $env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
 
-# 0) Pin theory authority
+# 0) Pin theory authority (always — mathematics lives on I:\FSOT-Physical-Archive)
 python run_archive_pin.py
+python run_fsot_bridge.py   # pin → fold → bridge → couple (not random stitch)
 
 # 1) Genetic-codon network (mission)
 python run_genetic_bio.py --units 64 --steps 1200
@@ -142,8 +143,9 @@ fsot_nuron/
   allen_data.py         # ephys CSV / API
   bio_metrics.py        # ISI, adaptation, bands
   failure_boundaries.py # lesion catalog (engineering)
+  fsot_bridge.py        # PIN/fold/bridge/couple through archive S=K(T1+T2+T3)
   machine_encode.py     # PRIMARY body I/O: UTF-8/bytes → T1 machine words / ABI
-  sensory/              # packet bus; machine inject helpers
+  sensory/              # packet bus; machine inject (FSOT-coupled strength)
   # --- secondary / demos ---
   morse_itu.py          # optional human telegraphy readout
   language_loop.py      # Morse + codon demo loop (legacy path)

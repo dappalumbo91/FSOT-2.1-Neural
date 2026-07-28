@@ -4,6 +4,10 @@
 
 For a **computer-native neurological body**, the default translation path is **machine**, not Morse.
 
+**FSOT marriage (required):** packing alone is transport. Drive and strength go through  
+`fsot_nuron.fsot_bridge` — pin archive → Computer_Body / Biology fold → ScalarInput → \(S\)/trinary couple.  
+See [`FSOT_APPLICATION_NEURAL.md`](FSOT_APPLICATION_NEURAL.md).
+
 | Path | Role | Use when |
 |------|------|----------|
 | **`machine`** ★ | UTF-8 / raw bytes → **lossless** bit→trit (0→0, 1→+1) → T1 packs → `MachineWord` / `MachineFrame` | Sensory inject, IPC, Zig ABI, Linux/Windows buffers |

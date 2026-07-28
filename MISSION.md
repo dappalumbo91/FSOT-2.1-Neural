@@ -34,9 +34,13 @@ Those demos may remain under `run_climb.py` / `run_sota_fronts.py` for explorati
 | Layer | Source |
 |-------|--------|
 | Theory pin | `I:\FSOT-Physical-Archive` → `vendor/fsot_compute.py` **D1D38A…** |
-| Codon map | `data/64_codon_trinary_map.txt` (same as Genetics-Longevity / SR-ITE) |
+| Codon map | `I:\64_codon_trinary_map.txt` ≡ archive ≡ `data/64_codon_trinary_map.txt` |
 | Protein interaction form | Archive `04_Genetics-Longevity` fluid-to-solid / protein formulas |
 | Bio targets | Allen Cell Types ephys (when CSV present) |
+| Application recipe | pin → fold → bridge → couple — [`docs/FSOT_APPLICATION_NEURAL.md`](docs/FSOT_APPLICATION_NEURAL.md) |
+| Usage doctrine | `I:\FSOT-Physical-Archive\FSOT_USAGE_DOCTRINE.md` |
+
+**Do not stitch** encodings, neurons, and UI without the scalar. Every claim-sensitive path runs `run_archive_pin.py` / `run_fsot_bridge.py`.
 
 ## Primary commands
 

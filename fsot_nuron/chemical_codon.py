@@ -24,6 +24,7 @@ from .paths import ROOT, ARTIFACTS
 # Codon map candidates (your machines)
 CODON_MAP_CANDIDATES = [
     ROOT / "data" / "64_codon_trinary_map.txt",
+    Path(r"I:\64_codon_trinary_map.txt"),
     Path(r"I:\FSOT-Physical-Archive\01_SR-ITE-USB-Original\3_driver_zig\64_codon_trinary_map.txt"),
     Path(r"I:\FSOT-Physical-Archive\04_Genetics-Longevity\64_codon_trinary_map.txt"),
     Path(r"C:\Users\damia\Desktop\FSOT_Trinary_Codon_Project\64_codon_trinary_map.txt"),
