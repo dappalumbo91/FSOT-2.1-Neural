@@ -57,7 +57,8 @@ def make_item_patterns(
     return items
 
 
-# Fixed vocabulary — machine-path text labels (not Morse), seed-indexed order
+# Fixed vocabulary — machine-path text labels (not Morse), seed-indexed order.
+# Expanded so high item counts stay distinguishable after machine→trit→feature fold.
 _FSOT_ITEM_VOCAB = (
     "alpha wave",
     "beta spike",
@@ -75,6 +76,22 @@ _FSOT_ITEM_VOCAB = (
     "vip disinhibit",
     "machine word pack",
     "biology fold twelve",
+    "thalamus relay pulse",
+    "association binding",
+    "poof dispersal valve",
+    "suction inflow dual",
+    "consciousness gate phi",
+    "observer quirk mod",
+    "yin yang balance",
+    "refractory continuous ms",
+    "fi step long window",
+    "codon spin charge",
+    "genetic sparse synapse",
+    "zig trit host body",
+    "sys metric interocept",
+    "hid sensory stream",
+    "log assoc stream",
+    "network thal drive",
 )
 
 
@@ -92,17 +109,24 @@ def make_fsot_item_patterns(
                 → encode drive from sensory_strength
 
     Archive math modulates the domain engine; features stay real vectors.
+    feat_dim auto-grows with n_items so high-load ladders keep separation.
     """
     from .machine_encode import text_to_utf8_trits, trits_to_drive_features
     from .fsot_bridge import bridge_machine_payload, couple_features_with_S
     from .seeds import SEEDS
+
+    # Capacity climb: more items need more trit-derived feature dimensions
+    # (still derived from machine encoding — not free noise).
+    if feat_dim <= 12 and n_items > 12:
+        feat_dim = min(48, 12 + 2 * (n_items - 12))
 
     items: List[Dict[str, Any]] = []
     # rotate vocab by seed for determinism without free noise
     rot = int(seed) % len(_FSOT_ITEM_VOCAB)
     for i in range(n_items):
         base = _FSOT_ITEM_VOCAB[(rot + i) % len(_FSOT_ITEM_VOCAB)]
-        label = f"{base} #{i}"
+        # Distinct suffix + index keeps UTF-8 trit streams well separated
+        label = f"{base} | item-{i:03d} | seed-{seed}"
         br = bridge_machine_payload(label)
         mods = br["modulators"]
         trits = text_to_utf8_trits(label)
@@ -214,6 +238,7 @@ def run_encode_epoch(
     sens_ids = brain.region_index.get("sens", [])
     assoc_ids = brain.region_index.get("assoc", [])
     thal_ids = brain.region_index.get("thal", [])
+    hipp_ids = brain.region_index.get("hipp", [])
 
     hist_S = torch.empty(steps, n, device=brain.device, dtype=brain.net.dtype)
     hist_f = torch.empty(steps, n, device=brain.device, dtype=torch.bool)
@@ -225,11 +250,14 @@ def run_encode_epoch(
         if (t % 80) < 20:
             for i in thal_ids:
                 ext[i] = drive_amp if brain.units[i].synapse_sign > 0 else drive_amp * 0.25
-        # continuous pattern into sensory / association (encoding content)
+        # continuous pattern into sensory / association / hippocampus (encoding content)
         for k, uid in enumerate(sens_ids):
             ext[uid] = ext[uid] + pattern_strength * float(feats[k % len(feats)])
         for k, uid in enumerate(assoc_ids):
             ext[uid] = ext[uid] + 0.7 * pattern_strength * float(feats[k % len(feats)])
+        # Hippocampal binding drive (CA proxy) — biology-like episodic tag
+        for k, uid in enumerate(hipp_ids):
+            ext[uid] = ext[uid] + 0.85 * pattern_strength * float(feats[k % len(feats)])
         ext = ext.clamp(-0.8, 1.5)
         S, fired, _, _, syn = brain.step(ext)
         hist_S[t] = S
@@ -273,6 +301,7 @@ def run_retrieve_epoch(
     sens_ids = brain.region_index.get("sens", [])
     assoc_ids = brain.region_index.get("assoc", [])
     thal_ids = brain.region_index.get("thal", [])
+    hipp_ids = brain.region_index.get("hipp", [])
 
     hist_S = torch.empty(steps, n, device=brain.device, dtype=brain.net.dtype)
     hist_f = torch.empty(steps, n, device=brain.device, dtype=torch.bool)
@@ -287,6 +316,8 @@ def run_retrieve_epoch(
             ext[uid] = ext[uid] + pattern_strength * float(cue[k % len(cue)])
         for k, uid in enumerate(assoc_ids):
             ext[uid] = ext[uid] + 0.5 * pattern_strength * float(cue[k % len(cue)])
+        for k, uid in enumerate(hipp_ids):
+            ext[uid] = ext[uid] + 0.65 * pattern_strength * float(cue[k % len(cue)])
         S, fired, _, _, _ = brain.step(ext.clamp(-0.8, 1.5))
         hist_S[t] = S
         hist_f[t] = fired

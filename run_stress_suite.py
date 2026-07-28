@@ -13,6 +13,7 @@ Stages:
   E  Intelligence probe ladder (items / delay)
   F  Zig body host
   G  Console display review
+  H  Embodiment v0.7 (host senses, self-mod, multi-region live, vault)
 
 Usage:
   python run_stress_suite.py
@@ -304,67 +305,148 @@ class StressSuite:
                 },
             )
 
-            for tol in ([0.02] if self.quick else [0.01, 0.02]):
-                genotypes = build_typed_population(64, seed=42, diversity=True)
-                labels = [getattr(g, "cell_type", "Pyr") for g in genotypes]
-                phenotypes = [dict(g.phenotype) for g in genotypes]
-                net = FSOTNeuronBatch(NeuronConfig(n_units=64), device="cpu")
-                d_eff = torch.tensor([p["d_eff"] for p in phenotypes], dtype=net.dtype)
-                thr = torch.tensor([p["fire_threshold"] for p in phenotypes], dtype=net.dtype)
-                vrest = torch.tensor(
-                    [p.get("vrest_mV", -70.0) for p in phenotypes], dtype=net.dtype
+            focus_need = [c for c in ("Pyr", "PV", "SST", "VIP") if c in targets]
+            # --- 2% floor (critical): short scalpel path ---
+            genotypes = build_typed_population(64, seed=42, diversity=True)
+            labels = [getattr(g, "cell_type", "Pyr") for g in genotypes]
+            phenotypes = [dict(g.phenotype) for g in genotypes]
+            net = FSOTNeuronBatch(NeuronConfig(n_units=64, dt_ms=1.0), device="cpu")
+            d_eff = torch.tensor([p["d_eff"] for p in phenotypes], dtype=net.dtype)
+            thr = torch.tensor([p["fire_threshold"] for p in phenotypes], dtype=net.dtype)
+            vrest = torch.tensor(
+                [p.get("vrest_mV", -70.0) for p in phenotypes], dtype=net.dtype
+            )
+            net.apply_bio_params(
+                d_eff=d_eff, fire_threshold=thr, vrest_mV=vrest, mode_name="stress"
+            )
+            focus = [c for c in focus_need if c in labels]
+            t1 = time.perf_counter()
+            report2 = scalpel_calibrate(
+                net,
+                labels,
+                phenotypes,
+                targets,
+                focus_order=focus,
+                tol=0.02,
+                max_iters=18 if self.quick else 28,
+                steps=900 if self.quick else 1400,
+                require_classes=focus,
+            )
+            dt2 = time.perf_counter() - t1
+            class_rows2 = {
+                lab: {
+                    "target_Hz": st.target_Hz,
+                    "measured_Hz": st.measured_Hz,
+                    "rel_err": st.rel_err,
+                    "within_tol": st.rel_err <= 0.02,
+                }
+                for lab, st in report2.classes.items()
+            }
+            within2 = sum(1 for v in class_rows2.values() if v["within_tol"])
+            self.record(
+                "D",
+                "scalpel_tol_2%",
+                bool(report2.ok),
+                critical=True,
+                metrics={
+                    "scalpel_ok": report2.ok,
+                    "classes_within": f"{within2}/{len(class_rows2)}",
+                    "wall_s": round(dt2, 2),
+                    **{f"{k}_err": v["rel_err"] for k, v in class_rows2.items()},
+                },
+                note="2% Allen wet-lab floor",
+            )
+            out = {
+                "generated_at": _now(),
+                "tol": 0.02,
+                "report": report2.to_dict(),
+                "gates": {"scalpel_ok": report2.ok},
+                "stress": True,
+            }
+            (ROOT / "artifacts").mkdir(parents=True, exist_ok=True)
+            (ROOT / "artifacts" / "scalpel_rates.json").write_text(
+                json.dumps(out, indent=2), encoding="utf-8"
+            )
+
+            # --- 1% climb (soft→climb): continuous-ms + long FI (T≳4s for integer spikes) ---
+            if not self.quick:
+                from fsot_nuron.precision_climb import precision_micro_climb
+
+                dt_ms = 0.5
+                sim_ms = 4200.0
+                steps1 = int(round(sim_ms / dt_ms))
+                genotypes1 = build_typed_population(64, seed=42, diversity=True)
+                labels1 = [getattr(g, "cell_type", "Pyr") for g in genotypes1]
+                phenotypes1 = [dict(g.phenotype) for g in genotypes1]
+                net1 = FSOTNeuronBatch(
+                    NeuronConfig(n_units=64, dt_ms=dt_ms), device="cpu"
                 )
-                net.apply_bio_params(
-                    d_eff=d_eff, fire_threshold=thr, vrest_mV=vrest, mode_name="stress"
+                d1 = torch.tensor([p["d_eff"] for p in phenotypes1], dtype=net1.dtype)
+                thr1 = torch.tensor(
+                    [p["fire_threshold"] for p in phenotypes1], dtype=net1.dtype
                 )
-                focus = [c for c in ("Pyr", "PV", "SST", "VIP") if c in labels and c in targets]
+                vr1 = torch.tensor(
+                    [p.get("vrest_mV", -70.0) for p in phenotypes1], dtype=net1.dtype
+                )
+                net1.apply_bio_params(
+                    d_eff=d1, fire_threshold=thr1, vrest_mV=vr1, mode_name="stress_1pct"
+                )
+                focus1 = [c for c in focus_need if c in labels1]
                 t1 = time.perf_counter()
-                report = scalpel_calibrate(
-                    net,
-                    labels,
-                    phenotypes,
+                report1 = precision_micro_climb(
+                    net1,
+                    labels1,
+                    phenotypes1,
                     targets,
-                    focus_order=focus,
-                    tol=tol,
-                    max_iters=18 if self.quick else 28,
-                    steps=900 if self.quick else 1400,
-                    require_classes=focus,
+                    tol=0.01,
+                    max_rounds=48,
+                    steps=steps1,
+                    seed_order=focus1,
                 )
-                dt = time.perf_counter() - t1
-                class_rows = {}
-                for lab, st in report.classes.items():
-                    class_rows[lab] = {
+                dt1 = time.perf_counter() - t1
+                class_rows1 = {
+                    lab: {
                         "target_Hz": st.target_Hz,
                         "measured_Hz": st.measured_Hz,
                         "rel_err": st.rel_err,
-                        "within_tol": st.rel_err == st.rel_err and st.rel_err <= tol,
+                        "within_tol": st.rel_err <= 0.01,
                     }
-                within = sum(1 for v in class_rows.values() if v["within_tol"])
+                    for lab, st in report1.classes.items()
+                }
+                within1 = sum(1 for v in class_rows1.values() if v["within_tol"])
                 self.record(
                     "D",
-                    f"scalpel_tol_{tol:.0%}",
-                    bool(report.ok),
-                    critical=(tol >= 0.02),  # 2% is hard floor; 1% may soft-break
+                    "scalpel_tol_1%",
+                    bool(report1.ok),
+                    critical=False,  # soft if fails; climb path is the accuracy frontier
                     metrics={
-                        "scalpel_ok": report.ok,
-                        "classes_within": f"{within}/{len(class_rows)}",
-                        "wall_s": round(dt, 2),
-                        **{f"{k}_err": v["rel_err"] for k, v in class_rows.items()},
+                        "scalpel_ok": report1.ok,
+                        "classes_within": f"{within1}/{len(class_rows1)}",
+                        "wall_s": round(dt1, 2),
+                        "dt_ms": dt_ms,
+                        "sim_ms": sim_ms,
+                        "method": "precision_micro_climb continuous-ms",
+                        **{f"{k}_err": v["rel_err"] for k, v in class_rows1.items()},
                     },
-                    note="1% is stretch; 2% wet-lab floor if 1% fails",
+                    note="1% needs T≳4s FI + continuous refractory (integer spike bound)",
                 )
-                # Persist last for UI
-                out = {
+                out1 = {
                     "generated_at": _now(),
-                    "tol": tol,
-                    "report": report.to_dict(),
-                    "gates": {"scalpel_ok": report.ok},
+                    "tol": 0.01,
+                    "report": report1.to_dict(),
+                    "gates": {"scalpel_ok": report1.ok, "precision_1pct": report1.ok},
                     "stress": True,
+                    "method": "precision_micro_climb",
+                    "dt_ms": dt_ms,
+                    "sim_ms": sim_ms,
                 }
-                (ROOT / "artifacts").mkdir(parents=True, exist_ok=True)
-                (ROOT / "artifacts" / "scalpel_rates.json").write_text(
-                    json.dumps(out, indent=2), encoding="utf-8"
+                (ROOT / "artifacts" / "precision_climb.json").write_text(
+                    json.dumps(out1, indent=2), encoding="utf-8"
                 )
+                if report1.ok:
+                    (ROOT / "artifacts" / "scalpel_rates.json").write_text(
+                        json.dumps(out1, indent=2), encoding="utf-8"
+                    )
         except Exception as e:
             self.record("D", "scalpel_block", False, critical=True, error=traceback.format_exc())
 
@@ -555,6 +637,244 @@ class StressSuite:
         except Exception as e:
             self.record("G", "console_displays", False, critical=True, error=str(e))
 
+    def stage_H_embodiment(self) -> None:
+        """v0.7 body: adaptive hardware, senses, self-mod, multi-region visual path."""
+        print("\n=== H · Embodiment (senses · self-mod · multi-region · vault) ===")
+        try:
+            from fsot_nuron.hardware_body import (
+                discover_hardware,
+                sample_metrics,
+                boot_body_report,
+                metrics_to_thalamic_packet,
+            )
+            from fsot_nuron.sensory.host_senses import (
+                sample_host_senses,
+                note_hid_key,
+                note_hid_click,
+                note_log_line,
+                sample_net_util,
+            )
+            from fsot_nuron.self_modulation import modulate_from_metrics
+            from fsot_nuron.sensory.bus import SensoryBus
+            from fsot_nuron.brain_architecture import FSOTBrainDesign, BrainDesignConfig, BRAIN_PROFILES, DEFAULT_PROJECTIONS
+            from fsot_nuron.obsidian_brain import ensure_live_vault, append_live_tick
+            import torch
+
+            # H1 adaptive hardware (not locked to one PC)
+            hw = discover_hardware()
+            body = boot_body_report()
+            self.record(
+                "H",
+                "hardware_discover",
+                bool(hw.cpu_count_logical >= 1 and hw.recommended_n_units >= 16),
+                critical=True,
+                metrics={
+                    "system": hw.system,
+                    "cpu_logical": hw.cpu_count_logical,
+                    "device": hw.recommended_device,
+                    "n_units": hw.recommended_n_units,
+                    "dt_ms": hw.recommended_dt_ms,
+                    "cuda": hw.cuda_available,
+                    "sensors": hw.sensors_available[:12],
+                },
+                note="portable boot probe",
+            )
+
+            # H2 metrics + thalamic packet
+            m = sample_metrics(hw)
+            pkt = metrics_to_thalamic_packet(m)
+            self.record(
+                "H",
+                "interoception_packet",
+                pkt.target_region == "thal" and 0.0 <= m.as_drive_scalar() <= 1.0,
+                critical=True,
+                metrics={
+                    "drive": round(m.as_drive_scalar(), 4),
+                    "cpu": round(m.cpu_util, 4),
+                    "mem": round(m.mem_util, 4),
+                    "net": round(m.net_util, 4),
+                    "strength": round(pkt.strength, 4),
+                },
+            )
+
+            # H3 extended senses
+            note_hid_key(6)
+            note_hid_click(2)
+            note_log_line("stress suite: scalpel PASS soft note")
+            note_log_line("stress suite: ERROR injection for log feature density")
+            sample_net_util()
+            time.sleep(0.05)
+            sample_net_util()
+            snap = sample_host_senses(metric=m, include_audio=False)
+            mods = {p.modality.value for p in snap.packets}
+            self.record(
+                "H",
+                "host_senses_sample",
+                "sys_metric" in mods and len(snap.packets) >= 2,
+                critical=True,
+                metrics={
+                    "sensors_live": snap.sensors_live,
+                    "modalities": sorted(mods),
+                    "n_packets": len(snap.packets),
+                    "hid": snap.hid,
+                    "log": snap.log,
+                },
+            )
+
+            # H4 self-modulation POOF / SUCTION (seed-derived)
+            m_hi = type(m)(
+                cpu_util=0.92, mem_util=0.88, disk_util=0.4, net_util=0.3, temp_norm=0.5
+            )
+            m_lo = type(m)(
+                cpu_util=0.04, mem_util=0.08, disk_util=0.05, net_util=0.0, temp_norm=0.0
+            )
+            mod_hi = modulate_from_metrics(m_hi, hw, fire_frac=0.4)
+            mod_lo = modulate_from_metrics(m_lo, hw, fire_frac=0.02)
+            mod_mid = modulate_from_metrics(m, hw, fire_frac=0.1)
+            poof_ok = mod_hi.mode == "dampen" and mod_hi.stim_scale < 1.0
+            suction_ok = mod_lo.mode == "explore" and mod_lo.stim_scale >= 1.0
+            self.record(
+                "H",
+                "self_mod_poof_suction",
+                poof_ok and suction_ok,
+                critical=True,
+                metrics={
+                    "hi_mode": mod_hi.mode,
+                    "hi_stim": round(mod_hi.stim_scale, 4),
+                    "lo_mode": mod_lo.mode,
+                    "lo_stim": round(mod_lo.stim_scale, 4),
+                    "mid_mode": mod_mid.mode,
+                    "mid_stim": round(mod_mid.stim_scale, 4),
+                },
+                note="POOF dampens under load; SUCTION explores when spare",
+            )
+
+            # H5 multi-region brain + sensory bus inject
+            prof = BRAIN_PROFILES["ai_efficient"]
+            brain = FSOTBrainDesign(
+                BrainDesignConfig(
+                    regions=list(prof["regions"]),
+                    projections=list(DEFAULT_PROJECTIONS),
+                    seed=7,
+                    device="cpu",
+                    dt_ms=0.5,
+                )
+            )
+            bus = SensoryBus()
+            for p in snap.packets:
+                bus.push(p)
+            n = brain.n_units
+            ext = bus.build_external(n, brain.region_index, device=brain.device, dtype=brain.net.dtype)
+            fires = 0
+            for t in range(80):
+                e = torch.full((n,), 0.45 * mod_mid.stim_scale, device=brain.device, dtype=brain.net.dtype)
+                if (t % 40) < 12:
+                    for i in brain.region_index.get("thal", []):
+                        e[i] = 0.75 * mod_mid.stim_scale
+                e = (e + ext * 0.25).clamp(-0.8, 1.5)
+                S, fired, *_ = brain.step(e)
+                fires += int(fired.sum().item())
+                if t == 0:
+                    # only first step had bus drain; re-push lightly for continuity
+                    for p in snap.packets[:2]:
+                        bus.push(p)
+                    ext = bus.build_external(
+                        n, brain.region_index, device=brain.device, dtype=brain.net.dtype
+                    )
+            rates = {}
+            for rid, ids in brain.region_index.items():
+                # approximate from last fired window — use structure only
+                rates[rid] = len(ids)
+            self.record(
+                "H",
+                "multi_region_live_drive",
+                brain.n_units >= 24 and fires >= 1 and set(brain.region_index) >= {"thal", "sens", "assoc", "hipp"},
+                critical=True,
+                metrics={
+                    "n_units": brain.n_units,
+                    "total_spikes_80": fires,
+                    "regions": list(brain.region_index.keys()),
+                    "region_sizes": {k: len(v) for k, v in brain.region_index.items()},
+                    "mean_S": round(float(S.mean().item()), 4),
+                },
+                note="bio-like loop thal→sens→assoc↔hipp under host drive",
+            )
+
+            # H6 live vault append
+            vault = ensure_live_vault()
+            live_path = append_live_tick(
+                step=80,
+                fire_frac=fires / max(1, 80 * n),
+                mean_S=float(S.mean().item()),
+                load=m.as_drive_scalar(),
+                mode=mod_mid.mode,
+                stim_scale=mod_mid.stim_scale,
+                rates_by_region={k: float(len(v)) for k, v in brain.region_index.items()},
+            )
+            self.record(
+                "H",
+                "live_obsidian_vault",
+                live_path.is_file() and (vault / ".fsot_vault_marker").is_file(),
+                critical=False,
+                metrics={"vault": str(vault), "live_md": str(live_path)},
+                note="soft — offline second-brain stream",
+            )
+
+            # H7 bio comparison snapshot: E/I mass + rate order intent
+            struct = brain.structure_report()
+            ei = float(struct.get("ei_mass_ratio") or 0)
+            # Cortex-like: excitatory mass should dominate recurrent weights somewhat
+            self.record(
+                "H",
+                "bio_ei_mass_ratio",
+                ei > 0.5,
+                critical=False,
+                metrics={
+                    "ei_mass_ratio": round(ei, 4),
+                    "exc_mass": round(float(struct.get("excitatory_synaptic_mass") or 0), 4),
+                    "inh_mass": round(float(struct.get("inhibitory_synaptic_mass") or 0), 4),
+                },
+                note="soft bio motif: E mass > half I (not medical claim)",
+            )
+
+            # H8 scale multi-region under recommended n (soft if slow)
+            if not self.quick:
+                try:
+                    from product.console.visual_brain import build_region_brain_visual
+
+                    t1 = time.perf_counter()
+                    b2 = build_region_brain_visual(
+                        profile="wetware_ref" if hw.recommended_n_units >= 64 else "ai_efficient",
+                        device="cpu",
+                        dt_ms=0.5,
+                    )
+                    for _ in range(40):
+                        b2.step(0.55)
+                    dt = time.perf_counter() - t1
+                    self.record(
+                        "H",
+                        "visual_brain_factory",
+                        b2.n_units >= 24 and dt < 30.0,
+                        critical=False,
+                        metrics={"n": b2.n_units, "wall_s": round(dt, 2)},
+                    )
+                except Exception as e:
+                    self.record(
+                        "H",
+                        "visual_brain_factory",
+                        False,
+                        critical=False,
+                        error=str(e),
+                    )
+        except Exception as e:
+            self.record(
+                "H",
+                "embodiment_block",
+                False,
+                critical=True,
+                error=traceback.format_exc(),
+            )
+
     def write_report(self) -> Path:
         art = ROOT / "artifacts"
         art.mkdir(parents=True, exist_ok=True)
@@ -588,6 +908,7 @@ class StressSuite:
             "- Allen wet-lab class rates (scalpel)",
             "- Intelligence via **FSOT machine** items (not Morse)",
             "- Biology accuracy before performance",
+            "- Computer body adaptive (senses · POOF/SUCTION · multi-region)",
             "",
             "## Critical breaks (must fix before next climb)",
             "",
@@ -626,9 +947,10 @@ class StressSuite:
             "",
             "## Where to go next",
             "",
-            "1. Fix any **critical** breaks first (pin, codon, scalpel 2%, zig host).",
+            "1. Fix any **critical** breaks first (pin, codon, scalpel 2%, zig host, embodiment).",
             "2. Soft breaks at 1% scalpel or high item counts define the accuracy frontier.",
-            "3. After green critical path: Zig machine-frame inject + live brain meters in UI.",
+            "3. Compare soft intel/scalpel breaks to biology: SME, E/I, Allen class order.",
+            "4. Climb: longer FI for 1%, consolidate ladder, vision sense, Zig metric inject.",
             "",
             f"JSON: `artifacts/stress_suite_report.json`",
             "",
@@ -661,6 +983,7 @@ def main() -> int:
     s.stage_E_intelligence()
     s.stage_F_zig()
     s.stage_G_console()
+    s.stage_H_embodiment()
     s.write_report()
 
     crit = [b for b in s.breaks if b.get("critical")]

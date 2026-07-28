@@ -247,15 +247,6 @@ class Battery:
                 expected="|err| ≤ 2%",
                 source="Allen Cre FI rate",
             )
-            self.check(
-                "T2",
-                f"rate_{lab}_within_1pct",
-                st.rel_err == st.rel_err and st.rel_err <= 0.01,
-                measured=st.rel_err,
-                expected="|err| ≤ 1% (stretch)",
-                source="Allen Cre FI rate",
-                critical=False,
-            )
         self.check(
             "T2",
             "scalpel_all_focus_2pct",
@@ -264,17 +255,97 @@ class Battery:
             expected=True,
             source="scalpel_calibrate tol=0.02",
         )
-        # persist for UI
+
+        # 1% climb: continuous-ms + long FI (integer-spike bound requires T≳4s for Pyr ~16 Hz)
+        from fsot_nuron.precision_climb import precision_micro_climb
+
+        dt_ms, sim_ms = 0.5, 4200.0
+        steps1 = int(round(sim_ms / dt_ms))
+        g1 = build_typed_population(64, seed=42, diversity=True)
+        labels1 = [getattr(g, "cell_type", "Pyr") for g in g1]
+        ph1 = [dict(g.phenotype) for g in g1]
+        net1 = FSOTNeuronBatch(NeuronConfig(n_units=64, dt_ms=dt_ms), device="cpu")
+        net1.apply_bio_params(
+            d_eff=torch.tensor([p["d_eff"] for p in ph1], dtype=net1.dtype),
+            fire_threshold=torch.tensor([p["fire_threshold"] for p in ph1], dtype=net1.dtype),
+            vrest_mV=torch.tensor(
+                [p.get("vrest_mV", -70.0) for p in ph1], dtype=net1.dtype
+            ),
+            mode_name="wetlab_1pct",
+        )
+        report1 = precision_micro_climb(
+            net1,
+            labels1,
+            ph1,
+            targets,
+            tol=0.01,
+            max_rounds=48,
+            steps=steps1,
+            seed_order=list(focus),
+        )
+        for lab in focus:
+            st = report1.classes.get(lab)
+            if st is None:
+                continue
+            self.check(
+                "T2",
+                f"rate_{lab}_within_1pct",
+                st.rel_err == st.rel_err and st.rel_err <= 0.01,
+                measured={
+                    "target_Hz": st.target_Hz,
+                    "measured_Hz": st.measured_Hz,
+                    "rel_err": st.rel_err,
+                    "method": "precision_micro_climb",
+                    "sim_ms": sim_ms,
+                    "dt_ms": dt_ms,
+                },
+                expected="|err| ≤ 1% (continuous-ms climb)",
+                source="Allen Cre FI rate + precision_climb",
+                critical=False,
+            )
+        self.check(
+            "T2",
+            "precision_all_focus_1pct",
+            bool(report1.ok),
+            measured=report1.ok,
+            expected=True,
+            source="precision_micro_climb tol=0.01 dt=0.5 sim_ms=4200",
+            critical=False,
+        )
+
+        # persist for UI (prefer 1% report if green)
         out = {
             "generated_at": datetime.now(timezone.utc).isoformat(),
-            "tol": 0.02,
-            "report": report.to_dict(),
-            "gates": {"scalpel_ok": report.ok},
+            "tol": 0.01 if report1.ok else 0.02,
+            "report": (report1 if report1.ok else report).to_dict(),
+            "report_2pct": report.to_dict(),
+            "report_1pct": report1.to_dict(),
+            "gates": {
+                "scalpel_ok": report.ok,
+                "precision_1pct": report1.ok,
+            },
             "battery": True,
+            "dt_ms": dt_ms,
+            "sim_ms": sim_ms,
         }
         (ROOT / "artifacts").mkdir(parents=True, exist_ok=True)
         (ROOT / "artifacts" / "scalpel_rates.json").write_text(
             json.dumps(out, indent=2), encoding="utf-8"
+        )
+        (ROOT / "artifacts" / "precision_climb.json").write_text(
+            json.dumps(
+                {
+                    "generated_at": out["generated_at"],
+                    "tol": 0.01,
+                    "report": report1.to_dict(),
+                    "gates": {"precision_1pct": report1.ok},
+                    "method": "precision_micro_climb",
+                    "dt_ms": dt_ms,
+                    "sim_ms": sim_ms,
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
         )
 
     def t3_learning(self) -> None:

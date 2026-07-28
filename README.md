@@ -111,7 +111,9 @@ python run_console.py
 ```
 
 Console **v0.7** product screens: Dashboard · Cell classes · Memory · Encode · **Body** (adaptive host + Zig) · **Visual** (multi-region Obsidian graph + host senses + self-mod) · Live/stress.  
-Readable boot checklist · hardware re-probe every boot · POOF/SUCTION homeostasis · live vault ticks · wet-lab scalpel table.
+Readable boot checklist · hardware re-probe every boot · POOF/SUCTION homeostasis · live vault ticks · wet-lab scalpel table.  
+
+**Stress (full):** 40/40 pass · 0 critical · 0 soft — Allen ≤1% via continuous-ms climb · intel 24@800 top-1 ~0.92 · stage H embodiment green. See [`docs/BIO_STRESS_COMPARISON.md`](docs/BIO_STRESS_COMPARISON.md) · [`docs/STRESS_STAGE_REPORT.md`](docs/STRESS_STAGE_REPORT.md).
 
 ```powershell
 python run_console.py

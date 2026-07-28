@@ -1,90 +1,75 @@
 # Stress suite report — stage break map
 
-**Full run** (2026-07-28): 90s · **30/32** pass · **0 critical** · **2 soft** (one fixed post-run)  
-**Quick re-check** after ABI fix: **25/25** pass · 0 breaks  
+Generated: `2026-07-28T18:07:11.220526+00:00`  
+Duration: **86.32s**  ·  tests **40/40** pass  
+Mode: `full`
 
 ## Doctrine
 
-- Archive pin **D1D38A** + 64-codon map  
-- Allen wet-lab class rates (scalpel)  
-- Intelligence via **FSOT machine** items (not Morse)  
-- Biology accuracy before performance  
+- Archive pin **D1D38A** + codon map
+- Allen wet-lab class rates (scalpel)
+- Intelligence via **FSOT machine** items (not Morse)
+- Biology accuracy before performance
+- Computer body adaptive (senses · POOF/SUCTION · multi-region)
 
-## Critical path — GREEN
+## Critical breaks (must fix before next climb)
 
-| Stage | Result |
-|-------|--------|
-| A Foundation (pin, seeds, codon 64/64, atlas S) | PASS |
-| B Machine ABI (through 4KB + inject + bridge) | PASS (16KB overflow **fixed** → u32 `n_trits`) |
-| C Genetic scale n=32…256 + multi-region brain | PASS |
-| D Allen targets loaded; scalpel **2%** all four classes | PASS |
-| E Intel ladder FSOT items 4→24 | PASS (above chance; ≥0.5 through 16 items) |
-| F Zig host `FSOT_TRIT PASS` | PASS |
-| G Console display review 15/15 | PASS |
+_None — critical path held._
 
-## Soft breaks (accuracy frontier — not show-stoppers)
+## Soft breaks (known stretch / scale)
 
-### 1. Scalpel **1%** (stretch)
+_None._
 
-| Class | Target Hz | Rel err @ 1% run |
-|-------|-----------|------------------|
-| Pyr | ~16.35 | **~1.21%** (just over 1%) |
-| PV | ~83.35 | ~0.59% |
-| SST | ~29.54 | ~0.001% |
-| VIP | ~34.82 | ~0.57% |
+## Full results
 
-- **1% gate:** 3/4 classes (Pyr slips ~0.2% over)  
-- **2% gate:** **4/4 PASS** — wet-lab floor holds  
+| Stage | Name | OK | Critical | t(s) |
+|-------|------|:--:|:--------:|-----:|
+| A | seeds_vs_archive | Y | Y | 1.3 |
+| A | archive_pin | Y | Y | 1.3 |
+| A | codon_64_map | Y | Y | 1.3 |
+| A | atlas_domain_S | Y | Y | 1.33 |
+| A | fsot_bridge | Y | Y | 1.33 |
+| B | machine_verify | Y | Y | 1.33 |
+| B | payload_1B | Y | Y | 1.33 |
+| B | payload_16B | Y | Y | 1.33 |
+| B | payload_256B | Y | Y | 1.33 |
+| B | payload_4096B | Y | Y | 1.36 |
+| B | payload_16384B | Y |  | 1.52 |
+| B | morse_secondary | Y |  | 1.52 |
+| B | inject_200_packets | Y |  | 1.66 |
+| B | bridge_large_text | Y |  | 1.66 |
+| C | genetic_net_n32 | Y | Y | 1.7 |
+| C | genetic_net_n64 | Y | Y | 1.76 |
+| C | genetic_net_n128 | Y | Y | 1.9 |
+| C | genetic_net_n256 | Y |  | 2.27 |
+| C | multi_region_brain | Y | Y | 2.38 |
+| D | allen_targets_loaded | Y | Y | 2.42 |
+| D | scalpel_tol_2% | Y | Y | 7.44 |
+| D | scalpel_tol_1% | Y |  | 48.6 |
+| E | scalpel_brain_build | Y |  | 57.52 |
+| E | intel_items4_delay0 | Y |  | 58.32 |
+| E | intel_items6_delay200 | Y |  | 60.53 |
+| E | intel_items12_delay400 | Y |  | 66.02 |
+| E | intel_items16_delay600 | Y |  | 73.82 |
+| E | intel_items24_delay800 | Y |  | 84.04 |
+| E | ladder_summary | Y |  | 84.04 |
+| F | zig_host_present | Y |  | 84.04 |
+| F | zig_host_run | Y | Y | 84.11 |
+| G | console_displays | Y | Y | 85.9 |
+| H | hardware_discover | Y | Y | 86.11 |
+| H | interoception_packet | Y | Y | 86.16 |
+| H | host_senses_sample | Y | Y | 86.23 |
+| H | self_mod_poof_suction | Y | Y | 86.23 |
+| H | multi_region_live_drive | Y | Y | 86.27 |
+| H | live_obsidian_vault | Y |  | 86.27 |
+| H | bio_ei_mass_ratio | Y |  | 86.27 |
+| H | visual_brain_factory | Y |  | 86.32 |
 
-**Break interpretation:** Stage is **Allen-accurate at 2%**; 1% is a stretch target for Pyr only.
+## Where to go next
 
-### 2. Machine frame `n_trits` u16 overflow (FIXED)
-
-- Payload ≥ ~8KB UTF-8 → trit count > 65535  
-- Header used **u16** → soft fail on 16KB round-trip  
-- **Fix landed:** `MachineFrame` header uses **u32** `n_trits`  
-
-### 3. Intelligence scale frontier (not a fail)
-
-| Items | Delay | Top-1 | Chance | Note |
-|------:|------:|------:|-------:|------|
-| 4 | 0 | **1.00** | 0.25 | solid |
-| 6 | 200 | **1.00** | 0.17 | solid |
-| 12 | 400 | **0.58** | 0.08 | ≥0.5 hold |
-| 16 | 600 | **0.56** | 0.06 | ≥0.5 hold |
-| 24 | 800 | **0.42** | 0.04 | above chance; below 0.5 |
-
-**Break interpretation:** Memory still beats chance at 24 items; **≥50% top-1 holds through 16** under delay. Harder ladder is the next climb, not a wet-lab failure.
-
-## Allen wet-lab targets used
-
-| Class | n cells | mean rate Hz |
-|-------|--------:|-------------:|
-| Pyr | 723 | 16.35 |
-| PV | 222 | 83.35 |
-| SST | 155 | 29.54 |
-| VIP | 149 | 34.82 |
-
-## How to re-run
-
-```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
-python run_stress_suite.py
-python run_stress_suite.py --quick
-python run_console.py   # Live/stress tab shows last report
-```
+1. Fix any **critical** breaks first (pin, codon, scalpel 2%, zig host, embodiment).
+2. Soft breaks at 1% scalpel or high item counts define the accuracy frontier.
+3. Compare soft intel/scalpel breaks to biology: SME, E/I, Allen class order.
+4. Climb: longer FI for 1%, consolidate ladder, vision sense, Zig metric inject.
 
 JSON: `artifacts/stress_suite_report.json`
-
-## Where to go next (after green critical path)
-
-1. Tighten Pyr toward **1%** without free-parameter drift  
-2. Intel ladder: more items + consolidation still ≥0.5  
-3. Zig body: machine-frame inject into host + serial telemetry in UI  
-4. Optional Dear PyGui polish — brain ABI unchanged  
-
----
-
-*Stress is for finding breaks. Critical path green means the stage is honest and wet-lab–anchored.*

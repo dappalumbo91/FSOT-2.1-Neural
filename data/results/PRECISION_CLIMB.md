@@ -1,6 +1,6 @@
 # Precision climb (FSOT-native)
 
-Generated: `2026-07-28T17:05:45.351696+00:00`
+Generated: `2026-07-28T18:01:32.408276+00:00`
 
 Tolerance: **1%** · ok=**True**
 
