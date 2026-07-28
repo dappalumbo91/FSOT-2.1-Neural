@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-FSOT Neural Console v0.6 — product screens (tkinter, local, no web).
+FSOT Neural Console v0.7 — product screens (tkinter, local, no web).
 
 Aligned with docs/PRODUCT_UI_AND_DISPLAY.md:
   Dashboard · Cell classes · Memory · Encode · Body · Visual · Live · Log
@@ -10,7 +10,8 @@ Display doctrine:
   - Wet-lab accuracy numbers (Allen rates, probe top-1)
   - Archive FSOT pin/bridge on every claim path
   - Hardware-adaptive body on every boot (not locked to one PC)
-  - Obsidian-style live genetic graph under Visual
+  - Multi-region Obsidian graph (thal/sens/assoc/hipp) under Visual
+  - Extended host senses + POOF/SUCTION self-modulation + live vault ticks
 """
 
 from __future__ import annotations
@@ -370,7 +371,7 @@ def _looks_like_dna(text: str) -> bool:
 class ConsoleApp(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("FSOT Neural Console v0.6 — product · visual · adaptive body · local")
+        self.title("FSOT Neural Console v0.7 — multi-region · senses · self-mod · local")
         self.geometry("1280x880")
         self.minsize(1040, 700)
         self.configure(bg="#1a1d23")
@@ -382,14 +383,20 @@ class ConsoleApp(tk.Tk):
         self._hw_body: Optional[Dict[str, Any]] = None
         self._visual_net = None
         self._visual_running = False
+        self._sensory_bus = None
+        self._mod_state: Optional[Dict[str, Any]] = None
+        self._live_vault_path: Optional[str] = None
         self._build()
         self.after(100, self._drain_log)
         self._log(
-            "FSOT Neural Console v0.6 (product design screens)\n"
+            "FSOT Neural Console v0.7 (product design screens)\n"
             "Dashboard · Cell classes · Memory · Encode · Body · Visual · Live\n"
-            "Archive math · wet-lab scalpel · adaptive hardware body · Obsidian graph\n"
+            "Multi-region brain · host senses · POOF/SUCTION self-mod · live Obsidian\n"
         )
         self.after(250, self._auto_boot)
+        # HID → sens cortex (portable event feed, not machine-locked)
+        self.bind_all("<Key>", self._on_hid_key)
+        self.bind_all("<Button>", self._on_hid_click)
 
     def _build(self) -> None:
         style = ttk.Style(self)
@@ -659,7 +666,7 @@ class ConsoleApp(tk.Tk):
         vis_hdr.pack(fill=tk.X, padx=8, pady=6)
         ttk.Label(
             vis_hdr,
-            text="Visual — Obsidian second-brain graph · live genetic synapses · host interoception",
+            text="Visual — multi-region (thal/sens/assoc/hipp) · Obsidian graph · senses · self-mod",
             font=("Segoe UI", 11, "bold"),
         ).pack(side=tk.LEFT)
         vis_btns = ttk.Frame(self.tab_visual)
@@ -673,7 +680,10 @@ class ConsoleApp(tk.Tk):
         ttk.Button(vis_btns, text="Rebuild graph", command=self._visual_rebuild).pack(
             side=tk.LEFT, padx=2
         )
-        ttk.Button(vis_btns, text="Pulse interoception", command=self._visual_pulse_intero).pack(
+        ttk.Button(vis_btns, text="Pulse senses", command=self._visual_pulse_intero).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(vis_btns, text="Open live vault", command=self._open_live_vault).pack(
             side=tk.LEFT, padx=2
         )
         self.visual_status = ttk.Label(
@@ -734,6 +744,30 @@ class ConsoleApp(tk.Tk):
 
     def _log(self, msg: str) -> None:
         self._log_q.put(msg)
+        try:
+            from fsot_nuron.sensory.host_senses import note_log_line
+
+            for line in str(msg).splitlines():
+                if line.strip():
+                    note_log_line(line)
+        except Exception:
+            pass
+
+    def _on_hid_key(self, event=None) -> None:
+        try:
+            from fsot_nuron.sensory.host_senses import note_hid_key
+
+            note_hid_key(1)
+        except Exception:
+            pass
+
+    def _on_hid_click(self, event=None) -> None:
+        try:
+            from fsot_nuron.sensory.host_senses import note_hid_click
+
+            note_hid_click(1)
+        except Exception:
+            pass
 
     def _drain_log(self) -> None:
         try:
@@ -888,22 +922,37 @@ class ConsoleApp(tk.Tk):
                 sample_metrics,
                 metrics_to_thalamic_packet,
             )
+            from fsot_nuron.sensory.host_senses import sample_host_senses
+            from fsot_nuron.self_modulation import modulate_from_metrics
 
             hw = discover_hardware()
             m = sample_metrics(hw)
             pkt = metrics_to_thalamic_packet(m)
+            snap = sample_host_senses(metric=m, include_audio=False)
+            mod = modulate_from_metrics(m, hw, fire_frac=0.0)
             lines = [
-                "INTEROCEPTION SAMPLE",
-                "====================",
+                "INTEROCEPTION + HOST SENSES",
+                "===========================",
                 "",
                 f"drive scalar ...... {m.as_drive_scalar():.4f}",
                 f"cpu / mem / disk .. {m.cpu_util:.3f} / {m.mem_util:.3f} / {m.disk_util:.3f}",
+                f"net_util .......... {m.net_util:.3f}",
                 f"temp_norm ......... {m.temp_norm:.3f}",
                 f"thalamic packet ... target={pkt.target_region}  strength={pkt.strength:.3f}",
                 f"features .......... {[round(x, 3) for x in pkt.features]}",
-                f"modality .......... {pkt.modality.value}",
                 "",
-                "Maps host plant → SensoryModality.SYS_METRIC → thalamus (autonomic analog).",
+                f"Extended senses ... {', '.join(snap.sensors_live)}",
+                f"  HID activity .... {snap.hid.get('activity', 0):.3f}",
+                f"  log activity .... {snap.log.get('activity', 0):.3f}",
+                f"  packets ......... {len(snap.packets)}  {[p.modality.value for p in snap.packets]}",
+                "",
+                "Self-modulation (POOF/SUCTION · seed-derived)",
+                f"  mode ............ {mod.mode}",
+                f"  stim_scale ...... {mod.stim_scale:.3f}",
+                f"  syn_scale ....... {mod.syn_scale:.3f}",
+                f"  notes ........... {'; '.join(mod.notes)}",
+                "",
+                "Maps host plant → SYS_METRIC/HID/LOG/NETWORK → brain regions.",
                 "",
             ]
             text = "\n".join(lines)
@@ -912,8 +961,9 @@ class ConsoleApp(tk.Tk):
             if self.visual_canvas is not None:
                 self.visual_canvas.set_interoception(
                     m.as_drive_scalar(),
-                    label=f"cpu={m.cpu_util:.2f} mem={m.mem_util:.2f}",
+                    label=f"cpu={m.cpu_util:.2f} mem={m.mem_util:.2f} net={m.net_util:.2f}",
                 )
+                self.visual_canvas.set_modulation(mod.stim_scale, mod.syn_scale, mod.mode)
         except Exception as e:
             messagebox.showerror("Interoception", str(e))
 
@@ -921,30 +971,62 @@ class ConsoleApp(tk.Tk):
         if self.visual_canvas is None:
             return
         try:
-            from product.console.visual_brain import build_small_genetic_visual
+            from product.console.visual_brain import build_region_brain_visual
             from fsot_nuron.hardware_body import discover_hardware
+            from fsot_nuron.sensory.bus import SensoryBus
+            from fsot_nuron.obsidian_brain import ensure_live_vault
 
             self._visual_stop()
             hw = discover_hardware()
-            # UI cap: keep canvas readable; full n_units used by engine elsewhere
-            n = min(48, int(hw.recommended_n_units or 32))
-            # Prefer CPU for live UI tick so CUDA workloads don't hitch the window
-            device = "cpu"
+            device = "cpu"  # UI tick stays on CPU for smooth window
             dt = float(hw.recommended_dt_ms or 0.5)
-            net, labels = build_small_genetic_visual(
-                n_units=n, device=device, seed=7, dt_ms=dt
+            # ai_efficient multi-region (~32 units) — portable; wetware_ref if huge host
+            profile = "wetware_ref" if (hw.recommended_n_units or 32) >= 96 else "ai_efficient"
+            brain = build_region_brain_visual(
+                profile=profile, device=device, seed=7, dt_ms=dt
             )
-            self._visual_net = net
-            self.visual_canvas.attach_live_net(net, labels, top_k=3)
+            self._visual_net = brain
+            self._sensory_bus = SensoryBus()
+            self.visual_canvas.attach_brain(brain, top_k=3)
+            self.visual_canvas.set_sensory_bus(self._sensory_bus)
+            vault = ensure_live_vault()
+            self._live_vault_path = str(vault)
+            self.visual_canvas.set_tick_callback(self._on_visual_tick, every=20)
+            regs = ",".join(brain.region_index.keys())
             self.visual_status.config(
-                text=f"graph ready · n={n} · dt={dt}ms · host={hw.recommended_device}"
+                text=(
+                    f"graph ready · {profile} n={brain.n_units} · "
+                    f"regions={regs} · dt={dt}ms · host={hw.recommended_device}"
+                )
             )
             if self._hw_body:
                 drive = float(self._hw_body.get("interoception_drive") or 0.0)
                 self.visual_canvas.set_interoception(drive, label="boot intero")
+            self._log(
+                f"Visual multi-region brain: profile={profile} n={brain.n_units} "
+                f"vault={vault}\n"
+            )
         except Exception as e:
             self.visual_status.config(text=f"rebuild error: {e}")
             self._log(f"visual rebuild error: {e}\n")
+
+    def _on_visual_tick(self, payload: Dict[str, Any]) -> None:
+        """Periodic vault write + status (called from canvas live loop)."""
+        try:
+            from fsot_nuron.obsidian_brain import append_live_tick
+
+            path = append_live_tick(
+                step=int(payload.get("step", 0)),
+                fire_frac=float(payload.get("fire_frac", 0.0)),
+                mean_S=float(payload.get("mean_S", 0.0)),
+                load=float(payload.get("intero", 0.0)),
+                mode=str(payload.get("mod_mode", "balanced")),
+                stim_scale=float(payload.get("mod_stim", 1.0)),
+                rates_by_region=payload.get("region_fire") or {},
+            )
+            self._live_vault_path = str(path.parent.parent)
+        except Exception:
+            pass
 
     def _visual_start(self) -> None:
         if self.visual_canvas is None:
@@ -955,19 +1037,19 @@ class ConsoleApp(tk.Tk):
             return
         try:
             self._visual_pulse_intero(silent=True)
-            self.visual_canvas.start_live(interval_ms=70, stim=0.55)
+            self.visual_canvas.start_live(interval_ms=70, stim=0.75)
             self._visual_running = True
-            self.visual_status.config(text="thinking…")
-            self.after(2000, self._visual_intero_loop)
+            self.visual_status.config(text="thinking… multi-region")
+            self.after(1500, self._visual_intero_loop)
         except Exception as e:
             messagebox.showerror("Visual", str(e))
 
     def _visual_intero_loop(self) -> None:
-        """While thinking, re-sample host plant every ~2s (circulatory analog)."""
+        """While thinking: host senses + self-modulation (circulatory / autonomic)."""
         if not self._visual_running:
             return
         self._visual_pulse_intero(silent=True)
-        self.after(2000, self._visual_intero_loop)
+        self.after(1500, self._visual_intero_loop)
 
     def _visual_stop(self) -> None:
         if self.visual_canvas is not None:
@@ -978,22 +1060,83 @@ class ConsoleApp(tk.Tk):
 
     def _visual_pulse_intero(self, silent: bool = False) -> None:
         try:
-            from fsot_nuron.hardware_body import discover_hardware, sample_metrics
+            from fsot_nuron.hardware_body import (
+                discover_hardware,
+                sample_metrics,
+            )
+            from fsot_nuron.sensory.host_senses import sample_host_senses
+            from fsot_nuron.self_modulation import modulate_from_metrics
 
             hw = discover_hardware()
             m = sample_metrics(hw)
+            snap = sample_host_senses(
+                include_audio=False,
+                include_hid=True,
+                include_log=True,
+                include_net=True,
+                metric=m,
+            )
+            # Inject all packets into sensory bus → regional drive
+            if self._sensory_bus is not None:
+                for pkt in snap.packets:
+                    self._sensory_bus.push(pkt)
+
+            fire_frac = 0.0
+            if self.visual_canvas is not None:
+                fire_frac = float(getattr(self.visual_canvas, "_mean_fire_ema", 0.0) or 0.0)
+            mod = modulate_from_metrics(
+                m, hw, fire_frac=fire_frac, base_n_units=hw.recommended_n_units
+            )
+            self._mod_state = mod.to_dict()
+
             if self.visual_canvas is not None:
                 self.visual_canvas.set_interoception(
                     m.as_drive_scalar(),
-                    label=f"cpu={m.cpu_util:.2f} mem={m.mem_util:.2f}",
+                    label=(
+                        f"cpu={m.cpu_util:.2f} mem={m.mem_util:.2f} net={m.net_util:.2f} "
+                        f"hid={snap.hid.get('activity', 0):.2f} · {mod.mode}"
+                    ),
+                )
+                self.visual_canvas.set_modulation(
+                    stim_scale=mod.stim_scale,
+                    syn_scale=mod.syn_scale,
+                    mode=mod.mode,
                 )
             if not silent:
                 self.visual_status.config(
-                    text=f"intero drive={m.as_drive_scalar():.3f}"
+                    text=(
+                        f"senses={','.join(snap.sensors_live)}  "
+                        f"drive={m.as_drive_scalar():.3f}  mod={mod.mode}×{mod.stim_scale:.2f}"
+                    )
+                )
+                self._log(
+                    f"Host senses pulse: {snap.to_dict()}\n"
+                    f"Self-mod: {mod.to_dict()}\n"
                 )
         except Exception as e:
             if not silent:
                 messagebox.showerror("Interoception", str(e))
+
+    def _open_live_vault(self) -> None:
+        try:
+            from fsot_nuron.obsidian_brain import ensure_live_vault
+            import subprocess
+
+            path = ensure_live_vault()
+            self._live_vault_path = str(path)
+            # Open folder in OS file explorer (local)
+            if sys.platform.startswith("win"):
+                subprocess.Popen(["explorer", str(path)])
+            else:
+                subprocess.Popen(["xdg-open", str(path)])
+            self._log(f"Live vault: {path}\n  (Open as Obsidian vault → 05_Dynamics/LIVE.md)\n")
+            messagebox.showinfo(
+                "Live vault",
+                f"Vault folder:\n{path}\n\n"
+                "Open as vault in Obsidian desktop, then open 05_Dynamics/LIVE.md",
+            )
+        except Exception as e:
+            messagebox.showerror("Live vault", str(e))
 
     def _refresh_banner(self) -> None:
         try:

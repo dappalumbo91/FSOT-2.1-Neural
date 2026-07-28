@@ -11,6 +11,13 @@ See fsot_nuron.machine_encode and docs/MACHINE_ENCODING.md.
 
 from .packets import SensoryModality, SensoryPacket, MetricPacket
 from .bus import SensoryBus
+from .host_senses import (
+    sample_host_senses,
+    note_hid_key,
+    note_hid_click,
+    note_log_line,
+    HostSenseSnapshot,
+)
 
 
 def push_machine_text(
@@ -61,4 +68,9 @@ __all__ = [
     "SensoryBus",
     "push_machine_text",
     "push_machine_frame_bytes",
+    "sample_host_senses",
+    "note_hid_key",
+    "note_hid_click",
+    "note_log_line",
+    "HostSenseSnapshot",
 ]

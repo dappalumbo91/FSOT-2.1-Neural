@@ -51,3 +51,11 @@ report = boot_body_report()       # console Dashboard / Body tab block
 - One specific hostname or drive letter for science paths (archive path is still env-configured)
 
 The organism **adapts** to the body it wakes up in.
+
+## Extended senses & self-modulation (v0.7+)
+
+See [`docs/SELF_MODULATION_AND_SENSES.md`](SELF_MODULATION_AND_SENSES.md):
+
+- Network I/O deltas, HID, log stream, optional audio  
+- `self_modulation.modulate_from_metrics` — POOF dampen / SUCTION explore  
+- Live Obsidian vault ticks under `artifacts/obsidian_vaults/FSOT_Neural_Live/`

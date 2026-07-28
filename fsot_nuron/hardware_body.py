@@ -145,6 +145,11 @@ def discover_hardware() -> HardwareProfile:
         sensors.append("cuda")
         notes.append(f"CUDA: {cuda_name}")
 
+    # Extended host senses (optional backends)
+    sensors.extend(["network_delta", "hid_events", "log_stream"])
+    sensors.append("audio_optional")
+    notes.append("Extended senses: net I/O · HID · log · audio(opt) — graceful if missing")
+
     # Capability-based recommendations (seed-folded caps, not free fit)
     # More RAM/CPU → larger default net; never require one machine
     if ram is not None and ram >= 16 and cpu_log >= 8:
@@ -209,11 +214,6 @@ def sample_metrics(profile: Optional[HardwareProfile] = None) -> MetricPacket:
         except Exception:
             disk = 0.0
         try:
-            # net: normalize to 0..1 loosely via counters delta not available — use 0
-            net = 0.0
-        except Exception:
-            pass
-        try:
             if hasattr(ps, "sensors_temperatures"):
                 temps = ps.sensors_temperatures() or {}
                 vals = []
@@ -230,6 +230,17 @@ def sample_metrics(profile: Optional[HardwareProfile] = None) -> MetricPacket:
     else:
         # stdlib: only static load proxies
         custom["cpu_count_norm"] = min(1.0, (os.cpu_count() or 1) / 16.0)
+
+    # Network I/O rate (portable delta — not bound to one NIC)
+    try:
+        from .sensory.host_senses import sample_net_util
+
+        net, net_d = sample_net_util()
+        if net_d:
+            custom["net_recv_MBps"] = min(1.0, net_d.get("bytes_recv_s", 0.0) / (10.0 * 1024 * 1024))
+            custom["net_sent_MBps"] = min(1.0, net_d.get("bytes_sent_s", 0.0) / (10.0 * 1024 * 1024))
+    except Exception:
+        net = 0.0
 
     if profile and profile.cuda_available:
         try:

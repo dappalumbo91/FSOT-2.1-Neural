@@ -869,3 +869,135 @@ def export_from_suite(
     cfg = ObsidianExportConfig(**cfg_kwargs)
     clean = other.pop("clean", True)
     return build_obsidian_vault(vault_root=vault_root, cfg=cfg, clean=clean)
+
+
+# ---------------------------------------------------------------------------
+# Live second-brain ticks (append-only, offline)
+# ---------------------------------------------------------------------------
+
+def ensure_live_vault(vault_root: Optional[Path] = None) -> Path:
+    """
+    Ensure a small live vault exists for runtime ticks without full rebuild.
+    Does not wipe an existing vault.
+    """
+    root = Path(vault_root) if vault_root else default_vault_root("FSOT_Neural_Live")
+    root = root.resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    marker = root / ".fsot_vault_marker"
+    if not marker.is_file():
+        _write(
+            marker,
+            "FSOT-2.1-Neural live Obsidian vault\n"
+            "offline=true\n"
+            "no_server=true\n"
+            "mode=live_ticks\n",
+        )
+    dyn = root / "05_Dynamics"
+    dyn.mkdir(parents=True, exist_ok=True)
+    live = dyn / "LIVE.md"
+    if not live.is_file():
+        _write(
+            live,
+            "\n".join(
+                [
+                    "---",
+                    'type: "dynamics"',
+                    'tags: ["live", "dynamics", "fsot"]',
+                    "offline: true",
+                    "---",
+                    "",
+                    "# LIVE — runtime second-brain stream",
+                    "",
+                    "Append-only ticks from the host console / visual graph.",
+                    "Open this folder as an Obsidian vault to watch the mind think offline.",
+                    "",
+                    "| utc | step | fire | mean_S | load | mode | stim | regions |",
+                    "|-----|------|------|--------|------|------|------|---------|",
+                    "",
+                ]
+            ),
+        )
+    home = root / "00_Home.md"
+    if not home.is_file():
+        _write(
+            home,
+            "\n".join(
+                [
+                    "---",
+                    'type: "home"',
+                    'tags: ["moc", "live"]',
+                    "---",
+                    "",
+                    "# 00_Home — Live FSOT mind",
+                    "",
+                    f"- [[{'LIVE'}|Open live dynamics stream]] → `05_Dynamics/LIVE.md`",
+                    "- Open **Graph view** after a full genetic export for synapse structure.",
+                    "",
+                ]
+            ),
+        )
+    return root
+
+
+def append_live_tick(
+    *,
+    step: int,
+    fire_frac: float,
+    mean_S: float,
+    load: float = 0.0,
+    mode: str = "balanced",
+    stim_scale: float = 1.0,
+    rates_by_region: Optional[Dict[str, float]] = None,
+    vault_root: Optional[Path] = None,
+    extra: Optional[Dict[str, Any]] = None,
+    max_rows: int = 400,
+) -> Path:
+    """
+    Append one live thinking tick to `05_Dynamics/LIVE.md`.
+    Rotates file if too many rows (keeps header + newest half).
+    """
+    root = ensure_live_vault(vault_root)
+    path = root / "05_Dynamics" / "LIVE.md"
+    utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    reg = ""
+    if rates_by_region:
+        reg = " ".join(f"{k}={v:.2f}" for k, v in sorted(rates_by_region.items()))
+    row = (
+        f"| {utc} | {int(step)} | {fire_frac:.3f} | {mean_S:+.3f} | "
+        f"{load:.3f} | {mode} | {stim_scale:.2f} | {reg} |"
+    )
+    text = path.read_text(encoding="utf-8") if path.is_file() else ""
+    if "| utc | step |" not in text:
+        ensure_live_vault(root)
+        text = path.read_text(encoding="utf-8")
+    lines = text.rstrip().splitlines()
+    lines.append(row)
+    # rotate if huge
+    header_end = 0
+    for i, ln in enumerate(lines):
+        if ln.startswith("|-----"):
+            header_end = i
+            break
+    data_rows = [ln for ln in lines[header_end + 1 :] if ln.startswith("|")]
+    if len(data_rows) > max_rows:
+        keep = data_rows[-(max_rows // 2) :]
+        lines = lines[: header_end + 1] + keep
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+
+    # Side JSONL for tooling (also local)
+    jpath = root / "05_Dynamics" / "live_ticks.jsonl"
+    rec = {
+        "utc": utc,
+        "step": int(step),
+        "fire_frac": fire_frac,
+        "mean_S": mean_S,
+        "load": load,
+        "mode": mode,
+        "stim_scale": stim_scale,
+        "rates_by_region": rates_by_region or {},
+        "extra": extra or {},
+    }
+    with jpath.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(rec) + "\n")
+    return path
+

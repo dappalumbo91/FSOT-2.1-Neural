@@ -219,7 +219,8 @@ You **do** need the **brain calculations** able to live there — which we alrea
 ## 8. Proposed product milestone (next build phase)
 
 **FSOT Neural Console v0.5 (local product screens) — landed**  
-**FSOT Neural Console v0.6 — adaptive body + Obsidian Visual — landed**
+**FSOT Neural Console v0.6 — adaptive body + Obsidian Visual — landed**  
+**FSOT Neural Console v0.7 — multi-region + host senses + self-mod + live vault — landed**
 
 ```powershell
 python run_console.py
@@ -234,7 +235,7 @@ python run_stress_suite.py --quick
 | Memory lab | FSOT-bridged encode/delay/retrieve scores |
 | Encode | Machine ★ / chemical / Morse + inject |
 | Body | **Adaptive host sensors** (CPU/RAM/disk/CUDA/psutil) + Zig host + QEMU |
-| **Visual** | **Obsidian-style live genetic graph** (cell-type hubs, synapse routes, interoception drive) |
+| **Visual** | **Multi-region Obsidian graph** (thal/sens/assoc/hipp) · host senses · POOF/SUCTION · live vault ticks |
 | Live / stress | Folds + stress break map |
 | Engine log | Subprocess stdout |
 
