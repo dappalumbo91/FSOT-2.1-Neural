@@ -95,6 +95,8 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Study / learning EEG** | [`docs/LEARNING_EEG_STUDY.md`](docs/LEARNING_EEG_STUDY.md) · `python run_learning_eeg_study.py` |
 | **Runtime inventory** | [`docs/RUNTIME_INVENTORY.md`](docs/RUNTIME_INVENTORY.md) · `python scripts/runtime_audit.py` |
 | **GitHub hygiene** | [`docs/GITHUB_HYGIENE.md`](docs/GITHUB_HYGIENE.md) |
+| **Wet-lab battery** | [`docs/WETLAB_ACCURACY_BATTERY.md`](docs/WETLAB_ACCURACY_BATTERY.md) · `python run_wetlab_accuracy_battery.py` |
+| **Genome as code** | [`docs/GENOME_AS_CODE.md`](docs/GENOME_AS_CODE.md) · `python run_cellular_expand.py --check` |
 | Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 
