@@ -84,6 +84,9 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Accuracy standard** | [`docs/ACCURACY_STANDARD.md`](docs/ACCURACY_STANDARD.md) — AlphaFold-*class* rigor, not CASP competitor |
 | **Intelligence probe** | [`docs/STAGE_INTELLIGENCE_PROBE.md`](docs/STAGE_INTELLIGENCE_PROBE.md) · `run_intelligence_probe.py --suite` |
 | **Retention / consolidate** | [`docs/STAGE_RETENTION_CONSOLIDATION.md`](docs/STAGE_RETENTION_CONSOLIDATION.md) |
+| **Checkpoint freeze** | [`CHECKPOINT_v0.5.md`](CHECKPOINT_v0.5.md) · tag `v0.5.0-bio-intel` |
+| **Intel options (later)** | [`docs/INTELLIGENCE_ROADMAP_OPTIONS.md`](docs/INTELLIGENCE_ROADMAP_OPTIONS.md) |
+| **Product UI / display** | [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md) — local, no web |
 | Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 

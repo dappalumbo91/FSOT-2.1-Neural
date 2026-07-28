@@ -86,8 +86,13 @@ python run_intelligence_probe.py --tol 0.02 --items 6
 python scripts/ci_smoke.py
 ```
 
-**Current stage docs:**  
-[`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md) · [`docs/STAGE_INTELLIGENCE_PROBE.md`](docs/STAGE_INTELLIGENCE_PROBE.md)  
+**Checkpoint (frozen accuracy):** [`CHECKPOINT_v0.5.md`](CHECKPOINT_v0.5.md) · tag `v0.5.0-bio-intel`  
+
+**Stage docs:**  
+[`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md) · [`docs/STAGE_INTELLIGENCE_PROBE.md`](docs/STAGE_INTELLIGENCE_PROBE.md) · [`docs/STAGE_RETENTION_CONSOLIDATION.md`](docs/STAGE_RETENTION_CONSOLIDATION.md)  
+
+**Next product phase:** local UI — [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md)  
+**Intel options after UI:** [`docs/INTELLIGENCE_ROADMAP_OPTIONS.md`](docs/INTELLIGENCE_ROADMAP_OPTIONS.md)  
 **Road to a full brain design:** [`BRAIN_PATH.md`](BRAIN_PATH.md)  
 **Python → Zig body:** [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md)
 
