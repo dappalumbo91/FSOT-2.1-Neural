@@ -53,6 +53,20 @@ S = K\cdot(T_1+T_2+T_3),\quad S\in[-3,3]
 **Neural fold:** \(D_{\mathrm{eff}}=13\), \(N=4\), \(P=3\), observed.  
 **Atlas:** \(S_{\mathrm{bio}}\approx +0.445\), \(S_{\mathrm{neuro}}\approx +0.514\).
 
+### Consciousness, observer, POOF, Yin–Yang (archive — required)
+
+These are **first-class FSOT law**, not optional Neural extras:
+
+| Concept | Formula / dual | Role |
+|---------|----------------|------|
+| Consciousness factor | \(C_{\mathrm{factor}}=C_{\mathrm{eff}}P_{\mathrm{new}}\) | Fundamental operational channel |
+| Observer / quirk_mod | \(\mathrm{obs}\Rightarrow\exp(C_f P_v)\cos(\delta\psi+P_v)\) else \(1\) | Observation changes \(T_1\) |
+| **POOF** | \(\exp[(- \ln\pi/e)/(\eta_{\mathrm{eff}}\ln\varphi)]\) | T3 dispersal valve |
+| **SUCTION** | \(\mathrm{POOF}\cdot(-\cos(\theta_s-\pi))\) | T3 dual (yang-like) |
+| Yin–Yang | T1/T3, E/I, bleed/inflow, \(+/-\) trits, obs on/off | Dual structure of the fluid |
+
+Module: `fsot_nuron/fsot_full_spine.py` · Lean: `FSOTNeural/FullSpine.lean` · Doc: `docs/FSOT_FULL_SPINE_NEURAL.md`.
+
 ### Codon primary map
 
 \[

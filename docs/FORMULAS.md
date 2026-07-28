@@ -55,6 +55,39 @@ S &= K\cdot(T_1+T_2+T_3),\quad S\in[-3,3]\ \text{(numerical clamp)}
 
 Implementation: `compute_scalar_torch` in `scalar.py`.
 
+### 2.1 Consciousness factor (archive)
+
+\[
+C_{\mathrm{factor}} = C_{\mathrm{eff}}\cdot P_{\mathrm{new}}
+\]
+
+Operational consciousness channel on the law path (not optional). See `fsot_full_spine.consciousness_factor`.
+
+### 2.2 Observer effect / quirk_mod (archive Scalar.lean)
+
+\[
+\mathrm{quirk\_mod}=\begin{cases}
+\exp(C_{\mathrm{factor}}\,P_{\mathrm{var}})\cdot\cos(\delta\psi+P_{\mathrm{var}}) & \mathrm{observed}=\mathrm{true}\\
+1 & \mathrm{observed}=\mathrm{false}
+\end{cases}
+\]
+
+When observed, \(T_1\leftarrow T_1\cdot\mathrm{quirk\_mod}\). **Observation changes \(S\).**
+
+### 2.3 POOF effect + SUCTION dual (Term 3 valves)
+
+\[
+\begin{aligned}
+\mathrm{POOF}&=\exp\!\Big(\frac{-\ln\pi/e}{\eta_{\mathrm{eff}}\ln\varphi}\Big)\\
+\mathrm{SUCTION}&=\mathrm{POOF}\cdot(-\cos(\theta_s-\pi))\\
+\text{valve fragment}&=1+\mathrm{POOF}\cdot\cos(\theta_s+\pi)+\mathrm{SUCTION}\cdot\sin(\theta_s)
+\end{aligned}
+\]
+
+Yin–yang fluid valves (dispersal / emergence), not free noise. Acoustic dual: \(A_{\mathrm{bleed}}\sin^2\delta\theta/\varphi\) vs \(A_{\mathrm{in}}\cos^2\delta\theta/\varphi\).
+
+Full spine module: `fsot_nuron/fsot_full_spine.py` · `docs/FSOT_FULL_SPINE_NEURAL.md`.
+
 ---
 
 ## 3. Trinary state

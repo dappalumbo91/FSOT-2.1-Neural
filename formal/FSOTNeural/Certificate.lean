@@ -12,6 +12,7 @@ import FSOTNeural.CellTypes
 import FSOTNeural.Expression
 import FSOTNeural.Authority
 import FSOTNeural.WetLabGates
+import FSOTNeural.FullSpine
 
 namespace FSOTNeural
 
@@ -47,8 +48,14 @@ theorem scientific_panel_ok :
     -- Wet-lab structural contract
     (allAllenClasses.length = 4) ∧
     (neuralWetLabContract.tolFloor_per_mille = 20) ∧
-    (neuralWetLabContract.freeParams = 0) := by
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    (neuralWetLabContract.freeParams = 0) ∧
+    -- Full spine: consciousness / observer / yin–yang / POOF duals
+    (consciousnessOnLawPath = true) ∧
+    (valvePole FluidValve.poof = DualPole.yin) ∧
+    (valvePole FluidValve.suction = DualPole.yang) ∧
+    (cellPole CellType.Pyr = DualPole.yang) ∧
+    (cellPole CellType.PV = DualPole.yin) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · exact allCodons_card
   · intro c; exact codon_in_own_fiber c
   · exact purine_pos
@@ -70,6 +77,11 @@ theorem scientific_panel_ok :
   · exact four_allen_classes
   · rfl
   · rfl
+  · exact consciousness_on_path
+  · exact poof_yin
+  · exact suction_yang
+  · exact pyr_yang
+  · exact pv_yin
 
 /-- Named export for documentation / certificate. -/
 def certificateName : String :=

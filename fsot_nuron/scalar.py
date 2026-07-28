@@ -1,8 +1,13 @@
 """
 Vectorized FSOT scalar S = K·(T1+T2+T3) for CPU and CUDA.
 
-Same structure as the neuron prototype / FSOT-GPU scalar; all ops are
-elementwise so one kernel launch path handles B or B×T batches.
+Full archive spine (must not be dropped):
+  T1 — coherence base + **observer quirk_mod** when observed=True
+       (consciousness_factor · phase_variance channel)
+  T2 — linear environment
+  T3 — valve with **POOF / SUCTION** dual + acoustic bleed/inflow (yin–yang)
+
+See fsot_nuron.fsot_full_spine and archive Scalar.lean / fsot_compute.py.
 """
 
 from __future__ import annotations
@@ -77,13 +82,17 @@ def compute_scalar_torch(
         * (1.0 + growth * s.c_eff)
     )
     t1 = base * (1.0 + s.p_new * torch.log(D_t / 25.0))
+    # --- Observer / consciousness channel (quirk_mod) ---
+    # Archive: if observed: T1 *= exp(C_factor*P_var)*cos(δψ+P_var); else ×1
     if observed:
-        t1 = t1 * torch.exp(torch.tensor(s.c_factor * s.p_var, device=ref.device, dtype=ref.dtype)) * torch.cos(
-            dpsi + s.p_var
-        )
+        t1 = t1 * torch.exp(
+            torch.tensor(s.c_factor * s.p_var, device=ref.device, dtype=ref.dtype)
+        ) * torch.cos(dpsi + s.p_var)
 
     t2 = sc * amp + tb
 
+    # --- Term-3 valve: POOF + SUCTION dual (yin–yang fluid valves) ---
+    # 1 + POOF·cos(θ_s+π) + SUCTION·sin(θ_s)
     valve = (
         s.beta
         * torch.cos(dpsi)

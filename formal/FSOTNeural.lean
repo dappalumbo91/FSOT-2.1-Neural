@@ -27,6 +27,7 @@ import FSOTNeural.CellTypes
 import FSOTNeural.Expression
 import FSOTNeural.Authority
 import FSOTNeural.WetLabGates
+import FSOTNeural.FullSpine
 import FSOTNeural.Certificate
 
 namespace FSOTNeural

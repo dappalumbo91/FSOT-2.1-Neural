@@ -1,0 +1,143 @@
+{
+  "generated_at": "2026-07-28T16:51:08.924584+00:00",
+  "gates": {
+    "pin_ok": true,
+    "c_factor_positive": true,
+    "poof_positive": true,
+    "suction_finite": true,
+    "observer_changes_S": true,
+    "quirk_not_unity_when_observed": true,
+    "yin_yang_pairs_ge_5": true
+  },
+  "snapshot": {
+    "authority": "I:/FSOT-Physical-Archive/02_FSOT-2.1-Lean-Full",
+    "free_parameters": 0,
+    "formula": "S = K*(T1+T2+T3)",
+    "consciousness": {
+      "C_factor": 0.287600151819184,
+      "psi_con": 0.6321205588285577,
+      "table": {
+        "Consciousness_Gate": 0.6180339887498949,
+        "Resonance_Persistence": 0.8652559794322651,
+        "Resonance_Rate": 0.21234577623937845,
+        "Resonance_Eq_Factor": 1.5759198467187907,
+        "Ignition_Coherence": 0.3921734915875945,
+        "W_Integration": 1.618033988749895,
+        "W_Complexity": 0.6180339887498949,
+        "W_Binding": 0.8652559794322651,
+        "W_Phase_Sync": 0.6180339887498948,
+        "consciousness_factor": 0.287600151819184,
+        "psi_con": 0.6321205588285577
+      },
+      "claim": "Consciousness fundamental in FSOT ontology; operational via C_factor/quirk_mod"
+    },
+    "observer": {
+      "S_observed": 0.43231972120140144,
+      "S_unobserved": 0.4389417801227434,
+      "delta_S": -0.006622058921341933,
+      "quirk_mod": 0.6462597275162424,
+      "consciousness_factor": 0.287600151819184,
+      "law": "observed=True multiplies T1 by quirk_mod; false \u2192 unity",
+      "source": "archive Scalar.lean quirk_mod + compute_scalar"
+    },
+    "yin_yang_pairs": [
+      {
+        "name": "trinary",
+        "yang": "+1 (emergent)",
+        "yin": "-1 (damped/dispersal)",
+        "archive_anchor": "\u03c4(S) trinary; from_S thresholds"
+      },
+      {
+        "name": "scalar_terms",
+        "yang": "T1 coherence / observer-boosted base",
+        "yin": "T3 valve / chaos / POOF\u2013SUCTION",
+        "archive_anchor": "S=K(T1+T2+T3)"
+      },
+      {
+        "name": "acoustic",
+        "yang": "A_in \u00b7 cos\u00b2(\u03b4\u03b8)/\u03c6  (inflow)",
+        "yin": "A_bleed \u00b7 sin\u00b2(\u03b4\u03b8)/\u03c6  (bleed)",
+        "archive_anchor": "term3 acoustic dual"
+      },
+      {
+        "name": "fluid_valves",
+        "yang": "SUCTION \u00b7 sin(\u03b8_s)",
+        "yin": "POOF \u00b7 cos(\u03b8_s+\u03c0)",
+        "archive_anchor": "POOF/SUCTION dual in valve factor"
+      },
+      {
+        "name": "cell_types",
+        "yang": "Pyr E (+1 glutamate)",
+        "yin": "PV/SST/VIP I (\u22121 GABA)",
+        "archive_anchor": "cortical E/I"
+      },
+      {
+        "name": "observer",
+        "yang": "observed=True (quirk_mod active)",
+        "yin": "observed=False (unity)",
+        "archive_anchor": "participatory dynamics"
+      }
+    ],
+    "poof": {
+      "POOF": 0.1534822148944508,
+      "SUCTION": 0.14703398542810284,
+      "poof_term_in_valve": -0.14703398542810284,
+      "suction_term_in_valve": 0.04217099594138865,
+      "valve_poof_suction_factor": 0.8951370105132858,
+      "acoustic_bleed_yin": 0.45816973104822023,
+      "acoustic_inflow_yang": 0.300734687029467,
+      "theta_s": 0.29089654054517305,
+      "delta_psi": 0.1,
+      "formula_poof": "exp((-ln(\u03c0)/e)/(\u03b7_eff\u00b7ln(\u03c6)))",
+      "formula_suction": "POOF\u00b7(-cos(\u03b8_s-\u03c0))",
+      "role": "T3 fluid valves \u2014 dispersal/emergence dual, not free noise"
+    },
+    "homeostasis_seed": {
+      "Novelty_Threshold": 0.6180339887498948,
+      "Consolidation_Rate": 0.18373345259830798,
+      "Attention_Inhibition": 0.7879407922764435,
+      "Replay_Passes": 6,
+      "source": "archive \u00a721 homeostasis()"
+    },
+    "stdp_seed": {
+      "STDP_Learning_Rate": 0.26563075318112606,
+      "Soliton_Width": 0.8669401115053211,
+      "Hebbian_Consolidation": 0.18373345259830798,
+      "source": "archive \u00a722 soliton_stdp()"
+    }
+  },
+  "observer": {
+    "S_observed": 0.43231972120140144,
+    "S_unobserved": 0.4389417801227434,
+    "delta_S": -0.006622058921341933,
+    "quirk_mod": 0.6462597275162424,
+    "consciousness_factor": 0.287600151819184,
+    "law": "observed=True multiplies T1 by quirk_mod; false \u2192 unity",
+    "source": "archive Scalar.lean quirk_mod + compute_scalar"
+  },
+  "term3": {
+    "POOF": 0.1534822148944508,
+    "SUCTION": 0.14703398542810284,
+    "poof_term_in_valve": -0.14703398542810284,
+    "suction_term_in_valve": 0.04217099594138865,
+    "valve_poof_suction_factor": 0.8951370105132858,
+    "acoustic_bleed_yin": 0.45816973104822023,
+    "acoustic_inflow_yang": 0.300734687029467,
+    "theta_s": 0.29089654054517305,
+    "delta_psi": 0.1,
+    "formula_poof": "exp((-ln(\u03c0)/e)/(\u03b7_eff\u00b7ln(\u03c6)))",
+    "formula_suction": "POOF\u00b7(-cos(\u03b8_s-\u03c0))",
+    "role": "T3 fluid valves \u2014 dispersal/emergence dual, not free noise"
+  },
+  "yin_yang_example": {
+    "E_fraction": 0.2857142857142806,
+    "I_fraction": 0.7142857142857194,
+    "EI_balance": 0.5714285714285792,
+    "S_pos": 0.5,
+    "S_neg": 0.0,
+    "S_balance": 1.999955756559757e-12,
+    "yin_yang_duality_product": 54.23936575262138,
+    "poof": 0.1534822148944508,
+    "suction": 0.14703398542810284
+  }
+}

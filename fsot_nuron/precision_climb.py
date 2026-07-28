@@ -4,7 +4,9 @@ FSOT-native precision climb for Allen class rates.
 Doctrine:
   - Do NOT fit free parameters on S = K(T1+T2+T3) or seeds.
   - Only phenotype timing knobs (already scalpel domain): R, fi_stim, thr, adapt.
-  - Step sizes scaled by SEEDS (φ, e, π) — seed-folded micro-surgery.
+  - Step sizes from full spine: φ, e, π, **POOF**, **SUCTION**, consciousness gate.
+  - Near 1% band: FI-only (POOF/SUCTION dual); avoid coarse ±R overshoot.
+  - Rollback if error worsens (immune / proofreading).
 
 Target: push rel_err ≤ 1% on Pyr/PV/SST/VIP when 2% already holds.
 """
@@ -32,23 +34,28 @@ from .neuron_batch import FSOTNeuronBatch
 
 def _seed_step_R(err: float) -> int:
     """
-    Integer refractory delta.
-    too fast (err>0) → +R; too slow (err<0) → −R.
-    Near 1% band use ±1 only (avoid overshoot).
+    Integer refractory delta — only when |err| is large.
+    Near soft-miss band (|err|≤0.02) return 0: use POOF-scaled FI instead.
     """
     if abs(err) < 1e-9:
         return 0
-    if abs(err) <= 0.03:
-        mag = 1
-    else:
-        mag = max(1, min(2, int(math.ceil(SEEDS.phi * min(1.5, abs(err) / 0.02)))))
+    if abs(err) <= 0.02:
+        return 0  # R is too coarse for 1% band
+    mag = max(1, min(2, int(math.ceil(SEEDS.phi * min(1.5, abs(err) / 0.03)))))
     return mag if err > 0 else -mag
 
 
 def _seed_fi_factor(err: float) -> float:
-    """Gentle multiplicative FI tweak (seed-scaled)."""
+    """
+    FI tweak using POOF/SUCTION dual (archive term3 valves) + consciousness gate.
+    too fast (err>0) → reduce FI; too slow → increase.
+    """
     s = SEEDS
-    amp = (1.0 / (s.e * s.pi * s.phi)) * min(0.5, abs(err) / 0.02)
+    # Dual amplitude: POOF (dispersal valve) + SUCTION (inflow dual)
+    dual = 0.5 * (abs(s.poof) + abs(s.suction))
+    gate = s.phi / (1.0 + s.phi)  # consciousness gate φ/(1+φ)
+    amp = dual * gate * min(1.0, abs(err) / 0.015) * (1.0 / (s.e * s.pi))
+    amp = min(0.08, max(0.002, amp))  # cap so we don't blow the 2% floor
     return 1.0 - math.copysign(amp, err)
 
 
@@ -132,11 +139,13 @@ def precision_micro_climb(
         )
 
         dR = _seed_step_R(err)
-        st.refractory_steps = max(3, min(200, st.refractory_steps + dR))
+        if dR != 0:
+            st.refractory_steps = max(3, min(200, st.refractory_steps + dR))
+        # POOF/SUCTION + consciousness-gate FI micro-step (primary near 1%)
         st.fi_stim = float(max(0.25, min(1.85, st.fi_stim * _seed_fi_factor(err))))
-        # very small threshold nudge only if far from band
+        # Observer-style threshold micro-nudge only if still outside 1.5%
         if abs(err) > 0.015:
-            thr_nudge = (SEEDS.pi - 3.0) * 0.01 * (1.0 if err > 0 else -1.0)
+            thr_nudge = SEEDS.c_factor * 0.01 * (1.0 if err > 0 else -1.0)
             st.fire_threshold = float(max(0.80, min(1.15, st.fire_threshold + thr_nudge)))
         st.iters = st.iters + 1
 

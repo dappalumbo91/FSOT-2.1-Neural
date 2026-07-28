@@ -434,6 +434,9 @@ class ConsoleApp(tk.Tk):
         ttk.Button(boot_row, text="Genome-as-code", command=self._cmd_cellular).pack(
             side=tk.LEFT, padx=2
         )
+        ttk.Button(boot_row, text="Full spine", command=self._cmd_full_spine).pack(
+            side=tk.LEFT, padx=2
+        )
 
         btn_row = ttk.Frame(self.tab_dash)
         btn_row.pack(fill=tk.X, padx=8, pady=6)
@@ -949,6 +952,9 @@ class ConsoleApp(tk.Tk):
         self._run_async(
             [sys.executable, str(ROOT / "run_cellular_expand.py"), "--check", "--expand", "64"]
         )
+
+    def _cmd_full_spine(self) -> None:
+        self._run_async([sys.executable, str(ROOT / "run_full_spine_check.py")])
 
     def _refresh_cells(self) -> None:
         lines = [
