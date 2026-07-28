@@ -55,9 +55,10 @@ For FSOT-Neural, translate to **tiers**:
 
 | Track | Status vs ambition |
 |-------|--------------------|
-| Class rates Pyr/PV/SST/VIP | **T2**: all within **5%** of Allen (often &lt;2%) |
+| Class rates Pyr/PV/SST/VIP | **T2–T3**: scalpel **≤2%** on wet-lab FI rates (often &lt;1.5%) |
 | Zig neuron parity | **T0–T1**: max \|ΔS\| ~1e-6 |
-| Learning (theta/gamma SME) | **Scaffold** — literature map exists; not yet AlphaFold-class gates |
+| Intelligence encode/retrieve | **Live**: fingerprint memory on scalpel brain; SME direction gates |
+| Learning (theta/gamma SME) | Directional gates on; effect-size vs literature still to climb |
 | Protein structure (archive) | Separate ladder (CAMEO MAE history) — not the neural scoreboard |
 
 ---

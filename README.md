@@ -78,11 +78,16 @@ python scripts/verify_formal.py
 python scripts/parity_zig_neuron.py
 cd embodiment\zig; powershell -File .\run_qemu.ps1
 
-# 6) CI smoke
+# 6) Wet-lab class rates (≤2%) + intelligence encode/retrieve
+python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.02
+python run_intelligence_probe.py --tol 0.02 --items 6
+
+# 7) CI smoke
 python scripts/ci_smoke.py
 ```
 
-**Current stage doc:** [`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md)  
+**Current stage docs:**  
+[`docs/STAGE_ZIG_NEURON_STEP.md`](docs/STAGE_ZIG_NEURON_STEP.md) · [`docs/STAGE_INTELLIGENCE_PROBE.md`](docs/STAGE_INTELLIGENCE_PROBE.md)  
 **Road to a full brain design:** [`BRAIN_PATH.md`](BRAIN_PATH.md)  
 **Python → Zig body:** [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md)
 

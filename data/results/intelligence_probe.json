@@ -1,0 +1,261 @@
+{
+  "generated_at": "2026-07-28T14:52:23.764734+00:00",
+  "mission": "accurate FSOT neurons \u2192 multi-region intelligence probe",
+  "accuracy_standard": "docs/ACCURACY_STANDARD.md",
+  "learning_alignment": "docs/LEARNING_ALIGNMENT.md",
+  "scalpel": {
+    "profile": "ai_efficient",
+    "scalpel_ok": true,
+    "tol": 0.02,
+    "class_rel_err": {
+      "Pyr": 0.0007596188105150371,
+      "PV": 0.0034307601919307163,
+      "SST": 0.015137918457600168
+    },
+    "class_measured_Hz": {
+      "Pyr": 16.363636016845703,
+      "PV": 83.63636016845703,
+      "SST": 29.09090805053711
+    },
+    "labels_count": {
+      "PV": 4,
+      "Pyr": 26,
+      "SST": 2
+    }
+  },
+  "scalpel_detail": {
+    "ok": true,
+    "tol": 0.02,
+    "classes": {
+      "Pyr": {
+        "cell_type": "Pyr",
+        "target_Hz": 16.35121532610921,
+        "refractory_steps": 51,
+        "fi_stim": 0.6019235860113233,
+        "fire_threshold": 0.9354388655425718,
+        "adapt_step": 0.0,
+        "adapt_gain": 0.05118673906140741,
+        "measured_Hz": 16.363636016845703,
+        "rel_err": 0.0007596188105150371,
+        "iters": 1
+      },
+      "PV": {
+        "cell_type": "PV",
+        "target_Hz": 83.3504049172855,
+        "refractory_steps": 11,
+        "fi_stim": 1.4,
+        "fire_threshold": 0.8621592116843989,
+        "adapt_step": 0.0,
+        "adapt_gain": 0.01,
+        "measured_Hz": 83.63636016845703,
+        "rel_err": 0.0034307601919307163,
+        "iters": 1
+      },
+      "SST": {
+        "cell_type": "SST",
+        "target_Hz": 29.538052683455557,
+        "refractory_steps": 32,
+        "fi_stim": 1.0363914332031714,
+        "fire_threshold": 0.978569762074966,
+        "adapt_step": 0.0,
+        "adapt_gain": 0.015,
+        "measured_Hz": 29.09090805053711,
+        "rel_err": 0.015137918457600168,
+        "iters": 2
+      }
+    },
+    "history": [
+      {
+        "iter": 0,
+        "phase": "init",
+        "measured": {
+          "Pyr": 13.63636302947998,
+          "PV": 83.63636016845703,
+          "SST": 17.27272605895996
+        },
+        "rel_err": {
+          "Pyr": 0.1660336704326938,
+          "PV": 0.0034307601919307163,
+          "SST": 0.4152381592631352
+        }
+      },
+      {
+        "iter": 1,
+        "phase": "focus:Pyr",
+        "focus": "Pyr",
+        "knobs": {
+          "Pyr": {
+            "R": 51,
+            "fi": 0.6019235860113233,
+            "thr": 0.9354388655425718
+          }
+        },
+        "measured": {
+          "Pyr": 16.363636016845703,
+          "PV": 83.63636016845703,
+          "SST": 17.27272605895996
+        },
+        "rel_err": {
+          "Pyr": 0.0007596188105150371,
+          "PV": 0.0034307601919307163,
+          "SST": 0.4152381592631352
+        }
+      },
+      {
+        "iter": 1,
+        "phase": "focus:SST",
+        "focus": "SST",
+        "knobs": {
+          "SST": {
+            "R": 26,
+            "fi": 0.9105164534719801,
+            "thr": 0.9985697620749661
+          }
+        },
+        "measured": {
+          "Pyr": 16.363636016845703,
+          "PV": 83.63636016845703,
+          "SST": 25.454544067382812
+        },
+        "rel_err": {
+          "Pyr": 0.0007596188105150371,
+          "PV": 0.0034307601919307163,
+          "SST": 0.13824569479354823
+        }
+      },
+      {
+        "iter": 2,
+        "phase": "focus:SST",
+        "focus": "SST",
+        "knobs": {
+          "SST": {
+            "R": 32,
+            "fi": 1.0363914332031714,
+            "thr": 0.978569762074966
+          }
+        },
+        "measured": {
+          "Pyr": 16.363636016845703,
+          "PV": 83.63636016845703,
+          "SST": 29.09090805053711
+        },
+        "rel_err": {
+          "Pyr": 0.0007596188105150371,
+          "PV": 0.0034307601919307163,
+          "SST": 0.015137918457600168
+        }
+      }
+    ]
+  },
+  "learning": {
+    "n_items": 6,
+    "top1_accuracy": 1.0,
+    "mean_correct_sim": 0.8528780440489451,
+    "mean_incorrect_sim": 0.5403828640778859,
+    "sme_theta_encode_gt_rest": true,
+    "sme_gamma_encode_gt_rest": true,
+    "per_item": [
+      {
+        "item_id": 0,
+        "predicted": 0,
+        "correct": true,
+        "sims": [
+          0.8924410939216614,
+          0.5697354674339294,
+          0.5841745138168335,
+          0.5493297576904297,
+          0.626980721950531,
+          0.714962899684906
+        ],
+        "encode_theta_rel": 0.02151272980986717,
+        "encode_gamma_rel": 0.5225753472022129
+      },
+      {
+        "item_id": 1,
+        "predicted": 1,
+        "correct": true,
+        "sims": [
+          0.6093016266822815,
+          0.8621591329574585,
+          0.5661303400993347,
+          0.3157608211040497,
+          0.5242350697517395,
+          0.526073694229126
+        ],
+        "encode_theta_rel": 0.00902143165005636,
+        "encode_gamma_rel": 0.44336725610276384
+      },
+      {
+        "item_id": 2,
+        "predicted": 2,
+        "correct": true,
+        "sims": [
+          0.5097296833992004,
+          0.3242041766643524,
+          0.8839737772941589,
+          0.40765291452407837,
+          0.7491726279258728,
+          0.6228623390197754
+        ],
+        "encode_theta_rel": 0.00128797569329925,
+        "encode_gamma_rel": 0.40047510807300585
+      },
+      {
+        "item_id": 3,
+        "predicted": 3,
+        "correct": true,
+        "sims": [
+          0.5192822813987732,
+          0.3201468586921692,
+          0.5512616634368896,
+          0.7846887111663818,
+          0.4736819565296173,
+          0.6308726668357849
+        ],
+        "encode_theta_rel": 0.011799696957800521,
+        "encode_gamma_rel": 0.31653890569684184
+      },
+      {
+        "item_id": 4,
+        "predicted": 4,
+        "correct": true,
+        "sims": [
+          0.4987639784812927,
+          0.4396534860134125,
+          0.6748937964439392,
+          0.5115209221839905,
+          0.8173952698707581,
+          0.5704859495162964
+        ],
+        "encode_theta_rel": 0.002340750653730602,
+        "encode_gamma_rel": 0.41620565634312157
+      },
+      {
+        "item_id": 5,
+        "predicted": 5,
+        "correct": true,
+        "sims": [
+          0.6774684190750122,
+          0.44993215799331665,
+          0.6181475520133972,
+          0.6021248698234558,
+          0.4729427099227905,
+          0.876610279083252
+        ],
+        "encode_theta_rel": 0.0036104041340597596,
+        "encode_gamma_rel": 0.45331889417971083
+      }
+    ],
+    "notes": "Fingerprint retrieval on multi-region FSOT brain; not a transformer LM. Wet-lab class rates locked separately via scalpel."
+  },
+  "gates": {
+    "pin_seed_ok": true,
+    "scalpel_ok": true,
+    "retrieve_above_chance": true,
+    "retrieve_ge_half": true,
+    "correct_sim_gt_incorrect": true,
+    "sme_theta_direction": true,
+    "sme_gamma_direction": true
+  },
+  "chance_accuracy": 0.16666666666666666
+}

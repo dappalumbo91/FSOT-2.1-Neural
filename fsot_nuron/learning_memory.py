@@ -1,0 +1,279 @@
+"""
+Encode → retain → retrieve probe on FSOT multi-region brains.
+
+Intelligence path grounded in accurate neuron dynamics:
+  - items = trinary / float feature patterns (sensory inject)
+  - encode under FI + pattern drive
+  - store regional fingerprints (mean S, spike duty, band proxies)
+  - retrieve by nearest-fingerprint under cue
+  - SME-style: band power during encode vs later success
+
+Biological time only (dt_ms). See docs/LEARNING_ALIGNMENT.md.
+"""
+
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field, asdict
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+import torch
+
+from .learning_bands import band_powers_from_fired, encoding_vs_rest_report
+from .trinary_substrate import quantize_features_to_trits
+
+
+def _cosine(a: torch.Tensor, b: torch.Tensor) -> float:
+    a = a.flatten().float()
+    b = b.flatten().float()
+    na = torch.linalg.vector_norm(a)
+    nb = torch.linalg.vector_norm(b)
+    if float(na) < 1e-12 or float(nb) < 1e-12:
+        return 0.0
+    return float((a @ b) / (na * nb))
+
+
+def make_item_patterns(
+    n_items: int,
+    feat_dim: int = 12,
+    seed: int = 7,
+) -> List[Dict[str, Any]]:
+    """Deterministic item set: continuous features + trit quantize."""
+    g = torch.Generator().manual_seed(seed)
+    items = []
+    for i in range(n_items):
+        feat = torch.randn(feat_dim, generator=g)
+        feat = feat / (feat.norm() + 1e-8)
+        trits = quantize_features_to_trits(feat.tolist())
+        items.append(
+            {
+                "id": i,
+                "label": f"item_{i}",
+                "features": feat.tolist(),
+                "trits": trits,
+            }
+        )
+    return items
+
+
+@dataclass
+class MemoryTrace:
+    item_id: int
+    fingerprint: torch.Tensor
+    encode_bands: Dict[str, float]
+    encode_mean_rate: float
+
+
+@dataclass
+class LearningReport:
+    n_items: int
+    top1_accuracy: float
+    mean_correct_sim: float
+    mean_incorrect_sim: float
+    sme_theta_encode_gt_rest: bool
+    sme_gamma_encode_gt_rest: bool
+    per_item: List[Dict[str, Any]] = field(default_factory=list)
+    notes: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        d = asdict(self)
+        return d
+
+
+def fingerprint_from_hist(
+    hist: Dict[str, torch.Tensor],
+    region_index: Dict[str, List[int]],
+    onset: int = 0,
+) -> torch.Tensor:
+    """
+    Concatenate per-region mean S and mean spike duty over [onset:).
+    """
+    S = hist["S"][onset:]  # [T, B]
+    fired = hist["fired"][onset:].float()
+    parts = []
+    for rid in sorted(region_index.keys()):
+        ids = region_index[rid]
+        if not ids:
+            continue
+        idx = torch.tensor(ids, device=S.device)
+        parts.append(S[:, idx].mean(dim=0))  # [n_reg]
+        parts.append(fired[:, idx].mean(dim=0))
+    if not parts:
+        parts = [S.mean(dim=0), fired.mean(dim=0)]
+    return torch.cat(parts).detach().cpu()
+
+
+def run_encode_epoch(
+    brain,
+    item: Dict[str, Any],
+    *,
+    steps: int = 400,
+    drive_amp: float = 0.55,
+    pattern_strength: float = 0.45,
+) -> Tuple[Dict[str, torch.Tensor], MemoryTrace]:
+    """
+    Encode one item: thalamic pulse + pattern drive into sens/assoc.
+    Uses brain.step loop (same dynamics as design suite).
+    """
+    brain.reset()
+    n = brain.n_units
+    feats = item["features"]
+    sens_ids = brain.region_index.get("sens", [])
+    assoc_ids = brain.region_index.get("assoc", [])
+    thal_ids = brain.region_index.get("thal", [])
+
+    hist_S = torch.empty(steps, n, device=brain.device, dtype=brain.net.dtype)
+    hist_f = torch.empty(steps, n, device=brain.device, dtype=torch.bool)
+    hist_syn = torch.empty(steps, n, device=brain.device, dtype=brain.net.dtype)
+
+    for t in range(steps):
+        ext = torch.zeros(n, device=brain.device, dtype=brain.net.dtype)
+        # theta-ish packet: 80 ms period, 25% duty on thalamus
+        if (t % 80) < 20:
+            for i in thal_ids:
+                ext[i] = drive_amp if brain.units[i].synapse_sign > 0 else drive_amp * 0.25
+        # continuous pattern into sensory / association (encoding content)
+        for k, uid in enumerate(sens_ids):
+            ext[uid] = ext[uid] + pattern_strength * float(feats[k % len(feats)])
+        for k, uid in enumerate(assoc_ids):
+            ext[uid] = ext[uid] + 0.7 * pattern_strength * float(feats[k % len(feats)])
+        ext = ext.clamp(-0.8, 1.5)
+        S, fired, _, _, syn = brain.step(ext)
+        hist_S[t] = S
+        hist_f[t] = fired
+        hist_syn[t] = syn
+
+    hist = {
+        "S": hist_S,
+        "fired": hist_f,
+        "synaptic": hist_syn,
+        "firing_rate_Hz": hist_f.float().sum(0) / (steps * brain.cfg.dt_ms / 1000.0),
+    }
+    fp = fingerprint_from_hist(hist, brain.region_index, onset=50)
+    bands = band_powers_from_fired(hist_f)
+    trace = MemoryTrace(
+        item_id=int(item["id"]),
+        fingerprint=fp,
+        encode_bands=bands,
+        encode_mean_rate=float(hist["firing_rate_Hz"].mean().item()),
+    )
+    return hist, trace
+
+
+def run_retrieve_epoch(
+    brain,
+    cue_item: Dict[str, Any],
+    *,
+    steps: int = 300,
+    pattern_strength: float = 0.35,
+) -> torch.Tensor:
+    """Cue with partial/weaker pattern; return fingerprint for matching."""
+    brain.reset()
+    n = brain.n_units
+    feats = cue_item["features"]
+    # partial cue: zero out last third of features
+    cue = list(feats)
+    cut = max(1, (2 * len(cue)) // 3)
+    for i in range(cut, len(cue)):
+        cue[i] = 0.0
+
+    sens_ids = brain.region_index.get("sens", [])
+    assoc_ids = brain.region_index.get("assoc", [])
+    thal_ids = brain.region_index.get("thal", [])
+
+    hist_S = torch.empty(steps, n, device=brain.device, dtype=brain.net.dtype)
+    hist_f = torch.empty(steps, n, device=brain.device, dtype=torch.bool)
+
+    for t in range(steps):
+        ext = torch.zeros(n, device=brain.device, dtype=brain.net.dtype)
+        if (t % 80) < 15:
+            for i in thal_ids:
+                if brain.units[i].synapse_sign > 0:
+                    ext[i] = 0.45
+        for k, uid in enumerate(sens_ids):
+            ext[uid] = ext[uid] + pattern_strength * float(cue[k % len(cue)])
+        for k, uid in enumerate(assoc_ids):
+            ext[uid] = ext[uid] + 0.5 * pattern_strength * float(cue[k % len(cue)])
+        S, fired, _, _, _ = brain.step(ext.clamp(-0.8, 1.5))
+        hist_S[t] = S
+        hist_f[t] = fired
+
+    hist = {"S": hist_S, "fired": hist_f}
+    return fingerprint_from_hist(hist, brain.region_index, onset=40)
+
+
+def learning_probe(
+    brain,
+    *,
+    n_items: int = 6,
+    encode_steps: int = 400,
+    retrieve_steps: int = 300,
+    seed: int = 7,
+) -> LearningReport:
+    """
+    Full encode-all → retrieve-each probe. Intelligence primitive on accurate neurons.
+    """
+    items = make_item_patterns(n_items, seed=seed)
+    memories: List[MemoryTrace] = []
+    encode_hists = []
+
+    for it in items:
+        hist, tr = run_encode_epoch(brain, it, steps=encode_steps)
+        memories.append(tr)
+        encode_hists.append(hist)
+
+    # rest baseline for SME-style bands (last encode hist vs pure rest)
+    brain.reset()
+    rest_steps = 300
+    n = brain.n_units
+    rest_f = torch.empty(rest_steps, n, device=brain.device, dtype=torch.bool)
+    for t in range(rest_steps):
+        _, fired, _, _, _ = brain.step(0.0)
+        rest_f[t] = fired
+    # concatenate encode fires for SME contrast
+    enc_fire = torch.cat([h["fired"] for h in encode_hists], dim=0)
+    sme = encoding_vs_rest_report(enc_fire, rest_f)
+
+    per_item = []
+    correct = 0
+    correct_sims = []
+    incorrect_sims = []
+
+    for true_i, it in enumerate(items):
+        q = run_retrieve_epoch(brain, it, steps=retrieve_steps)
+        sims = [_cosine(q, m.fingerprint) for m in memories]
+        pred = int(max(range(len(sims)), key=lambda j: sims[j]))
+        ok = pred == true_i
+        if ok:
+            correct += 1
+            correct_sims.append(sims[true_i])
+        else:
+            incorrect_sims.append(sims[true_i])
+        for j, s in enumerate(sims):
+            if j != true_i:
+                incorrect_sims.append(s)
+        per_item.append(
+            {
+                "item_id": true_i,
+                "predicted": pred,
+                "correct": ok,
+                "sims": sims,
+                "encode_theta_rel": memories[true_i].encode_bands.get("theta_rel"),
+                "encode_gamma_rel": memories[true_i].encode_bands.get("gamma_rel"),
+            }
+        )
+
+    n = max(1, n_items)
+    return LearningReport(
+        n_items=n_items,
+        top1_accuracy=correct / n,
+        mean_correct_sim=sum(correct_sims) / len(correct_sims) if correct_sims else 0.0,
+        mean_incorrect_sim=sum(incorrect_sims) / len(incorrect_sims) if incorrect_sims else 0.0,
+        sme_theta_encode_gt_rest=bool(sme.get("theta_encode_gt_rest")),
+        sme_gamma_encode_gt_rest=bool(sme.get("gamma_encode_gt_rest")),
+        per_item=per_item,
+        notes=(
+            "Fingerprint retrieval on multi-region FSOT brain; "
+            "not a transformer LM. Wet-lab class rates locked separately via scalpel."
+        ),
+    )

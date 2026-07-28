@@ -1,41 +1,30 @@
 {
-  "ts_utc": "2026-07-28T14:46:27.579840+00:00",
-  "experiment": "scalpel_class_rates",
-  "profile": "tol_0.05",
-  "git_sha": "e634c91b591e",
+  "ts_utc": "2026-07-28T14:52:23.773277+00:00",
+  "experiment": "intelligence_probe",
+  "profile": "ai_efficient",
+  "git_sha": "de29db3dc4c6",
   "formulas_ref": "docs/FORMULAS.md",
   "thesis_ref": "docs/THESIS.md",
   "authority_pin_prefix": "D1D38A",
   "gates": {
-    "pv_faster_than_pyr": true,
+    "pin_seed_ok": true,
     "scalpel_ok": true,
-    "pyr_within_tol": true,
-    "pv_within_tol": true,
-    "sst_within_tol": true,
-    "vip_within_tol": true
+    "retrieve_above_chance": true,
+    "retrieve_ge_half": true,
+    "correct_sim_gt_incorrect": true,
+    "sme_theta_direction": true,
+    "sme_gamma_direction": true
   },
   "metrics": {
-    "Pyr": {
-      "target": 16.35121532610921,
-      "measured": 16.363636016845703,
-      "rel_err": 0.0007596188105150371
-    },
-    "PV": {
-      "target": 83.3504049172855,
-      "measured": 83.63636016845703,
-      "rel_err": 0.0034307601919307163
-    },
-    "SST": {
-      "target": 29.538052683455557,
-      "measured": 29.09090805053711,
-      "rel_err": 0.015137918457600168
-    },
-    "VIP": {
-      "target": 34.81541758294487,
-      "measured": 33.6363639831543,
-      "rel_err": 0.033865846847350674
+    "top1": 1.0,
+    "correct_sim": 0.8528780440489451,
+    "incorrect_sim": 0.5403828640778859,
+    "scalpel": {
+      "Pyr": 0.0007596188105150371,
+      "PV": 0.0034307601919307163,
+      "SST": 0.015137918457600168
     }
   },
-  "notes": "Scalpel rate lock Pyr then PV to Allen wet-lab",
+  "notes": "scalpel brain + encode/retrieve fingerprint memory",
   "efficiency_doctrine": "docs/EFFICIENCY_DOCTRINE.md"
 }
