@@ -20,7 +20,8 @@ embodiment/zig/.zig-cache/
 embodiment/zig/zig-out/
 embodiment/zig/qemu_serial.log
 embodiment/zig/qemu_err.log
-artifacts/*.json
+artifacts/
+!artifacts/.gitkeep
 # Keep scientific thesis ledger (jsonl is small)
 !data/thesis_ledger/
 !data/thesis_ledger/**
