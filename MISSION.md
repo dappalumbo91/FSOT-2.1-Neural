@@ -81,6 +81,7 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Bio accuracy (wet-lab data)** | [`docs/BIO_ACCURACY.md`](docs/BIO_ACCURACY.md) |
 | **Learning / study alignment** | [`docs/LEARNING_ALIGNMENT.md`](docs/LEARNING_ALIGNMENT.md) |
 | **Scalpel rate lock** | [`docs/SCALPEL_RATE_SYSTEM.md`](docs/SCALPEL_RATE_SYSTEM.md) · `run_scalpel_rates.py` |
+| **Accuracy standard** | [`docs/ACCURACY_STANDARD.md`](docs/ACCURACY_STANDARD.md) — AlphaFold-*class* rigor, not CASP competitor |
 | Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 
