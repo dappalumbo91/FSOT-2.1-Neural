@@ -31,8 +31,8 @@ def main() -> int:
     ap.add_argument(
         "--focus",
         type=str,
-        default="Pyr,PV",
-        help="comma order: large errors first (default Pyr then PV)",
+        default="Pyr,PV,SST,VIP",
+        help="comma order: calibrate these classes (default all four)",
     )
     ap.add_argument("--device", type=str, default="cpu")
     args = ap.parse_args()
@@ -105,17 +105,20 @@ def main() -> int:
     print(f"\nhistory_points: {len(report.history)}")
     print(f"scalpel_ok (all targeted ≤ {args.tol:.0%}): {report.ok}")
 
-    # Priority gates
+    # Priority gates: every focused class + PV>Pyr order
     pyr = report.classes.get("Pyr")
     pv = report.classes.get("PV")
     gates = {
-        "pyr_within_tol": bool(pyr and pyr.rel_err == pyr.rel_err and pyr.rel_err <= args.tol),
-        "pv_within_tol": bool(pv and pv.rel_err == pv.rel_err and pv.rel_err <= args.tol),
         "pv_faster_than_pyr": bool(
             pv and pyr and pv.measured_Hz > pyr.measured_Hz
         ),
         "scalpel_ok": report.ok,
     }
+    for lab in focus or []:
+        st = report.classes.get(lab)
+        gates[f"{lab.lower()}_within_tol"] = bool(
+            st and st.rel_err == st.rel_err and st.rel_err <= args.tol
+        )
     print("\n--- Gates ---")
     for k, v in gates.items():
         print(f"  {k}: {v}")
@@ -178,8 +181,10 @@ def main() -> int:
         notes="Scalpel rate lock Pyr then PV to Allen wet-lab",
     )
 
-    # Require Pyr and PV within tol (the two margins user named)
-    ok = gates["pyr_within_tol"] and gates["pv_within_tol"] and gates["pv_faster_than_pyr"]
+    # Require every focused class within tol + PV faster than Pyr when both present
+    focus_ok = all(gates.get(f"{lab.lower()}_within_tol", False) for lab in (focus or []))
+    order_ok = gates["pv_faster_than_pyr"] if (pyr and pv) else True
+    ok = bool(focus_ok and order_ok and report.ok)
     print("\nPASS" if ok else "\nFAIL")
     return 0 if ok else 1
 

@@ -51,16 +51,29 @@ User requirement: **~24% Pyr error is not acceptable**; close it, then the ~8% P
 
 ---
 
-## 4. Measured (this machine, 2026-07-24)
+## 4. Measured (this machine)
+
+### Pass 1 — Pyr then PV (2026-07-24)
 
 | Class | Allen target | Scalpel measured | Rel err |
 |-------|--------------|------------------|---------|
 | **Pyr** | 16.35 Hz | **16.36 Hz** | **0.1%** |
 | **PV** | 83.35 Hz | **83.64 Hz** | **0.3%** |
 
-Both within **5%**. Order preserved.
+### Pass 2 — all four classes (2026-07-28)
 
-SST/VIP not in default focus — next scalpel pass after Pyr/PV locked.
+| Class | Allen target | Scalpel measured | Rel err |
+|-------|--------------|------------------|---------|
+| **Pyr** | 16.35 Hz | **16.15 Hz** | **1.2%** |
+| **PV** | 83.35 Hz | **83.85 Hz** | **0.6%** |
+| **SST** | 29.54 Hz | **29.23 Hz** | **1.0%** |
+| **VIP** | 34.82 Hz | **34.62 Hz** | **0.6%** |
+
+All four within **5%** hard tol. PV faster than Pyr preserved.
+
+```powershell
+python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.05
+```
 
 ---
 

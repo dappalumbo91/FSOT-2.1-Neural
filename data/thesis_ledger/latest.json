@@ -1,16 +1,18 @@
 {
-  "ts_utc": "2026-07-24T18:20:11.383633+00:00",
+  "ts_utc": "2026-07-28T14:46:27.579840+00:00",
   "experiment": "scalpel_class_rates",
   "profile": "tol_0.05",
-  "git_sha": "57c13be76074",
+  "git_sha": "e634c91b591e",
   "formulas_ref": "docs/FORMULAS.md",
   "thesis_ref": "docs/THESIS.md",
   "authority_pin_prefix": "D1D38A",
   "gates": {
+    "pv_faster_than_pyr": true,
+    "scalpel_ok": true,
     "pyr_within_tol": true,
     "pv_within_tol": true,
-    "pv_faster_than_pyr": true,
-    "scalpel_ok": true
+    "sst_within_tol": true,
+    "vip_within_tol": true
   },
   "metrics": {
     "Pyr": {
@@ -25,13 +27,13 @@
     },
     "SST": {
       "target": 29.538052683455557,
-      "measured": 20.909090042114258,
-      "rel_err": 0.2921303829271871
+      "measured": 29.09090805053711,
+      "rel_err": 0.015137918457600168
     },
     "VIP": {
       "target": 34.81541758294487,
-      "measured": 27.27272605895996,
-      "rel_err": 0.2166480268695633
+      "measured": 33.6363639831543,
+      "rel_err": 0.033865846847350674
     }
   },
   "notes": "Scalpel rate lock Pyr then PV to Allen wet-lab",
