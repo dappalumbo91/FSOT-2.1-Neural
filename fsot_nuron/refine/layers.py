@@ -634,14 +634,24 @@ def score_self_curriculum() -> LayerScore:
                 "delta_recall": ex.get("metric_delta_recall"),
                 "delta_pixel": ex.get("metric_delta_pixel"),
                 "after_recall": ex.get("after_recall"),
+                "held_gap_minus_fixed": ex.get("held_metric_gap_minus_fixed"),
+                "gap_beats_fixed_recall": ex.get("gap_beats_fixed_recall"),
             }
             if ex.get("ok"):
-                score += 10.0
-                design_ceiling = 78.0
+                score += 8.0
+                design_ceiling = 80.0
             if float(ex.get("metric_delta_recall") or 0) >= 0:
-                score += 4.0
+                score += 3.0
             if float(ex.get("after_pixel") or 0) >= 0.5:
+                score += 3.0
+            # Held A/B: gap arm vs fixed order on same budget
+            if ex.get("gap_beats_fixed_recall"):
+                score += 6.0
+            held = ex.get("held_metric_gap_minus_fixed")
+            if held is not None and float(held) > 0:
                 score += 4.0
+            if int(ex.get("n_steps") or 0) >= 4:
+                score += 3.0
         else:
             design_ceiling = 72.0 if self_auth and delta is not None else 42.0
         score = _clamp(min(score, design_ceiling))

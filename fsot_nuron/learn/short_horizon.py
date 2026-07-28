@@ -344,13 +344,20 @@ def run_short_horizon_learn(
                 stride=22,
                 seed=seed,
             )
-            cap_top1 = float(cap.pixel_to_name_top1)
+            # Prefer multi-frame vote score when available
+            cap_top1 = float(
+                getattr(cap, "pixel_to_name_top1_vote", None)
+                or cap.pixel_to_name_top1
+                or 0.0
+            )
             cap_names = int(cap.n_names)
             cap_pairs = int(cap.n_caption_binds)
             cap_detail = cap.to_dict()
             notes.append(
                 f"caption_bind binds={cap.n_caption_binds} names={cap.n_names} "
                 f"pixel→name top1={cap.pixel_to_name_top1:.3f} "
+                f"vote={getattr(cap, 'pixel_to_name_top1_vote', 0):.3f} "
+                f"purity={getattr(cap, 'mean_cluster_purity', 0):.3f} "
                 f"heldout={cap.n_heldout}"
             )
             # Store a memory summary of caption-name clusters for recall

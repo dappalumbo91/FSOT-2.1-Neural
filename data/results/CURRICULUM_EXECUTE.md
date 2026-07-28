@@ -1,23 +1,43 @@
-# Curriculum execute (short-horizon units)
+# Curriculum execute (short-horizon units + fixed A/B)
 
-Time: `2026-07-28T20:13:14.377858+00:00` → `2026-07-28T20:14:01.725675+00:00`
-OK: **True**  steps=**2**
+Time: `2026-07-28T20:20:40.633958+00:00` → `2026-07-28T20:22:04.205842+00:00`
+OK: **True**  gap_steps=**4**
 
-- recall **0.900** → **0.917** (Δ=+0.017)
-- pixel_id **1.000** → **0.583** (Δ=-0.417)
-- caption→name **0.000** → **0.000**
-- plan Δ_vs_fixed (synthetic)=0.3144
+## Held metrics (same budget)
 
-## Steps
+| Arm | Recall after | Pixel after | Δ recall vs base |
+|-----|-------------:|------------:|-----------------:|
+| baseline | 0.900 | 1.000 | — |
+| **gap** | **0.917** | **0.583** | +0.017 |
+| fixed | 0.917 | 0.667 | +0.017 |
 
-- step 1 `dialogue`: recall=0.917 pixel=0.417 caption=0.000 ok=True
-- step 2 `explain`: recall=0.900 pixel=0.750 caption=0.000 ok=True
+- gap beats fixed on recall: **True** (held Δ=+0.000)
+- gap beats fixed on pixel (±0.05): **False**
+- plan synthetic Δ_vs_fixed=0.4455
+
+## Gap steps
+
+- step 1 `dialogue`: recall=0.917 pixel=0.917 caption=1.000
+- step 2 `explain`: recall=0.900 pixel=0.500 caption=1.000
+- step 3 `face`: recall=0.917 pixel=0.583 caption=1.000
+- step 4 `particularly`: recall=0.900 pixel=0.875 caption=1.000
+
+## Fixed steps
+
+- step 1 `action`: recall=0.917 pixel=0.833
+- step 2 `animal`: recall=0.900 pixel=0.625
+- step 3 `brain`: recall=0.900 pixel=0.875
+- step 4 `dialogue`: recall=0.917 pixel=0.750
 
 ## Notes
 
-- plan steps=2 path=I:\fsot nuron\artifacts\curriculum\latest_plan.json
-- gap_order=['dialogue', 'explain', 'face', 'particularly', 'person', 'project', 'science', 'shakespeare']
-- baseline recall=0.900 pixel=1.000 caption=0.000 ok=True
-- step 1 target=dialogue recall=0.917 pixel=0.417
-- step 2 target=explain recall=0.900 pixel=0.750
-- final recall=0.917 pixel=0.583 caption=0.000 ok=True
+- plan steps=4 path=I:\fsot nuron\artifacts\curriculum\latest_plan.json
+- gap_order=['dialogue', 'explain', 'face', 'particularly', 'person', 'project', 'science', 'shakespeare', 'subscribe', 'sufficiently']
+- fixed_order=['action', 'animal', 'brain', 'dialogue', 'dog', 'explain', 'face', 'happened', 'human', 'ian']
+- baseline recall=0.900 pixel=1.000 caption=1.000
+- gap step 1 dialogue: recall=0.917 pixel=0.917
+- gap step 2 explain: recall=0.900 pixel=0.500
+- gap step 3 face: recall=0.917 pixel=0.583
+- gap step 4 particularly: recall=0.900 pixel=0.875
+- gap final recall=0.917 pixel=0.583 caption=1.000
+- fixed final recall=0.917 pixel=0.667
