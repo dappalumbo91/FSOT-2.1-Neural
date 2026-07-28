@@ -1,5 +1,7 @@
 __pycache__/
 *.py[cod]
+# Legacy experiment dump — never publish
+files-3ccbc49e/
 *.egg-info/
 .eggs/
 dist/

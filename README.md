@@ -58,6 +58,8 @@ $env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
 # 0) Pin theory authority (always — mathematics lives on I:\FSOT-Physical-Archive)
 python run_archive_pin.py
 python run_fsot_bridge.py   # pin → fold → bridge → couple (not random stitch)
+python scripts/runtime_audit.py   # → docs/RUNTIME_INVENTORY.md
+python run_learning_eeg_study.py  # study EEG wet-lab + SME memory
 
 # 1) Genetic-codon network (mission)
 python run_genetic_bio.py --units 64 --steps 1200

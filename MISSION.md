@@ -92,6 +92,9 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Intel options (later)** | [`docs/INTELLIGENCE_ROADMAP_OPTIONS.md`](docs/INTELLIGENCE_ROADMAP_OPTIONS.md) |
 | **Product UI / display** | [`docs/PRODUCT_UI_AND_DISPLAY.md`](docs/PRODUCT_UI_AND_DISPLAY.md) — Console v0.5 product screens |
 | **Stress / break map** | [`docs/STRESS_STAGE_REPORT.md`](docs/STRESS_STAGE_REPORT.md) · `python run_stress_suite.py` |
+| **Study / learning EEG** | [`docs/LEARNING_EEG_STUDY.md`](docs/LEARNING_EEG_STUDY.md) · `python run_learning_eeg_study.py` |
+| **Runtime inventory** | [`docs/RUNTIME_INVENTORY.md`](docs/RUNTIME_INVENTORY.md) · `python scripts/runtime_audit.py` |
+| **GitHub hygiene** | [`docs/GITHUB_HYGIENE.md`](docs/GITHUB_HYGIENE.md) |
 | Trinary bare metal | [`docs/TRINARY_BARE_METAL.md`](docs/TRINARY_BARE_METAL.md) |
 | Formulas | [`docs/FORMULAS.md`](docs/FORMULAS.md) |
 

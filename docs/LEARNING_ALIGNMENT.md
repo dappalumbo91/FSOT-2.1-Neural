@@ -1,7 +1,9 @@
 # Learning alignment — instrumental human data → FSOT neural targets
 
-**Status:** living roadmap (not yet fully implemented as closed gates).  
+**Status:** living roadmap + **implemented study-EEG path** (`run_learning_eeg_study.py`, `fsot_nuron/learning_eeg_study.py`).  
 **Purpose:** Keep human **encoding / retention / retrieval / creative use** of information as measurable alignment targets while we stay biologically accurate on cell-class ephys and port to bare metal.
+
+See also: [`LEARNING_EEG_STUDY.md`](LEARNING_EEG_STUDY.md) · [`RUNTIME_INVENTORY.md`](RUNTIME_INVENTORY.md).
 
 These targets come from **instrumental wet-lab / clinical recordings** (iEEG, EEG, fMRI, MEG) — public literature your project can treat the same way as Allen ephys: **authority for dynamics**, not metaphors.
 

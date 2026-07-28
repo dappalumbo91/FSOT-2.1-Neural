@@ -488,6 +488,9 @@ class ConsoleApp(tk.Tk):
         ttk.Button(mem_btns, text="Quick intel", command=self._cmd_intel_quick).pack(
             side=tk.LEFT, padx=2
         )
+        ttk.Button(mem_btns, text="Study EEG path", command=self._cmd_learning_eeg).pack(
+            side=tk.LEFT, padx=2
+        )
         ttk.Button(mem_btns, text="Full suite (slow)", command=self._cmd_intel).pack(
             side=tk.LEFT, padx=2
         )
@@ -914,6 +917,9 @@ class ConsoleApp(tk.Tk):
 
     def _cmd_stress_quick(self) -> None:
         self._run_async([sys.executable, str(ROOT / "run_stress_suite.py"), "--quick"])
+
+    def _cmd_learning_eeg(self) -> None:
+        self._run_async([sys.executable, str(ROOT / "run_learning_eeg_study.py")])
 
     def _refresh_cells(self) -> None:
         lines = [
