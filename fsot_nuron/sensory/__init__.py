@@ -25,6 +25,11 @@ from .media_stream import (
     media_roots_from_env,
     discover_media_files,
 )
+from .cross_modal import (
+    iter_audiovisual_moments,
+    cross_modal_association,
+    moment_to_packets,
+)
 
 
 def push_machine_text(
@@ -85,4 +90,7 @@ __all__ = [
     "MediaChewReport",
     "media_roots_from_env",
     "discover_media_files",
+    "iter_audiovisual_moments",
+    "cross_modal_association",
+    "moment_to_packets",
 ]

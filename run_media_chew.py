@@ -79,7 +79,26 @@ def main() -> int:
     print(f"mean_S={rep.mean_S:.4f}  total_spikes={rep.total_spikes}")
     print(f"region |S| proxy: { {k: round(v, 4) for k, v in rep.region_rates.items()} }")
     print(f"sources: {rep.sources}")
-    for n in rep.notes[:12]:
+    if rep.association_summary:
+        print(f"association_summary: {rep.association_summary}")
+    for ep in (rep.episodes or [])[:6]:
+        print(f"\n  episode: {ep.get('title')} ({ep.get('kind')})")
+        print(f"    top_symbols: {ep.get('top_symbols')}")
+        print(f"    meta_bind (tutor optional): {ep.get('meta_bind_score')}")
+        av = ep.get("av_cross_modal") or {}
+        if av:
+            print(
+                f"    AV co-stream: moments={av.get('n_moments')} "
+                f"soundtrack={av.get('has_soundtrack')} "
+                f"mean_bind={av.get('mean_bind')} "
+                f"speech_band={av.get('mean_speech_band')}"
+            )
+            for c in (av.get("clusters") or [])[:3]:
+                syms = [s.get("symbol") for s in (c.get("top_symbols") or [])[:4]]
+                print(f"      pattern cluster n={c.get('n_moments')} stats={c.get('mean_stats')} → {syms}")
+            if av.get("cross_modal_symbols"):
+                print(f"    cross_modal_symbols: {av.get('cross_modal_symbols')}")
+    for n in rep.notes[:16]:
         print(f"  note: {n}")
 
     out = {
@@ -99,30 +118,53 @@ def main() -> int:
     path.write_text(json.dumps(out, indent=2), encoding="utf-8")
     md = ROOT / "data" / "results" / "MEDIA_CHEW.md"
     md.parent.mkdir(parents=True, exist_ok=True)
-    md.write_text(
-        "\n".join(
-            [
-                "# Media sensory chew",
-                "",
-                f"Generated: `{out['generated_at']}`",
-                "",
-                "Optional world injectors (movies / shows / music). Brain boots without them.",
-                "",
-                f"- Vision packets: **{rep.n_vision_packets}** from {rep.n_video_files} files",
-                f"- Audio packets: **{rep.n_audio_packets}** from {rep.n_audio_files} files",
-                f"- Mean luma / motion / RMS: **{rep.mean_vision_luma:.3f}** / **{rep.mean_motion:.3f}** / **{rep.mean_audio_rms:.3f}**",
-                f"- Brain mean S / spikes: **{rep.mean_S:.3f}** / **{rep.total_spikes}**",
-                f"- Region |S|: `{rep.region_rates}`",
-                f"- Sources: {', '.join(rep.sources)}",
-                "",
-                "Decode: luma · RGB · hue hist · 8×8 retinotopic grid · edge · motion · FFT bands.",
-                "",
-                f"JSON: `{path}`",
-                "",
-            ]
-        ),
-        encoding="utf-8",
-    )
+    lines = [
+        "# Media sensory chew",
+        "",
+        f"Generated: `{out['generated_at']}`",
+        "",
+        "Optional world injectors (movies / shows / music). Brain boots without them.",
+        "",
+        "## Stream stats",
+        "",
+        f"- Vision packets: **{rep.n_vision_packets}** from {rep.n_video_files} files",
+        f"- Audio packets: **{rep.n_audio_packets}** from {rep.n_audio_files} files",
+        f"- Mean luma / motion / RMS: **{rep.mean_vision_luma:.3f}** / **{rep.mean_motion:.3f}** / **{rep.mean_audio_rms:.3f}**",
+        f"- Brain mean S / spikes: **{rep.mean_S:.3f}** / **{rep.total_spikes}**",
+        f"- Region |S|: `{rep.region_rates}`",
+        f"- Sources: {', '.join(rep.sources)}",
+        "",
+        "## Meaning layer",
+        "",
+        "Cross-modal A/V co-occurrence is primary; metadata is optional tutor.",
+        "",
+        f"- Association summary: `{rep.association_summary}`",
+        "",
+    ]
+    for ep in rep.episodes or []:
+        lines += [
+            f"### {ep.get('title')} ({ep.get('kind')})",
+            "",
+            f"- Top symbols: {ep.get('top_symbols')}",
+            f"- Meta bind (tutor): {ep.get('meta_bind_score')}",
+        ]
+        av = ep.get("av_cross_modal") or {}
+        if av:
+            lines.append(
+                f"- AV co-stream: moments={av.get('n_moments')} soundtrack={av.get('has_soundtrack')} "
+                f"mean_bind={av.get('mean_bind')} speech_band={av.get('mean_speech_band')}"
+            )
+            for c in (av.get("clusters") or [])[:4]:
+                syms = [s.get("symbol") for s in (c.get("top_symbols") or [])[:5]]
+                lines.append(f"  - pattern n={c.get('n_moments')} {c.get('mean_stats')} → {syms}")
+        lines.append("")
+    lines += [
+        "Decode: luma · RGB · hue · grid · motion · soundtrack speech-band · **vision⊗audio joint**.",
+        "",
+        f"JSON: `{path}`",
+        "",
+    ]
+    md.write_text("\n".join(lines), encoding="utf-8")
     print(f"\nWrote {path}")
     print(f"Wrote {md}")
     return 0 if rep.ok else 1

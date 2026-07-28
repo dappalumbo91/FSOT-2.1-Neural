@@ -384,6 +384,9 @@ class MediaChewConfig:
     seed: int = 7
     profile: str = "ai_efficient"
     device: str = "cpu"
+    associate: bool = True  # bind metadata + symbols after chew
+    av_costream: bool = True  # movies/shows: simultaneous audio+visual binding
+    use_metadata_tutor: bool = True  # optional labels; not required for AV binding
 
 
 @dataclass
@@ -402,6 +405,9 @@ class MediaChewReport:
     total_spikes: int
     sources: List[str]
     notes: List[str] = field(default_factory=list)
+    # Meaning layer (metadata + symbolic association)
+    episodes: List[Dict[str, Any]] = field(default_factory=list)
+    association_summary: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -471,98 +477,223 @@ def chew_media(
             )
         )
 
-    bus = SensoryBus()
+    from .bus import SensoryBus as _Bus
+    from .media_meta import extract_media_metadata
+    from .symbol_assoc import (
+        build_sensory_signature,
+        associate_media_episode,
+        summarize_associations,
+        MediaAssociationReport,
+    )
+
     sources: List[str] = []
     vision_stats: List[Dict[str, float]] = []
     audio_rms: List[float] = []
+    audio_centroids: List[float] = []
     n_vis = n_aud = 0
-    prev_gray = None
+    total_spikes = 0
+    last_S = None
+    n = brain.n_units
 
-    # --- video chew ---
+    def _drive_packets(packets: List[SensoryPacket]) -> None:
+        nonlocal total_spikes, last_S
+        hold = max(3, int(cfg.brain_steps_per_packet))
+
+        def _packet_external(pkt: SensoryPacket) -> torch.Tensor:
+            tmp = _Bus()
+            tmp.push(pkt)
+            return tmp.build_external(
+                n, brain.region_index, device=brain.device, dtype=brain.net.dtype
+            )
+
+        for pkt in packets:
+            ext = _packet_external(pkt)
+            energy = float(ext.abs().mean().item()) if ext.numel() else 0.0
+            gain = 0.55 / max(0.05, energy)
+            gain = min(4.0, max(1.2, gain))
+            ext = (ext * gain).clamp(-0.5, 1.4)
+            for i in brain.region_index.get("thal", []):
+                if brain.units[i].synapse_sign > 0:
+                    ext[i] = torch.clamp(ext[i] + 0.35, -0.5, 1.4)
+            for _ in range(hold):
+                S, fired, *_ = brain.step(ext)
+                total_spikes += int(fired.sum().item())
+                last_S = S
+            for _ in range(2):
+                S, fired, *_ = brain.step(ext * 0.4)
+                total_spikes += int(fired.sum().item())
+                last_S = S
+
+    # Per-file episodes for metadata + association
+    episode_raw: List[Dict[str, Any]] = []
+
+    # --- video chew (per file) — prefer simultaneous A/V co-stream ---
     for vp in videos:
         sources.append(str(vp))
         notes.append(f"video: {vp.name}")
-        for rgb, t_sec in iter_video_frames(
-            vp,
-            max_frames=cfg.frames_per_video,
-            stride=cfg.frame_stride,
-        ):
-            pkt, prev_gray, st = vision_packet_from_frame(
-                rgb, prev_gray, source=str(vp), t_sec=t_sec
-            )
-            bus.push(pkt)
-            n_vis += 1
-            vision_stats.append(st)
-            # Also mild thalamic salience from motion
-            if st["motion"] > 0.02:
-                bus.push(
-                    SensoryPacket(
-                        modality=SensoryModality.VISION,
-                        target_region="thal",
-                        features=[st["motion"], st["luma"]],
-                        strength=0.2 * pkt.strength,
-                        timestamp_ms=pkt.timestamp_ms,
-                        meta={"kind": "vision_salience", "source": str(vp)},
-                    )
+        meta = extract_media_metadata(vp)
+        from ..machine_encode import encode_to_sensory_packet, EncodePath
+
+        meta_pkt = None
+        if cfg.use_metadata_tutor:
+            try:
+                meta_pkt = encode_to_sensory_packet(
+                    meta.label_line(),
+                    path=EncodePath.MACHINE,
+                    target_region="assoc",
+                    strength=0.35,
+                )
+                meta_pkt.meta["kind"] = "media_metadata_tutor"  # optional tutor, not required
+                meta_pkt.meta["media_meta"] = meta.to_dict()
+            except Exception:
+                meta_pkt = None
+
+        file_vis_stats: List[Dict[str, float]] = []
+        file_rms: List[float] = []
+        file_cent: List[float] = []
+        file_pkts: List[SensoryPacket] = []
+        av_report: Dict[str, Any] = {}
+        if meta_pkt is not None:
+            file_pkts.append(meta_pkt)
+
+        used_av = False
+        if cfg.av_costream:
+            try:
+                from .cross_modal import (
+                    iter_audiovisual_moments,
+                    moment_to_packets,
+                    cross_modal_association,
                 )
 
-    # --- audio chew ---
+                moments = list(
+                    iter_audiovisual_moments(
+                        vp,
+                        max_moments=cfg.frames_per_video,
+                        frame_stride=cfg.frame_stride,
+                    )
+                )
+                if moments:
+                    used_av = True
+                    for m in moments:
+                        file_pkts.extend(moment_to_packets(m, source=str(vp)))
+                        file_vis_stats.append(m.vision_stats)
+                        vision_stats.append(m.vision_stats)
+                        n_vis += 1
+                        if m.audio_feats:
+                            n_aud += 1
+                            file_rms.append(float(m.audio_stats.get("rms", 0.0)))
+                            file_cent.append(float(m.audio_stats.get("centroid_norm", 0.0)))
+                            audio_rms.append(float(m.audio_stats.get("rms", 0.0)))
+                            audio_centroids.append(
+                                float(m.audio_stats.get("centroid_norm", 0.0))
+                            )
+                    av_report = cross_modal_association(moments, seed=cfg.seed)
+                    notes.append(
+                        f"AV co-stream {vp.name}: moments={av_report.get('n_moments')} "
+                        f"soundtrack={av_report.get('has_soundtrack')} "
+                        f"mean_bind={av_report.get('mean_bind', 0):.3f} "
+                        f"speech={av_report.get('mean_speech_band', 0):.3f}"
+                    )
+            except Exception as e:
+                notes.append(f"AV co-stream fallback ({vp.name}): {e}")
+                used_av = False
+
+        if not used_av:
+            # vision-only fallback
+            prev_gray = None
+            for rgb, t_sec in iter_video_frames(
+                vp,
+                max_frames=cfg.frames_per_video,
+                stride=cfg.frame_stride,
+            ):
+                pkt, prev_gray, st = vision_packet_from_frame(
+                    rgb, prev_gray, source=str(vp), t_sec=t_sec
+                )
+                file_pkts.append(pkt)
+                n_vis += 1
+                vision_stats.append(st)
+                file_vis_stats.append(st)
+
+        _drive_packets(file_pkts)
+        rates_ep: Dict[str, float] = {}
+        if last_S is not None:
+            s_cpu = last_S.detach().cpu()
+            for rid, ids in brain.region_index.items():
+                if ids:
+                    rates_ep[rid] = float(s_cpu[ids].abs().mean().item())
+        episode_raw.append(
+            {
+                "meta": meta,
+                "vision_stats": file_vis_stats,
+                "audio_rms": file_rms,
+                "audio_centroids": file_cent,
+                "region_abs": rates_ep,
+                "mean_S": float(last_S.mean().item()) if last_S is not None else 0.0,
+                "n_vision": len(file_vis_stats),
+                "n_audio": len(file_rms),
+                "av_cross_modal": av_report,
+            }
+        )
+
+    # --- audio chew (per file) ---
     for ap in audios:
         sources.append(str(ap))
         notes.append(f"audio: {ap.name}")
+        meta = extract_media_metadata(ap)
+        from ..machine_encode import encode_to_sensory_packet, EncodePath
+
+        try:
+            meta_pkt = encode_to_sensory_packet(
+                meta.label_line(),
+                path=EncodePath.MACHINE,
+                target_region="assoc",
+                strength=0.4,
+            )
+            meta_pkt.meta["kind"] = "media_metadata_label"
+            meta_pkt.meta["media_meta"] = meta.to_dict()
+        except Exception:
+            meta_pkt = None
+        file_pkts = []
+        if meta_pkt is not None:
+            file_pkts.append(meta_pkt)
+        file_rms: List[float] = []
+        file_cent: List[float] = []
         for w in range(cfg.audio_windows):
             off = w * cfg.audio_duration_s * 1.5
             pkt = audio_packet_from_file(ap, offset_s=off, duration_s=cfg.audio_duration_s)
             if not pkt.features:
                 continue
-            bus.push(pkt)
+            file_pkts.append(pkt)
             n_aud += 1
-            audio_rms.append(float(pkt.meta.get("stats", {}).get("rms", 0.0)))
-
-    # Drain into brain dynamics — hold each packet as sustained drive (like
-    # continuous light / sound on the receptor sheet, not a one-sample blip).
-    n = brain.n_units
-    total_spikes = 0
-    last_S = torch.zeros(n, device=brain.device, dtype=brain.net.dtype)
-    packets_all = bus.drain()
-    if not packets_all:
-        notes.append("No frames/windows decoded (codec or empty).")
-
-    def _packet_external(pkt: SensoryPacket) -> torch.Tensor:
-        tmp = SensoryBus()
-        tmp.push(pkt)
-        return tmp.build_external(
-            n, brain.region_index, device=brain.device, dtype=brain.net.dtype
+            st = pkt.meta.get("stats") or {}
+            file_rms.append(float(st.get("rms", 0.0)))
+            file_cent.append(float(st.get("centroid_norm", 0.0)))
+            audio_rms.append(float(st.get("rms", 0.0)))
+            audio_centroids.append(float(st.get("centroid_norm", 0.0)))
+        _drive_packets(file_pkts)
+        rates_ep = {}
+        if last_S is not None:
+            s_cpu = last_S.detach().cpu()
+            for rid, ids in brain.region_index.items():
+                if ids:
+                    rates_ep[rid] = float(s_cpu[ids].abs().mean().item())
+        episode_raw.append(
+            {
+                "meta": meta,
+                "vision_stats": [],
+                "audio_rms": file_rms,
+                "audio_centroids": file_cent,
+                "region_abs": rates_ep,
+                "mean_S": float(last_S.mean().item()) if last_S is not None else 0.0,
+                "n_vision": 0,
+                "n_audio": len(file_rms),
+            }
         )
 
-    hold = max(3, int(cfg.brain_steps_per_packet))
-    for pkt in packets_all:
-        ext = _packet_external(pkt)
-        # Receptor-sheet gain: map packet energy into FI-like drive band
-        # (media features are 0..1; bare product is too weak for class phenotypes)
-        energy = float(ext.abs().mean().item()) if ext.numel() else 0.0
-        gain = 0.55 / max(0.05, energy)  # normalize toward ~0.55 mean
-        gain = min(4.0, max(1.2, gain))
-        ext = (ext * gain).clamp(-0.5, 1.4)
-        # thalamic carrier burst on top of content (wake-up / attention)
-        for i in brain.region_index.get("thal", []):
-            if brain.units[i].synapse_sign > 0:
-                ext[i] = torch.clamp(ext[i] + 0.35, -0.5, 1.4)
-        for _ in range(hold):
-            S, fired, *_ = brain.step(ext)
-            total_spikes += int(fired.sum().item())
-            last_S = S
-        # iconic / echoic residual
-        for _ in range(2):
-            S, fired, *_ = brain.step(ext * 0.4)
-            total_spikes += int(fired.sum().item())
-            last_S = S
+    if not videos and not audios:
+        notes.append("No frames/windows decoded (codec or empty).")
 
     rates: Dict[str, float] = {}
-    # approximate region activity from last fired not stored — use structure sizes + spike total
-    for rid, ids in brain.region_index.items():
-        rates[rid] = float(len(ids))  # placeholder size
-    # better: run short rest to measure? use mean |S| as proxy per region
     if last_S is not None:
         s_cpu = last_S.detach().cpu()
         for rid, ids in brain.region_index.items():
@@ -576,6 +707,44 @@ def chew_media(
         sum(s["motion"] for s in vision_stats) / len(vision_stats) if vision_stats else 0.0
     )
     mean_rms = sum(audio_rms) / len(audio_rms) if audio_rms else 0.0
+
+    # --- Association / meaning layer ---
+    episodes_out: List[Dict[str, Any]] = []
+    assoc_summary: Dict[str, Any] = {}
+    if cfg.associate and episode_raw:
+        metas = [ep["meta"] for ep in episode_raw]
+        reports: List[MediaAssociationReport] = []
+        for ep in episode_raw:
+            sig = build_sensory_signature(
+                vision_stats=ep["vision_stats"],
+                audio_rms=ep["audio_rms"],
+                audio_centroids=ep["audio_centroids"],
+                mean_S=ep["mean_S"],
+                region_abs=ep["region_abs"],
+                n_vision=ep["n_vision"],
+                n_audio=ep["n_audio"],
+            )
+            rivals = [m for m in metas if m.path != ep["meta"].path]
+            arep = associate_media_episode(
+                ep["meta"], sig, seed=cfg.seed, rival_metas=rivals or None
+            )
+            reports.append(arep)
+            episodes_out.append(
+                {
+                    "title": ep["meta"].title,
+                    "kind": ep["meta"].kind,
+                    "metadata": ep["meta"].to_dict(),
+                    "association": arep.to_dict(),
+                    "top_symbols": [a["symbol"] for a in arep.top_anchors[:6]],
+                    "meta_bind_score": arep.meta_bind_score,
+                    "av_cross_modal": ep.get("av_cross_modal") or {},
+                }
+            )
+        assoc_summary = summarize_associations(reports)
+        notes.append(
+            f"association: mean_meta_bind={assoc_summary.get('mean_meta_bind', 0):.3f} "
+            f"top5_meta_hit_frac={assoc_summary.get('top5_anchor_hits_meta_frac', 0):.2f}"
+        )
 
     return MediaChewReport(
         ok=True,
@@ -592,4 +761,6 @@ def chew_media(
         total_spikes=total_spikes,
         sources=[Path(s).name for s in sources[:12]],
         notes=notes,
+        episodes=episodes_out,
+        association_summary=assoc_summary,
     )
