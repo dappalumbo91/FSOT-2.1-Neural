@@ -33,7 +33,7 @@ Those demos may remain under `run_climb.py` / `run_sota_fronts.py` for explorati
 
 | Layer | Source |
 |-------|--------|
-| Theory pin | `I:\FSOT-Physical-Archive` → `vendor/fsot_compute.py` **D1D38A…** |
+| Theory pin | **Standalone** `data/archive_snapshot/` → **D1D38A…** (no external drive required) |
 | Codon map | `I:\64_codon_trinary_map.txt` ≡ archive ≡ `data/64_codon_trinary_map.txt` |
 | Protein interaction form | Archive `04_Genetics-Longevity` fluid-to-solid / protein formulas |
 | Bio targets | Allen Cell Types ephys (when CSV present) |
@@ -47,7 +47,7 @@ Those demos may remain under `run_climb.py` / `run_sota_fronts.py` for explorati
 ```powershell
 cd "I:\fsot nuron"
 $env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+$env:FSOT_STANDALONE = "1"
 
 python run_archive_pin.py
 python run_genetic_bio.py --units 64 --steps 1200

@@ -15,7 +15,7 @@ Biologically structured **FSOT neurons** whose identity and wiring come from the
 |--|--|
 | **Mission** | See **`MISSION.md`** (read this first) |
 | **Primary runner** | `python run_genetic_bio.py` |
-| **Theory authority** | [FSOT-2.1-Lean](https://github.com/dappalumbo91/FSOT-2.1-Lean) + `I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full` |
+| **Theory authority** | **In-repo** `data/archive_snapshot/` (D1D38A) · lineage [FSOT-2.1-Lean](https://github.com/dappalumbo91/FSOT-2.1-Lean) · optional external re-pin only |
 | **Archive pin** | `python run_archive_pin.py` → must report `connected: True` on this machine |
 | **Codon authority** | `data/64_codon_trinary_map.txt` (A,G=+1 · C,T=−1) |
 | **License** | Apache-2.0 |
@@ -50,12 +50,13 @@ Allen timing lock (bio_match) + hard bio metrics
 ## Quick start (primary path)
 
 ```powershell
-cd "I:\fsot nuron"
+cd "<this-repo>"   # any machine — no other folders required
 pip install -r requirements.txt
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+$env:PYTHONPATH = (Get-Location).Path
+$env:FSOT_STANDALONE = "1"
+# Law lives in data/archive_snapshot/ (D1D38A). Optional external archive is NOT required.
 
-# 0) Pin theory authority (always — mathematics lives on I:\FSOT-Physical-Archive)
+# 0) Pin theory authority (standalone in-repo)
 python run_archive_pin.py
 python run_fsot_bridge.py   # pin → fold → bridge → couple (not random stitch)
 python scripts/runtime_audit.py   # → docs/RUNTIME_INVENTORY.md
@@ -242,25 +243,27 @@ python run_failure_probe.py --list
 
 ---
 
-## Data paths
+## Data paths (standalone)
 
 ```powershell
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
-$env:FSOT_ALLEN_EPHYS = "D:\path\to\ephys_features.csv"   # optional override
-$env:FSOT_NURON_ARTIFACTS = "I:\fsot nuron\artifacts"
+$env:FSOT_STANDALONE = "1"
+$env:FSOT_NURON_ARTIFACTS = ".\artifacts"   # default under repo
+# Allen features: data/eeg/allen_ephys/ephys_features.csv (bundled / local)
+# Codon map: data/64_codon_trinary_map.txt
+# Authority: data/archive_snapshot/fsot_compute_authority.py
 ```
 
-Default Allen features (if present on this machine): Desktop nuron cell data CSV.
+See [`docs/STANDALONE_TRANSPLANT.md`](docs/STANDALONE_TRANSPLANT.md).
 
 ---
 
-## Related work on this machine
+## Theory lineage (optional external)
 
 | Path | Role |
 |------|------|
-| `I:\FSOT-Physical-Archive` | Lean authority + genetics + SR-ITE |
-| `I:\FSOT-Physical-Archive\04_Genetics-Longevity` | Codon map + protein formulas |
-| [FSOT-2.1-Lean](https://github.com/dappalumbo91/FSOT-2.1-Lean) | Public theory |
+| **In-repo** `data/archive_snapshot/` | **Required** authority for this brain |
+| [FSOT-2.1-Lean](https://github.com/dappalumbo91/FSOT-2.1-Lean) | Public theory lineage |
+| External Physical-Archive | Optional developer re-pin only |
 
 ---
 

@@ -32,7 +32,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 os.environ.setdefault("PYTHONPATH", str(ROOT))
-os.environ.setdefault("FSOT_PHYSICAL_ARCHIVE", r"I:\FSOT-Physical-Archive")
+os.environ.setdefault("FSOT_STANDALONE", "1")
+# Do NOT default to another machine folder — brain is in-repo.
 
 ZIG_HOST = ROOT / "embodiment" / "zig" / "zig-out" / "bin" / "fsot_trit_host.exe"
 ZIG_QEMU = ROOT / "embodiment" / "zig" / "run_qemu.ps1"
@@ -62,9 +63,12 @@ def format_boot_report(
         "  and the machine body ABI (not Morse) round-trips correctly.",
         "",
         f"1. Archive pin ............. {_fmt_yes(pin.connected)}",
+        f"   Pin mode ................ {getattr(pin, 'pin_mode', 'standalone')}",
+        f"   Transplantable .......... {_fmt_yes(getattr(pin, 'transplantable', True))}",
         f"   Seed match .............. {_fmt_yes(pin.seed_match_ok)}",
         f"   Authority hash .......... {(pin.compute_sha256 or 'missing')[:24]}…",
         f"   Lean proved / 7-way ..... {_fmt_yes(pin.lean_build_ok)} / {_fmt_yes(pin.seven_way_bare_metal)}",
+        f"   Authority root .......... {(pin.archive_root or 'in-repo snapshot')[:60]}",
         "",
         "2. Domain folds (preregistered — not free fits)",
     ]
@@ -98,7 +102,14 @@ def format_boot_report(
         and machine.get("utf8_roundtrip_ok")
         and machine.get("frame_roundtrip_ok")
     )
-    lines.append("RESULT: " + ("BOOT PASS — system ready to run science buttons." if boot_ok else "BOOT FAIL — fix archive pin / FSOT_PHYSICAL_ARCHIVE."))
+    lines.append(
+        "RESULT: "
+        + (
+            "BOOT PASS — standalone brain ready (in-repo authority)."
+            if boot_ok
+            else "BOOT FAIL — fix data/archive_snapshot (no external drive required)."
+        )
+    )
     lines.append("")
     return "\n".join(lines), boot_ok
 
@@ -466,7 +477,7 @@ class ConsoleApp(tk.Tk):
         ).pack(anchor=tk.W, padx=8, pady=(8, 2))
         ttk.Label(
             self.tab_dash,
-            text="Lab UI (Python) + body (Zig) + math (I:\\FSOT-Physical-Archive). No web.",
+            text="Standalone brain: in-repo math · Zig body · host senses. No other folders required. No web.",
             font=("Segoe UI", 9),
         ).pack(anchor=tk.W, padx=8, pady=(0, 6))
 
@@ -797,7 +808,7 @@ class ConsoleApp(tk.Tk):
             try:
                 env = os.environ.copy()
                 env["PYTHONPATH"] = str(ROOT)
-                env.setdefault("FSOT_PHYSICAL_ARCHIVE", r"I:\FSOT-Physical-Archive")
+                env.setdefault("FSOT_STANDALONE", "1")
                 p = subprocess.Popen(
                     args,
                     cwd=str(cwd or ROOT),
@@ -879,7 +890,11 @@ class ConsoleApp(tk.Tk):
 
                 self.after(0, ui)
             except Exception as e:
-                msg = f"BOOT ERROR\n==========\n{e}\n\nSet FSOT_PHYSICAL_ARCHIVE=I:\\FSOT-Physical-Archive\n"
+                msg = (
+                    f"BOOT ERROR\n==========\n{e}\n\n"
+                    "Standalone package: ensure data/archive_snapshot/ is present in this repo.\n"
+                    "No external FSOT_PHYSICAL_ARCHIVE required.\n"
+                )
                 self._log(msg)
 
                 def ui_err() -> None:

@@ -21,7 +21,7 @@ if str(ROOT) not in sys.path:
 def main() -> int:
     import os
 
-    os.environ.setdefault("FSOT_PHYSICAL_ARCHIVE", r"I:\FSOT-Physical-Archive")
+    os.environ.setdefault("FSOT_STANDALONE", "1")
     os.environ.setdefault("PYTHONPATH", str(ROOT))
 
     from fsot_nuron.fsot_bridge import (

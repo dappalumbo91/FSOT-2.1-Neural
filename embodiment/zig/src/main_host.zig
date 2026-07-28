@@ -7,6 +7,7 @@ const network = @import("network.zig");
 const fingerprint = @import("fingerprint.zig");
 const seeds = @import("seeds.zig");
 const frame_inject = @import("frame_inject.zig");
+const metric_inject = @import("metric_inject.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     // Zig 0.15: scientific via {e}
@@ -88,6 +89,13 @@ pub fn main() !void {
         std.process.exit(1);
     }
     std.debug.print("FSOT_FRAME PASS\n", .{});
+
+    // Interoception MetricPacket ABI (standalone plant → body)
+    if (!metric_inject.selfTest()) {
+        std.debug.print("FSOT_METRIC FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_METRIC PASS\n", .{});
 
     std.debug.print("FSOT_STAGE_ZIG_NEURON_OK\n", .{});
 }

@@ -122,18 +122,17 @@ _ENGINE_PATH: Optional[str] = None
 
 def get_authority_engine():
     """
-    Load archive vendor/fsot_compute.py (mpmath 50-digit) when present.
-    Fail closed for claim-sensitive paths if pin hash mismatches.
+    Load **in-repo** fsot_compute_authority.py (standalone transplant package).
+    Optional external vendor path only if standalone file missing.
     """
     global _ENGINE, _ENGINE_PATH
     if _ENGINE is not None:
         return _ENGINE
 
-    hub = resolve_lean_hub()
-    if hub is None:
-        return None
-    path = hub / "vendor" / "fsot_compute.py"
-    if not path.is_file():
+    from .paths import resolve_authority_compute
+
+    path = resolve_authority_compute()
+    if path is None or not path.is_file():
         return None
     spec = importlib.util.spec_from_file_location("fsot_compute_authority_neural", path)
     if spec is None or spec.loader is None:
@@ -147,11 +146,12 @@ def get_authority_engine():
 
 
 def require_pin(*, write_snapshot: bool = False) -> ArchivePin:
-    """Fail-closed pin for claim-sensitive work."""
+    """Fail-closed pin for claim-sensitive work — standalone package only."""
     pin = pin_archive(write_snapshot=write_snapshot)
     if not pin.connected:
         raise RuntimeError(
-            "FSOT archive not connected. Set FSOT_PHYSICAL_ARCHIVE=I:\\FSOT-Physical-Archive"
+            "FSOT standalone pin failed. Ensure data/archive_snapshot/fsot_compute_authority.py "
+            "is present (D1D38A) and seeds match. No external drive required."
         )
     if pin.compute_matches_certificate is False:
         raise RuntimeError(
@@ -159,7 +159,7 @@ def require_pin(*, write_snapshot: bool = False) -> ArchivePin:
         )
     if not pin.seed_match_ok:
         raise RuntimeError(
-            f"Local SEEDS drift from archive (max_rel_err={pin.seed_max_rel_err})"
+            f"Local SEEDS drift from archive formulas (max_rel_err={pin.seed_max_rel_err})"
         )
     return pin
 

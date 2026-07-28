@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-os.environ.setdefault("FSOT_PHYSICAL_ARCHIVE", r"I:\FSOT-Physical-Archive")
+os.environ.setdefault("FSOT_STANDALONE", "1")
 os.environ.setdefault("PYTHONPATH", str(ROOT))
 
 
@@ -663,6 +663,28 @@ class StressSuite:
             # H1 adaptive hardware (not locked to one PC)
             hw = discover_hardware()
             body = boot_body_report()
+            # H0 standalone pin (no external archive required)
+            from fsot_nuron.archive_pin import pin_archive
+            from fsot_nuron.paths import transplant_report, standalone_mode
+
+            pin = pin_archive(write_snapshot=False)
+            tr = transplant_report()
+            self.record(
+                "H",
+                "standalone_transplant_pin",
+                bool(pin.connected and pin.seed_match_ok and standalone_mode()),
+                critical=True,
+                metrics={
+                    "pin_mode": getattr(pin, "pin_mode", None),
+                    "transplantable": getattr(pin, "transplantable", None),
+                    "sha": (pin.compute_sha256 or "")[:16],
+                    "archive_root": (pin.archive_root or "")[-40:],
+                    "standalone_complete": tr.get("standalone_complete"),
+                    "external_optional": tr.get("external_archive_optional"),
+                },
+                note="brain must boot from in-repo snapshot only",
+            )
+
             self.record(
                 "H",
                 "hardware_discover",

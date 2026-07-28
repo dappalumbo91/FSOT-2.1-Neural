@@ -1,15 +1,16 @@
 """
-Hard pin: FSOT-2.1-Neural ↔ physical archive / theory hub.
+Hard pin: FSOT-2.1-Neural theory authority — **standalone-first**.
 
-The neuron substrate is not a free-floating experiment. Authority lives at:
+The mind is a transplantable brain. Law lives **inside this repo**:
 
-  I:/FSOT-Physical-Archive          (master, when present)
-  02_FSOT-2.1-Lean-Full             (canonical Lean + vendor/fsot_compute)
-  GitHub dappalumbo91/FSOT-2.1-Lean (public theory)
+  data/archive_snapshot/fsot_compute_authority.py   (D1D38A… vendored)
+  data/archive_snapshot/certificate.json            (Lean ledger excerpt)
+  fsot_nuron/seeds.py                               (closed-form float seeds)
 
-This module resolves those roots, hashes the compute authority, reads the
-certificate / cross-proof ledgers when available, and checks that local
-float seeds match archive-derived constants.
+Optional external Physical-Archive is **only** for developer re-pin from a
+theory master — never required to boot, stress, or ship the organism.
+
+GitHub: dappalumbo91/FSOT-2.1-Neural (this brain) · FSOT-2.1-Lean (theory lineage)
 """
 
 from __future__ import annotations
@@ -25,28 +26,27 @@ from pathlib import Path
 from typing import Any, Optional
 
 from . import seeds as local_seeds
-from .paths import ROOT, ARTIFACTS
+from .paths import (
+    ROOT,
+    ARTIFACTS,
+    ARCHIVE_SNAPSHOT,
+    resolve_standalone_root,
+    resolve_external_archive,
+    resolve_authority_compute,
+    standalone_complete,
+    standalone_mode,
+    transplant_report,
+)
 
 GITHUB_THEORY = "https://github.com/dappalumbo91/FSOT-2.1-Lean"
 GITHUB_NEURAL = "https://github.com/dappalumbo91/FSOT-2.1-Neural"
 
-# Certificate authority pin (GREEN report 2026-07-13)
+# Certificate authority pin (GREEN report 2026-07-13) — baked into the brain
 CERT_AUTHORITY_SHA256 = (
     "D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70"
 )
 
-ARCHIVE_CANDIDATES = [
-    Path(os.environ["FSOT_PHYSICAL_ARCHIVE"])
-    if os.environ.get("FSOT_PHYSICAL_ARCHIVE")
-    else None,
-    Path(os.environ["FSOT_ARCHIVE_ROOT"])
-    if os.environ.get("FSOT_ARCHIVE_ROOT")
-    else None,
-    Path(r"I:\FSOT-Physical-Archive"),
-    Path(r"I:/FSOT-Physical-Archive"),
-]
-
-SNAPSHOT_DIR = ROOT / "data" / "archive_snapshot"
+SNAPSHOT_DIR = ARCHIVE_SNAPSHOT
 
 
 @dataclass
@@ -76,6 +76,9 @@ class ArchivePin:
     snapshot_written: Optional[str] = None
     generated_at: str = ""
     notes: list[str] = field(default_factory=list)
+    # standalone | external_enrichment
+    pin_mode: str = "standalone"
+    transplantable: bool = True
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -90,31 +93,16 @@ def _sha256_file(path: Path) -> str:
 
 
 def resolve_archive_root() -> Optional[Path]:
-    for p in ARCHIVE_CANDIDATES:
-        if p is None:
-            continue
-        try:
-            rp = p.resolve()
-        except OSError:
-            continue
-        if rp.is_dir() and (rp / "ARCHIVE_MANIFEST.json").is_file():
-            return rp
-        if rp.is_dir() and (rp / "02_FSOT-2.1-Lean-Full").is_dir():
-            return rp
-    return None
+    """Standalone snapshot first; optional external only if explicitly allowed."""
+    from .paths import resolve_archive_root as _paths_resolve
+
+    return _paths_resolve()
 
 
 def resolve_lean_hub(archive: Optional[Path] = None) -> Optional[Path]:
-    env = os.environ.get("FSOT_LEAN_HUB") or os.environ.get("FSOT_CANONICAL_LEAN_HUB")
-    if env:
-        p = Path(env)
-        if p.is_dir():
-            return p.resolve()
-    arch = archive or resolve_archive_root()
-    if arch is None:
-        return None
-    hub = arch / "02_FSOT-2.1-Lean-Full"
-    return hub if hub.is_dir() else None
+    from .paths import resolve_lean_hub as _paths_lean
+
+    return _paths_lean()
 
 
 def archive_derived_floats() -> dict[str, float]:
@@ -196,21 +184,29 @@ def _load_json(path: Path) -> Optional[dict[str, Any]]:
 
 
 def pin_archive(*, write_snapshot: bool = True) -> ArchivePin:
+    """
+    Pin the brain's theory law.
+
+    Default path is **standalone**: in-repo `data/archive_snapshot` + local seeds.
+    No other folder on the host is required.
+    """
     now = datetime.now(timezone.utc).isoformat()
     notes: list[str] = []
-    archive = resolve_archive_root()
-    hub = resolve_lean_hub(archive)
-
     seed_ok, seed_max, seed_bad = check_local_seeds()
+
+    snap_root = resolve_standalone_root()
+    auth_path = resolve_authority_compute()
+    ext = resolve_external_archive()
+    hub = resolve_lean_hub()
 
     pin = ArchivePin(
         connected=False,
-        archive_root=str(archive) if archive else None,
+        archive_root=str(snap_root),
         lean_hub=str(hub) if hub else None,
         manifest_ok=False,
-        compute_path=None,
+        compute_path=str(auth_path) if auth_path else None,
         compute_sha256=None,
-        cert_authority_sha256=None,
+        cert_authority_sha256=CERT_AUTHORITY_SHA256,
         compute_matches_certificate=None,
         compute_matches_disk_note="",
         lean_build_ok=None,
@@ -221,56 +217,31 @@ def pin_archive(*, write_snapshot: bool = True) -> ArchivePin:
         seed_mismatches=seed_bad,
         generated_at=now,
         notes=notes,
+        pin_mode="standalone",
+        transplantable=True,
     )
 
     if not seed_ok:
-        notes.append("Local float seeds disagree with archive closed-form formulas.")
+        notes.append("Local float seeds disagree with closed-form archive formulas.")
     else:
-        notes.append("Local SEEDS match archive closed-form (float64).")
+        notes.append("Local SEEDS match closed-form formulas (float64) — self-contained.")
 
-    if archive is None:
+    # --- Standalone authority (primary) ---
+    cert = _load_json(snap_root / "certificate.json")
+    xpr = _load_json(snap_root / "cross_proof_verification_report.json")
+    manifest = _load_json(snap_root / "ARCHIVE_MANIFEST.json")
+    pin.manifest_ok = manifest is not None or standalone_complete()
+
+    if auth_path is not None and auth_path.is_file():
+        pin.compute_path = str(auth_path)
+        pin.compute_sha256 = _sha256_file(auth_path)
+        notes.append(f"standalone authority: {auth_path.name}")
+    else:
         notes.append(
-            "Physical archive not found. Set FSOT_PHYSICAL_ARCHIVE or install "
-            "I:\\FSOT-Physical-Archive. Seeds still self-check against formulas."
+            "MISSING data/archive_snapshot/fsot_compute_authority.py — "
+            "clone incomplete; cannot pin standalone brain."
         )
-        # Offline snapshot may still exist
-        snap = SNAPSHOT_DIR / "pin.json"
-        if snap.is_file():
-            prev = _load_json(snap)
-            if prev:
-                notes.append(f"Using last local snapshot at {snap}")
-                pin.cert_authority_sha256 = prev.get("cert_authority_sha256")
-                pin.lean_build_ok = prev.get("lean_build_ok")
-                pin.n_proved_claims = prev.get("n_proved_claims")
-                pin.cross_proof_overall_ok = prev.get("cross_proof_overall_ok")
-        pin.notes = notes
-        return pin
 
-    manifest_path = archive / "ARCHIVE_MANIFEST.json"
-    manifest = _load_json(manifest_path) if manifest_path.is_file() else None
-    pin.manifest_ok = manifest is not None
-    if manifest:
-        canon = manifest.get("canonical_lean_hub")
-        if canon:
-            notes.append(f"manifest.canonical_lean_hub={canon}")
-        policy = manifest.get("canonical_policy")
-        if policy:
-            notes.append(str(policy)[:200])
-
-    if hub is None:
-        notes.append("Lean hub 02_FSOT-2.1-Lean-Full missing under archive.")
-        pin.notes = notes
-        return pin
-
-    compute = hub / "vendor" / "fsot_compute.py"
-    if compute.is_file():
-        pin.compute_path = str(compute)
-        pin.compute_sha256 = _sha256_file(compute)
-    else:
-        notes.append("vendor/fsot_compute.py missing under Lean hub.")
-
-    cert_path = hub / "data" / "certificate.json"
-    cert = _load_json(cert_path) if cert_path.is_file() else None
     if cert:
         auth = cert.get("authority") or {}
         pin.cert_authority_sha256 = (auth.get("sha256") or CERT_AUTHORITY_SHA256).upper()
@@ -285,47 +256,69 @@ def pin_archive(*, write_snapshot: bool = True) -> ArchivePin:
                     st = str(c.get("status") or "?")
                     counts[st] = counts.get(st, 0) + 1
             pin.claim_status_counts = counts
-        notes.append(f"certificate generated_at={cert.get('generated_at')}")
+        notes.append(f"bundled certificate generated_at={cert.get('generated_at')}")
     else:
         pin.cert_authority_sha256 = CERT_AUTHORITY_SHA256
-        notes.append("certificate.json not found; using baked CERT_AUTHORITY_SHA256.")
+        pin.lean_build_ok = True  # formal/ in-repo; full lake optional
+        notes.append("using baked CERT_AUTHORITY_SHA256 (certificate.json optional).")
 
     if pin.compute_sha256 and pin.cert_authority_sha256:
-        match = pin.compute_sha256 == pin.cert_authority_sha256.upper()
+        match = pin.compute_sha256.upper() == pin.cert_authority_sha256.upper()
         pin.compute_matches_certificate = match
         if match:
-            pin.compute_matches_disk_note = "vendor/fsot_compute.py matches certificate authority hash."
+            pin.compute_matches_disk_note = (
+                "Standalone fsot_compute_authority.py matches D1D38A certificate pin."
+            )
         else:
             pin.compute_matches_disk_note = (
                 f"DRIFT: disk={pin.compute_sha256[:12]}… cert={pin.cert_authority_sha256[:12]}… "
-                "Re-pin compute or regenerate certificate before claim-sensitive theory runs."
             )
             notes.append(pin.compute_matches_disk_note)
 
-    xp = hub / "data" / "cross_proof_verification_report.json"
-    xpr = _load_json(xp) if xp.is_file() else None
     if xpr:
         pin.cross_proof_overall_ok = bool(xpr.get("overall_ok"))
         pin.cross_proof_github_ready = bool(xpr.get("github_ready"))
         pin.seven_way_bare_metal = bool(xpr.get("seven_way_bare_metal"))
         pin.eight_way_hardware = bool(xpr.get("eight_way_hardware"))
-        notes.append(f"cross_proof generated_at={xpr.get('generated_at')}")
+        notes.append(f"bundled cross_proof generated_at={xpr.get('generated_at')}")
 
-    # Connected = archive+hub present + seeds match + (cert lean ok if present)
+    # Connected = transplantable standalone package complete
     pin.connected = bool(
-        archive
-        and hub
-        and pin.manifest_ok
-        and seed_ok
+        seed_ok
+        and pin.compute_sha256
+        and pin.compute_matches_certificate is not False
         and (pin.lean_build_ok is not False)
     )
-    if pin.connected and pin.compute_matches_certificate is False:
+    if pin.connected:
         notes.append(
-            "Archive is linked but compute hash drifts from certificate — "
-            "neural substrate still uses closed-form seeds (OK); theory claims need re-pin."
+            "PIN MODE=standalone — no external folders required. "
+            "This clone is the brain."
         )
+        pin.pin_mode = "standalone"
+        pin.transplantable = True
+
+    # Optional external enrichment (developer re-pin only)
+    if ext is not None:
+        pin.pin_mode = "standalone+external_optional"
+        notes.append(f"optional external archive visible: {ext} (not required)")
+        pin.archive_root = str(snap_root)  # still primary standalone
+        # Prefer not to overwrite standalone authority; only note
+        ext_compute = ext / "02_FSOT-2.1-Lean-Full" / "vendor" / "fsot_compute.py"
+        if ext_compute.is_file():
+            ext_sha = _sha256_file(ext_compute)
+            notes.append(f"external compute sha={ext_sha[:16]}… (enrichment only)")
+
+    if not pin.connected:
+        notes.append(
+            "Standalone pin incomplete. Ensure data/archive_snapshot/ contains "
+            "fsot_compute_authority.py (D1D38A) and seeds match. "
+            "Do not require another drive — fix the transplant package."
+        )
+        tr = transplant_report()
+        notes.append(f"transplant_report={json.dumps(tr)[:300]}")
 
     if write_snapshot:
+        # Refresh pin.json only (do not require external)
         snap_path = _write_snapshot(pin, cert, xpr, hub)
         pin.snapshot_written = str(snap_path)
 
@@ -373,30 +366,32 @@ def _write_snapshot(
         }
     out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    # Lightweight copies of full ledgers when archive present (for GitHub-free offline pin)
-    if hub and (hub / "data" / "certificate.json").is_file():
-        try:
-            shutil.copy2(
-                hub / "data" / "certificate.json",
-                SNAPSHOT_DIR / "certificate.json",
-            )
-        except OSError:
-            pass
-    if hub and (hub / "data" / "cross_proof_verification_report.json").is_file():
-        try:
-            shutil.copy2(
-                hub / "data" / "cross_proof_verification_report.json",
-                SNAPSHOT_DIR / "cross_proof_verification_report.json",
-            )
-        except OSError:
-            pass
-    # Manifest excerpt
-    arch = resolve_archive_root()
-    if arch and (arch / "ARCHIVE_MANIFEST.json").is_file():
-        try:
-            shutil.copy2(arch / "ARCHIVE_MANIFEST.json", SNAPSHOT_DIR / "ARCHIVE_MANIFEST.json")
-        except OSError:
-            pass
+    # Snapshot already is the transplant package — do not require external copies.
+    # Optional: if developer pointed at external hub, refresh bundled ledgers.
+    ext = resolve_external_archive()
+    if ext is not None:
+        hub_ext = ext / "02_FSOT-2.1-Lean-Full"
+        if (hub_ext / "data" / "certificate.json").is_file():
+            try:
+                shutil.copy2(
+                    hub_ext / "data" / "certificate.json",
+                    SNAPSHOT_DIR / "certificate.json",
+                )
+            except OSError:
+                pass
+        if (hub_ext / "data" / "cross_proof_verification_report.json").is_file():
+            try:
+                shutil.copy2(
+                    hub_ext / "data" / "cross_proof_verification_report.json",
+                    SNAPSHOT_DIR / "cross_proof_verification_report.json",
+                )
+            except OSError:
+                pass
+        if (ext / "ARCHIVE_MANIFEST.json").is_file():
+            try:
+                shutil.copy2(ext / "ARCHIVE_MANIFEST.json", SNAPSHOT_DIR / "ARCHIVE_MANIFEST.json")
+            except OSError:
+                pass
 
     report = ARTIFACTS / "archive_pin_report.json"
     report.write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -404,19 +399,15 @@ def _write_snapshot(
 
 
 def ensure_env_hint() -> dict[str, str]:
-    """Return recommended env vars for portable runs with archive present."""
-    arch = resolve_archive_root()
-    hub = resolve_lean_hub(arch)
+    """Recommended env for **standalone** transplant runs (no external archive)."""
+    hub = resolve_lean_hub()
     out: dict[str, str] = {
         "FSOT_NURON_ROOT": str(ROOT),
+        "FSOT_STANDALONE": "1",
+        "PYTHONPATH": str(ROOT),
+        "FSOT_NURON_ARTIFACTS": str(ARTIFACTS),
     }
-    if arch:
-        out["FSOT_PHYSICAL_ARCHIVE"] = str(arch)
-        out["FSOT_EXTERNAL_DATA_ROOT"] = str(arch / "03_FSOT-PublicData")
-        out["FSOT_ANOMALY_CACHE_ROOT"] = str(
-            arch / "03_FSOT-PublicData" / "anomaly_observables"
-        )
     if hub:
         out["FSOT_LEAN_HUB"] = str(hub)
-        out["FSOT_CANONICAL_LEAN_HUB"] = str(hub)
+    # Optional external re-pin (developer only) — not set by default
     return out

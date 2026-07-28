@@ -290,4 +290,32 @@ def boot_body_report() -> Dict[str, Any]:
             "dt_ms": hw.recommended_dt_ms,
             "note": "Not bound to one machine — re-probed every boot",
         },
+        "standalone": True,
+        "metric_frame_hex": pack_metric_frame(m).hex()[:48],
     }
+
+
+def pack_metric_frame(metric: MetricPacket) -> bytes:
+    """
+    Binary MetricPacket for Zig body (metric_inject.zig).
+
+    Layout LE: magic FSMT | ver u8 | n_ch u8 | pad u16 | n × f32
+    Standalone ABI — no file paths.
+    """
+    import struct
+
+    channels = [
+        float(metric.cpu_util),
+        float(metric.mem_util),
+        float(metric.disk_util),
+        float(metric.net_util),
+        float(metric.temp_norm),
+    ]
+    for v in metric.custom.values():
+        channels.append(float(v))
+        if len(channels) >= 16:
+            break
+    n = len(channels)
+    hdr = b"FSMT" + bytes([1, n, 0, 0])
+    body = b"".join(struct.pack("<f", c) for c in channels)
+    return hdr + body

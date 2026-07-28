@@ -258,16 +258,91 @@ class HostSenseSnapshot:
         }
 
 
+def sample_vision_frame(
+    max_side: int = 32,
+) -> Tuple[List[float], str]:
+    """
+    Optional host vision: downsample a screenshot to flat features → sens.
+    Graceful if no capture backend (PIL/mss/tk). Standalone — no external files.
+    Returns (features, backend_note).
+    """
+    # mss
+    try:
+        import mss  # type: ignore
+        import numpy as np  # type: ignore
+
+        with mss.mss() as sct:
+            mon = sct.monitors[0]
+            shot = sct.grab(mon)
+            arr = np.array(shot)[:, :, :3].astype("float32") / 255.0
+            # crude downsample to max_side grid mean RGB
+            h, w, _ = arr.shape
+            step_y = max(1, h // max_side)
+            step_x = max(1, w // max_side)
+            small = arr[::step_y, ::step_x]
+            small = small[:max_side, :max_side]
+            # grayscale energy + RGB means
+            gray = small.mean(axis=2).flatten()
+            feats = gray.tolist()[: max_side * max_side]
+            # pad/truncate fixed length
+            target = max_side * max_side
+            if len(feats) < target:
+                feats = feats + [0.0] * (target - len(feats))
+            else:
+                feats = feats[:target]
+            return feats, "mss"
+    except Exception:
+        pass
+    # PIL ImageGrab
+    try:
+        from PIL import ImageGrab  # type: ignore
+        import numpy as np  # type: ignore
+
+        im = ImageGrab.grab()
+        im = im.convert("L").resize((max_side, max_side))
+        arr = np.array(im).astype("float32") / 255.0
+        return arr.flatten().tolist(), "PIL.ImageGrab"
+    except Exception:
+        pass
+    return [], "no_vision_backend"
+
+
+def vision_to_packet(features: List[float], backend: str = "", strength: float = 0.4) -> SensoryPacket:
+    if not features:
+        return SensoryPacket(
+            modality=SensoryModality.VISION,
+            target_region="sens",
+            features=[],
+            strength=0.0,
+            timestamp_ms=time.time() * 1000.0,
+            meta={"kind": "vision", "backend": backend, "empty": True},
+        )
+    # compact energy stats + head of pixels for regional drive
+    mean = sum(features) / max(1, len(features))
+    peak = max(features) if features else 0.0
+    head = features[:16]
+    return SensoryPacket(
+        modality=SensoryModality.VISION,
+        target_region="sens",
+        features=[mean, peak] + head,
+        strength=float(strength) * (SEEDS.phi / (1.0 + SEEDS.phi)),
+        timestamp_ms=time.time() * 1000.0,
+        meta={"kind": "vision", "backend": backend, "n": len(features)},
+    )
+
+
 def sample_host_senses(
     *,
     include_audio: bool = False,
     include_hid: bool = True,
     include_log: bool = True,
     include_net: bool = True,
+    include_vision: bool = False,
     metric: Optional[MetricPacket] = None,
 ) -> HostSenseSnapshot:
     """
-    Probe available host senses. Audio off by default (mic may not exist / may hang).
+    Probe available host senses. Audio/vision off by default (may not exist).
+    All optional — organism adapts; no external project folders required.
     """
     snap = HostSenseSnapshot(metric=metric)
     packets: List[SensoryPacket] = []
@@ -301,6 +376,12 @@ def sample_host_senses(
         snap.sensors_live.append("log")
         if lf.get("activity", 0) > 0:
             packets.append(log_to_packet(lf))
+
+    if include_vision:
+        feats, backend = sample_vision_frame()
+        snap.sensors_live.append(f"vision:{backend}")
+        if feats:
+            packets.append(vision_to_packet(feats, backend))
 
     if metric is not None:
         from ..hardware_body import metrics_to_thalamic_packet

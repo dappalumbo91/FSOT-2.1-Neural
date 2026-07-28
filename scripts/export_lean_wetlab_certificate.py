@@ -28,7 +28,7 @@ RESULTS = ROOT / "data" / "results"
 DOCS = ROOT / "docs"
 
 sys.path.insert(0, str(ROOT))
-os.environ.setdefault("FSOT_PHYSICAL_ARCHIVE", r"I:\FSOT-Physical-Archive")
+os.environ.setdefault("FSOT_STANDALONE", "1")
 os.environ.setdefault("PYTHONPATH", str(ROOT))
 
 

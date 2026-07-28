@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-28T18:07:11.220526+00:00",
-  "quick": false,
-  "duration_s": 86.32,
-  "n_tests": 40,
-  "n_pass": 40,
+  "generated_at": "2026-07-28T18:16:34.934840+00:00",
+  "quick": true,
+  "duration_s": 14.83,
+  "n_tests": 33,
+  "n_pass": 33,
   "n_fail": 0,
   "critical_breaks": [],
   "soft_breaks": [],
@@ -19,7 +19,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.3
+      "t_s": 1.25
     },
     {
       "stage": "A",
@@ -34,7 +34,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.3
+      "t_s": 1.25
     },
     {
       "stage": "A",
@@ -46,7 +46,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.3
+      "t_s": 1.25
     },
     {
       "stage": "A",
@@ -59,7 +59,7 @@
       },
       "error": "",
       "note": "Biology\u22480.445 Neuroscience\u22480.514",
-      "t_s": 1.33
+      "t_s": 1.28
     },
     {
       "stage": "A",
@@ -72,7 +72,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.33
+      "t_s": 1.28
     },
     {
       "stage": "B",
@@ -108,7 +108,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.33
+      "t_s": 1.29
     },
     {
       "stage": "B",
@@ -122,7 +122,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.33
+      "t_s": 1.29
     },
     {
       "stage": "B",
@@ -136,7 +136,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.33
+      "t_s": 1.29
     },
     {
       "stage": "B",
@@ -150,7 +150,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.33
+      "t_s": 1.29
     },
     {
       "stage": "B",
@@ -164,21 +164,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.36
-    },
-    {
-      "stage": "B",
-      "name": "payload_16384B",
-      "ok": true,
-      "critical": false,
-      "metrics": {
-        "n_trits": 239544,
-        "frame_bytes": 394,
-        "roundtrip": true
-      },
-      "error": "",
-      "note": "",
-      "t_s": 1.52
+      "t_s": 1.32
     },
     {
       "stage": "B",
@@ -190,20 +176,20 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.52
+      "t_s": 1.32
     },
     {
       "stage": "B",
-      "name": "inject_200_packets",
+      "name": "inject_50_packets",
       "ok": true,
       "critical": false,
       "metrics": {
         "nonzero": 64,
-        "mean": 0.25
+        "mean": 0.329016774892807
       },
       "error": "",
       "note": "",
-      "t_s": 1.66
+      "t_s": 1.35
     },
     {
       "stage": "B",
@@ -216,7 +202,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.66
+      "t_s": 1.36
     },
     {
       "stage": "C",
@@ -224,14 +210,14 @@
       "ok": true,
       "critical": true,
       "metrics": {
-        "spikes_total": 128,
-        "S_mean": -0.9302987456321716,
+        "spikes_total": 64,
+        "S_mean": -0.3054293096065521,
         "synapses": 128,
-        "wall_s": 0.04
+        "wall_s": 0.06
       },
       "error": "",
       "note": "",
-      "t_s": 1.7
+      "t_s": 1.42
     },
     {
       "stage": "C",
@@ -239,44 +225,14 @@
       "ok": true,
       "critical": true,
       "metrics": {
-        "spikes_total": 256,
-        "S_mean": -1.0038864612579346,
+        "spikes_total": 128,
+        "S_mean": -0.47125157713890076,
         "synapses": 576,
-        "wall_s": 0.06
+        "wall_s": 0.04
       },
       "error": "",
       "note": "",
-      "t_s": 1.76
-    },
-    {
-      "stage": "C",
-      "name": "genetic_net_n128",
-      "ok": true,
-      "critical": true,
-      "metrics": {
-        "spikes_total": 512,
-        "S_mean": -1.0039334297180176,
-        "synapses": 2432,
-        "wall_s": 0.14
-      },
-      "error": "",
-      "note": "",
-      "t_s": 1.9
-    },
-    {
-      "stage": "C",
-      "name": "genetic_net_n256",
-      "ok": true,
-      "critical": false,
-      "metrics": {
-        "spikes_total": 1024,
-        "S_mean": -1.0039221048355103,
-        "synapses": 9728,
-        "wall_s": 0.36
-      },
-      "error": "",
-      "note": "",
-      "t_s": 2.27
+      "t_s": 1.46
     },
     {
       "stage": "C",
@@ -285,7 +241,7 @@
       "critical": true,
       "metrics": {
         "n_units": 32,
-        "wall_s": 0.11,
+        "wall_s": 0.05,
         "keys": [
           "mission",
           "profile",
@@ -303,7 +259,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 2.38
+      "t_s": 1.51
     },
     {
       "stage": "D",
@@ -330,7 +286,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 2.42
+      "t_s": 1.55
     },
     {
       "stage": "D",
@@ -340,36 +296,15 @@
       "metrics": {
         "scalpel_ok": true,
         "classes_within": "4/4",
-        "wall_s": 5.01,
-        "Pyr_err": 0.012070575883824328,
-        "PV_err": 0.0032810606318985427,
-        "SST_err": 0.010402939410548344,
-        "VIP_err": 0.005745460888920435
+        "wall_s": 3.29,
+        "Pyr_err": 0.006190079702980287,
+        "PV_err": 0.004794158865947256,
+        "SST_err": 0.015639057912682986,
+        "VIP_err": 0.005301743591481562
       },
       "error": "",
       "note": "2% Allen wet-lab floor",
-      "t_s": 7.44
-    },
-    {
-      "stage": "D",
-      "name": "scalpel_tol_1%",
-      "ok": true,
-      "critical": false,
-      "metrics": {
-        "scalpel_ok": true,
-        "classes_within": "4/4",
-        "wall_s": 41.13,
-        "dt_ms": 0.5,
-        "sim_ms": 4200.0,
-        "method": "precision_micro_climb continuous-ms",
-        "Pyr_err": 0.000596422768916685,
-        "PV_err": 0.0007705995833863263,
-        "SST_err": 0.0008753825641267492,
-        "VIP_err": 0.0052065995896800055
-      },
-      "error": "",
-      "note": "1% needs T\u22734s FI + continuous refractory (integer spike bound)",
-      "t_s": 48.6
+      "t_s": 4.85
     },
     {
       "stage": "E",
@@ -382,102 +317,45 @@
       },
       "error": "",
       "note": "",
-      "t_s": 57.52
+      "t_s": 10.04
     },
     {
       "stage": "E",
-      "name": "intel_items4_delay0",
+      "name": "intel_items4_delay50",
       "ok": true,
       "critical": false,
       "metrics": {
         "top1": 1.0,
         "chance": 0.25,
-        "sim+": 0.6000630706548691,
-        "sim-": 0.34858500584959984,
+        "sim+": 0.5426104813814163,
+        "sim-": 0.2691753978530566,
         "sme_theta": true,
         "sme_gamma": true,
-        "wall_s": 0.79,
-        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Fingerprint retrieval "
+        "wall_s": 0.98,
+        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 50 mod"
       },
       "error": "",
       "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
-      "t_s": 58.32
+      "t_s": 11.02
     },
     {
       "stage": "E",
-      "name": "intel_items6_delay200",
+      "name": "intel_items6_delay100",
       "ok": true,
       "critical": false,
       "metrics": {
-        "top1": 1.0,
+        "top1": 0.8333333333333334,
         "chance": 0.16666666666666666,
-        "sim+": 0.7062523563702902,
-        "sim-": 0.3607450025777022,
+        "sim+": 0.585491132736206,
+        "sim-": 0.33402139381054907,
         "sme_theta": true,
         "sme_gamma": true,
-        "wall_s": 2.21,
-        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 200 mo"
+        "wall_s": 1.58,
+        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 100 mo"
       },
       "error": "",
       "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
-      "t_s": 60.53
-    },
-    {
-      "stage": "E",
-      "name": "intel_items12_delay400",
-      "ok": true,
-      "critical": false,
-      "metrics": {
-        "top1": 0.75,
-        "chance": 0.08333333333333333,
-        "sim+": 0.7410209443834093,
-        "sim-": 0.4499397315360882,
-        "sme_theta": true,
-        "sme_gamma": true,
-        "wall_s": 5.48,
-        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 400 mo"
-      },
-      "error": "",
-      "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
-      "t_s": 66.02
-    },
-    {
-      "stage": "E",
-      "name": "intel_items16_delay600",
-      "ok": true,
-      "critical": false,
-      "metrics": {
-        "top1": 0.9375,
-        "chance": 0.0625,
-        "sim+": 0.8530537843704223,
-        "sim-": 0.2694698920061897,
-        "sme_theta": true,
-        "sme_gamma": true,
-        "wall_s": 7.8,
-        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 600 mo"
-      },
-      "error": "",
-      "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
-      "t_s": 73.82
-    },
-    {
-      "stage": "E",
-      "name": "intel_items24_delay800",
-      "ok": true,
-      "critical": false,
-      "metrics": {
-        "top1": 0.9166666666666666,
-        "chance": 0.041666666666666664,
-        "sim+": 0.7581743354147131,
-        "sim-": 0.29941508588078514,
-        "sme_theta": true,
-        "sme_gamma": true,
-        "wall_s": 10.21,
-        "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 800 mo"
-      },
-      "error": "",
-      "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
-      "t_s": 84.04
+      "t_s": 12.6
     },
     {
       "stage": "E",
@@ -486,13 +364,13 @@
       "critical": false,
       "metrics": {
         "last_ok": [
-          24,
-          0.9166666666666666
+          6,
+          0.8333333333333334
         ]
       },
       "error": "",
       "note": "",
-      "t_s": 84.04
+      "t_s": 12.61
     },
     {
       "stage": "F",
@@ -504,7 +382,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 84.04
+      "t_s": 12.61
     },
     {
       "stage": "F",
@@ -517,7 +395,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 84.11
+      "t_s": 12.67
     },
     {
       "stage": "G",
@@ -529,7 +407,24 @@
       },
       "error": "",
       "note": "iment\\zig\\zig-out\\bin\\fsot_trit_host.exe | PASS path_default_machine {'default': 'machine', 'for_os_body': 'machine', 'for_genetics': 'chemical', 'for_legacy_demo': 'morse', 'summary': 'Prefer machine (UTF-8/b | --- | FAILED: none | TOTAL 15 PASS 15 | Wrote I:\\fsot nuron\\artifacts\\console_display_review.json | ",
-      "t_s": 85.9
+      "t_s": 14.45
+    },
+    {
+      "stage": "H",
+      "name": "standalone_transplant_pin",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "pin_mode": "standalone",
+        "transplantable": true,
+        "sha": "D1D38A185487B452",
+        "archive_root": "I:\\fsot nuron\\data\\archive_snapshot",
+        "standalone_complete": true,
+        "external_optional": null
+      },
+      "error": "",
+      "note": "brain must boot from in-repo snapshot only",
+      "t_s": 14.66
     },
     {
       "stage": "H",
@@ -558,7 +453,7 @@
       },
       "error": "",
       "note": "portable boot probe",
-      "t_s": 86.11
+      "t_s": 14.66
     },
     {
       "stage": "H",
@@ -566,15 +461,15 @@
       "ok": true,
       "critical": true,
       "metrics": {
-        "drive": 0.1594,
-        "cpu": 0.08,
-        "mem": 0.492,
-        "net": 0.0003,
+        "drive": 0.1954,
+        "cpu": 0.103,
+        "mem": 0.494,
+        "net": 0.1318,
         "strength": 0.2163
       },
       "error": "",
       "note": "",
-      "t_s": 86.16
+      "t_s": 14.72
     },
     {
       "stage": "H",
@@ -609,7 +504,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 86.23
+      "t_s": 14.78
     },
     {
       "stage": "H",
@@ -626,7 +521,7 @@
       },
       "error": "",
       "note": "POOF dampens under load; SUCTION explores when spare",
-      "t_s": 86.23
+      "t_s": 14.78
     },
     {
       "stage": "H",
@@ -652,7 +547,7 @@
       },
       "error": "",
       "note": "bio-like loop thal\u2192sens\u2192assoc\u2194hipp under host drive",
-      "t_s": 86.27
+      "t_s": 14.83
     },
     {
       "stage": "H",
@@ -665,7 +560,7 @@
       },
       "error": "",
       "note": "soft \u2014 offline second-brain stream",
-      "t_s": 86.27
+      "t_s": 14.83
     },
     {
       "stage": "H",
@@ -679,20 +574,7 @@
       },
       "error": "",
       "note": "soft bio motif: E mass > half I (not medical claim)",
-      "t_s": 86.27
-    },
-    {
-      "stage": "H",
-      "name": "visual_brain_factory",
-      "ok": true,
-      "critical": false,
-      "metrics": {
-        "n": 64,
-        "wall_s": 0.04
-      },
-      "error": "",
-      "note": "",
-      "t_s": 86.32
+      "t_s": 14.83
     }
   ],
   "doctrine": "wet-lab accuracy first; pin D1D38A; machine body; FSOT bridge"
