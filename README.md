@@ -33,6 +33,8 @@ Biologically structured **FSOT neurons** whose identity and wiring come from the
 | **Standalone transplant** | [`docs/STANDALONE_TRANSPLANT.md`](docs/STANDALONE_TRANSPLANT.md) — **no other folders required** |
 | **Autonomous learn** | `python run_autonomous_learn.py` — docs + optional media, minimal prompts |
 | **Capability frontier** | [`docs/CAPABILITY_FRONTIER.md`](docs/CAPABILITY_FRONTIER.md) — **unclaimed** gaps we track (pixel ID, curriculum, monologue) |
+| **Bio-equivalence distance** | [`docs/BIO_EQUIVALENCE_DISTANCE.md`](docs/BIO_EQUIVALENCE_DISTANCE.md) · `python run_bio_equivalence_scorecard.py` |
+| **Multi-species (fly→computer)** | [`docs/MULTI_SPECIES_COMPUTER_CENTRIC.md`](docs/MULTI_SPECIES_COMPUTER_CENTRIC.md) |
 | **Episode watch / recall** | `python run_episode_watch.py` · `--recall "Brave"` |
 | **Document reading** | real PDF/MD/TXT page text → machine/trinary (not next-token LM) |
 | **Media** | AV co-stream + subtitles → symbols → knowledge → memory |

@@ -96,6 +96,8 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Knowledge / subtitles** | [`docs/KNOWLEDGE_CROSSFEED.md`](docs/KNOWLEDGE_CROSSFEED.md) · `run_episode_watch.py` |
 | **Capability frontier (unclaimed)** | [`docs/CAPABILITY_FRONTIER.md`](docs/CAPABILITY_FRONTIER.md) · `python run_capability_frontier.py` |
 | **Bio sensory system** | [`docs/BIO_SENSORY_SYSTEM.md`](docs/BIO_SENSORY_SYSTEM.md) · `python run_bio_sensory_check.py` |
+| **Bio-equivalence distance** | [`docs/BIO_EQUIVALENCE_DISTANCE.md`](docs/BIO_EQUIVALENCE_DISTANCE.md) · `python run_bio_equivalence_scorecard.py` |
+| **Multi-species / fly motifs** | [`docs/MULTI_SPECIES_COMPUTER_CENTRIC.md`](docs/MULTI_SPECIES_COMPUTER_CENTRIC.md) · FlyWire-class literature targets |
 | **Stress / break map** | [`docs/STRESS_STAGE_REPORT.md`](docs/STRESS_STAGE_REPORT.md) · `python run_stress_suite.py` |
 | **Study / learning EEG** | [`docs/LEARNING_EEG_STUDY.md`](docs/LEARNING_EEG_STUDY.md) · `python run_learning_eeg_study.py` |
 | **Runtime inventory** | [`docs/RUNTIME_INVENTORY.md`](docs/RUNTIME_INVENTORY.md) · `python scripts/runtime_audit.py` |
