@@ -889,6 +889,32 @@ class StressSuite:
                         error=str(e),
                     )
 
+            # H8b bio-equivalent sensory pathways (FSOT-lawful routing)
+            try:
+                from fsot_nuron.sensory.bio_pathways import audit_bio_sensory
+
+                ba = audit_bio_sensory()
+                self.record(
+                    "H",
+                    "bio_sensory_pathways",
+                    ba.ok and ba.pathway_gains["relay"] < ba.pathway_gains["primary"],
+                    critical=True,
+                    metrics={
+                        "free_parameters": ba.free_parameters,
+                        "consciousness_gate": ba.consciousness_gate,
+                        "gains": ba.pathway_gains,
+                    },
+                    note="thalamic filter < cortical primary; seed-only gains",
+                )
+            except Exception as e:
+                self.record(
+                    "H",
+                    "bio_sensory_pathways",
+                    False,
+                    critical=True,
+                    error=str(e)[:400],
+                )
+
             # H9 optional media sensory (soft — world injectors not required)
             try:
                 from fsot_nuron.sensory.media_stream import (

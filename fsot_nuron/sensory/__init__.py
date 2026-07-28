@@ -11,6 +11,13 @@ See fsot_nuron.machine_encode and docs/MACHINE_ENCODING.md.
 
 from .packets import SensoryModality, SensoryPacket, MetricPacket
 from .bus import SensoryBus
+from .bio_pathways import (
+    apply_bio_routing,
+    pathway_gain,
+    audit_bio_sensory,
+    MODALITY_ROUTE,
+    consciousness_gate,
+)
 from .host_senses import (
     sample_host_senses,
     note_hid_key,
@@ -93,4 +100,9 @@ __all__ = [
     "iter_audiovisual_moments",
     "cross_modal_association",
     "moment_to_packets",
+    "apply_bio_routing",
+    "pathway_gain",
+    "audit_bio_sensory",
+    "MODALITY_ROUTE",
+    "consciousness_gate",
 ]

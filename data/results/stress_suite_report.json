@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-28T18:16:34.934840+00:00",
+  "generated_at": "2026-07-28T19:08:45.596403+00:00",
   "quick": true,
-  "duration_s": 14.83,
-  "n_tests": 33,
-  "n_pass": 33,
+  "duration_s": 18.27,
+  "n_tests": 35,
+  "n_pass": 35,
   "n_fail": 0,
   "critical_breaks": [],
   "soft_breaks": [],
@@ -19,7 +19,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.25
+      "t_s": 1.41
     },
     {
       "stage": "A",
@@ -34,7 +34,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.25
+      "t_s": 1.41
     },
     {
       "stage": "A",
@@ -46,7 +46,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.25
+      "t_s": 1.41
     },
     {
       "stage": "A",
@@ -59,7 +59,7 @@
       },
       "error": "",
       "note": "Biology\u22480.445 Neuroscience\u22480.514",
-      "t_s": 1.28
+      "t_s": 1.44
     },
     {
       "stage": "A",
@@ -72,7 +72,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.28
+      "t_s": 1.44
     },
     {
       "stage": "B",
@@ -108,7 +108,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.29
+      "t_s": 1.45
     },
     {
       "stage": "B",
@@ -122,7 +122,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.29
+      "t_s": 1.45
     },
     {
       "stage": "B",
@@ -136,7 +136,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.29
+      "t_s": 1.45
     },
     {
       "stage": "B",
@@ -150,7 +150,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.29
+      "t_s": 1.45
     },
     {
       "stage": "B",
@@ -164,7 +164,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.32
+      "t_s": 1.48
     },
     {
       "stage": "B",
@@ -176,7 +176,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.32
+      "t_s": 1.49
     },
     {
       "stage": "B",
@@ -185,11 +185,11 @@
       "critical": false,
       "metrics": {
         "nonzero": 64,
-        "mean": 0.329016774892807
+        "mean": 0.34820905327796936
       },
       "error": "",
       "note": "",
-      "t_s": 1.35
+      "t_s": 1.53
     },
     {
       "stage": "B",
@@ -202,7 +202,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.36
+      "t_s": 1.53
     },
     {
       "stage": "C",
@@ -213,11 +213,11 @@
         "spikes_total": 64,
         "S_mean": -0.3054293096065521,
         "synapses": 128,
-        "wall_s": 0.06
+        "wall_s": 0.07
       },
       "error": "",
       "note": "",
-      "t_s": 1.42
+      "t_s": 1.6
     },
     {
       "stage": "C",
@@ -232,7 +232,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.46
+      "t_s": 1.64
     },
     {
       "stage": "C",
@@ -259,7 +259,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.51
+      "t_s": 1.69
     },
     {
       "stage": "D",
@@ -286,7 +286,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 1.55
+      "t_s": 1.73
     },
     {
       "stage": "D",
@@ -296,7 +296,7 @@
       "metrics": {
         "scalpel_ok": true,
         "classes_within": "4/4",
-        "wall_s": 3.29,
+        "wall_s": 3.48,
         "Pyr_err": 0.006190079702980287,
         "PV_err": 0.004794158865947256,
         "SST_err": 0.015639057912682986,
@@ -304,7 +304,7 @@
       },
       "error": "",
       "note": "2% Allen wet-lab floor",
-      "t_s": 4.85
+      "t_s": 5.22
     },
     {
       "stage": "E",
@@ -317,7 +317,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 10.04
+      "t_s": 10.45
     },
     {
       "stage": "E",
@@ -331,12 +331,12 @@
         "sim-": 0.2691753978530566,
         "sme_theta": true,
         "sme_gamma": true,
-        "wall_s": 0.98,
+        "wall_s": 0.96,
         "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 50 mod"
       },
       "error": "",
       "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
-      "t_s": 11.02
+      "t_s": 11.41
     },
     {
       "stage": "E",
@@ -350,12 +350,12 @@
         "sim-": 0.33402139381054907,
         "sme_theta": true,
         "sme_gamma": true,
-        "wall_s": 1.58,
+        "wall_s": 1.61,
         "notes": "items via FSOT machine bridge (Computer_Body \u2192 S couple). Retention delay 100 mo"
       },
       "error": "",
       "note": "FSOT machine items; break when top1\u2264chance or <0.5 at \u226412",
-      "t_s": 12.6
+      "t_s": 13.02
     },
     {
       "stage": "E",
@@ -370,7 +370,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 12.61
+      "t_s": 13.03
     },
     {
       "stage": "F",
@@ -382,7 +382,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 12.61
+      "t_s": 13.03
     },
     {
       "stage": "F",
@@ -395,7 +395,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 12.67
+      "t_s": 13.1
     },
     {
       "stage": "G",
@@ -407,7 +407,7 @@
       },
       "error": "",
       "note": "iment\\zig\\zig-out\\bin\\fsot_trit_host.exe | PASS path_default_machine {'default': 'machine', 'for_os_body': 'machine', 'for_genetics': 'chemical', 'for_legacy_demo': 'morse', 'summary': 'Prefer machine (UTF-8/b | --- | FAILED: none | TOTAL 15 PASS 15 | Wrote I:\\fsot nuron\\artifacts\\console_display_review.json | ",
-      "t_s": 14.45
+      "t_s": 15.03
     },
     {
       "stage": "H",
@@ -424,7 +424,7 @@
       },
       "error": "",
       "note": "brain must boot from in-repo snapshot only",
-      "t_s": 14.66
+      "t_s": 15.34
     },
     {
       "stage": "H",
@@ -453,7 +453,7 @@
       },
       "error": "",
       "note": "portable boot probe",
-      "t_s": 14.66
+      "t_s": 15.34
     },
     {
       "stage": "H",
@@ -461,15 +461,15 @@
       "ok": true,
       "critical": true,
       "metrics": {
-        "drive": 0.1954,
-        "cpu": 0.103,
-        "mem": 0.494,
-        "net": 0.1318,
+        "drive": 0.1652,
+        "cpu": 0.096,
+        "mem": 0.523,
+        "net": 0.0002,
         "strength": 0.2163
       },
       "error": "",
       "note": "",
-      "t_s": 14.72
+      "t_s": 15.4
     },
     {
       "stage": "H",
@@ -504,7 +504,7 @@
       },
       "error": "",
       "note": "",
-      "t_s": 14.78
+      "t_s": 15.47
     },
     {
       "stage": "H",
@@ -521,7 +521,7 @@
       },
       "error": "",
       "note": "POOF dampens under load; SUCTION explores when spare",
-      "t_s": 14.78
+      "t_s": 15.47
     },
     {
       "stage": "H",
@@ -547,7 +547,7 @@
       },
       "error": "",
       "note": "bio-like loop thal\u2192sens\u2192assoc\u2194hipp under host drive",
-      "t_s": 14.83
+      "t_s": 15.51
     },
     {
       "stage": "H",
@@ -560,7 +560,7 @@
       },
       "error": "",
       "note": "soft \u2014 offline second-brain stream",
-      "t_s": 14.83
+      "t_s": 15.51
     },
     {
       "stage": "H",
@@ -574,7 +574,52 @@
       },
       "error": "",
       "note": "soft bio motif: E mass > half I (not medical claim)",
-      "t_s": 14.83
+      "t_s": 15.51
+    },
+    {
+      "stage": "H",
+      "name": "bio_sensory_pathways",
+      "ok": true,
+      "critical": true,
+      "metrics": {
+        "free_parameters": 0,
+        "consciousness_gate": 0.6180339887498949,
+        "gains": {
+          "primary": 0.6180339887498949,
+          "relay": 0.38196601125010515,
+          "intero": 0.09286461298465515,
+          "hipp_bind": 0.3906719903436261
+        }
+      },
+      "error": "",
+      "note": "thalamic filter < cortical primary; seed-only gains",
+      "t_s": 15.51
+    },
+    {
+      "stage": "H",
+      "name": "media_sensory_chew",
+      "ok": true,
+      "critical": false,
+      "metrics": {
+        "roots": [
+          "G:\\movies",
+          "G:\\showes",
+          "G:\\Debut"
+        ],
+        "vision_pkts": 8,
+        "audio_pkts": 3,
+        "luma": 0.4086,
+        "motion": 0.2503,
+        "rms": 0.039,
+        "spikes": 67,
+        "sources": [
+          "epica-xvid-sml.avi",
+          "06 - All The Rage!.mp3"
+        ]
+      },
+      "error": "",
+      "note": "optional media libraries \u2014 eyes/ears on world, not identity",
+      "t_s": 18.27
     }
   ],
   "doctrine": "wet-lab accuracy first; pin D1D38A; machine body; FSOT bridge"

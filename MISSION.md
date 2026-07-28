@@ -95,6 +95,7 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Autonomous multi-modal** | `python run_autonomous_learn.py` · document read + media + memory |
 | **Knowledge / subtitles** | [`docs/KNOWLEDGE_CROSSFEED.md`](docs/KNOWLEDGE_CROSSFEED.md) · `run_episode_watch.py` |
 | **Capability frontier (unclaimed)** | [`docs/CAPABILITY_FRONTIER.md`](docs/CAPABILITY_FRONTIER.md) · `python run_capability_frontier.py` |
+| **Bio sensory system** | [`docs/BIO_SENSORY_SYSTEM.md`](docs/BIO_SENSORY_SYSTEM.md) · `python run_bio_sensory_check.py` |
 | **Stress / break map** | [`docs/STRESS_STAGE_REPORT.md`](docs/STRESS_STAGE_REPORT.md) · `python run_stress_suite.py` |
 | **Study / learning EEG** | [`docs/LEARNING_EEG_STUDY.md`](docs/LEARNING_EEG_STUDY.md) · `python run_learning_eeg_study.py` |
 | **Runtime inventory** | [`docs/RUNTIME_INVENTORY.md`](docs/RUNTIME_INVENTORY.md) · `python scripts/runtime_audit.py` |

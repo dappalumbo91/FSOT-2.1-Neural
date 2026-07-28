@@ -68,6 +68,7 @@ Stand-alone law: data/archive_snapshot/fsot_compute_authority.py (D1D38A)
 | Subtitles + memory | `python run_episode_watch.py` | `docs/KNOWLEDGE_CROSSFEED.md` |
 | Knowledge→trinary | `python run_knowledge_demo.py` | `docs/KNOWLEDGE_CROSSFEED.md` |
 | **Autonomous learn** | `python run_autonomous_learn.py` | this file |
+| **Bio sensory check** | `python run_bio_sensory_check.py` | `docs/BIO_SENSORY_SYSTEM.md` |
 | Stress map | `python run_stress_suite.py` | `docs/STRESS_STAGE_REPORT.md` |
 | Bio comparison | | `docs/BIO_STRESS_COMPARISON.md` |
 

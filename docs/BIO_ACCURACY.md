@@ -15,7 +15,8 @@
 If PV is wrong vs Allen, fix **phenotype lock to wet-lab ms/Hz**, not “slow the computer down.”  
 Performance tweaks (`efficient` mode, Zig speed) come **after** `bio_match` fidelity.
 
-Learning-band targets (theta/gamma, etc.): **`docs/LEARNING_ALIGNMENT.md`**.
+Learning-band targets (theta/gamma, etc.): **`docs/LEARNING_ALIGNMENT.md`**.  
+**Sensory system (eyes/ears/body/read):** **`docs/BIO_SENSORY_SYSTEM.md`** · `python run_bio_sensory_check.py`.
 
 ---
 
