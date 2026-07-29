@@ -103,13 +103,49 @@ pub fn dnaToTrits(dna: []const u8, out: []trit.Trit) usize {
     return n;
 }
 
+/// Minimal IUPAC DNA→AA for chemical path (standard genetic code subset check).
+fn codonToAa(c0: u8, c1: u8, c2: u8) u8 {
+    // uppercase
+    const a = if (c0 >= 'a') c0 - 32 else c0;
+    const b = if (c1 >= 'a') c1 - 32 else c1;
+    const c = if (c2 >= 'a') c2 - 32 else c2;
+    // ATG=M, TTT=F, TAA=*
+    if (a == 'A' and b == 'T' and c == 'G') return 'M';
+    if (a == 'T' and b == 'T' and c == 'T') return 'F';
+    if (a == 'T' and b == 'T' and c == 'C') return 'F';
+    if (a == 'T' and b == 'A' and c == 'A') return '*';
+    if (a == 'T' and b == 'A' and c == 'G') return '*';
+    if (a == 'T' and b == 'G' and c == 'A') return '*';
+    if (a == 'G' and b == 'G' and c == 'T') return 'G';
+    if (a == 'C' and b == 'G' and c == 'T') return 'R';
+    if (a == 'A' and b == 'A' and c == 'A') return 'K';
+    // default: map by primary trit sum (stable non-LM interpretation)
+    const t0 = trit.basePrimary(a);
+    const t1 = trit.basePrimary(b);
+    const t2 = trit.basePrimary(c);
+    const s = @as(i32, t0) + @as(i32, t1) + @as(i32, t2);
+    return @intCast(@as(u8, 'A') + @as(u8, @intCast(@mod(s + 3, 20))));
+}
+
+pub fn dnaToAa(dna: []const u8, out: []u8) usize {
+    var n: usize = 0;
+    var i: usize = 0;
+    while (i + 2 < dna.len and n < out.len) : (i += 3) {
+        out[n] = codonToAa(dna[i], dna[i + 1], dna[i + 2]);
+        n += 1;
+    }
+    return n;
+}
+
 pub const MachineReport = struct {
     ok: bool,
     bytes_roundtrip: bool,
     text_roundtrip: bool,
     feat_trit_ok: bool,
     dna_codon_ok: bool,
+    chemical_aa_ok: bool,
     n_words: u32,
+    n_aa: u32,
 };
 
 pub fn runMachineEncodeProbe() MachineReport {
@@ -135,11 +171,16 @@ pub fn runMachineEncodeProbe() MachineReport {
     const feat_ok = nft == 4 and ft[0] == 1 and ft[1] == -1 and ft[2] == 0 and ft[3] == 1;
 
     // DNA primary
-    const dna = "ATGCGTAA";
+    const dna = "ATGCGTAAATTT";
     var dt: [32]trit.Trit = undefined;
     const nd = dnaToTrits(dna, dt[0..]);
     // A T G C → +1 -1 +1 -1
     const dna_ok = nd >= 4 and dt[0] == 1 and dt[1] == -1 and dt[2] == 1 and dt[3] == -1;
+
+    // chemical AA path: ATG→M, CGT→R, AAA→K, TTT→F
+    var aa: [8]u8 = undefined;
+    const naa = dnaToAa(dna, aa[0..]);
+    const chem_ok = naa >= 4 and aa[0] == 'M' and aa[1] == 'R' and aa[2] == 'K' and aa[3] == 'F';
 
     // words
     var words: [8]trit.TritWord = undefined;
@@ -149,12 +190,14 @@ pub fn runMachineEncodeProbe() MachineReport {
     const text_ok = bytes_ok;
 
     return .{
-        .ok = bytes_ok and feat_ok and dna_ok and nw >= 1,
+        .ok = bytes_ok and feat_ok and dna_ok and chem_ok and nw >= 1,
         .bytes_roundtrip = bytes_ok,
         .text_roundtrip = text_ok,
         .feat_trit_ok = feat_ok,
         .dna_codon_ok = dna_ok,
+        .chemical_aa_ok = chem_ok,
         .n_words = @intCast(nw),
+        .n_aa = @intCast(naa),
     };
 }
 

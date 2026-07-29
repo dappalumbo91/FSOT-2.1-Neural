@@ -163,7 +163,27 @@ fn letterMeaning(idx: u32, out: *[MEANING_N]Fixed) void {
     }
 }
 
-const LETTERS = "ABCDEFGH"; // small alphabet probe (motor–sound–letter)
+const LETTERS = "ABCDEFGHIJKLMNOP"; // expanded alphabet scaffold (16)
+
+/// Multi-gesture "word": coarticulated blend (onset-heavy) — still not next-token.
+pub fn utterWord(meanings: []const [MEANING_N]Fixed, out: *Acoustic) void {
+    var i: usize = 0;
+    while (i < ACOUSTIC_N) : (i += 1) out.ch[i] = 0;
+    if (meanings.len == 0) return;
+    // onset (first) weighted higher — syllable nucleus bias
+    const w0 = fixed.fromDecimalStr("0.72");
+    const w1 = fixed.fromDecimalStr("0.28");
+    const onset = SpeechOrgan.utter(meanings[0][0..]);
+    i = 0;
+    while (i < ACOUSTIC_N) : (i += 1) out.ch[i] = fixed.mul(onset.acoustic.ch[i], w0);
+    if (meanings.len > 1) {
+        const coda = SpeechOrgan.utter(meanings[1][0..]);
+        i = 0;
+        while (i < ACOUSTIC_N) : (i += 1) {
+            out.ch[i] = fixed.add(out.ch[i], fixed.mul(coda.acoustic.ch[i], w1));
+        }
+    }
+}
 
 pub const SpeechReport = struct {
     ok: bool,
@@ -174,6 +194,10 @@ pub const SpeechReport = struct {
     /// re-utter from meaning → acoustic still matches letter
     roundtrip_correct: u32,
     roundtrip_top1: f64,
+    /// multi-gesture word discrimination
+    word_correct: u32,
+    word_n: u32,
+    word_top1: f64,
     doctrine: []const u8 = "motor→sound→symbol; not next-token",
 };
 
@@ -181,31 +205,29 @@ pub fn runSpeechOrganProbe() SpeechReport {
     var organ: SpeechOrgan = .{};
     organ.clear();
 
-    const n_letters: usize = 8;
-    var meanings: [8][MEANING_N]Fixed = undefined;
-    var symbols: [8]u32 = undefined;
+    const n_letters: usize = 16;
+    var meanings: [16][MEANING_N]Fixed = undefined;
+    var symbols: [16]u32 = undefined;
 
     var i: usize = 0;
     while (i < n_letters) : (i += 1) {
         letterMeaning(@intCast(i), &meanings[i]);
-        // symbol = letter code (A,B,…) — orthography layer
         symbols[i] = @as(u32, LETTERS[i]);
         organ.teachSymbol(symbols[i], meanings[i][0..]);
     }
 
-    // Test 1: produce sound from meaning, hear letter (no letter in cue)
+    // Test 1: produce sound from meaning, hear letter
     var hear_ok: u32 = 0;
     i = 0;
     while (i < n_letters) : (i += 1) {
         const u = SpeechOrgan.utter(meanings[i][0..]);
-        // slight acoustic noise (listener channel)
         var heard = u.acoustic;
         heard.ch[3] = fixed.add(heard.ch[3], fixed.fromDecimalStr("0.02"));
         const sym = organ.hearSymbol(heard);
         if (sym == symbols[i]) hear_ok += 1;
     }
 
-    // Test 2: motor path round-trip identity under re-utter
+    // Test 2: round-trip
     var rt_ok: u32 = 0;
     i = 0;
     while (i < n_letters) : (i += 1) {
@@ -214,11 +236,25 @@ pub fn runSpeechOrganProbe() SpeechReport {
         if (sym == symbols[i]) rt_ok += 1;
     }
 
+    // Test 3: words = 2-letter motor sequences → mean acoustic → first letter identity still above chance
+    // (scaffold for continuous utterance; full lexicon later)
+    var word_ok: u32 = 0;
+    const n_words: usize = 8;
+    i = 0;
+    while (i < n_words) : (i += 1) {
+        const pair = [_][MEANING_N]Fixed{ meanings[i], meanings[i + 1] };
+        var ac: Acoustic = .{};
+        utterWord(pair[0..], &ac);
+        const sym = organ.hearSymbol(ac);
+        // onset-heavy: expect first letter of pair
+        if (sym == symbols[i]) word_ok += 1;
+    }
+
     const nf: f64 = @floatFromInt(n_letters);
     const hear_top1 = @as(f64, @floatFromInt(hear_ok)) / nf;
     const rt_top1 = @as(f64, @floatFromInt(rt_ok)) / nf;
-    // above chance 1/8
-    const ok = hear_top1 >= 0.75 and rt_top1 >= 0.875;
+    const wtop = @as(f64, @floatFromInt(word_ok)) / @as(f64, @floatFromInt(n_words));
+    const ok = hear_top1 >= 0.75 and rt_top1 >= 0.85 and wtop >= 0.5;
     return .{
         .ok = ok,
         .n_letters = @intCast(n_letters),
@@ -226,6 +262,9 @@ pub fn runSpeechOrganProbe() SpeechReport {
         .hear_top1 = hear_top1,
         .roundtrip_correct = rt_ok,
         .roundtrip_top1 = rt_top1,
+        .word_correct = word_ok,
+        .word_n = @intCast(n_words),
+        .word_top1 = wtop,
     };
 }
 

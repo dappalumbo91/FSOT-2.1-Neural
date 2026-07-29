@@ -69,6 +69,9 @@ const sensory_fixed = @import("sensory_fixed.zig");
 const machine_encode_fixed = @import("machine_encode_fixed.zig");
 const failure_fixed = @import("failure_fixed.zig");
 const autonomous_fixed = @import("autonomous_fixed.zig");
+const wire_around_fixed = @import("wire_around_fixed.zig");
+const symbol_assoc_fixed = @import("symbol_assoc_fixed.zig");
+const hardware_metric_fixed = @import("hardware_metric_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -514,8 +517,8 @@ fn runCurriculum() void {
     std.debug.print("=== FSOT MIND CURRICULUM (fixed short-horizon units) ===\n", .{});
     const cr = curriculum_fixed.runCurriculum();
     std.debug.print(
-        "CURRIC units={d} encode={d} retrieve={d}/{d} top1={e} spikes={d}\n",
-        .{ cr.n_units, cr.encode_ok, cr.retrieve_correct, cr.n_units, cr.top1, cr.spikes },
+        "CURRIC units={d} encode={d} full={d}/{d} top1={e} partial={d}/{d} ptop1={e} spikes={d}\n",
+        .{ cr.n_units, cr.encode_ok, cr.retrieve_correct, cr.n_units, cr.top1, cr.partial_correct, cr.n_units, cr.partial_top1, cr.spikes },
     );
     if (cr.ok) {
         std.debug.print("FSOT_CURRICULUM PASS\n", .{});
@@ -629,8 +632,8 @@ fn runSpeechOrgan() void {
     std.debug.print("doctrine: tongue/jaw/lips/larynx plant; letters are sound associations\n", .{});
     const r = speech_organ_fixed.runSpeechOrganProbe();
     std.debug.print(
-        "SPEECH letters={d} hear={d}/{d} top1={e} roundtrip={d}/{d} rtop1={e}\n",
-        .{ r.n_letters, r.hear_correct, r.n_letters, r.hear_top1, r.roundtrip_correct, r.n_letters, r.roundtrip_top1 },
+        "SPEECH letters={d} hear={d}/{d} top1={e} roundtrip={d}/{d} rtop1={e} words={d}/{d} wtop1={e}\n",
+        .{ r.n_letters, r.hear_correct, r.n_letters, r.hear_top1, r.roundtrip_correct, r.n_letters, r.roundtrip_top1, r.word_correct, r.word_n, r.word_top1 },
     );
     std.debug.print("path={s}\n", .{r.doctrine});
     if (r.ok) {
@@ -697,11 +700,11 @@ fn runBioIo() void {
 }
 
 fn runMachineEncode() void {
-    std.debug.print("=== FSOT MACHINE ENCODE (bytes/UTF-8/trit ABI — not Morse/LM) ===\n", .{});
+    std.debug.print("=== FSOT MACHINE ENCODE (bytes/UTF-8/trit/chemical AA — not Morse/LM) ===\n", .{});
     const r = machine_encode_fixed.runMachineEncodeProbe();
     std.debug.print(
-        "MACHINE bytes_rt={} text_rt={} feat_trit={} dna={} words={d}\n",
-        .{ r.bytes_roundtrip, r.text_roundtrip, r.feat_trit_ok, r.dna_codon_ok, r.n_words },
+        "MACHINE bytes_rt={} text_rt={} feat_trit={} dna={} chem_aa={} words={d} n_aa={d}\n",
+        .{ r.bytes_roundtrip, r.text_roundtrip, r.feat_trit_ok, r.dna_codon_ok, r.chemical_aa_ok, r.n_words, r.n_aa },
     );
     if (r.ok) {
         std.debug.print("FSOT_MACHINE PASS\n", .{});
@@ -712,16 +715,61 @@ fn runMachineEncode() void {
 }
 
 fn runFailure() void {
-    std.debug.print("=== FSOT FAILURE BOUNDARIES (lesion envelope, fixed) ===\n", .{});
+    std.debug.print("=== FSOT FAILURE BOUNDARIES (expanded catalog, fixed) ===\n", .{});
     const r = failure_fixed.runFailureProbe();
     std.debug.print(
-        "FAILURE healthy={d} AD={d} PD={d} ALS={d} envelope={} boundary={}\n",
-        .{ r.healthy_spikes, r.ad_spikes, r.pd_spikes, r.als_spikes, r.healthy_in_envelope, r.boundary_detected },
+        "FAILURE modes={d} healthy={d} AD={d} PD={d} ALS={d} MS={d} EPI={d} ISCH={d} envelope={} boundary={} shape={}\n",
+        .{ r.n_modes, r.healthy_spikes, r.ad_spikes, r.pd_spikes, r.als_spikes, r.ms_spikes, r.epi_spikes, r.ischemia_spikes, r.healthy_in_envelope, r.boundary_detected, r.catalog_shape_ok },
     );
     if (r.ok) {
         std.debug.print("FSOT_FAILURE PASS\n", .{});
     } else {
         std.debug.print("FSOT_FAILURE FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runWireAround() void {
+    std.debug.print("=== FSOT WIRE-AROUND (lesion → recovery actions, fixed) ===\n", .{});
+    const r = wire_around_fixed.runWireAroundProbe();
+    std.debug.print(
+        "WIRE healthy={d} lesion={d} rescued={d} improved={} actions={d}\n",
+        .{ r.healthy_spikes, r.lesion_spikes, r.rescued_spikes, r.improved, r.n_actions },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_WIRE_AROUND PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_WIRE_AROUND FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runSymbolAssoc() void {
+    std.debug.print("=== FSOT SYMBOL ASSOC (sensory signature → prototype anchors) ===\n", .{});
+    const r = symbol_assoc_fixed.runSymbolAssocProbe();
+    std.debug.print(
+        "SYMBOL anchors={d} hit={d}/{d} top1={e} cross={d}/{d} ctop1={e}\n",
+        .{ r.n_anchors, r.correct, r.n_probes, r.top1, r.cross_modal_correct, r.n_probes, r.cross_modal_top1 },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_SYMBOL PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_SYMBOL FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runHardware() void {
+    std.debug.print("=== FSOT HARDWARE METRIC (plant interoception stub) ===\n", .{});
+    const r = hardware_metric_fixed.runHardwareProbe();
+    std.debug.print(
+        "HARDWARE n_units={d} cpu={e} mem={e} source={s} mod_ok={}\n",
+        .{ r.n_units_suggest, r.cpu, r.mem, r.source, r.mod_mode_ok },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_HARDWARE PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_HARDWARE FAIL\n", .{});
         std.process.exit(1);
     }
 }
@@ -775,11 +823,11 @@ fn runVisionInjectDemo() void {
 }
 
 fn runPixelId() void {
-    std.debug.print("=== FSOT MIND PIXEL-ID (tutor-ablated, fixed synthetic) ===\n", .{});
+    std.debug.print("=== FSOT MIND PIXEL-ID (tutor-ablated multi-seed synthetic) ===\n", .{});
     const p = pixel_id_fixed.runPixelIdProbe();
     std.debug.print(
-        "PIXEL_ID chars={d} train={d} test={d} correct={d}/{d} top1={e} chance={e} tutor_ablated={} spikes={d}\n",
-        .{ p.n_characters, p.n_train, p.n_test, p.correct, p.n_test, p.top1, p.chance, p.tutor_ablated, p.spikes },
+        "PIXEL_ID chars={d} seeds={d} train={d} test={d} correct={d}/{d} top1={e} multi_mean={e} chance={e} tutor_ablated={} spikes={d}\n",
+        .{ p.n_characters, p.n_seeds, p.n_train, p.n_test, p.correct, p.n_test, p.top1, p.multi_seed_mean, p.chance, p.tutor_ablated, p.spikes },
     );
     if (p.ok) {
         std.debug.print("FSOT_PIXEL_ID PASS\n", .{});
@@ -1196,6 +1244,12 @@ pub fn main() !void {
         runMachineEncode();
     } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
         runFailure();
+    } else if (std.mem.eql(u8, mode, "wire") or std.mem.eql(u8, mode, "wire-around") or std.mem.eql(u8, mode, "wire_around")) {
+        runWireAround();
+    } else if (std.mem.eql(u8, mode, "symbol") or std.mem.eql(u8, mode, "symbol-assoc") or std.mem.eql(u8, mode, "anchors")) {
+        runSymbolAssoc();
+    } else if (std.mem.eql(u8, mode, "hardware") or std.mem.eql(u8, mode, "plant") or std.mem.eql(u8, mode, "body")) {
+        runHardware();
     } else if (std.mem.eql(u8, mode, "autonomous") or std.mem.eql(u8, mode, "auto") or std.mem.eql(u8, mode, "chew")) {
         runAutonomous();
     } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
@@ -1236,11 +1290,13 @@ pub fn main() !void {
         runFixed();
         runBioIo();
         runFailure();
+        runWireAround();
+        runHardware();
     } else if (std.mem.eql(u8, mode, "bio-float") or std.mem.eql(u8, mode, "bio_float")) {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
     } else if (std.mem.eql(u8, mode, "stress")) {
-        // stress authority = fixed stack + expansions
+        // stress authority = fixed stack + expanded scaffolds
         runFixed();
         runLearnFixed();
         runCurriculum();
@@ -1255,6 +1311,9 @@ pub fn main() !void {
         runBioIo();
         runMachineEncode();
         runFailure();
+        runWireAround();
+        runSymbolAssoc();
+        runHardware();
         runAutonomous();
         runInject();
         runVisionInjectDemo();
@@ -1287,6 +1346,9 @@ pub fn main() !void {
         runBioIo();
         runMachineEncode();
         runFailure();
+        runWireAround();
+        runSymbolAssoc();
+        runHardware();
         runAutonomous();
         runInject();
         runVisionInjectDemo();
@@ -1299,7 +1361,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|machine|failure|autonomous|bio-io|speech|fixed|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|wire|symbol|hardware|machine|failure|speech|pixel-id|…]\n", .{});
         std.process.exit(2);
     }
 }
