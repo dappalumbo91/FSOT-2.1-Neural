@@ -1,22 +1,26 @@
 # Capability frontier — live status
 
-Updated: `2026-07-28T19:52:17.559837+00:00`  
-Git: `aabf7f615eeb`  
-Experiment: `frontier_probes`
+Updated: `2026-07-29T12:22:21.763093+00:00`  
+Git: `560ca319d9c2`  
+Experiment: `visual_individual_identity`
 
 | Claim | Status | Note |
 |-------|--------|------|
-| **Open-world pixel identity** (`open_world_pixel_identity`) | `probing` | synthetic tutor-ablated top1=1.000 chance=0.250 (not real Jake pixels) |
-| **Self-directed curriculum design** (`self_directed_curriculum`) | `probing` | gap-driven order heuristic measured; not self-authored curriculum |
-| **LLM-style free monologue** (`free_monologue`) | `partial` | compositional grounded expansion scored; not free monologue |
+| **Open-world pixel identity** (`open_world_pixel_identity`) | `partial` | VIU-first: look→individual then name bind; re-id=0.689 chance≈0.152 unique_name=0.333 (name-bag franchise protocol retired as primary) |
+| **Self-directed curriculum design** (`self_directed_curriculum`) | `probing` | run_autonomous_learn.py chews discovered docs/media with fixed heuristics; not self-authored curriculum |
+| **LLM-style free monologue** (`free_monologue`) | `partial` | plain_english / recall_plain_english are compositional expansions, not free generative monologue |
 
 See [`docs/CAPABILITY_FRONTIER.md`](../../docs/CAPABILITY_FRONTIER.md) for gates.
 
 ```json
 {
-  "pixel_id_top1": 1.0,
-  "curriculum_gap_driven_fraction": 1.0,
-  "monologue_groundedness": 0.5,
-  "monologue_sentences": 2
+  "pixel_id_top1": 0.6888888888888889,
+  "pixel_id_chance": 0.15151515151515152,
+  "n_characters": 26,
+  "n_heldout_clips": 45,
+  "tutor_ablated": true,
+  "viu_reid_top1": 0.6888888888888889,
+  "unique_name_top1": 0.3333333333333333,
+  "n_viu": 33
 }
 ```

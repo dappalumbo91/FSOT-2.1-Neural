@@ -1,48 +1,55 @@
 {
-  "ts_utc": "2026-07-28T19:52:17.559837+00:00",
-  "experiment": "frontier_probes",
-  "git_sha": "aabf7f615eeb",
+  "ts_utc": "2026-07-29T12:22:21.763093+00:00",
+  "experiment": "visual_individual_identity",
+  "git_sha": "560ca319d9c2",
   "authority_pin_prefix": "D1D38A",
   "claims": {
     "open_world_pixel_identity": {
-      "status": "probing",
-      "status_note": "synthetic tutor-ablated top1=1.000 chance=0.250 (not real Jake pixels)",
+      "status": "partial",
+      "status_note": "VIU-first: look\u2192individual then name bind; re-id=0.689 chance\u22480.152 unique_name=0.333 (name-bag franchise protocol retired as primary)",
       "metrics": {
-        "pixel_id_top1": 1.0,
-        "pixel_id_chance": 0.25,
-        "n_characters": 4,
-        "n_heldout_clips": 16,
-        "tutor_ablated": true
+        "pixel_id_top1": 0.6888888888888889,
+        "pixel_id_chance": 0.15151515151515152,
+        "n_characters": 26,
+        "n_heldout_clips": 45,
+        "tutor_ablated": true,
+        "viu_reid_top1": 0.6888888888888889,
+        "unique_name_top1": 0.3333333333333333,
+        "n_viu": 33
       }
     },
     "self_directed_curriculum": {
       "status": "probing",
-      "status_note": "gap-driven order heuristic measured; not self-authored curriculum",
+      "status_note": "run_autonomous_learn.py chews discovered docs/media with fixed heuristics; not self-authored curriculum",
       "metrics": {
-        "curriculum_steps_planned": 4,
+        "curriculum_steps_planned": 0,
         "curriculum_self_authored": false,
-        "gap_driven_fraction": 1.0,
+        "gap_driven_fraction": 0.0,
         "metric_delta_vs_fixed_order": null
       }
     },
     "free_monologue": {
       "status": "partial",
-      "status_note": "compositional grounded expansion scored; not free monologue",
+      "status_note": "plain_english / recall_plain_english are compositional expansions, not free generative monologue",
       "metrics": {
         "monologue_mode": "compositional_regurgitation",
-        "max_coherent_sentences": 2,
-        "groundedness_score": 0.5,
+        "max_coherent_sentences": null,
+        "groundedness_score": null,
         "external_llm_used": false,
-        "n_turns": 1
+        "n_turns": 0
       }
     }
   },
   "related_metrics": {
-    "pixel_id_top1": 1.0,
-    "curriculum_gap_driven_fraction": 1.0,
-    "monologue_groundedness": 0.5,
-    "monologue_sentences": 2
+    "pixel_id_top1": 0.6888888888888889,
+    "pixel_id_chance": 0.15151515151515152,
+    "n_characters": 26,
+    "n_heldout_clips": 45,
+    "tutor_ablated": true,
+    "viu_reid_top1": 0.6888888888888889,
+    "unique_name_top1": 0.3333333333333333,
+    "n_viu": 33
   },
-  "notes": "Synthetic pixel-ID + gap curriculum + compositional monologue probes.",
+  "notes": "VIU-first identity status=partial re-id=0.689 unique_name=0.333 n_viu=33",
   "doc_ref": "docs/CAPABILITY_FRONTIER.md"
 }

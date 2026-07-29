@@ -294,14 +294,62 @@ def refine_curriculum() -> Dict[str, Any]:
 
 def refine_pixel_id() -> Dict[str, Any]:
     """
-    Climb pixel-ID via real media frames → RF cascade retina features → prototypes.
-    Named-character open-world claim still separate; this is media-entity ID.
+    Climb visual-individual identity (look first, name second).
+    See docs/VISUAL_INDIVIDUAL_IDENTITY.md.
     """
     from .layers import score_open_world_pixel
-    from ..benchmarks.media_pixel_id import probe_real_media_pixel_id
+    from ..knowledge.visual_individual import run_visual_individual_probe
+    import subprocess
+    import sys
+    from pathlib import Path
 
     before = score_open_world_pixel()
-    pix = probe_real_media_pixel_id(n_classes=4, n_train=6, n_test=4, seed=7)
+    # Full probe + frontier log via runner logic inline
+    viu = run_visual_individual_probe(max_videos=5, max_frames=24, seed=7)
+    try:
+        # update frontier status consistently
+        from ..capability_frontier import log_frontier, CLAIM_OPEN_WORLD
+
+        st = "probing"
+        if viu.viu_reid_top1 >= 0.45 and viu.n_heldout >= 12:
+            st = "partial"
+        if (
+            viu.viu_reid_top1 >= 0.70
+            and viu.unique_name_top1 >= 0.50
+            and viu.n_unique_name_trials >= 5
+        ):
+            st = "claimed"
+        log_frontier(
+            experiment="visual_individual_refine",
+            related_metrics={
+                "pixel_id_top1": viu.viu_reid_top1,
+                "pixel_id_chance": viu.viu_reid_chance,
+                "n_characters": viu.n_named_viu,
+                "n_heldout_clips": viu.n_heldout,
+                "tutor_ablated": True,
+                "viu_reid_top1": viu.viu_reid_top1,
+                "unique_name_top1": viu.unique_name_top1,
+            },
+            notes=f"VIU refine status={st} re-id={viu.viu_reid_top1:.3f}",
+            overrides={
+                CLAIM_OPEN_WORLD: {
+                    "status": st,
+                    "status_note": (
+                        f"VIU-first re-id={viu.viu_reid_top1:.3f} "
+                        f"unique_name={viu.unique_name_top1:.3f} n_viu={viu.n_viu}"
+                    ),
+                    "metrics": {
+                        "pixel_id_top1": viu.viu_reid_top1,
+                        "pixel_id_chance": viu.viu_reid_chance,
+                        "n_characters": viu.n_named_viu,
+                        "n_heldout_clips": viu.n_heldout,
+                        "tutor_ablated": True,
+                    },
+                }
+            },
+        )
+    except Exception:
+        pass
     after = score_open_world_pixel()
     return {
         "layer_id": "open_world_pixel_id",
@@ -310,14 +358,14 @@ def refine_pixel_id() -> Dict[str, Any]:
         "before_measured": before.measured,
         "after_measured": {
             **after.measured,
-            "refine_probe_top1": pix.pixel_id_top1,
-            "feature_mode": pix.feature_mode,
-            "synthetic": pix.synthetic,
+            "viu_reid": viu.viu_reid_top1,
+            "unique_name": viu.unique_name_top1,
+            "n_viu": viu.n_viu,
         },
         "improved": after.score >= before.score - 1e-9,
         "note": (
-            f"real_media={not pix.synthetic} top1={pix.pixel_id_top1:.3f} "
-            f"mode={pix.feature_mode}"
+            f"VIU-first re-id={viu.viu_reid_top1:.3f} chance≈{viu.viu_reid_chance:.3f} "
+            f"unique_name={viu.unique_name_top1:.3f} n_viu={viu.n_viu}"
         ),
     }
 

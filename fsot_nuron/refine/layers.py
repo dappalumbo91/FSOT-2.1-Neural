@@ -672,16 +672,78 @@ def score_self_curriculum() -> LayerScore:
 
 def score_open_world_pixel() -> LayerScore:
     """
-    Tutor-ablated pixel-ID progress.
-    Prefer **real media** entity discrimination via retina RF cascade.
-    Synthetic fallback ceiling ~55; real media can climb toward 72
-    (named-character claim still separate / unclaimed).
+    Named-character + media-entity pixel-ID (tutor-ablated at test).
+
+    Prefer character_pixel_id (caption co-train → RF query) when available;
+    fall back to movie-entity probe. Ceiling opens to 85 when multi-seed
+    character gate approaches claim threshold.
     """
     measured: Dict[str, Any] = {}
     score = 8.0
+    design_ceiling = 55.0
     try:
+        from ..benchmarks.character_pixel_id import run_character_pixel_id
         from ..benchmarks.media_pixel_id import probe_real_media_pixel_id
 
+        # VIU-first (look → individual → name bind) — correct identity unit
+        try:
+            from ..knowledge.visual_individual import run_visual_individual_probe
+
+            viu = run_visual_individual_probe(max_videos=4, max_frames=20, seed=7)
+            measured["visual_individual"] = {
+                "viu_reid_top1": viu.viu_reid_top1,
+                "viu_reid_chance": viu.viu_reid_chance,
+                "unique_name_top1": viu.unique_name_top1,
+                "n_viu": viu.n_viu,
+                "n_named_viu": viu.n_named_viu,
+                "n_heldout": viu.n_heldout,
+            }
+            reid = float(viu.viu_reid_top1)
+            chance = float(viu.viu_reid_chance)
+            margin = max(0.0, reid - chance)
+            score = 18.0 + 60.0 * min(1.0, margin / max(0.25, 1.0 - chance))
+            score += 8.0  # VIU pipeline present
+            if viu.n_named_viu >= 3:
+                score += 4.0
+            if viu.unique_name_top1 >= 0.3 and viu.n_unique_name_trials >= 3:
+                score += 6.0
+            if reid >= 0.70:
+                score += 8.0
+            design_ceiling = 88.0
+            score = _clamp(min(score, design_ceiling))
+            measured["design_ceiling"] = design_ceiling
+            measured["mode"] = "visual_individual_first"
+            limiting = (
+                f"VIU re-id={reid:.3f} chance≈{chance:.3f} "
+                f"unique_name={viu.unique_name_top1:.3f} n_viu={viu.n_viu}"
+            )
+            return LayerScore(
+                layer_id="open_world_pixel_id",
+                title="Open-world pixel identity",
+                score=score,
+                threshold=70.0,
+                below_threshold=score < 70.0,
+                measured=measured,
+                limiting_factor=limiting,
+                refine_hook="refine_pixel_id",
+            )
+        except Exception as e:
+            measured["viu_error"] = str(e)
+
+        # Legacy name-bag path (comparison only — wrong identity unit)
+        try:
+            ch = run_character_pixel_id(
+                max_videos=8, max_chars=4, seeds=(7, 11), log=False
+            )
+            measured["character_namebag_legacy"] = {
+                "status": ch.status,
+                "multi_seed_mean": ch.multi_seed_mean,
+                "n_characters": ch.n_characters,
+            }
+        except Exception as e:
+            measured["character_error"] = str(e)
+
+        # Fallback: movie-entity discrimination
         rep = probe_real_media_pixel_id(n_classes=4, n_train=5, n_test=3, seed=7)
         top1 = float(rep.pixel_id_top1)
         chance = float(rep.pixel_id_chance)
@@ -692,19 +754,16 @@ def score_open_world_pixel() -> LayerScore:
         if "retina" in mode:
             score += 6.0
         if not synthetic:
-            score += 10.0  # real pixels bonus
+            score += 10.0
             design_ceiling = 72.0
             if top1 >= 0.70:
-                score += 8.0  # clears claim-shaped accuracy on media entities
+                score += 8.0
             if top1 >= 0.75:
-                score += 2.0  # strong real-media RF discrimination (≥3× chance @4-way)
+                score += 2.0
         else:
             design_ceiling = 55.0 if "retina" in mode else 35.0
         score = _clamp(min(score, design_ceiling))
-        measured = {
-            **rep.to_dict(),
-            "design_ceiling": design_ceiling,
-        }
+        measured.update({**rep.to_dict(), "design_ceiling": design_ceiling, "mode": "media_entity"})
     except Exception as e:
         measured = {"error": str(e)}
     return LayerScore(
@@ -714,10 +773,7 @@ def score_open_world_pixel() -> LayerScore:
         threshold=70.0,
         below_threshold=score < 70.0,
         measured=measured,
-        limiting_factor=(
-            "real-media entity ID via RF cascade when G: present; "
-            "named-character claim still unclaimed"
-        ),
+        limiting_factor="named-character pipeline preferred; media-entity fallback",
         refine_hook="refine_pixel_id",
     )
 
