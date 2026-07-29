@@ -37,6 +37,7 @@ from ..knowledge.episode_memory import (
     _eid,
 )
 from ..knowledge.teach_5w1h import build_5w1h, Teach5W1H
+from ..knowledge.curiosity import run_curiosity_loop
 from ..sensory.media_stream import (
     media_roots_from_env,
     discover_media_files,
@@ -210,6 +211,15 @@ def run_short_horizon_learn(
                 caption_source="document_text",
                 sample_lines=(rep.sample_text or "").split(". ")[:4],
             )
+            # Active curiosity before freeze: try fill empty slots from memory
+            try:
+                cur = run_curiosity_loop(lesson, root=mem_root, max_questions=4)
+                if cur.n_resolved:
+                    lesson.plain += (
+                        f" Curiosity filled {cur.n_resolved}/{cur.n_questions} open slots."
+                    )
+            except Exception:
+                pass
             teach = lesson.as_teach_text()
             mem = EpisodeMemory(
                 episode_id=_eid(rep.title, rep.path),
@@ -225,7 +235,7 @@ def run_short_horizon_learn(
                 n_trits=rep.n_trits_total,
                 S_couple=rep.S_couple,
                 sample_lines=(rep.sample_text or "").split(". ")[:4],
-                notes=["short_horizon", "5w1h"] + list(rep.notes[:4]),
+                notes=["short_horizon", "5w1h", "curiosity"] + list(rep.notes[:4]),
             )
             save_episode(mem, root=mem_root)
             n_docs += 1
@@ -233,6 +243,8 @@ def run_short_horizon_learn(
             # 5W1H probes (content-level, not title-prefix tricks)
             for q, exp in lesson.query_bank()[:6]:
                 queries.append((q, exp))
+            if lesson.mechanism:
+                queries.append((f"what mechanism for {rep.title[:20]}", lesson.mechanism.split("_")[0]))
             if rep.symbols_guessed:
                 queries.append(
                     (

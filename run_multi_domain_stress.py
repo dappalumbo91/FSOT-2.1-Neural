@@ -21,7 +21,10 @@ def main() -> int:
     from fsot_nuron.benchmarks.multi_domain_stress import run_multi_domain_stress
 
     print("=== FSOT MULTI-DOMAIN STRESS ===")
-    print("domains: authority · learning_sme · docs · narrative · media · short_horizon_5w1h")
+    print(
+        "domains: authority · learning_sme · docs · narrative · media · "
+        "short_horizon_5w1h · transfer · curiosity"
+    )
     rep = run_multi_domain_stress()
     print(f"ok={rep.ok}  pass={rep.n_pass}/{rep.n_domains}  mean={rep.mean_score:.1f}")
     for d in rep.domains:

@@ -36,6 +36,8 @@ from ..benchmarks.learning_bio import run_learning_bio_benchmark
 from ..benchmarks.media_pixel_id import probe_real_media_pixel_id
 from ..knowledge.vision_caption_bind import run_vision_caption_bind
 from ..knowledge.monologue import run_grounded_monologue
+from ..knowledge.curiosity import run_curiosity_loop
+from ..benchmarks.transfer_test import run_transfer_tests
 from ..archive_pin import pin_archive
 
 
@@ -286,6 +288,63 @@ def _domain_short_horizon() -> DomainResult:
         return DomainResult("short_horizon_5w1h", False, 0.0, {}, [str(e)])
 
 
+def _domain_transfer() -> DomainResult:
+    try:
+        rep = run_transfer_tests(max_pairs=3)
+        score = 70.0 * rep.mean_hit_rate + 30.0 * rep.mean_curiosity
+        return DomainResult(
+            "transfer_paraphrase",
+            rep.ok,
+            float(min(100.0, score)),
+            {
+                "mean_hit_rate": rep.mean_hit_rate,
+                "mean_curiosity": rep.mean_curiosity,
+                "n_pairs": rep.n_pairs,
+            },
+            rep.notes[:4],
+        )
+    except Exception as e:
+        return DomainResult("transfer_paraphrase", False, 0.0, {}, [str(e)])
+
+
+def _domain_curiosity() -> DomainResult:
+    try:
+        # Force empty WHO/WHERE style card on a science snippet
+        text = (
+            "Parvalbumin interneurons fire faster than pyramidal cells. "
+            "Allen FI data constrains class rates. "
+            "Scalpel locks PV and Pyr without free-fit S."
+        )
+        lesson = build_5w1h(
+            title="PV vs Pyr order",
+            text=text,
+            symbols=["neuron", "brain", "science"],
+            kind="document:biology",
+            path="synthetic://pv_pyr",
+        )
+        cur = run_curiosity_loop(lesson, max_questions=6)
+        rate = cur.n_resolved / max(1, cur.n_questions)
+        # domain should be biology with rich WHY
+        why_ok = lesson.domain == "biology" and bool(lesson.mechanism)
+        score = 50.0 * rate + 30.0 * (1.0 if why_ok else 0.0) + 20.0 * min(
+            1.0, len(lesson.why) / 3.0
+        )
+        return DomainResult(
+            "curiosity_5w1h",
+            rate >= 0.5 and why_ok,
+            float(min(100.0, score)),
+            {
+                "resolved": f"{cur.n_resolved}/{cur.n_questions}",
+                "domain": lesson.domain,
+                "mechanism": lesson.mechanism,
+                "n_why": len(lesson.why),
+            },
+            cur.notes[:3] + [f"open={lesson.open_questions[:2]}"],
+        )
+    except Exception as e:
+        return DomainResult("curiosity_5w1h", False, 0.0, {}, [str(e)])
+
+
 def _domain_authority() -> DomainResult:
     try:
         pin = pin_archive(write_snapshot=False)
@@ -325,12 +384,14 @@ def run_multi_domain_stress() -> MultiDomainStressReport:
         _domain_narrative(),
         _domain_media(),
         _domain_short_horizon(),
+        _domain_transfer(),
+        _domain_curiosity(),
     ]
     n_pass = sum(1 for d in domains if d.ok)
     mean = sum(d.score for d in domains) / max(1, len(domains))
     finished = datetime.now(timezone.utc)
     rep = MultiDomainStressReport(
-        ok=n_pass >= max(4, len(domains) - 1),
+        ok=n_pass >= max(5, len(domains) - 1),
         n_pass=n_pass,
         n_domains=len(domains),
         mean_score=mean,

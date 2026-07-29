@@ -29,12 +29,22 @@ Domains: authority/Allen · learning SME · science docs · narrative · media A
 4. **Caption name quality (prior)** — glue words / cold names.  
    **Addressed earlier:** character bias, purity prune, multi-frame vote (held ~0.94–1.0).
 
-### Remaining honest limits (not bugs)
+### Weakness climb (1–3) — 2026-07-29
+
+| Climb | Status |
+|-------|--------|
+| 1. Richer WHY (domain mechanisms) | **Done** — biology / physics_fsot / narrative / media / learning templates |
+| 2. Transfer tests (no title tokens) | **Done** — `run_transfer_test.py` mean hit 1.0 |
+| 3. Active questioning | **Done** — `curiosity.py` fills empty 5W1H; bio WHO = cell-class system |
+
+Multi-domain after climb: **8/8 · mean 96.2**.
+
+## Remaining honest limits (not bugs)
 
 | Limit | Why it matters |
 |-------|----------------|
 | Open-world **character** ID | Tutor-ablated movie-entity ID ≠ “that is Jake from pixels alone” |
-| Causal WHY | Extractive “because…” sentences, not true scientific causal models |
+| Causal WHY depth | Domain **templates** + extractive “because…” — not full lab causal inference |
 | Curriculum A/B | Gap vs fixed often **tie** on recall; pixel scores are seed-noisy |
 | Media first-N discovery | Same videos preferred unless shuffle seeds change order |
 | Score_all_layers cost | Real media decode on every refine score can be slow |
