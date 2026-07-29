@@ -813,13 +813,30 @@ fn runHostLoop() void {
     std.debug.print("=== FSOT HOST LOOP (continuous sample→inject→tick) ===\n", .{});
     const r = host_loop_fixed.runHostLoop(24, true);
     std.debug.print(
-        "HOST_LOOP ticks={d} live_disp={d} live_mic={d} spikes={d} eps={d} spoke={}\n",
-        .{ r.n_ticks, r.n_live_display, r.n_live_mic, r.spikes, r.episodes, r.spoke },
+        "HOST_LOOP ticks={d} live_disp={d} live_mic={d} spikes={d} eps={d} spoke={} sleep_ms={d}\n",
+        .{ r.n_ticks, r.n_live_display, r.n_live_mic, r.spikes, r.episodes, r.spoke, r.sleep_ms },
     );
     if (r.ok) {
         std.debug.print("FSOT_HOST_LOOP PASS\n", .{});
     } else {
         std.debug.print("FSOT_HOST_LOOP FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runBodyDaemon() void {
+    std.debug.print("=== FSOT BODY DAEMON (boot continuous host loop) ===\n", .{});
+    std.debug.print("doctrine: plant sample → Fixed inject → genetic mind tick\n", .{});
+    const r = host_loop_fixed.runBodyDaemon();
+    std.debug.print(
+        "BODY ticks={d} live_disp={d} live_mic={d} spikes={d} eps={d} spoke={} sleep_ms={d}\n",
+        .{ r.n_ticks, r.n_live_display, r.n_live_mic, r.spikes, r.episodes, r.spoke, r.sleep_ms },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_BODY PASS\n", .{});
+        std.debug.print("FSOT_BODY_BOOT_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_BODY FAIL\n", .{});
         std.process.exit(1);
     }
 }
@@ -1314,12 +1331,14 @@ pub fn main() !void {
         runWireAround();
     } else if (std.mem.eql(u8, mode, "symbol") or std.mem.eql(u8, mode, "symbol-assoc") or std.mem.eql(u8, mode, "anchors")) {
         runSymbolAssoc();
-    } else if (std.mem.eql(u8, mode, "hardware") or std.mem.eql(u8, mode, "plant") or std.mem.eql(u8, mode, "body")) {
+    } else if (std.mem.eql(u8, mode, "hardware") or std.mem.eql(u8, mode, "plant")) {
         runHardware();
     } else if (std.mem.eql(u8, mode, "host-senses") or std.mem.eql(u8, mode, "host_senses") or std.mem.eql(u8, mode, "senses") or std.mem.eql(u8, mode, "host")) {
         runHostSenses();
     } else if (std.mem.eql(u8, mode, "host-loop") or std.mem.eql(u8, mode, "host_loop") or std.mem.eql(u8, mode, "loop")) {
         runHostLoop();
+    } else if (std.mem.eql(u8, mode, "body") or std.mem.eql(u8, mode, "daemon") or std.mem.eql(u8, mode, "boot")) {
+        runBodyDaemon();
     } else if (std.mem.eql(u8, mode, "speakers") or std.mem.eql(u8, mode, "speaker") or std.mem.eql(u8, mode, "audio-out")) {
         runSpeakers();
     } else if (std.mem.eql(u8, mode, "autonomous") or std.mem.eql(u8, mode, "auto") or std.mem.eql(u8, mode, "chew")) {
@@ -1442,7 +1461,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|host-senses|host-loop|speakers|stress|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|body|host-senses|host-loop|speakers|stress|…]\n", .{});
         std.process.exit(2);
     }
 }
