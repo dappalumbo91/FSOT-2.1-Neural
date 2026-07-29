@@ -8,7 +8,7 @@
 //!   s  = +1 causal LTP window, −1 anti-causal LTD window, 0 outside
 //!   η  = HEBB_LR * psi_con  (FSOT consciousness-coupling scale)
 //!
-//! Not full molecular cascade (CaMKII, AMPA trafficking) — that is the next depth.
+//! Molecular eligibility / glia η scale optional via applyStdpEpochScaled.
 
 const fixed = @import("fixed.zig");
 const seeds_f = @import("seeds_fixed.zig");
@@ -59,11 +59,21 @@ pub fn fsotStdpDelta(
 }
 
 /// Apply STDP over the network using last_spike_tick[i].
-/// Returns number of edges updated.
 pub fn applyStdpEpoch(
     b: *brain_f.BrainF,
     last_spike_tick: []const i32,
     global_tick: i32,
+) u32 {
+    return applyStdpEpochModulated(b, last_spike_tick, global_tick, null, null);
+}
+
+/// gain_at_post[post] and elig_at[post*MAX_N+pre] optional scales (glia + molecular).
+pub fn applyStdpEpochModulated(
+    b: *brain_f.BrainF,
+    last_spike_tick: []const i32,
+    global_tick: i32,
+    gain_at_post: ?[]const Fixed,
+    elig_flat: ?[]const Fixed,
 ) u32 {
     _ = global_tick;
     var n_upd: u32 = 0;
@@ -71,6 +81,7 @@ pub fn applyStdpEpoch(
     var post: usize = 0;
     while (post < n) : (post += 1) {
         if (b.genotypes[post].synapse_sign <= 0) continue;
+        const g_post: Fixed = if (gain_at_post) |g| g[post] else fixed.fromInt(1);
         var pre: usize = 0;
         while (pre < n) : (pre += 1) {
             if (pre == post) continue;
@@ -78,7 +89,7 @@ pub fn applyStdpEpoch(
             const sgn = stdpSign(last_spike_tick[pre], last_spike_tick[post]);
             if (sgn == 0) continue;
             const dist = if (post > pre) post - pre else pre - post;
-            const dw = fsotStdpDelta(
+            var dw = fsotStdpDelta(
                 b.genotypes[pre].composite_spin,
                 b.genotypes[post].composite_spin,
                 b.genotypes[pre].composite_charge,
@@ -87,9 +98,10 @@ pub fn applyStdpEpoch(
                 sgn,
             );
             if (dw == 0) continue;
+            const elig: Fixed = if (elig_flat) |e| e[post * network_f.MAX_N + pre] else fixed.fromInt(1);
+            dw = fixed.mul(fixed.mul(dw, g_post), elig);
             const idx = post * network_f.MAX_N + pre;
             var w = b.net.W[idx];
-            // synaptogenesis: absent contact gets FSOT-seeded birth weight
             if (w == 0 and sgn > 0) {
                 w = fixed.mul(
                     genetic_f.fsotPairWeight(
@@ -105,7 +117,6 @@ pub fn applyStdpEpoch(
             w = fixed.add(w, dw);
             if (fixed.gt(w, STDP_CAP)) w = STDP_CAP;
             if (fixed.lt(w, fixed.negate(STDP_CAP))) w = fixed.negate(STDP_CAP);
-            // prune near-zero anti-causal remnants
             if (fixed.lt(fixed.abs(w), fixed.fromDecimalStr("0.002")) and sgn < 0) w = 0;
             b.net.W[idx] = w;
             n_upd += 1;

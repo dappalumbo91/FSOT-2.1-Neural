@@ -26,6 +26,8 @@ const organism_f = @import("organism_fixed.zig");
 const stdp_f = @import("stdp_fixed.zig");
 const genetic_f = @import("genetic_fixed.zig");
 const seeds_f = @import("seeds_fixed.zig");
+const glia_f = @import("glia_fixed.zig");
+const molecular_f = @import("molecular_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const PASS_THRESHOLD: f64 = 0.95;
@@ -212,12 +214,14 @@ fn cueFeatures(cue: []const u8, out: *[8]Fixed) void {
 /// Run inject+ticks; record which synapses carried spikes; apply Hebb; optional prune.
 fn neuralEpoch(
     org: *organism_f.OrganismF,
+    glia: *glia_f.GliaState,
+    mol: *molecular_f.CascadeState,
     cue: []const u8,
     steps: u32,
     apply_stdp: bool,
     traces: *[MAX_TRACE]EdgeTrace,
     n_tr: *usize,
-) struct { spikes: u32, mean_s: f64, hebb_updates: u32, stdp_updates: u32 } {
+) struct { spikes: u32, mean_s: f64, hebb_updates: u32, stdp_updates: u32, n_consol: u32, n_prune: u32, n_myelo: u32 } {
     var feats: [8]Fixed = undefined;
     cueFeatures(cue, &feats);
     org.bus.clear();
@@ -229,9 +233,14 @@ fn neuralEpoch(
     const sp0 = org.brain.totalSpikes();
     var hebb_n: u32 = 0;
     var stdp_n: u32 = 0;
+    var n_consol: u32 = 0;
+    var n_prune: u32 = 0;
+    var n_myelo: u32 = 0;
 
     var last_spike_tick: [network_f.MAX_N]i32 = .{-1} ** network_f.MAX_N;
     var event_w: [network_f.MAX_N * network_f.MAX_N]u32 = .{0} ** (network_f.MAX_N * network_f.MAX_N);
+    var gain_buf: [network_f.MAX_N]Fixed = undefined;
+    var elig_buf: [network_f.MAX_N * network_f.MAX_N]Fixed = undefined;
     var global_t: i32 = 0;
 
     var t: u32 = 0;
@@ -243,7 +252,12 @@ fn neuralEpoch(
         _ = org.tickOnce();
         global_t += 1;
 
-        // record spike times for STDP
+        // glia: load/clear/supply after spikes
+        glia.stepAfterSpikes(&org.brain);
+        // molecular: tag coactive, advance cascade
+        mol.tagCoactive(&org.brain);
+        mol.cascadeStep();
+
         i = 0;
         while (i < org.brain.n) : (i += 1) {
             if (org.brain.net.last_fired[i]) last_spike_tick[i] = global_t;
@@ -264,12 +278,35 @@ fn neuralEpoch(
         }
 
         if (apply_stdp) {
-            // FSOT-solidified STDP (timing + pair weight)
-            stdp_n += stdp_f.applyStdpEpoch(&org.brain, last_spike_tick[0..org.brain.n], global_t);
-            // residual co-fire Hebb (same-tick) already inside STDP sign==0→1
-            hebb_n += 1; // epoch marker
+            // fill glia gain + molecular eligibility buffers
+            i = 0;
+            while (i < org.brain.n) : (i += 1) {
+                gain_buf[i] = glia.plasticityGain(i);
+            }
+            i = 0;
+            while (i < org.brain.n) : (i += 1) {
+                var j: usize = 0;
+                while (j < org.brain.n) : (j += 1) {
+                    elig_buf[i * network_f.MAX_N + j] = mol.eligibility(i, j);
+                }
+            }
+            stdp_n += stdp_f.applyStdpEpochModulated(
+                &org.brain,
+                last_spike_tick[0..org.brain.n],
+                global_t,
+                gain_buf[0..org.brain.n],
+                elig_buf[0 .. org.brain.n * network_f.MAX_N],
+            );
+            hebb_n += 1;
+        }
+        // late LTP consolidation every few ticks
+        if (t % 4 == 3) {
+            n_consol += mol.consolidateToW(&org.brain);
         }
     }
+    // glial structural maintenance after epoch
+    n_prune += glia.microglialPrune(&org.brain);
+    n_myelo += glia.myelinate(&org.brain);
 
     // harvest top edges by events
     var ranked: [MAX_TRACE]EdgeTrace = undefined;
@@ -324,6 +361,9 @@ fn neuralEpoch(
         .mean_s = fixed.toF64(org.brain.meanS()),
         .hebb_updates = hebb_n,
         .stdp_updates = stdp_n,
+        .n_consol = n_consol,
+        .n_prune = n_prune,
+        .n_myelo = n_myelo,
     };
 }
 
@@ -440,6 +480,15 @@ pub const SynapseReport = struct {
     n_edge_traces: u32,
     n_hebb: u32,
     n_stdp: u32,
+    n_molecular_tags: u32,
+    n_camk_peaks: u32,
+    n_ampa_up: u32,
+    n_consolidate: u32,
+    n_glia_clear: u32,
+    n_glia_prune: u32,
+    n_myelo: u32,
+    mean_supply: f64,
+    mean_load: f64,
     spikes: u32,
     n_concepts: u32,
     n_bonds_before: u32,
@@ -451,6 +500,8 @@ pub const SynapseReport = struct {
     cross_region_edges: u32,
     mean_s: f64,
     stdp_selftest: bool,
+    glia_selftest: bool,
+    mol_selftest: bool,
 };
 
 pub fn runSynapsePathwayProbe() SynapseReport {
@@ -460,15 +511,16 @@ pub fn runSynapsePathwayProbe() SynapseReport {
 
     var org = organism_f.OrganismF.init();
     org.steps_per_tick = 4;
+    var glia = glia_f.GliaState.init();
+    var mol = molecular_f.CascadeState.init();
 
     // Cross-domain query seeds: science + math + literacy co-activated
-    // Arbitrary STEM question style → walk bonds → form novel cross edges
     const seeds = [_][]const u8{ "plant", "sun", "day", "two", "five", "book", "read" };
 
     var traces: [MAX_TRACE]EdgeTrace = undefined;
     var n_tr: usize = 0;
-    const ep1 = neuralEpoch(&org, "plants need sun grow day", 12, true, &traces, &n_tr);
-    const ep2 = neuralEpoch(&org, "living things water light", 10, true, &traces, &n_tr);
+    const ep1 = neuralEpoch(&org, &glia, &mol, "plants need sun grow day", 12, true, &traces, &n_tr);
+    const ep2 = neuralEpoch(&org, &glia, &mol, "living things water light", 10, true, &traces, &n_tr);
     _ = learning_f.HEBB_LR;
 
     var thought: [12]ThoughtStep = undefined;
@@ -493,19 +545,28 @@ pub fn runSynapsePathwayProbe() SynapseReport {
     }
 
     // print bio-comparable trace
-    std.debug.print("--- BIO MAP (human ↔ FSOT Fixed + STDP) ---\n", .{});
-    std.debug.print("  human LTP (causal STDP)      ↔ stdp_fixed pre→post Δt>0 → +fsotPairWeight\n", .{});
-    std.debug.print("  human LTD (anti-causal STDP) ↔ post→pre Δt<0 → −fsotPairWeight\n", .{});
-    std.debug.print("  human Hebb co-fire           ↔ same-tick STDP sign=+1\n", .{});
-    std.debug.print("  human prune / LTD residual   ↔ decay + pruneWeakBonds / near-zero wipe\n", .{});
-    std.debug.print("  human synaptogenesis         ↔ W=0 + causal → FSOT birth weight\n", .{});
-    std.debug.print("  human AHN (hippocampus)      ↔ limited; rewire + hipp region, not mass birth\n", .{});
-    std.debug.print("  glia / molecular cascade     ↔ NOT yet (depth target; see BIO_ACCURACY_AUDIT)\n", .{});
+    std.debug.print("--- BIO MAP (human ↔ FSOT Fixed + STDP + glia + molecular) ---\n", .{});
+    std.debug.print("  human LTP (causal STDP)      ↔ stdp pre→post · glia η · mol eligibility\n", .{});
+    std.debug.print("  human LTD (anti-causal STDP) ↔ post→pre −fsotPairWeight\n", .{});
+    std.debug.print("  human CaMKII / AMPA cascade  ↔ molecular_fixed tag→camk→ampa→protein\n", .{});
+    std.debug.print("  human late LTP (protein)     ↔ consolidateToW when protein high\n", .{});
+    std.debug.print("  human astrocyte supply/clear ↔ glia supply/load (poof/suction FSOT)\n", .{});
+    std.debug.print("  human microglia prune        ↔ microglialPrune weak edges\n", .{});
+    std.debug.print("  human oligo myelination      ↔ myelinate strong long-range W\n", .{});
+    std.debug.print("  human AHN (hippocampus)      ↔ limited; rewire + hipp, not mass birth\n", .{});
     std.debug.print("  association / new thought    ↔ FSOT-scaled concept bonds (ψ_con·|pair|)\n", .{});
     std.debug.print("  genetics as code             ↔ codon→genotype→trinary spin/charge→W\n", .{});
     const route = pathways_f.routeFor(.text);
     std.debug.print("  text query route primary={s} hipp_bind={}\n", .{ regionName(route.primary), route.hipp_bind });
-    std.debug.print("  STDP selftest={}\n", .{stdp_f.selfTest()});
+    std.debug.print("  STDP selftest={} glia={} mol={}\n", .{ stdp_f.selfTest(), glia_f.selfTest(), molecular_f.selfTest() });
+    std.debug.print(
+        "  glia supply={e} load={e} clear={d} prune={d} myelo={d}\n",
+        .{ fixed.toF64(glia.meanSupply()), fixed.toF64(glia.meanLoad()), glia.n_clear_events, glia.n_prune_events, glia.n_myelo_events },
+    );
+    std.debug.print(
+        "  mol tags={d} camk_peaks={d} ampa_up={d} consolidate={d}\n",
+        .{ mol.n_tags, mol.n_camk_peak, mol.n_ampa_up, mol.n_consolidate },
+    );
 
     std.debug.print("--- SYNAPTIC EDGE TRACE (top carriers this query) ---\n", .{});
     i = 0;
@@ -542,10 +603,16 @@ pub fn runSynapsePathwayProbe() SynapseReport {
     const hebb = ep1.hebb_updates + ep2.hebb_updates;
     const stdp_u = ep1.stdp_updates + ep2.stdp_updates;
     const st_ok = stdp_f.selfTest();
+    const g_ok = glia_f.selfTest();
+    const m_ok = molecular_f.selfTest();
     const ok =
         st_ok and
+        g_ok and
+        m_ok and
         stdp_u >= 1 and
         spikes >= 1 and
+        glia.n_clear_events >= 1 and
+        mol.n_tags >= 1 and
         th.n_visited >= 4 and
         th.n_novel >= 1 and
         th.n_cross >= 1 and
@@ -556,6 +623,15 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         .n_edge_traces = @intCast(n_tr),
         .n_hebb = hebb,
         .n_stdp = stdp_u,
+        .n_molecular_tags = mol.n_tags,
+        .n_camk_peaks = mol.n_camk_peak,
+        .n_ampa_up = mol.n_ampa_up,
+        .n_consolidate = mol.n_consolidate + ep1.n_consol + ep2.n_consol,
+        .n_glia_clear = glia.n_clear_events,
+        .n_glia_prune = glia.n_prune_events + ep1.n_prune + ep2.n_prune,
+        .n_myelo = glia.n_myelo_events + ep1.n_myelo + ep2.n_myelo,
+        .mean_supply = fixed.toF64(glia.meanSupply()),
+        .mean_load = fixed.toF64(glia.meanLoad()),
         .spikes = spikes,
         .n_concepts = @intCast(n_concepts),
         .n_bonds_before = @intCast(bonds_before),
@@ -567,6 +643,8 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         .cross_region_edges = cross_reg,
         .mean_s = ep2.mean_s,
         .stdp_selftest = st_ok,
+        .glia_selftest = g_ok,
+        .mol_selftest = m_ok,
     };
 }
 

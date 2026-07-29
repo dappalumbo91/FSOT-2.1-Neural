@@ -43,7 +43,8 @@
 | Adult neurogenesis mass birth | **No (by design)** | hipp region only | Aligns with “limited AHN” caution |
 | Concept / association bonds | Yes | Δbond ∝ ψ_con·\|pair\| | Memory association layer |
 | Novel thought | Bond-composed only | No free prose | Correct for truth doctrine |
-| Glia / molecular cascade | **No** | — | **Gap — next depth** |
+| Glia (astro/micro/oligo) | **Yes** (`glia_fixed`) | supply/load poof·suction; η scale; prune; myelo | Process-level, not full wet glia |
+| Molecular cascade (CaMKII/AMPA/protein) | **Yes** (`molecular_fixed`) | tag→camk→ampa→protein→consolidate W | Compressed late-LTP stand-in |
 | Full STDP curve + multi-timescale | Partial | discrete windows | **Gap — deepen** |
 | History / moral corpus | **Excluded** | — | Intentional |
 
@@ -73,12 +74,13 @@ Bond / STDP solidification:
 
 ## Gaps we will close (depth order)
 
-1. **STDP** — timing windows + FSOT pair (done v1; refine windows / multi-timescale).  
-2. **Inhibition / E-I balance** — already sign-coded; tighten motif law.  
-3. **Glial / metabolic modulation** — scale η and prune by “supply” state (FSOT suction/poof seeds).  
-4. **Richer hipp neurogenesis proxy** — rare new hipp units under activity, not every query.  
-5. **Molecular cascade stand-in** — multi-step eligibility traces (still Fixed, no IEEE mind).  
-6. **Only later:** broader world knowledge / moral nuance (after truth STEM depth is solid).
+1. ~~**STDP**~~ — done (`stdp_fixed`); refine multi-timescale later.  
+2. ~~**Glial / metabolic**~~ — done v1 (`glia_fixed` astro/micro/oligo).  
+3. ~~**Molecular cascade**~~ — done v1 (`molecular_fixed` tag→camk→ampa→protein).  
+4. **Inhibition / E-I balance** — tighten motif law under load.  
+5. **Richer hipp neurogenesis proxy** — rare new hipp units under activity.  
+6. **Multi-timescale STDP + true molecular delay** — longer late-LTP consolidation.  
+7. **Only later:** broader world knowledge / moral nuance (after truth STEM depth is solid).
 
 ---
 

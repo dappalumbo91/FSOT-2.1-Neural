@@ -1339,9 +1339,18 @@ fn runSynapsePathways() void {
             r.mean_s,
         },
     );
+    std.debug.print(
+        "GLIA supply={e} load={e} clear={d} prune={d} myelo={d} self={}\n",
+        .{ r.mean_supply, r.mean_load, r.n_glia_clear, r.n_glia_prune, r.n_myelo, r.glia_selftest },
+    );
+    std.debug.print(
+        "MOL tags={d} camk={d} ampa={d} consol={d} self={}\n",
+        .{ r.n_molecular_tags, r.n_camk_peaks, r.n_ampa_up, r.n_consolidate, r.mol_selftest },
+    );
     if (r.ok) {
         std.debug.print("FSOT_SYNAPSE_PATH PASS\n", .{});
         std.debug.print("FSOT_NOVEL_PATHWAY_OK\n", .{});
+        std.debug.print("FSOT_GLIA_MOLECULAR_OK\n", .{});
     } else {
         std.debug.print("FSOT_SYNAPSE_PATH FAIL\n", .{});
         std.process.exit(1);
@@ -1836,7 +1845,7 @@ pub fn main() !void {
         runMnistAccuracy();
     } else if (std.mem.eql(u8, mode, "depth") or std.mem.eql(u8, mode, "understand") or std.mem.eql(u8, mode, "paraphrase") or std.mem.eql(u8, mode, "grade-depth")) {
         runGradeDepth();
-    } else if (std.mem.eql(u8, mode, "pathways") or std.mem.eql(u8, mode, "synapse") or std.mem.eql(u8, mode, "synaptic") or std.mem.eql(u8, mode, "trace") or std.mem.eql(u8, mode, "think-path")) {
+    } else if (std.mem.eql(u8, mode, "pathways") or std.mem.eql(u8, mode, "synapse") or std.mem.eql(u8, mode, "synaptic") or std.mem.eql(u8, mode, "trace") or std.mem.eql(u8, mode, "think-path") or std.mem.eql(u8, mode, "glia") or std.mem.eql(u8, mode, "molecular") or std.mem.eql(u8, mode, "cascade")) {
         runSynapsePathways();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
