@@ -29,9 +29,10 @@ if errorlevel 1 (
 )
 
 echo.
-echo Starting live mind (~6 seconds of continuous experience)...
-echo You should see structure, then mind t=30/300 ... with eps/enc/spikes growing.
-echo Speakers may click briefly when the speech plant fires.
+echo Starting live mind (~9s continuous)...
+echo Expect: mind t=... spikes rising, enc/cur/teach growing.
+echo Speakers play; then mic listens for OWN sound (self_hear=X/Y).
+echo Noisy room: amb_high may be high while self template still anchors.
 echo.
 "%OUT%" mind
 set ERR=%ERRORLEVEL%

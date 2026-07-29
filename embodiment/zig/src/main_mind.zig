@@ -856,8 +856,8 @@ fn runLiveMindConnected() void {
         .teach_every = 40,
     });
     std.debug.print(
-        "SUMMARY spikes={d} rate={e} eps={d} enc={d} cur={d}/{d} teach={d} ret={d} spk={d}\n",
-        .{ r.spikes, r.spike_rate, r.episodes, r.n_encodes, r.n_curiosity, r.n_curiosity_q, r.n_teaches, r.n_retrieves, r.n_speaks },
+        "SUMMARY spikes={d} rate={e} eps={d} enc={d} cur={d}/{d} teach={d} ret={d} spk={d} self={d}/{d} match={e} amb={d}\n",
+        .{ r.spikes, r.spike_rate, r.episodes, r.n_encodes, r.n_curiosity, r.n_curiosity_q, r.n_teaches, r.n_retrieves, r.n_speaks, r.n_self_hear, r.n_self_attempts, r.last_self_match, r.n_ambient_high },
     );
     if (r.ok) {
         std.debug.print("FSOT_LIVE_MIND PASS\n", .{});

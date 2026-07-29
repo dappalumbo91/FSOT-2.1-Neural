@@ -17,6 +17,8 @@ const memory_f = @import("memory_fixed.zig");
 const speech_f = @import("speech_organ_fixed.zig");
 const audio_out = @import("host_audio_out_fixed.zig");
 const teach_f = @import("teach_fixed.zig");
+const self_audio = @import("self_audio_loop.zig");
+const pathways_f = @import("pathways_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const LiveConfig = struct {
@@ -29,6 +31,13 @@ pub const LiveConfig = struct {
     curiosity_every: u32 = 12,
     /// inject synthetic multi-domain lessons (Python autonomous/curriculum spirit)
     teach_every: u32 = 40,
+    /// close speaker→mic loop (self-voice anchor in noise)
+    self_hear: bool = true,
+    /// soft match for noisy living rooms (shape, not pure loudness)
+    /// soft for noisy rooms (same PCM feature space now)
+    self_match_thresh: Fixed = fixed.fromDecimalStr("0.10"),
+    /// settle ms after DAC before mic grab (room echo)
+    self_hear_settle_ms: u32 = 120,
 };
 
 pub const LiveReport = struct {
@@ -45,6 +54,10 @@ pub const LiveReport = struct {
     n_speaks: u32,
     n_retrieves: u32,
     n_teaches: u32,
+    n_self_hear: u32,
+    n_self_attempts: u32,
+    n_ambient_high: u32,
+    last_self_match: f64,
     last_symbol: u32,
     mean_s: f64,
     units: u32,
@@ -97,10 +110,17 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
     var n_spk: u32 = 0;
     var n_ret: u32 = 0;
     var n_teach: u32 = 0;
+    var n_self: u32 = 0;
+    var n_self_try: u32 = 0;
+    var n_amb: u32 = 0;
+    var last_match: f64 = 0;
     var last_sym: u32 = 0;
     var last_vision: [8]Fixed = .{0} ** 8;
     var last_audio: [8]Fixed = .{0} ** 8;
     var prev_vision: [8]Fixed = .{0} ** 8;
+    // running self-voice template (anchored when match succeeds — fights room noise over time)
+    var self_template: [8]Fixed = .{0} ** 8;
+    var has_self_template: bool = false;
 
     const domains = [_]teach_f.Domain{ .physics_fsot, .biology, .narrative, .learning, .media };
     const who_s = [_][]const u8{ "agent", "pyr", "neo", "learner", "viewer" };
@@ -213,22 +233,75 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
             if (hit != 0) n_ret += 1;
         }
 
-        // --- speech + speakers ---
+        // --- speech + speakers + self-hear loop (efference copy vs mic) ---
         if (cfg.speak_every > 0 and (t % cfg.speak_every) == 0) {
             org.speakNow();
             n_spk += 1;
+            // Always inject predicted self-sound (corollary discharge) even before mic returns
+            var pred_f: [8]Fixed = undefined;
+            self_audio.acousticToFeats(org.last_acoustic, &pred_f);
+            org.pushSense(.speech_sound, pred_f[0..], fixed.fromDecimalStr("0.95"));
+            org.pushSense(.motor_proprio, pred_f[0..], fixed.fromDecimalStr("0.55"));
+
             if (cfg.speakers) {
                 var pcm: [2400]i16 = undefined;
                 const n = audio_out.acousticToPcm(org.last_acoustic, pcm[0..]);
                 _ = audio_out.playPcm(pcm[0..n]);
             }
+
+            if (cfg.self_hear) {
+                n_self_try += 1;
+                // let room + speakers settle (echo path)
+                if (cfg.self_hear_settle_ms > 0) {
+                    std.Thread.sleep(@as(u64, cfg.self_hear_settle_ms) * std.time.ns_per_ms);
+                }
+                const sh = self_audio.hearSelfAfterSpeak(org.last_acoustic, cfg.self_match_thresh);
+                // report best of feature cosine and pcm shape corr
+                last_match = @max(fixed.toF64(sh.match), sh.pcm_corr);
+                if (sh.ambient_high) n_amb += 1;
+
+                // residual ambient still enters as external audio (noisy living room honesty)
+                org.pushSense(.audio, sh.residual[0..], fixed.fromDecimalStr("0.7"));
+
+                if (sh.self_heard) {
+                    n_self += 1;
+                    // blend into running self-voice template (anchor despite noise)
+                    var i: usize = 0;
+                    while (i < 8) : (i += 1) {
+                        if (has_self_template) {
+                            self_template[i] = fixed.add(
+                                fixed.mul(self_template[i], fixed.fromDecimalStr("0.7")),
+                                fixed.mul(sh.pred[i], fixed.fromDecimalStr("0.3")),
+                            );
+                        } else {
+                            self_template[i] = sh.pred[i];
+                        }
+                    }
+                    has_self_template = true;
+                    // episodic: "I heard myself" — who=self, what=voice
+                    const tok = [_]u32{
+                        memory_f.hashToken("self"),
+                        memory_f.hashToken("own_voice"),
+                        memory_f.hashToken("reafferent"),
+                        0,
+                        0,
+                        memory_f.hashToken("hear"),
+                    };
+                    org.last_encode_id = org.store.encode(&org.brain, pred_f[0..], 0b100111, tok);
+                    n_enc += 1;
+                    // teach speech organ bind: self sound ↔ self token
+                    org.speech.teachSymbol(memory_f.hashToken("self"), pred_f[0..]);
+                } else if (has_self_template) {
+                    // fight noise: re-inject known self template weakly so identity holds
+                    org.pushSense(.speech_sound, self_template[0..], fixed.fromDecimalStr("0.4"));
+                }
+            }
         }
 
         if (cfg.report_every > 0 and ((t + 1) % cfg.report_every) == 0) {
-            const br = org.brain.structureReport();
             const sp_now = org.brain.totalSpikes();
             std.debug.print(
-                "mind t={d}/{d} meanS={e} spikes+={d} total_sp={d} eps={d} enc={d} cur={d}/{d} ret={d} teach={d} spk={d} live_d={} live_m={} mod={s} sym={d} syn={d}\n",
+                "mind t={d}/{d} meanS={e} spikes+={d} total_sp={d} eps={d} enc={d} cur={d}/{d} ret={d} teach={d} spk={d} self={d}/{d} match={e} amb={d} live_d={} live_m={} mod={s} sym={d}\n",
                 .{
                     t + 1,
                     cfg.n_ticks,
@@ -242,11 +315,14 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
                     n_ret,
                     n_teach,
                     n_spk,
+                    n_self,
+                    n_self_try,
+                    last_match,
+                    n_amb,
                     sample.live_display,
                     sample.live_mic,
                     @import("modulate_fixed.zig").modeName(org.last_mod.mode),
                     anc,
-                    br.n_synapses,
                 },
             );
         }
@@ -262,13 +338,14 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
     // Gates: live plant + memory + curiosity/teach cognitive work (+ spikes if plant drives them)
     const ok = org.store.n >= 8 and n_enc >= 4 and n_cur_q >= 4 and n_ret >= 2 and (spikes >= 8 or n_cur >= 4);
     std.debug.print(
-        "LIVE_MIND ticks={d} spikes={d} rate={e}/tick eps={d} encodes={d} cur_res={d} cur_q={d} ret={d} teach={d} speaks={d} live_d={d} live_m={d}\n",
-        .{ cfg.n_ticks, spikes, rate, org.store.n, n_enc, n_cur, n_cur_q, n_ret, n_teach, n_spk, n_disp, n_mic },
+        "LIVE_MIND ticks={d} spikes={d} rate={e}/tick eps={d} encodes={d} cur_res={d} cur_q={d} ret={d} teach={d} speaks={d} self_hear={d}/{d} amb_high={d} live_d={d} live_m={d}\n",
+        .{ cfg.n_ticks, spikes, rate, org.store.n, n_enc, n_cur, n_cur_q, n_ret, n_teach, n_spk, n_self, n_self_try, n_amb, n_disp, n_mic },
     );
     std.debug.print(
-        "LIVE_MIND brain units={d} syn={d} meanS={e} (Python gap: real docs/media banks still host-side)\n",
-        .{ st.n_units, st.n_synapses, fixed.toF64(org.brain.meanS()) },
+        "LIVE_MIND brain units={d} syn={d} meanS={e} last_self_match={e} self_template={}\n",
+        .{ st.n_units, st.n_synapses, fixed.toF64(org.brain.meanS()), last_match, has_self_template },
     );
+    std.debug.print("SELF_AUDIO: efference_copy+mic match; residual=room (noisy living room expected)\n", .{});
     return .{
         .ok = ok,
         .ticks = cfg.n_ticks,
@@ -283,6 +360,10 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
         .n_speaks = n_spk,
         .n_retrieves = n_ret,
         .n_teaches = n_teach,
+        .n_self_hear = n_self,
+        .n_self_attempts = n_self_try,
+        .n_ambient_high = n_amb,
+        .last_self_match = last_match,
         .last_symbol = last_sym,
         .mean_s = fixed.toF64(org.brain.meanS()),
         .units = @intCast(st.n_units),
