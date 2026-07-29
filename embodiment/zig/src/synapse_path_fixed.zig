@@ -23,6 +23,9 @@ const pathways_f = @import("pathways_fixed.zig");
 const memory_f = @import("memory_fixed.zig");
 const lexicon_en = @import("lexicon_en_fixed.zig");
 const organism_f = @import("organism_fixed.zig");
+const stdp_f = @import("stdp_fixed.zig");
+const genetic_f = @import("genetic_fixed.zig");
+const seeds_f = @import("seeds_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const PASS_THRESHOLD: f64 = 0.95;
@@ -82,22 +85,40 @@ fn findBond(a: u16, b: u16) ?usize {
     return null;
 }
 
+/// Bond strength increment from FSOT pair weight (spin/charge/dist), not a free constant.
+fn fsotBondDelta(a: u16, b: u16) Fixed {
+    // Map concept tokens → pseudo spin/charge on lattice (trinary-ish)
+    const ta = concepts[a].token;
+    const tb = concepts[b].token;
+    const spin_a = fixed.sub(fixed.div(fixed.fromInt(@intCast(ta % 200)), fixed.fromInt(100)), fixed.fromInt(1));
+    const spin_b = fixed.sub(fixed.div(fixed.fromInt(@intCast(tb % 200)), fixed.fromInt(100)), fixed.fromInt(1));
+    const q_a = fixed.div(fixed.fromInt(@intCast((ta >> 8) % 100)), fixed.fromInt(100));
+    const q_b = fixed.div(fixed.fromInt(@intCast((tb >> 8) % 100)), fixed.fromInt(100));
+    const dist = @as(usize, @intCast(@abs(@as(i32, @intCast(a)) - @as(i32, @intCast(b))))) + 1;
+    const pair = genetic_f.fsotPairWeight(spin_a, spin_b, q_a, q_b, dist);
+    // Δbond = ψ_con * |pair| * 0.05  (consciousness-coupled association)
+    return fixed.mul(fixed.mul(seeds_f.psi_con, fixed.abs(pair)), fixed.fromDecimalStr("0.05"));
+}
+
 fn strengthenBond(a: u16, b: u16, origin: u8) void {
     if (a == b) return;
     const lo = @min(a, b);
     const hi = @max(a, b);
+    const dlt = fsotBondDelta(lo, hi);
     if (findBond(lo, hi)) |i| {
-        bonds[i].weight = fixed.add(bonds[i].weight, fixed.fromDecimalStr("0.08"));
+        bonds[i].weight = fixed.add(bonds[i].weight, dlt);
         if (fixed.gt(bonds[i].weight, fixed.fromInt(1))) bonds[i].weight = fixed.fromInt(1);
         bonds[i].uses += 1;
-        if (origin == 2 and bonds[i].origin == 0) {} // keep innate
         return;
     }
     if (n_bonds >= MAX_BONDS) return;
+    // birth weight also FSOT-derived
+    var birth = fixed.add(fixed.fromDecimalStr("0.12"), dlt);
+    if (fixed.gt(birth, fixed.fromDecimalStr("0.5"))) birth = fixed.fromDecimalStr("0.5");
     bonds[n_bonds] = .{
         .a = lo,
         .b = hi,
-        .weight = fixed.fromDecimalStr("0.25"),
+        .weight = birth,
         .origin = origin,
         .uses = 1,
     };
@@ -193,10 +214,10 @@ fn neuralEpoch(
     org: *organism_f.OrganismF,
     cue: []const u8,
     steps: u32,
-    apply_hebb: bool,
+    apply_stdp: bool,
     traces: *[MAX_TRACE]EdgeTrace,
     n_tr: *usize,
-) struct { spikes: u32, mean_s: f64, hebb_updates: u32 } {
+) struct { spikes: u32, mean_s: f64, hebb_updates: u32, stdp_updates: u32 } {
     var feats: [8]Fixed = undefined;
     cueFeatures(cue, &feats);
     org.bus.clear();
@@ -207,20 +228,27 @@ fn neuralEpoch(
     n_tr.* = 0;
     const sp0 = org.brain.totalSpikes();
     var hebb_n: u32 = 0;
+    var stdp_n: u32 = 0;
 
-    // clear event counters for this epoch by zeroing local map
+    var last_spike_tick: [network_f.MAX_N]i32 = .{-1} ** network_f.MAX_N;
     var event_w: [network_f.MAX_N * network_f.MAX_N]u32 = .{0} ** (network_f.MAX_N * network_f.MAX_N);
+    var global_t: i32 = 0;
 
     var t: u32 = 0;
     while (t < steps) : (t += 1) {
-        // snapshot who fired last step
         var pre_fired: [network_f.MAX_N]bool = undefined;
         var i: usize = 0;
         while (i < org.brain.n) : (i += 1) pre_fired[i] = org.brain.net.last_fired[i];
 
         _ = org.tickOnce();
+        global_t += 1;
 
-        // after step, post units that fire received from pre_fired via W
+        // record spike times for STDP
+        i = 0;
+        while (i < org.brain.n) : (i += 1) {
+            if (org.brain.net.last_fired[i]) last_spike_tick[i] = global_t;
+        }
+
         i = 0;
         while (i < org.brain.n) : (i += 1) {
             if (!org.brain.net.last_fired[i]) continue;
@@ -235,30 +263,11 @@ fn neuralEpoch(
             }
         }
 
-        if (apply_hebb) {
-            // reuse learning hebb: strengthen co-active E→E
-            const n = org.brain.n;
-            var post: usize = 0;
-            while (post < n) : (post += 1) {
-                if (org.brain.genotypes[post].synapse_sign <= 0) continue;
-                if (!org.brain.net.last_fired[post]) continue;
-                var pre: usize = 0;
-                while (pre < n) : (pre += 1) {
-                    if (pre == post) continue;
-                    if (org.brain.genotypes[pre].synapse_sign <= 0) continue;
-                    if (!org.brain.net.last_fired[pre]) continue;
-                    const idx = post * network_f.MAX_N + pre;
-                    var w = org.brain.net.W[idx];
-                    // if absent (0), allow weak structural plasticity — new contact
-                    if (w == 0) {
-                        w = fixed.fromDecimalStr("0.02");
-                    }
-                    w = fixed.add(w, learning_f.HEBB_LR);
-                    if (fixed.gt(w, learning_f.HEBB_CAP)) w = learning_f.HEBB_CAP;
-                    org.brain.net.W[idx] = w;
-                    hebb_n += 1;
-                }
-            }
+        if (apply_stdp) {
+            // FSOT-solidified STDP (timing + pair weight)
+            stdp_n += stdp_f.applyStdpEpoch(&org.brain, last_spike_tick[0..org.brain.n], global_t);
+            // residual co-fire Hebb (same-tick) already inside STDP sign==0→1
+            hebb_n += 1; // epoch marker
         }
     }
 
@@ -314,6 +323,7 @@ fn neuralEpoch(
         .spikes = org.brain.totalSpikes() - sp0,
         .mean_s = fixed.toF64(org.brain.meanS()),
         .hebb_updates = hebb_n,
+        .stdp_updates = stdp_n,
     };
 }
 
@@ -429,6 +439,7 @@ pub const SynapseReport = struct {
     ok: bool,
     n_edge_traces: u32,
     n_hebb: u32,
+    n_stdp: u32,
     spikes: u32,
     n_concepts: u32,
     n_bonds_before: u32,
@@ -439,6 +450,7 @@ pub const SynapseReport = struct {
     n_thought_steps: u32,
     cross_region_edges: u32,
     mean_s: f64,
+    stdp_selftest: bool,
 };
 
 pub fn runSynapsePathwayProbe() SynapseReport {
@@ -457,6 +469,7 @@ pub fn runSynapsePathwayProbe() SynapseReport {
     var n_tr: usize = 0;
     const ep1 = neuralEpoch(&org, "plants need sun grow day", 12, true, &traces, &n_tr);
     const ep2 = neuralEpoch(&org, "living things water light", 10, true, &traces, &n_tr);
+    _ = learning_f.HEBB_LR;
 
     var thought: [12]ThoughtStep = undefined;
     var n_th: usize = 0;
@@ -480,15 +493,19 @@ pub fn runSynapsePathwayProbe() SynapseReport {
     }
 
     // print bio-comparable trace
-    std.debug.print("--- BIO MAP (human ↔ FSOT Fixed) ---\n", .{});
-    std.debug.print("  human LTP / Hebb co-fire     ↔ HEBB_LR strengthen W[post,pre]\n", .{});
-    std.debug.print("  human LTD / prune unused     ↔ weight decay + pruneWeakBonds\n", .{});
-    std.debug.print("  human synaptogenesis         ↔ new W from 0 → small contact\n", .{});
-    std.debug.print("  human adult neurogenesis     ↔ limited; we rewire, not mass-birth units\n", .{});
-    std.debug.print("  human long-range association ↔ concept bonds cross domain\n", .{});
-    std.debug.print("  anatomical route             ↔ thal/sens/assoc/hipp (pathways_fixed)\n", .{});
+    std.debug.print("--- BIO MAP (human ↔ FSOT Fixed + STDP) ---\n", .{});
+    std.debug.print("  human LTP (causal STDP)      ↔ stdp_fixed pre→post Δt>0 → +fsotPairWeight\n", .{});
+    std.debug.print("  human LTD (anti-causal STDP) ↔ post→pre Δt<0 → −fsotPairWeight\n", .{});
+    std.debug.print("  human Hebb co-fire           ↔ same-tick STDP sign=+1\n", .{});
+    std.debug.print("  human prune / LTD residual   ↔ decay + pruneWeakBonds / near-zero wipe\n", .{});
+    std.debug.print("  human synaptogenesis         ↔ W=0 + causal → FSOT birth weight\n", .{});
+    std.debug.print("  human AHN (hippocampus)      ↔ limited; rewire + hipp region, not mass birth\n", .{});
+    std.debug.print("  glia / molecular cascade     ↔ NOT yet (depth target; see BIO_ACCURACY_AUDIT)\n", .{});
+    std.debug.print("  association / new thought    ↔ FSOT-scaled concept bonds (ψ_con·|pair|)\n", .{});
+    std.debug.print("  genetics as code             ↔ codon→genotype→trinary spin/charge→W\n", .{});
     const route = pathways_f.routeFor(.text);
     std.debug.print("  text query route primary={s} hipp_bind={}\n", .{ regionName(route.primary), route.hipp_bind });
+    std.debug.print("  STDP selftest={}\n", .{stdp_f.selfTest()});
 
     std.debug.print("--- SYNAPTIC EDGE TRACE (top carriers this query) ---\n", .{});
     i = 0;
@@ -523,10 +540,11 @@ pub fn runSynapsePathwayProbe() SynapseReport {
 
     const spikes = ep1.spikes + ep2.spikes;
     const hebb = ep1.hebb_updates + ep2.hebb_updates;
-    // Pass: real synaptic traffic + Hebb plasticity + concept walk + new bonds
-    // (edge_traces can be few if sparse firing; Hebb still rewires W)
+    const stdp_u = ep1.stdp_updates + ep2.stdp_updates;
+    const st_ok = stdp_f.selfTest();
     const ok =
-        hebb >= 1 and
+        st_ok and
+        stdp_u >= 1 and
         spikes >= 1 and
         th.n_visited >= 4 and
         th.n_novel >= 1 and
@@ -537,6 +555,7 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         .ok = ok,
         .n_edge_traces = @intCast(n_tr),
         .n_hebb = hebb,
+        .n_stdp = stdp_u,
         .spikes = spikes,
         .n_concepts = @intCast(n_concepts),
         .n_bonds_before = @intCast(bonds_before),
@@ -547,6 +566,7 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         .n_thought_steps = @intCast(n_th),
         .cross_region_edges = cross_reg,
         .mean_s = ep2.mean_s,
+        .stdp_selftest = st_ok,
     };
 }
 

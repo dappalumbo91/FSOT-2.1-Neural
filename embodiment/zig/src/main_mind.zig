@@ -1321,10 +1321,12 @@ fn runSynapsePathways() void {
     std.debug.print("compare to human: LTP/LTD, synaptogenesis, limited adult neurogenesis, association\n", .{});
     const r = synapse_path_fixed.runSynapsePathwayProbe();
     std.debug.print(
-        "PATH edges={d} hebb={d} spikes={d} concepts={d} bonds {d}→{d} novel={d} cross={d} pruned={d} thought_steps={d} cross_region={d} meanS={e}\n",
+        "PATH edges={d} hebb={d} stdp={d} stdp_ok={} spikes={d} concepts={d} bonds {d}→{d} novel={d} cross={d} pruned={d} thought_steps={d} cross_region={d} meanS={e}\n",
         .{
             r.n_edge_traces,
             r.n_hebb,
+            r.n_stdp,
+            r.stdp_selftest,
             r.spikes,
             r.n_concepts,
             r.n_bonds_before,
