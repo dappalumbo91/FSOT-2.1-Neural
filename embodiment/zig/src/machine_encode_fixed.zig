@@ -43,18 +43,17 @@ pub fn tritsToBytes(trits: []const trit.Trit, out: []u8) usize {
     return n_out;
 }
 
-/// Chunk trits into TritWords (default 32).
+/// Chunk trits into TritWords (up to 32). Word.n is actual trit count (no false pad).
 pub fn tritsToWords(trits: []const trit.Trit, out: []trit.TritWord) usize {
     var n: usize = 0;
     var i: usize = 0;
     while (i < trits.len and n < out.len) {
         const end = @min(i + 32, trits.len);
-        var chunk: [32]trit.Trit = .{0} ** 32;
         const clen = end - i;
-        @memcpy(chunk[0..clen], trits[i..end]);
-        out[n] = trit.TritWord.fromTrits(chunk[0..32]);
+        out[n] = trit.TritWord.fromTrits(trits[i..end]);
         n += 1;
         i = end;
+        _ = clen;
     }
     return n;
 }

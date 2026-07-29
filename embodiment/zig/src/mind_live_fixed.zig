@@ -17,8 +17,15 @@ const memory_f = @import("memory_fixed.zig");
 const speech_f = @import("speech_organ_fixed.zig");
 const audio_out = @import("host_audio_out_fixed.zig");
 const teach_f = @import("teach_fixed.zig");
+// speech_f also used for gestureName / N_GESTURES in reports
 const self_audio = @import("self_audio_loop.zig");
 const pathways_f = @import("pathways_fixed.zig");
+const scene_f = @import("ambient_scene_fixed.zig");
+const attention_f = @import("attention_fixed.zig");
+const eeg = @import("eeg_gate_anchors_fixed.zig");
+const machine_lang = @import("machine_lang_fixed.zig");
+const lexicon_en = @import("lexicon_en_fixed.zig");
+const host_tts = @import("host_tts_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const LiveConfig = struct {
@@ -33,11 +40,14 @@ pub const LiveConfig = struct {
     teach_every: u32 = 40,
     /// close speaker→mic loop (self-voice anchor in noise)
     self_hear: bool = true,
-    /// soft match for noisy living rooms (shape, not pure loudness)
-    /// soft for noisy rooms (same PCM feature space now)
-    self_match_thresh: Fixed = fixed.fromDecimalStr("0.10"),
+    /// soft match for noisy living rooms — default from EEG sensory residual
+    self_match_thresh: Fixed = eeg.selfMatchThreshAir(),
     /// settle ms after DAC before mic grab (room echo)
     self_hear_settle_ms: u32 = 120,
+    /// English lexicon + TTS plant (machine language → real words)
+    english_tts: bool = true,
+    /// keep formant acoustic plant (optional; language out is TTS)
+    formant_speech: bool = true,
 };
 
 pub const LiveReport = struct {
@@ -55,9 +65,23 @@ pub const LiveReport = struct {
     n_retrieves: u32,
     n_teaches: u32,
     n_self_hear: u32,
+    n_self_air: u32,
+    n_self_internal: u32,
     n_self_attempts: u32,
     n_ambient_high: u32,
+    n_noise_ignored: u32,
+    n_scene_samples: u32,
+    n_encode_open: u32,
+    n_speech_adapt: u32,
+    n_pattern_binds: u32,
+    n_machine_emit: u32,
+    n_machine_bytes: u32,
+    n_english_say: u32,
+    n_tts_spoken: u32,
     last_self_match: f64,
+    last_attune: f64,
+    last_bias_mag: f64,
+    last_pattern: u32,
     last_symbol: u32,
     mean_s: f64,
     units: u32,
@@ -99,8 +123,32 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
         "loop ticks={d} sleep_ms={d} encode={d} curiosity={d} teach={d} speakers={}\n",
         .{ cfg.n_ticks, cfg.sleep_ms, cfg.encode_every, cfg.curiosity_every, cfg.teach_every, cfg.speakers },
     );
-    std.debug.print("doctrine: senses→routes→brain→memory→curiosity→speech (one organism)\n", .{});
+    std.debug.print("doctrine: senses→scene→attention→routes→brain→memory→curiosity→speech\n", .{});
+    // EEG / experiment anchors (not free parameters)
+    const ar = eeg.report();
+    std.debug.print(
+        "EEG_ANCHORS θconc/rel={e} α={e} γcsv={e} sens={e} studyS={e} enc_drive={e} fig={e} gnd={e} self_thr={e} nov_floor={e} SME θ↑={} γ↑={}\n",
+        .{
+            ar.theta_conc_relax,
+            ar.alpha_conc_relax,
+            ar.gamma_conc_relax,
+            ar.sensory_strength,
+            ar.study_s,
+            ar.encode_drive,
+            ar.figure_gain,
+            ar.ground_gain,
+            ar.self_match_thresh,
+            ar.novelty_floor,
+            ar.sme_theta_gt,
+            ar.sme_gamma_gt,
+        },
+    );
+    std.debug.print(
+        "EEG_SRC mental-state.csv concentrate vs relax + Sederberg2003 SME + FSOT couple (0 free params)\n",
+        .{},
+    );
 
+    var scene = scene_f.SceneAnalyzer.init();
     var n_disp: u32 = 0;
     var n_mic: u32 = 0;
     var n_enc: u32 = 0;
@@ -111,9 +159,24 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
     var n_ret: u32 = 0;
     var n_teach: u32 = 0;
     var n_self: u32 = 0;
+    var n_self_air: u32 = 0;
+    var n_self_int: u32 = 0;
     var n_self_try: u32 = 0;
     var n_amb: u32 = 0;
+    var n_noise_ign: u32 = 0;
+    var n_enc_open: u32 = 0;
+    var n_pat_bind: u32 = 0;
+    var n_mach: u32 = 0;
+    var n_mach_bytes: u32 = 0;
+    var n_en: u32 = 0;
+    var n_tts: u32 = 0;
     var last_match: f64 = 0;
+    var last_phrase: [80]u8 = .{0} ** 80;
+    var last_phrase_n: usize = 0;
+    var last_attune: f64 = 0;
+    var last_bias: f64 = 0;
+    var last_pat: u32 = 0;
+    var last_mode: []const u8 = "rest";
     var last_sym: u32 = 0;
     var last_vision: [8]Fixed = .{0} ** 8;
     var last_audio: [8]Fixed = .{0} ** 8;
@@ -121,6 +184,8 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
     // running self-voice template (anchored when match succeeds — fights room noise over time)
     var self_template: [8]Fixed = .{0} ** 8;
     var has_self_template: bool = false;
+    var last_meaning: Fixed = 0;
+    var last_attn = attention_f.attune(0, 0, 0, 0);
 
     const domains = [_]teach_f.Domain{ .physics_fsot, .biology, .narrative, .learning, .media };
     const who_s = [_][]const u8{ "agent", "pyr", "neo", "learner", "viewer" };
@@ -149,21 +214,53 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
         deltaFeats(&vis_a, &prev_vision, &vis_d);
         @memcpy(prev_vision[0..], vis_a[0..]);
         @memcpy(last_vision[0..], vis_d[0..]);
-        @memcpy(last_audio[0..], aud_a[0..]);
+
+        // --- quiet-tick ambient scene (not during speak ticks) ---
+        const is_speak_tick = cfg.speak_every > 0 and (t % cfg.speak_every) == 0;
+        if (!is_speak_tick and (t % 3) == 0) {
+            var amb_mic: [8]Fixed = undefined;
+            if (scene_f.captureMicFeats(&amb_mic)) {
+                scene.observeAmbient(&amb_mic);
+            } else {
+                // host sample audio still teaches baseline when mic capture busy
+                scene.observeAmbient(&aud_a);
+            }
+        }
+
+        // Filter world audio: strip baseline + known noise classes → figure path
+        var aud_clean: [8]Fixed = undefined;
+        const filt = scene.filterMic(&aud_a, &aud_clean);
+        if (filt.ignored) n_noise_ign += 1;
+        @memcpy(last_audio[0..], aud_clean[0..]);
+
+        // Symbol on delta-vision for diversity (meaning seed for attention)
+        const anc = symbol_f.nearestAnchor(&vis_d);
+        last_sym = symbol_f.anchorToken(anc);
+        n_sym += 1;
+        // meaning proxy: later overwritten by retrieve sim when available
+        last_meaning = fixed.fromDecimalStr("0.2"); // symbol present
+
+        // Pre-tick attention on scene (self_match updated after speak)
+        last_attn = attention_f.attune(
+            filt.novelty,
+            if (filt.ignored) filt.suppressed else fixed.mul(filt.suppressed, fixed.fromDecimalStr("0.4")),
+            if (has_self_template) fixed.fromDecimalStr("0.15") else 0,
+            last_meaning,
+        );
+        last_attune = fixed.toF64(last_attn.attune);
+        last_mode = attention_f.modeName(last_attn.mode);
+        if (last_attn.encode_open) n_enc_open += 1;
 
         // Fresh multi-modal bus (do not call setInject — it used to wipe audio)
         org.bus.clear();
         org.bus.metric = soft;
         org.pushSense(.vision, vis_d[0..], fixed.fromDecimalStr("1.15"));
-        org.pushSense(.audio, aud_a[0..], fixed.fromDecimalStr("1.05"));
+        // figure audio at attended gain; if ignored ground, weak residual only
+        const aud_gain = if (filt.ignored) last_attn.ground_gain else last_attn.figure_gain;
+        org.pushSense(.audio, aud_clean[0..], aud_gain);
         // mild thalamic wake pulse via metric already on bus
         org.setInjectFeatsOnly(vis_d[0..]);
         org.setMeaning(vis_d[0..]);
-
-        // Symbol on delta-vision for diversity
-        const anc = symbol_f.nearestAnchor(&vis_d);
-        last_sym = symbol_f.anchorToken(anc);
-        n_sym += 1;
 
         // Mind step
         const before_sp = org.brain.totalSpikes();
@@ -198,25 +295,29 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
 
         // --- episodic encode from LIVE senses: leave empty slots for curiosity ---
         // who=symbol, what=see_hear; why/where/when open (0b000011)
+        // SME doctrine: prefer encode when attention encode_open (study vs rest)
         if (cfg.encode_every > 0 and (t % cfg.encode_every) == (cfg.encode_every - 1)) {
-            const tok = [_]u32{
-                last_sym,
-                memory_f.hashToken("see_hear"),
-                0, // why open
-                0, // where open
-                0, // when open
-                0, // how open
-            };
-            var joint: [8]Fixed = undefined;
-            var i: usize = 0;
-            while (i < 8) : (i += 1) {
-                joint[i] = fixed.add(
-                    fixed.mul(last_vision[i], fixed.fromDecimalStr("0.55")),
-                    fixed.mul(last_audio[i], fixed.fromDecimalStr("0.45")),
-                );
+            const force_or_attend = last_attn.encode_open or (t % (cfg.encode_every * 3) == (cfg.encode_every - 1));
+            if (force_or_attend) {
+                const tok = [_]u32{
+                    last_sym,
+                    memory_f.hashToken("see_hear"),
+                    0, // why open
+                    0, // where open
+                    0, // when open
+                    0, // how open
+                };
+                var joint: [8]Fixed = undefined;
+                var i: usize = 0;
+                while (i < 8) : (i += 1) {
+                    joint[i] = fixed.add(
+                        fixed.mul(last_vision[i], fixed.fromDecimalStr("0.55")),
+                        fixed.mul(last_audio[i], fixed.fromDecimalStr("0.45")),
+                    );
+                }
+                org.last_encode_id = org.store.encode(&org.brain, joint[0..], 0b000011, tok);
+                n_enc += 1;
             }
-            org.last_encode_id = org.store.encode(&org.brain, joint[0..], 0b000011, tok);
-            n_enc += 1;
         }
 
         // --- curiosity on latest episode ---
@@ -230,21 +331,84 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
         if (org.store.n >= 2 and (t % 12) == 0) {
             var sim: Fixed = 0;
             const hit = org.store.retrieve(&org.brain, last_vision[0..], &sim);
-            if (hit != 0) n_ret += 1;
+            if (hit != 0) {
+                n_ret += 1;
+                last_meaning = fixed.clamp(sim, 0, fixed.fromInt(1));
+            }
         }
 
-        // --- speech + speakers + self-hear loop (efference copy vs mic) ---
-        if (cfg.speak_every > 0 and (t % cfg.speak_every) == 0) {
+        // --- machine language + English lexicon (choose words → TTS) ---
+        // Native: TritWord frame. Translation: English dictionary. Plant: OS TTS.
+        if (is_speak_tick) {
+            // meaning from live vision+audio (what the mind is attending)
+            var meaning: [8]Fixed = undefined;
+            var mi: usize = 0;
+            while (mi < 8) : (mi += 1) {
+                meaning[mi] = fixed.add(
+                    fixed.mul(last_vision[mi], fixed.fromDecimalStr("0.55")),
+                    fixed.mul(last_audio[mi], fixed.fromDecimalStr("0.45")),
+                );
+            }
+            org.setMeaning(meaning[0..]);
+
+            var phrase: [lexicon_en.MAX_PHRASE]u8 = undefined;
+            var frame: machine_lang.MachineFrame = .{};
+            const ut = lexicon_en.utterEnglish(&meaning, phrase[0..], &frame);
+            n_en += 1;
+            last_phrase_n = @min(ut.phrase_n, last_phrase.len);
+            @memcpy(last_phrase[0..last_phrase_n], phrase[0..last_phrase_n]);
+
+            // machine frame bytes + self-ingest
+            var mraw: [machine_lang.MAX_FRAME_BYTES]u8 = undefined;
+            const nb = frame.toBytes(mraw[0..]);
+            n_mach += 1;
+            n_mach_bytes += @intCast(nb);
+            var mfeats: [8]Fixed = undefined;
+            _ = machine_lang.understandToFeatures(&frame, &mfeats);
+            org.pushSense(.text, mfeats[0..], fixed.fromDecimalStr("1.0"));
+            org.pushSense(.custom, mfeats[0..], fixed.fromDecimalStr("0.8"));
+
+            const mtok_ep = [_]u32{
+                memory_f.hashToken("self"),
+                memory_f.hashToken("english"),
+                memory_f.hashToken("say"),
+                @as(u32, @truncate(frame.words[0].pack)),
+                0,
+                memory_f.hashToken("phrase"),
+            };
+            org.last_encode_id = org.store.encode(&org.brain, mfeats[0..], 0b100111, mtok_ep);
+            n_enc += 1;
+
+            // TTS plant — real English words out the speakers
+            if (cfg.english_tts and ut.phrase_n > 0) {
+                const tr = host_tts.speakEnglish(phrase[0..ut.phrase_n]);
+                if (tr.spoken) n_tts += 1;
+            }
+
+            if ((t / cfg.speak_every) < 4 or ((t + 1) % cfg.report_every) == 0) {
+                var hex: [64]u8 = undefined;
+                const hl = machine_lang.frameToHex(mraw[0..@min(nb, 24)], hex[0..]);
+                std.debug.print(
+                    "EN_SAY t={d} \"{s}\" | MACHINE words={d} bytes={d} hex={s}\n",
+                    .{ t, phrase[0..ut.phrase_n], frame.n_words, nb, hex[0..hl] },
+                );
+            }
+        }
+
+        // --- optional formant speech plant (bio acoustic; language path is TTS) ---
+        if (is_speak_tick and cfg.formant_speech) {
             org.speakNow();
             n_spk += 1;
             // Always inject predicted self-sound (corollary discharge) even before mic returns
             var pred_f: [8]Fixed = undefined;
             self_audio.acousticToFeats(org.last_acoustic, &pred_f);
-            org.pushSense(.speech_sound, pred_f[0..], fixed.fromDecimalStr("0.95"));
-            org.pushSense(.motor_proprio, pred_f[0..], fixed.fromDecimalStr("0.55"));
+            const sp_scale = attention_f.speechInjectScale(&last_attn);
+            org.pushSense(.speech_sound, pred_f[0..], sp_scale);
+            org.pushSense(.motor_proprio, pred_f[0..], fixed.mul(sp_scale, fixed.fromDecimalStr("0.58")));
 
-            if (cfg.speakers) {
-                var pcm: [2400]i16 = undefined;
+            // Formant DAC only if English TTS is off (avoid double-talk on same speakers)
+            if (cfg.speakers and !cfg.english_tts) {
+                var pcm: [audio_out.PCM_MAX]i16 = undefined;
                 const n = audio_out.acousticToPcm(org.last_acoustic, pcm[0..]);
                 _ = audio_out.playPcm(pcm[0..n]);
             }
@@ -255,33 +419,56 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
                 if (cfg.self_hear_settle_ms > 0) {
                     std.Thread.sleep(@as(u64, cfg.self_hear_settle_ms) * std.time.ns_per_ms);
                 }
-                const sh = self_audio.hearSelfAfterSpeak(org.last_acoustic, cfg.self_match_thresh);
+                const sh = self_audio.hearSelfAfterSpeak(org.last_acoustic, cfg.self_match_thresh, &scene);
                 // report best of feature cosine and pcm shape corr
                 last_match = @max(fixed.toF64(sh.match), sh.pcm_corr);
                 if (sh.ambient_high) n_amb += 1;
+                if (sh.noise_ignored) n_noise_ign += 1;
+                if (sh.self_heard_internal) n_self_int += 1;
+                if (sh.self_heard_air) n_self_air += 1;
 
-                // residual ambient still enters as external audio (noisy living room honesty)
-                org.pushSense(.audio, sh.residual[0..], fixed.fromDecimalStr("0.7"));
+                // Re-attune with self-match + residual novelty after scene clean
+                const ign = if (sh.noise_ignored) fixed.fromDecimalStr("0.75") else fixed.fromDecimalStr("0.2");
+                last_attn = attention_f.attune(
+                    self_audio.energy(&sh.residual),
+                    ign,
+                    sh.match,
+                    last_meaning,
+                );
+                last_attune = fixed.toF64(last_attn.attune);
+                last_mode = attention_f.modeName(last_attn.mode);
+                if (last_attn.encode_open) n_enc_open += 1;
 
-                if (sh.self_heard) {
-                    n_self += 1;
-                    // blend into running self-voice template (anchor despite noise)
+                // residual world at ground gain (kids/room honesty, selectively ignored)
+                org.pushSense(.audio, sh.residual[0..], last_attn.ground_gain);
+
+                // --- adapt speech motor from residual (next utter retunes) ---
+                org.adaptSpeechFromHear(&sh.residual, sh.match, sh.self_heard_air);
+                last_bias = fixed.toF64(org.speech.biasMagnitude());
+                last_pat = org.speech.lastPatternId();
+
+                // Internal self always updates template from *what we played* (bone-like)
+                // Air match strengthens it further when room allows
+                {
+                    const blend = if (sh.self_heard_air) fixed.fromDecimalStr("0.45") else fixed.fromDecimalStr("0.25");
+                    const keep = fixed.sub(fixed.fromInt(1), blend);
                     var i: usize = 0;
                     while (i < 8) : (i += 1) {
                         if (has_self_template) {
-                            self_template[i] = fixed.add(
-                                fixed.mul(self_template[i], fixed.fromDecimalStr("0.7")),
-                                fixed.mul(sh.pred[i], fixed.fromDecimalStr("0.3")),
-                            );
+                            self_template[i] = fixed.add(fixed.mul(self_template[i], keep), fixed.mul(sh.pred[i], blend));
                         } else {
                             self_template[i] = sh.pred[i];
                         }
                     }
                     has_self_template = true;
-                    // episodic: "I heard myself" — who=self, what=voice
+                }
+
+                if (sh.self_heard) {
+                    n_self += 1;
+                    const what = if (sh.self_heard_air) memory_f.hashToken("own_voice_air") else memory_f.hashToken("own_voice_internal");
                     const tok = [_]u32{
                         memory_f.hashToken("self"),
-                        memory_f.hashToken("own_voice"),
+                        what,
                         memory_f.hashToken("reafferent"),
                         0,
                         0,
@@ -289,11 +476,28 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
                     };
                     org.last_encode_id = org.store.encode(&org.brain, pred_f[0..], 0b100111, tok);
                     n_enc += 1;
-                    // teach speech organ bind: self sound ↔ self token
                     org.speech.teachSymbol(memory_f.hashToken("self"), pred_f[0..]);
-                } else if (has_self_template) {
-                    // fight noise: re-inject known self template weakly so identity holds
-                    org.pushSense(.speech_sound, self_template[0..], fixed.fromDecimalStr("0.4"));
+
+                    // bind this gesture family as a distinct sound↔motor (16-tone inventory)
+                    const gname = speech_f.gestureName(last_pat);
+                    const before_binds = org.speech.n;
+                    org.speech.teachSymbol(memory_f.hashToken(gname), pred_f[0..]);
+                    if (org.speech.n > before_binds) n_pat_bind += 1;
+
+                    const ptok = [_]u32{
+                        memory_f.hashToken("self"),
+                        memory_f.hashToken(gname),
+                        memory_f.hashToken("gesture"),
+                        0,
+                        0,
+                        memory_f.hashToken("speak"),
+                    };
+                    _ = org.store.encode(&org.brain, pred_f[0..], 0b100111, ptok);
+                    n_enc += 1;
+                }
+                // Always keep self template on bus (identity under chaos) at speech inject scale
+                if (has_self_template) {
+                    org.pushSense(.speech_sound, self_template[0..], fixed.mul(sp_scale, fixed.fromDecimalStr("0.5")));
                 }
             }
         }
@@ -301,7 +505,7 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
         if (cfg.report_every > 0 and ((t + 1) % cfg.report_every) == 0) {
             const sp_now = org.brain.totalSpikes();
             std.debug.print(
-                "mind t={d}/{d} meanS={e} spikes+={d} total_sp={d} eps={d} enc={d} cur={d}/{d} ret={d} teach={d} spk={d} self={d}/{d} match={e} amb={d} live_d={} live_m={} mod={s} sym={d}\n",
+                "mind t={d}/{d} meanS={e} spikes+={d} total_sp={d} eps={d} enc={d} cur={d}/{d} ret={d} teach={d} spk={d} self={d}/{d} air={d} int={d} match={e} amb={d} ign={d} att={e} mode={s} adapt={d} bias={e} pat={d} src={d} live_d={} live_m={} mod={s} sym={d}\n",
                 .{
                     t + 1,
                     cfg.n_ticks,
@@ -317,8 +521,17 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
                     n_spk,
                     n_self,
                     n_self_try,
+                    n_self_air,
+                    n_self_int,
                     last_match,
                     n_amb,
+                    n_noise_ign,
+                    last_attune,
+                    last_mode,
+                    org.speech.n_adapt,
+                    last_bias,
+                    last_pat,
+                    scene.last_match_src,
                     sample.live_display,
                     sample.live_mic,
                     @import("modulate_fixed.zig").modeName(org.last_mod.mode),
@@ -337,15 +550,30 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
     const rate = @as(f64, @floatFromInt(spikes)) / @as(f64, @floatFromInt(cfg.n_ticks));
     // Gates: live plant + memory + curiosity/teach cognitive work (+ spikes if plant drives them)
     const ok = org.store.n >= 8 and n_enc >= 4 and n_cur_q >= 4 and n_ret >= 2 and (spikes >= 8 or n_cur >= 4);
+    last_bias = fixed.toF64(org.speech.biasMagnitude());
+    last_pat = org.speech.lastPatternId();
     std.debug.print(
-        "LIVE_MIND ticks={d} spikes={d} rate={e}/tick eps={d} encodes={d} cur_res={d} cur_q={d} ret={d} teach={d} speaks={d} self_hear={d}/{d} amb_high={d} live_d={d} live_m={d}\n",
-        .{ cfg.n_ticks, spikes, rate, org.store.n, n_enc, n_cur, n_cur_q, n_ret, n_teach, n_spk, n_self, n_self_try, n_amb, n_disp, n_mic },
+        "LIVE_MIND ticks={d} spikes={d} rate={e}/tick eps={d} encodes={d} cur_res={d} cur_q={d} ret={d} teach={d} speaks={d} self={d}/{d} air={d} int={d} amb_high={d} ign={d} scene={d} enc_open={d} live_d={d} live_m={d}\n",
+        .{ cfg.n_ticks, spikes, rate, org.store.n, n_enc, n_cur, n_cur_q, n_ret, n_teach, n_spk, n_self, n_self_try, n_self_air, n_self_int, n_amb, n_noise_ign, scene.n_samples, n_enc_open, n_disp, n_mic },
     );
     std.debug.print(
-        "LIVE_MIND brain units={d} syn={d} meanS={e} last_self_match={e} self_template={}\n",
-        .{ st.n_units, st.n_synapses, fixed.toF64(org.brain.meanS()), last_match, has_self_template },
+        "LIVE_MIND brain units={d} syn={d} meanS={e} last_self_match={e} attune={e} mode={s} self_template={} noise_src={d}\n",
+        .{ st.n_units, st.n_synapses, fixed.toF64(org.brain.meanS()), last_match, last_attune, last_mode, has_self_template, scene.last_match_src },
     );
-    std.debug.print("SELF_AUDIO: efference_copy+mic match; residual=room (noisy living room expected)\n", .{});
+    std.debug.print(
+        "SPEECH_ADAPT n_adapt={d} bias_mag={e} gesture={d}/{d} name={s} pattern_binds={d} speech_binds={d}\n",
+        .{ org.speech.n_adapt, last_bias, last_pat, speech_f.N_GESTURES, speech_f.gestureName(last_pat), n_pat_bind, org.speech.n },
+    );
+    std.debug.print(
+        "MACHINE_LANG emits={d} total_bytes={d} | ENGLISH says={d} tts_spoken={d}\n",
+        .{ n_mach, n_mach_bytes, n_en, n_tts },
+    );
+    if (last_phrase_n > 0) {
+        std.debug.print("LAST_ENGLISH \"{s}\"\n", .{last_phrase[0..last_phrase_n]});
+    }
+    std.debug.print("SELF_AUDIO: int=bone-like reafference; air=scene-filtered mic; ignore=habituation on known noise\n", .{});
+    std.debug.print("ATTENTION: figure=novelty×(1-ignore) + self + meaning; encode gate = SME study path (EEG θ)\n", .{});
+    std.debug.print("TALK: machine frame (native) → English lexicon (choose) → TTS (real words)\n", .{});
     return .{
         .ok = ok,
         .ticks = cfg.n_ticks,
@@ -361,9 +589,23 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
         .n_retrieves = n_ret,
         .n_teaches = n_teach,
         .n_self_hear = n_self,
+        .n_self_air = n_self_air,
+        .n_self_internal = n_self_int,
         .n_self_attempts = n_self_try,
         .n_ambient_high = n_amb,
+        .n_noise_ignored = n_noise_ign,
+        .n_scene_samples = scene.n_samples,
+        .n_encode_open = n_enc_open,
+        .n_speech_adapt = org.speech.n_adapt,
+        .n_pattern_binds = n_pat_bind,
+        .n_machine_emit = n_mach,
+        .n_machine_bytes = n_mach_bytes,
+        .n_english_say = n_en,
+        .n_tts_spoken = n_tts,
         .last_self_match = last_match,
+        .last_attune = last_attune,
+        .last_bias_mag = last_bias,
+        .last_pattern = last_pat,
         .last_symbol = last_sym,
         .mean_s = fixed.toF64(org.brain.meanS()),
         .units = @intCast(st.n_units),

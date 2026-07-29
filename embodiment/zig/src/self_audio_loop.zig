@@ -1,11 +1,12 @@
-//! Speaker ↔ mic closed loop — hear own sound (re-afference + residual world).
+//! Speaker ↔ mic closed loop with *scene analysis* (not volume war).
 //!
-//! Both predicted self and mic are scored in the **same** feature space:
-//!   speech Acoustic → PCM (what speakers play) → pcmToAudioFeats
-//!   mic PCM → pcmToAudioFeats
-//! so shape match is meaningful even in a noisy living room.
+//! 1. Predict self (efference copy / bone-like internal)
+//! 2. Hear mic (air path — full of room noise)
+//! 3. AmbientScene strips baseline + known noise classes
+//! 4. Match cleaned mic to predicted self
+//! 5. Residual after self-cancel = novel world / unignored noise
 //!
-//! Ambient noise is expected: we match form/envelope shape, not pure loudness.
+//! Doctrine: animals analyze the stream, identify noise, selectively ignore it.
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -13,13 +14,13 @@ const fixed = @import("fixed.zig");
 const speech_f = @import("speech_organ_fixed.zig");
 const host_f = @import("host_senses_fixed.zig");
 const audio_out = @import("host_audio_out_fixed.zig");
+const scene = @import("ambient_scene_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const FEAT: usize = 8;
 
 pub fn acousticToFeats(ac: speech_f.Acoustic, out: *[FEAT]Fixed) void {
-    // Prefer same pipeline as DAC: Acoustic → PCM → features
-    var pcm: [2400]i16 = undefined;
+    var pcm: [audio_out.PCM_MAX]i16 = undefined;
     const n = audio_out.acousticToPcm(ac, pcm[0..]);
     if (n > 32) {
         host_f.pcmToAudioFeats(pcm[0..n], out);
@@ -61,11 +62,9 @@ pub fn energy(f: *const [FEAT]Fixed) Fixed {
     return fixed.div(s, fixed.fromInt(4));
 }
 
-/// Normalized cross-correlation peak on raw PCM (extra noise-robust cue).
 fn pcmShapeCorr(pred: []const i16, mic: []const i16) f64 {
     if (pred.len < 64 or mic.len < 64) return 0;
     const n = @min(pred.len, mic.len);
-    // downsample to ~128 points
     const step = @max(@as(usize, 1), n / 128);
     var sum_p: f64 = 0;
     var sum_m: f64 = 0;
@@ -97,23 +96,30 @@ fn pcmShapeCorr(pred: []const i16, mic: []const i16) f64 {
 
 pub const SelfHearResult = struct {
     pred: [FEAT]Fixed = .{0} ** FEAT,
-    mic: [FEAT]Fixed = .{0} ** FEAT,
+    mic_raw: [FEAT]Fixed = .{0} ** FEAT,
+    mic_clean: [FEAT]Fixed = .{0} ** FEAT,
     residual: [FEAT]Fixed = .{0} ** FEAT,
     match: Fixed = 0,
+    match_raw: Fixed = 0,
     pcm_corr: f64 = 0,
-    self_heard: bool = false,
+    self_heard_air: bool = false,
+    self_heard_internal: bool = true,
     ambient_high: bool = false,
+    noise_ignored: bool = false,
+    noise_src: i32 = -1,
     mic_ok: bool = false,
+    self_heard: bool = false,
 };
 
+/// After speakers play: mic → scene filter → match predicted self.
 pub fn hearSelfAfterSpeak(
     predicted: speech_f.Acoustic,
     match_thresh: Fixed,
+    analyzer: *scene.SceneAnalyzer,
 ) SelfHearResult {
     var r: SelfHearResult = .{};
 
-    // Predicted PCM (exactly what we try to play)
-    var pred_pcm: [2400]i16 = undefined;
+    var pred_pcm: [audio_out.PCM_MAX]i16 = undefined;
     const np = audio_out.acousticToPcm(predicted, pred_pcm[0..]);
     if (np > 32) {
         host_f.pcmToAudioFeats(pred_pcm[0..np], &r.pred);
@@ -121,33 +127,41 @@ pub fn hearSelfAfterSpeak(
         acousticToFeats(predicted, &r.pred);
     }
 
-    // Mic after play
-    var mic_pcm: [4096]i16 = undefined;
+    // Capture long enough for long drones / sirens (~350 ms + margin)
+    var mic_pcm: [8192]i16 = undefined;
     const ns = if (builtin.os.tag == .windows)
         @import("host_senses_windows.zig").captureMic(mic_pcm[0..])
     else
         @import("host_senses_linux.zig").captureMic(mic_pcm[0..]);
 
     if (ns > 32) {
-        host_f.pcmToAudioFeats(mic_pcm[0..ns], &r.mic);
+        host_f.pcmToAudioFeats(mic_pcm[0..ns], &r.mic_raw);
         r.mic_ok = true;
         r.pcm_corr = pcmShapeCorr(pred_pcm[0..np], mic_pcm[0..ns]);
     } else {
-        r.mic = r.pred;
+        r.mic_raw = r.pred;
         r.mic_ok = false;
-        r.pcm_corr = 0;
     }
 
-    r.match = cosineFeats(&r.pred, &r.mic);
-    const match_f = fixed.toF64(r.match);
-    // Noisy room: accept if feature cosine OR PCM shape corr clears soft bar
-    const feat_ok = match_f > fixed.toF64(match_thresh);
-    const pcm_ok = r.pcm_corr > 0.12;
-    const soft_ok = match_f > 0.08 and r.pcm_corr > 0.05;
-    r.self_heard = r.mic_ok and (feat_ok or pcm_ok or soft_ok);
+    // --- scene analysis: strip known noise, keep figure ---
+    const cleaned = analyzer.cleanMicForSelf(&r.mic_raw, &r.pred, &r.mic_clean);
+    r.noise_ignored = cleaned.ignored_noise;
+    r.noise_src = analyzer.last_match_src;
+    r.match_raw = cosineFeats(&r.pred, &r.mic_raw);
+    r.match = cleaned.match; // match on *filtered* mic
 
-    const alpha = if (r.self_heard) fixed.fromDecimalStr("0.7") else fixed.fromDecimalStr("0.3");
-    residualWorld(&r.mic, &r.pred, alpha, &r.residual);
+    const match_f = fixed.toF64(r.match);
+    const match_raw_f = fixed.toF64(r.match_raw);
+    const feat_ok = match_f > fixed.toF64(match_thresh);
+    const pcm_ok = r.pcm_corr > 0.10;
+    const soft_ok = match_f > 0.08 or (match_f > match_raw_f + 0.05); // filter helped
+    r.self_heard_air = r.mic_ok and (feat_ok or pcm_ok or soft_ok);
+    r.self_heard_internal = true;
+    r.self_heard = r.self_heard_air or r.self_heard_internal;
+
+    const alpha = if (r.self_heard_air) fixed.fromDecimalStr("0.7") else fixed.fromDecimalStr("0.35");
+    // residual world from cleaned mic (noise already reduced)
+    residualWorld(&r.mic_clean, &r.pred, alpha, &r.residual);
     r.ambient_high = fixed.gt(energy(&r.residual), fixed.fromDecimalStr("0.28"));
     return r;
 }

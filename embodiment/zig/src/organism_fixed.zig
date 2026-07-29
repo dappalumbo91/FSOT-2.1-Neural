@@ -89,9 +89,10 @@ pub const OrganismF = struct {
     }
 
     /// One motor→sound frame; re-afference into audio + proprio paths.
+    /// Cycles 16-gesture tone bank + adapted motor bias (self-hear retunes the tract).
     pub fn speakNow(self: *OrganismF) void {
         if (!self.has_meaning) return;
-        const u = speech_f.SpeechOrgan.utter(self.last_meaning[0..]);
+        const u = self.speech.utterNextGesture(self.last_meaning[0..]);
         self.last_motor = u.motor;
         self.last_acoustic = u.acoustic;
         var a_feats: [8]Fixed = undefined;
@@ -105,6 +106,16 @@ pub const OrganismF = struct {
         self.bus.push(sensory_f.PacketF.fromSlice(.speech_sound, a_feats[0..], fixed.fromDecimalStr("0.8")));
         self.bus.push(sensory_f.PacketF.fromSlice(.motor_proprio, m_feats[0..], fixed.fromDecimalStr("0.45")));
         self.use_bio_bus = true;
+    }
+
+    /// After speaker→mic self-hear: retune articulatory bias from residual.
+    pub fn adaptSpeechFromHear(
+        self: *OrganismF,
+        residual: *const [8]Fixed,
+        air_match: Fixed,
+        air_heard: bool,
+    ) void {
+        self.speech.adaptFromSelfHear(residual, air_match, air_heard);
     }
 
     pub fn tickOnce(self: *OrganismF) struct { tick: u32, mean_s: Fixed, spikes: u32, episodes: u32 } {

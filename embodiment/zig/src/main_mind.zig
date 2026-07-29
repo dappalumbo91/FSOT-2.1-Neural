@@ -67,6 +67,9 @@ const bio_io_fixed = @import("bio_io_fixed.zig");
 const pathways_fixed = @import("pathways_fixed.zig");
 const sensory_fixed = @import("sensory_fixed.zig");
 const machine_encode_fixed = @import("machine_encode_fixed.zig");
+const machine_lang_fixed = @import("machine_lang_fixed.zig");
+const lexicon_en_fixed = @import("lexicon_en_fixed.zig");
+const host_tts_fixed = @import("host_tts_fixed.zig");
 const failure_fixed = @import("failure_fixed.zig");
 const autonomous_fixed = @import("autonomous_fixed.zig");
 const wire_around_fixed = @import("wire_around_fixed.zig");
@@ -76,6 +79,8 @@ const host_senses_fixed = @import("host_senses_fixed.zig");
 const host_loop_fixed = @import("host_loop_fixed.zig");
 const host_audio_out_fixed = @import("host_audio_out_fixed.zig");
 const mind_live_fixed = @import("mind_live_fixed.zig");
+const eeg_gate_anchors_fixed = @import("eeg_gate_anchors_fixed.zig");
+const attention_fixed = @import("attention_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -616,6 +621,46 @@ fn runSmeFixed() void {
     }
 }
 
+fn runAttentionEeg() void {
+    std.debug.print("=== FSOT ATTENTION (EEG-anchored gates) ===\n", .{});
+    if (!eeg_gate_anchors_fixed.selfTest()) {
+        std.debug.print("FSOT_EEG_ANCHORS FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    if (!attention_fixed.selfTest()) {
+        std.debug.print("FSOT_ATTENTION FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const ar = eeg_gate_anchors_fixed.report();
+    std.debug.print(
+        "EEG_ANCHORS θconc/rel={e} α={e} γcsv={e} sens={e} studyS={e} enc_drive={e} fig={e} gnd={e} self_thr={e} nov_floor={e}\n",
+        .{
+            ar.theta_conc_relax,
+            ar.alpha_conc_relax,
+            ar.gamma_conc_relax,
+            ar.sensory_strength,
+            ar.study_s,
+            ar.encode_drive,
+            ar.figure_gain,
+            ar.ground_gain,
+            ar.self_match_thresh,
+            ar.novelty_floor,
+        },
+    );
+    std.debug.print(
+        "EEG_LIT SME_θ↑={} SME_γ↑={} consol_σ/θ={} ideation_α↑={}\n",
+        .{
+            ar.sme_theta_gt,
+            ar.sme_gamma_gt,
+            eeg_gate_anchors_fixed.CONSOL_EXPECT_SIGMA_OR_THETA,
+            eeg_gate_anchors_fixed.IDEATION_EXPECT_ALPHA_UP,
+        },
+    );
+    std.debug.print("SRC: mental-state.csv concentrate vs relax (n=2479) + Sederberg2003 + FSOT couple\n", .{});
+    std.debug.print("FSOT_EEG_ANCHORS PASS\n", .{});
+    std.debug.print("FSOT_ATTENTION PASS\n", .{});
+}
+
 fn runShortHorizon() void {
     std.debug.print("=== FSOT MIND SHORT-HORIZON (fixed quick encode→recall) ===\n", .{});
     const r = short_horizon_fixed.runShortHorizonProbe();
@@ -714,6 +759,101 @@ fn runMachineEncode() void {
         std.debug.print("FSOT_MACHINE PASS\n", .{});
     } else {
         std.debug.print("FSOT_MACHINE FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runMachineLang() void {
+    std.debug.print("=== FSOT MACHINE LANGUAGE (generate = understand = run tongue) ===\n", .{});
+    std.debug.print("doctrine: mind emits TritWord frames; re-ingests same bytes; UTF-8 is codec only\n", .{});
+    if (!machine_lang_fixed.selfTest()) {
+        std.debug.print("FSOT_MACHINE_LANG FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const r = machine_lang_fixed.runMachineLangLoop();
+    std.debug.print(
+        "MACHINE_LANG frame_rt={} text_rt={} words={d} trits={d} bytes={d} gen={d} under={d} spikes={d}\n",
+        .{ r.frame_roundtrip, r.text_roundtrip, r.n_words, r.n_trits, r.n_bytes, r.n_generated, r.n_understood, r.inject_spikes },
+    );
+    if (r.hex_len > 0) {
+        std.debug.print("MACHINE_LANG hex_head={s}\n", .{r.hex_head[0..r.hex_len]});
+    }
+    if (r.ok) {
+        std.debug.print("FSOT_MACHINE_LANG PASS\n", .{});
+        std.debug.print("FSOT_MACHINE_TONGUE_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_MACHINE_LANG FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runMachineLangStress() void {
+    std.debug.print("=== FSOT MACHINE LANGUAGE STRESS (1000 frames + text + corrupt + inject) ===\n", .{});
+    if (!machine_lang_fixed.selfTest()) {
+        std.debug.print("FSOT_MACHINE_LANG_STRESS FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const r = machine_lang_fixed.runMachineLangStress(1000);
+    std.debug.print(
+        "MLANG_STRESS frames={d}/{d} text={d}/{d} inject={d} bytes={d} trits={d} mismatches={d} corrupt_rej={d} max_spk={d}\n",
+        .{
+            r.n_frame_ok,
+            r.n_frames,
+            r.n_text_ok,
+            r.n_text_trials,
+            r.n_inject_ok,
+            r.n_bytes_total,
+            r.n_trits_total,
+            r.n_word_mismatches,
+            r.n_corrupt_reject,
+            r.max_spikes,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_MACHINE_LANG_STRESS PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_MACHINE_LANG_STRESS FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runEnglishCodec() void {
+    std.debug.print("=== FSOT ENGLISH CODEC (lexicon choose + machine frame + TTS plant) ===\n", .{});
+    std.debug.print("doctrine: mind chooses machine tokens; English library translates; TTS speaks words\n", .{});
+    if (!lexicon_en_fixed.selfTest()) {
+        std.debug.print("FSOT_ENGLISH FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const r = lexicon_en_fixed.runLexiconProbe();
+    std.debug.print(
+        "ENGLISH words={d} choose={d}/3 input_known={d} phrase=\"{s}\" frame_rt={} choose_diff={}\n",
+        .{ r.n_words, r.n_choose_ok, r.n_input_known, r.phrase_sample[0..r.phrase_n], r.frame_roundtrip, r.choose_not_echo },
+    );
+
+    // Input → understand → re-export path
+    var toks: [6]u32 = undefined;
+    var meaning: [8]@import("fixed.zig").Fixed = undefined;
+    const inp = lexicon_en_fixed.inputEnglish("I hear the sound here", &toks, &meaning);
+    var phrase: [lexicon_en_fixed.MAX_PHRASE]u8 = undefined;
+    var frame: machine_lang_fixed.MachineFrame = .{};
+    const ut = lexicon_en_fixed.utterEnglish(&meaning, phrase[0..], &frame);
+    std.debug.print(
+        "ENGLISH_IO in_known={d} out_phrase=\"{s}\" frame_words={d}\n",
+        .{ inp.n_known, phrase[0..ut.phrase_n], frame.n_words },
+    );
+
+    // TTS plant (real words out the speakers)
+    const tts = host_tts_fixed.speakEnglish(phrase[0..ut.phrase_n]);
+    std.debug.print(
+        "TTS backend={s} spoken={} chars={d}\n",
+        .{ tts.backend, tts.spoken, tts.n_chars },
+    );
+
+    if (r.ok and inp.n_known >= 3 and ut.phrase_n >= 5) {
+        std.debug.print("FSOT_ENGLISH PASS\n", .{});
+        if (tts.spoken) std.debug.print("FSOT_TTS_SPOKEN_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_ENGLISH FAIL\n", .{});
         std.process.exit(1);
     }
 }
@@ -854,10 +994,12 @@ fn runLiveMindConnected() void {
         .encode_every = 6,
         .curiosity_every = 12,
         .teach_every = 40,
+        .english_tts = true,
+        .formant_speech = true, // internal motor path; DAC skipped when TTS on
     });
     std.debug.print(
-        "SUMMARY spikes={d} rate={e} eps={d} enc={d} cur={d}/{d} teach={d} ret={d} spk={d} self={d}/{d} match={e} amb={d}\n",
-        .{ r.spikes, r.spike_rate, r.episodes, r.n_encodes, r.n_curiosity, r.n_curiosity_q, r.n_teaches, r.n_retrieves, r.n_speaks, r.n_self_hear, r.n_self_attempts, r.last_self_match, r.n_ambient_high },
+        "SUMMARY spikes={d} rate={e} eps={d} enc={d} cur={d}/{d} teach={d} ret={d} spk={d} self={d}/{d} air={d} int={d} match={e} amb={d} ign={d} scene={d} enc_open={d} att={e} adapt={d} bias={e} pat={d} pat_bind={d} mach={d}/{d}B en={d} tts={d}\n",
+        .{ r.spikes, r.spike_rate, r.episodes, r.n_encodes, r.n_curiosity, r.n_curiosity_q, r.n_teaches, r.n_retrieves, r.n_speaks, r.n_self_hear, r.n_self_attempts, r.n_self_air, r.n_self_internal, r.last_self_match, r.n_ambient_high, r.n_noise_ignored, r.n_scene_samples, r.n_encode_open, r.last_attune, r.n_speech_adapt, r.last_bias_mag, r.last_pattern, r.n_pattern_binds, r.n_machine_emit, r.n_machine_bytes, r.n_english_say, r.n_tts_spoken },
     );
     if (r.ok) {
         std.debug.print("FSOT_LIVE_MIND PASS\n", .{});
@@ -1352,6 +1494,12 @@ pub fn main() !void {
         runBioIo();
     } else if (std.mem.eql(u8, mode, "machine") or std.mem.eql(u8, mode, "machine-encode") or std.mem.eql(u8, mode, "abi")) {
         runMachineEncode();
+    } else if (std.mem.eql(u8, mode, "machine-lang") or std.mem.eql(u8, mode, "machine_lang") or std.mem.eql(u8, mode, "mlang") or std.mem.eql(u8, mode, "tongue")) {
+        runMachineLang();
+    } else if (std.mem.eql(u8, mode, "machine-lang-stress") or std.mem.eql(u8, mode, "mlang-stress") or std.mem.eql(u8, mode, "tongue-stress")) {
+        runMachineLangStress();
+    } else if (std.mem.eql(u8, mode, "english") or std.mem.eql(u8, mode, "lexicon") or std.mem.eql(u8, mode, "tts") or std.mem.eql(u8, mode, "words")) {
+        runEnglishCodec();
     } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
         runFailure();
     } else if (std.mem.eql(u8, mode, "wire") or std.mem.eql(u8, mode, "wire-around") or std.mem.eql(u8, mode, "wire_around")) {
@@ -1376,6 +1524,8 @@ pub fn main() !void {
         runAutonomous();
     } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
         runSmeFixed();
+    } else if (std.mem.eql(u8, mode, "attention") or std.mem.eql(u8, mode, "eeg") or std.mem.eql(u8, mode, "eeg-gates") or std.mem.eql(u8, mode, "attune")) {
+        runAttentionEeg();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {
@@ -1469,11 +1619,13 @@ pub fn main() !void {
         runTransfer();
         runModulate();
         runSmeFixed();
+        runAttentionEeg();
         runShortHorizon();
         runSpeechOrgan();
         runCrossModal();
         runBioIo();
         runMachineEncode();
+        runMachineLang();
         runFailure();
         runWireAround();
         runSymbolAssoc();
