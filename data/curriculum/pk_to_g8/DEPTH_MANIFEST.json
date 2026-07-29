@@ -1,0 +1,15 @@
+{
+  "n_exam": 540,
+  "by_domain": {
+    "math": 150,
+    "literacy": 150,
+    "science": 150,
+    "vision": 90
+  },
+  "paths": {
+    "tsv": "I:\\fsot nuron\\data\\curriculum\\pk_to_g8\\paraphrase_exam.tsv",
+    "jsonl": "I:\\fsot nuron\\data\\curriculum\\pk_to_g8\\paraphrase_exam.jsonl"
+  },
+  "doctrine": "held-out natural questions over taught STEM/literacy only; no history",
+  "claim": "depth = understand paraphrases of known curriculum, not new untaught claims"
+}

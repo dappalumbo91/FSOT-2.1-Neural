@@ -74,6 +74,7 @@ const language_practice_fixed = @import("language_practice_fixed.zig");
 const grade_practice_fixed = @import("grade_practice_fixed.zig");
 const grade_ladder_fixed = @import("grade_ladder_fixed.zig");
 const mnist_accuracy_fixed = @import("mnist_accuracy_fixed.zig");
+const understand_depth_fixed = @import("understand_depth_fixed.zig");
 const reason_practice_fixed = @import("reason_practice_fixed.zig");
 const novel_inquiry_fixed = @import("novel_inquiry_fixed.zig");
 const checkpoint_fixed = @import("checkpoint_fixed.zig");
@@ -1295,6 +1296,24 @@ fn runMnistAccuracy() void {
     }
 }
 
+fn runGradeDepth() void {
+    std.debug.print("=== FSOT GRADE-SCHOOL DEPTH (understand paraphrases, ≥95%) ===\n", .{});
+    std.debug.print("doctrine: taught STEM/literacy only; natural Q → parse → bank/math/overlap → answer\n", .{});
+    std.debug.print("no history; deepen claimability before expanding further\n", .{});
+    const r = understand_depth_fixed.runDepthExam();
+    std.debug.print(
+        "DEPTH bank={d} exam={d} correct={d} acc={e} thr={e} math={d} overlap={d} exact={d} miss={d}\n",
+        .{ r.n_bank, r.n_exam, r.n_correct, r.accuracy, r.threshold, r.n_math, r.n_overlap, r.n_exact, r.n_miss },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_DEPTH PASS\n", .{});
+        std.debug.print("FSOT_GRADE_SCHOOL_UNDERSTAND_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_DEPTH FAIL (need ≥95% held-out paraphrases)\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runPixelId() void {
     std.debug.print("=== FSOT MIND PIXEL-ID (tutor-ablated multi-seed synthetic) ===\n", .{});
     const p = pixel_id_fixed.runPixelIdProbe();
@@ -1781,6 +1800,8 @@ pub fn main() !void {
         runAttentionEeg();
     } else if (std.mem.eql(u8, mode, "mnist") or std.mem.eql(u8, mode, "mnist-gate") or std.mem.eql(u8, mode, "mnist_accuracy")) {
         runMnistAccuracy();
+    } else if (std.mem.eql(u8, mode, "depth") or std.mem.eql(u8, mode, "understand") or std.mem.eql(u8, mode, "paraphrase") or std.mem.eql(u8, mode, "grade-depth")) {
+        runGradeDepth();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {

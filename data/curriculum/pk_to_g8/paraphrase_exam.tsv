@@ -1,0 +1,541 @@
+# domain	grade	question	answer	source_key
+math	preschool	What is the answer to: number 0?	zero	number 0
+math	preschool	What is the answer to: count word zero?	0	count word zero
+math	preschool	What is the answer to: after zero?	one	after zero
+math	preschool	What is the answer to: number 1?	one	number 1
+math	preschool	What is the answer to: count word one?	1	count word one
+math	preschool	What is the answer to: after one?	two	after one
+math	preschool	What is the answer to: before one?	zero	before one
+math	preschool	What is the answer to: number 2?	two	number 2
+math	preschool	What is the answer to: count word two?	2	count word two
+math	preschool	What is the answer to: after two?	three	after two
+math	preschool	What is the answer to: before two?	one	before two
+math	preschool	What is the answer to: number 3?	three	number 3
+math	preschool	What is the answer to: count word three?	3	count word three
+math	preschool	What is the answer to: after three?	four	after three
+math	preschool	What is the answer to: before three?	two	before three
+math	preschool	What is the answer to: number 4?	four	number 4
+math	preschool	What is the answer to: count word four?	4	count word four
+math	preschool	What is the answer to: after four?	five	after four
+math	preschool	What is the answer to: before four?	three	before four
+math	preschool	What is the answer to: number 5?	five	number 5
+math	preschool	What is the answer to: count word five?	5	count word five
+math	preschool	What is the answer to: after five?	six	after five
+math	preschool	What is the answer to: before five?	four	before five
+math	kindergarten	What is the answer to: number 6?	six	number 6
+math	kindergarten	What is the answer to: count word six?	6	count word six
+math	kindergarten	What is the answer to: after six?	seven	after six
+math	kindergarten	What is the answer to: before six?	five	before six
+math	kindergarten	What is the answer to: number 7?	seven	number 7
+math	kindergarten	What is the answer to: count word seven?	7	count word seven
+math	kindergarten	What is the answer to: after seven?	eight	after seven
+math	kindergarten	What is the answer to: before seven?	six	before seven
+math	kindergarten	What is the answer to: number 8?	eight	number 8
+math	kindergarten	What is the answer to: count word eight?	8	count word eight
+math	kindergarten	What is the answer to: after eight?	nine	after eight
+math	kindergarten	What is the answer to: before eight?	seven	before eight
+math	kindergarten	What is the answer to: number 9?	nine	number 9
+math	kindergarten	What is the answer to: count word nine?	9	count word nine
+math	kindergarten	What is the answer to: after nine?	ten	after nine
+math	kindergarten	What is the answer to: before nine?	eight	before nine
+math	kindergarten	What is the answer to: number 10?	ten	number 10
+math	kindergarten	What is the answer to: count word ten?	10	count word ten
+math	kindergarten	What is the answer to: after ten?	eleven	after ten
+math	kindergarten	What is the answer to: before ten?	nine	before ten
+math	grade1	What is the answer to: number 11?	eleven	number 11
+math	grade1	What is the answer to: count word eleven?	11	count word eleven
+math	grade1	What is the answer to: after eleven?	twelve	after eleven
+math	grade1	What is the answer to: before eleven?	ten	before eleven
+math	grade1	What is the answer to: number 12?	twelve	number 12
+math	grade1	What is the answer to: count word twelve?	12	count word twelve
+math	grade1	What is the answer to: after twelve?	thirteen	after twelve
+math	grade1	What is the answer to: before twelve?	eleven	before twelve
+math	grade1	What is the answer to: number 13?	thirteen	number 13
+math	grade1	What is the answer to: count word thirteen?	13	count word thirteen
+math	grade1	What is the answer to: after thirteen?	fourteen	after thirteen
+math	grade1	What is the answer to: before thirteen?	twelve	before thirteen
+math	grade1	What is the answer to: number 14?	fourteen	number 14
+math	grade1	What is the answer to: count word fourteen?	14	count word fourteen
+math	grade1	What is the answer to: after fourteen?	fifteen	after fourteen
+math	grade1	What is the answer to: before fourteen?	thirteen	before fourteen
+math	grade1	What is the answer to: number 15?	fifteen	number 15
+math	grade1	What is the answer to: count word fifteen?	15	count word fifteen
+math	grade1	What is the answer to: after fifteen?	sixteen	after fifteen
+math	grade1	What is the answer to: before fifteen?	fourteen	before fifteen
+math	grade1	What is the answer to: number 16?	sixteen	number 16
+math	grade1	What is the answer to: count word sixteen?	16	count word sixteen
+math	grade1	What is the answer to: after sixteen?	seventeen	after sixteen
+math	grade1	What is the answer to: before sixteen?	fifteen	before sixteen
+math	grade1	What is the answer to: number 17?	seventeen	number 17
+math	grade1	What is the answer to: count word seventeen?	17	count word seventeen
+math	grade1	What is the answer to: after seventeen?	eighteen	after seventeen
+math	grade1	What is the answer to: before seventeen?	sixteen	before seventeen
+math	grade1	What is the answer to: number 18?	eighteen	number 18
+math	grade1	What is the answer to: count word eighteen?	18	count word eighteen
+math	grade1	What is the answer to: after eighteen?	nineteen	after eighteen
+math	grade1	What is the answer to: before eighteen?	seventeen	before eighteen
+math	grade1	What is the answer to: number 19?	nineteen	number 19
+math	grade1	What is the answer to: count word nineteen?	19	count word nineteen
+math	grade1	What is the answer to: after nineteen?	twenty	after nineteen
+math	grade1	What is the answer to: before nineteen?	eighteen	before nineteen
+math	grade1	What is the answer to: number 20?	twenty	number 20
+math	grade1	What is the answer to: count word twenty?	20	count word twenty
+math	grade1	What is the answer to: before twenty?	nineteen	before twenty
+math	preschool	What is the answer to: 0 plus 0?	zero	0 plus 0
+math	preschool	What is the answer to: 0+0?	0	0+0
+math	preschool	What is the answer to: 0 plus 1?	one	0 plus 1
+math	preschool	What is the answer to: 0+1?	1	0+1
+math	preschool	What is the answer to: 0 plus 2?	two	0 plus 2
+math	preschool	What is the answer to: 0+2?	2	0+2
+math	preschool	What is the answer to: 0 plus 3?	three	0 plus 3
+math	preschool	What is the answer to: 0+3?	3	0+3
+math	kindergarten	What is the answer to: 0 plus 4?	four	0 plus 4
+math	kindergarten	What is the answer to: 0+4?	4	0+4
+math	kindergarten	What is the answer to: 0 plus 5?	five	0 plus 5
+math	kindergarten	What is the answer to: 0+5?	5	0+5
+math	kindergarten	What is the answer to: 0 plus 6?	six	0 plus 6
+math	kindergarten	What is the answer to: 0+6?	6	0+6
+math	kindergarten	What is the answer to: 0 plus 7?	seven	0 plus 7
+math	kindergarten	What is the answer to: 0+7?	7	0+7
+math	kindergarten	What is the answer to: 0 plus 8?	eight	0 plus 8
+math	kindergarten	What is the answer to: 0+8?	8	0+8
+math	kindergarten	What is the answer to: 0 plus 9?	nine	0 plus 9
+math	kindergarten	What is the answer to: 0+9?	9	0+9
+math	kindergarten	What is the answer to: 0 plus 10?	ten	0 plus 10
+math	kindergarten	What is the answer to: 0+10?	10	0+10
+math	preschool	What is the answer to: 0 minus 0?	zero	0 minus 0
+math	preschool	What is the answer to: 0-0?	0	0-0
+math	preschool	What is the answer to: 1 plus 0?	one	1 plus 0
+math	preschool	What is the answer to: 1+0?	1	1+0
+math	preschool	What is the answer to: 1 plus 1?	two	1 plus 1
+math	preschool	What is the answer to: 1+1?	2	1+1
+math	preschool	What is the answer to: 1 plus 2?	three	1 plus 2
+math	preschool	What is the answer to: 1+2?	3	1+2
+math	preschool	What is the answer to: 1 plus 3?	four	1 plus 3
+math	preschool	What is the answer to: 1+3?	4	1+3
+math	kindergarten	What is the answer to: 1 plus 4?	five	1 plus 4
+math	kindergarten	What is the answer to: 1+4?	5	1+4
+math	kindergarten	What is the answer to: 1 plus 5?	six	1 plus 5
+math	kindergarten	What is the answer to: 1+5?	6	1+5
+math	kindergarten	What is the answer to: 1 plus 6?	seven	1 plus 6
+math	kindergarten	What is the answer to: 1+6?	7	1+6
+math	kindergarten	What is the answer to: 1 plus 7?	eight	1 plus 7
+math	kindergarten	What is the answer to: 1+7?	8	1+7
+math	kindergarten	What is the answer to: 1 plus 8?	nine	1 plus 8
+math	kindergarten	What is the answer to: 1+8?	9	1+8
+math	kindergarten	What is the answer to: 1 plus 9?	ten	1 plus 9
+math	kindergarten	What is the answer to: 1+9?	10	1+9
+math	grade1	What is the answer to: 1 plus 10?	eleven	1 plus 10
+math	grade1	What is the answer to: 1+10?	11	1+10
+math	preschool	What is the answer to: 1 minus 0?	one	1 minus 0
+math	preschool	What is the answer to: 1-0?	1	1-0
+math	preschool	What is the answer to: 1 minus 1?	zero	1 minus 1
+math	preschool	What is the answer to: 1-1?	0	1-1
+math	preschool	What is the answer to: 2 plus 0?	two	2 plus 0
+math	preschool	What is the answer to: 2+0?	2	2+0
+math	preschool	What is the answer to: 2 plus 1?	three	2 plus 1
+math	preschool	What is the answer to: 2+1?	3	2+1
+math	preschool	What is the answer to: 2 plus 2?	four	2 plus 2
+math	preschool	What is the answer to: 2+2?	4	2+2
+math	preschool	What is the answer to: 2 plus 3?	five	2 plus 3
+math	preschool	What is the answer to: 2+3?	5	2+3
+math	kindergarten	What is the answer to: 2 plus 4?	six	2 plus 4
+math	kindergarten	What is the answer to: 2+4?	6	2+4
+math	kindergarten	What is the answer to: 2 plus 5?	seven	2 plus 5
+math	kindergarten	What is the answer to: 2+5?	7	2+5
+math	kindergarten	What is the answer to: 2 plus 6?	eight	2 plus 6
+math	kindergarten	What is the answer to: 2+6?	8	2+6
+math	kindergarten	What is the answer to: 2 plus 7?	nine	2 plus 7
+math	kindergarten	What is the answer to: 2+7?	9	2+7
+math	kindergarten	What is the answer to: 2 plus 8?	ten	2 plus 8
+math	kindergarten	What is the answer to: 2+8?	10	2+8
+literacy	preschool	What is the answer to: letter starts apple?	a	letter starts apple
+literacy	preschool	What is the answer to: what starts apple?	a	what starts apple
+literacy	preschool	What is the answer to: sound of a?	ah	sound of a
+literacy	preschool	What is the answer to: letter starts ball?	b	letter starts ball
+literacy	preschool	What is the answer to: what starts ball?	b	what starts ball
+literacy	preschool	What is the answer to: sound of b?	buh	sound of b
+literacy	preschool	What is the answer to: letter starts cat?	c	letter starts cat
+literacy	preschool	What is the answer to: what starts cat?	c	what starts cat
+literacy	preschool	What is the answer to: sound of c?	kuh	sound of c
+literacy	preschool	What is the answer to: letter starts dog?	d	letter starts dog
+literacy	preschool	What is the answer to: what starts dog?	d	what starts dog
+literacy	preschool	What is the answer to: sound of d?	duh	sound of d
+literacy	preschool	What is the answer to: letter starts egg?	e	letter starts egg
+literacy	preschool	What is the answer to: what starts egg?	e	what starts egg
+literacy	preschool	What is the answer to: sound of e?	eh	sound of e
+literacy	preschool	What is the answer to: letter starts fish?	f	letter starts fish
+literacy	preschool	What is the answer to: what starts fish?	f	what starts fish
+literacy	preschool	What is the answer to: sound of f?	fuh	sound of f
+literacy	preschool	What is the answer to: letter starts goat?	g	letter starts goat
+literacy	preschool	What is the answer to: what starts goat?	g	what starts goat
+literacy	preschool	What is the answer to: sound of g?	guh	sound of g
+literacy	preschool	What is the answer to: letter starts hat?	h	letter starts hat
+literacy	preschool	What is the answer to: what starts hat?	h	what starts hat
+literacy	preschool	What is the answer to: sound of h?	huh	sound of h
+literacy	preschool	What is the answer to: letter starts igloo?	i	letter starts igloo
+literacy	preschool	What is the answer to: what starts igloo?	i	what starts igloo
+literacy	preschool	What is the answer to: sound of i?	ih	sound of i
+literacy	preschool	What is the answer to: letter starts jam?	j	letter starts jam
+literacy	preschool	What is the answer to: what starts jam?	j	what starts jam
+literacy	preschool	What is the answer to: sound of j?	juh	sound of j
+literacy	preschool	What is the answer to: letter starts kite?	k	letter starts kite
+literacy	preschool	What is the answer to: what starts kite?	k	what starts kite
+literacy	preschool	What is the answer to: sound of k?	kuh	sound of k
+literacy	preschool	What is the answer to: letter starts leaf?	l	letter starts leaf
+literacy	preschool	What is the answer to: what starts leaf?	l	what starts leaf
+literacy	preschool	What is the answer to: sound of l?	luh	sound of l
+literacy	preschool	What is the answer to: letter starts moon?	m	letter starts moon
+literacy	preschool	What is the answer to: what starts moon?	m	what starts moon
+literacy	preschool	What is the answer to: sound of m?	muh	sound of m
+literacy	kindergarten	What is the answer to: letter starts nest?	n	letter starts nest
+literacy	kindergarten	What is the answer to: what starts nest?	n	what starts nest
+literacy	kindergarten	What is the answer to: sound of n?	nuh	sound of n
+literacy	kindergarten	What is the answer to: letter starts octopus?	o	letter starts octopus
+literacy	kindergarten	What is the answer to: what starts octopus?	o	what starts octopus
+literacy	kindergarten	What is the answer to: sound of o?	oh	sound of o
+literacy	kindergarten	What is the answer to: letter starts pig?	p	letter starts pig
+literacy	kindergarten	What is the answer to: what starts pig?	p	what starts pig
+literacy	kindergarten	What is the answer to: sound of p?	puh	sound of p
+literacy	kindergarten	What is the answer to: letter starts queen?	q	letter starts queen
+literacy	kindergarten	What is the answer to: what starts queen?	q	what starts queen
+literacy	kindergarten	What is the answer to: sound of q?	kwuh	sound of q
+literacy	kindergarten	What is the answer to: letter starts rain?	r	letter starts rain
+literacy	kindergarten	What is the answer to: what starts rain?	r	what starts rain
+literacy	kindergarten	What is the answer to: sound of r?	ruh	sound of r
+literacy	kindergarten	What is the answer to: letter starts sun?	s	letter starts sun
+literacy	kindergarten	What is the answer to: what starts sun?	s	what starts sun
+literacy	kindergarten	What is the answer to: sound of s?	sss	sound of s
+literacy	kindergarten	What is the answer to: letter starts tree?	t	letter starts tree
+literacy	kindergarten	What is the answer to: what starts tree?	t	what starts tree
+literacy	kindergarten	What is the answer to: sound of t?	tuh	sound of t
+literacy	kindergarten	What is the answer to: letter starts umbrella?	u	letter starts umbrella
+literacy	kindergarten	What is the answer to: what starts umbrella?	u	what starts umbrella
+literacy	kindergarten	What is the answer to: sound of u?	uh	sound of u
+literacy	kindergarten	What is the answer to: letter starts van?	v	letter starts van
+literacy	kindergarten	What is the answer to: what starts van?	v	what starts van
+literacy	kindergarten	What is the answer to: sound of v?	vuh	sound of v
+literacy	kindergarten	What is the answer to: letter starts water?	w	letter starts water
+literacy	kindergarten	What is the answer to: what starts water?	w	what starts water
+literacy	kindergarten	What is the answer to: sound of w?	wuh	sound of w
+literacy	kindergarten	What is the answer to: letter starts xray?	x	letter starts xray
+literacy	kindergarten	What is the answer to: what starts xray?	x	what starts xray
+literacy	kindergarten	What is the answer to: sound of x?	ks	sound of x
+literacy	kindergarten	What is the answer to: letter starts yarn?	y	letter starts yarn
+literacy	kindergarten	What is the answer to: what starts yarn?	y	what starts yarn
+literacy	kindergarten	What is the answer to: sound of y?	yuh	sound of y
+literacy	kindergarten	What is the answer to: letter starts zoo?	z	letter starts zoo
+literacy	kindergarten	What is the answer to: what starts zoo?	z	what starts zoo
+literacy	kindergarten	What is the answer to: sound of z?	zzz	sound of z
+literacy	preschool	What is the answer to: sight word a?	a	sight word a
+literacy	preschool	What is the answer to: read a?	a	read a
+literacy	preschool	What is the answer to: sight word and?	and	sight word and
+literacy	preschool	What is the answer to: read and?	and	read and
+literacy	preschool	What is the answer to: sight word away?	away	sight word away
+literacy	preschool	What is the answer to: read away?	away	read away
+literacy	preschool	What is the answer to: sight word big?	big	sight word big
+literacy	preschool	What is the answer to: read big?	big	read big
+literacy	preschool	What is the answer to: sight word blue?	blue	sight word blue
+literacy	preschool	What is the answer to: read blue?	blue	read blue
+literacy	preschool	What is the answer to: sight word can?	can	sight word can
+literacy	preschool	What is the answer to: read can?	can	read can
+literacy	preschool	What is the answer to: sight word come?	come	sight word come
+literacy	preschool	What is the answer to: read come?	come	read come
+literacy	preschool	What is the answer to: sight word down?	down	sight word down
+literacy	preschool	What is the answer to: read down?	down	read down
+literacy	preschool	What is the answer to: sight word find?	find	sight word find
+literacy	preschool	What is the answer to: read find?	find	read find
+literacy	preschool	What is the answer to: sight word for?	for	sight word for
+literacy	preschool	What is the answer to: read for?	for	read for
+literacy	preschool	What is the answer to: sight word funny?	funny	sight word funny
+literacy	preschool	What is the answer to: read funny?	funny	read funny
+literacy	preschool	What is the answer to: sight word go?	go	sight word go
+literacy	preschool	What is the answer to: read go?	go	read go
+literacy	preschool	What is the answer to: sight word help?	help	sight word help
+literacy	preschool	What is the answer to: read help?	help	read help
+literacy	preschool	What is the answer to: sight word here?	here	sight word here
+literacy	preschool	What is the answer to: read here?	here	read here
+literacy	preschool	What is the answer to: sight word i?	i	sight word i
+literacy	preschool	What is the answer to: read i?	i	read i
+literacy	preschool	What is the answer to: sight word in?	in	sight word in
+literacy	preschool	What is the answer to: read in?	in	read in
+literacy	preschool	What is the answer to: sight word is?	is	sight word is
+literacy	preschool	What is the answer to: read is?	is	read is
+literacy	preschool	What is the answer to: sight word it?	it	sight word it
+literacy	preschool	What is the answer to: read it?	it	read it
+literacy	preschool	What is the answer to: sight word jump?	jump	sight word jump
+literacy	preschool	What is the answer to: read jump?	jump	read jump
+literacy	preschool	What is the answer to: sight word little?	little	sight word little
+literacy	preschool	What is the answer to: read little?	little	read little
+literacy	preschool	What is the answer to: sight word look?	look	sight word look
+literacy	preschool	What is the answer to: read look?	look	read look
+literacy	preschool	What is the answer to: sight word make?	make	sight word make
+literacy	preschool	What is the answer to: read make?	make	read make
+literacy	preschool	What is the answer to: sight word me?	me	sight word me
+literacy	preschool	What is the answer to: read me?	me	read me
+literacy	preschool	What is the answer to: sight word my?	my	sight word my
+literacy	preschool	What is the answer to: read my?	my	read my
+literacy	preschool	What is the answer to: sight word not?	not	sight word not
+literacy	preschool	What is the answer to: read not?	not	read not
+literacy	preschool	What is the answer to: sight word one?	one	sight word one
+literacy	preschool	What is the answer to: read one?	one	read one
+literacy	preschool	What is the answer to: sight word play?	play	sight word play
+literacy	preschool	What is the answer to: read play?	play	read play
+literacy	preschool	What is the answer to: sight word red?	red	sight word red
+literacy	preschool	What is the answer to: read red?	red	read red
+literacy	preschool	What is the answer to: sight word run?	run	sight word run
+literacy	preschool	What is the answer to: read run?	run	read run
+literacy	preschool	What is the answer to: sight word said?	said	sight word said
+literacy	preschool	What is the answer to: read said?	said	read said
+literacy	preschool	What is the answer to: sight word see?	see	sight word see
+literacy	preschool	What is the answer to: read see?	see	read see
+literacy	preschool	What is the answer to: sight word the?	the	sight word the
+literacy	preschool	What is the answer to: read the?	the	read the
+literacy	preschool	What is the answer to: sight word three?	three	sight word three
+literacy	preschool	What is the answer to: read three?	three	read three
+literacy	preschool	What is the answer to: sight word to?	to	sight word to
+literacy	preschool	What is the answer to: read to?	to	read to
+literacy	preschool	What is the answer to: sight word two?	two	sight word two
+literacy	preschool	What is the answer to: read two?	two	read two
+literacy	preschool	What is the answer to: sight word up?	up	sight word up
+literacy	preschool	What is the answer to: read up?	up	read up
+science	preschool	What is the answer to: sky color?	blue	sky color
+science	preschool	What is the answer to: color of sky?	blue	color of sky
+science	preschool	What is the answer to: grass color?	green	grass color
+science	preschool	What is the answer to: color of grass?	green	color of grass
+science	preschool	What is the answer to: sun when?	day	sun when
+science	preschool	What is the answer to: when is sun out?	day	when is sun out
+science	preschool	What is the answer to: moon when?	night	moon when
+science	preschool	What is the answer to: when is moon out?	night	when is moon out
+science	preschool	What is the answer to: see with?	eyes	see with
+science	preschool	What is the answer to: what sees?	eyes	what sees
+science	preschool	What is the answer to: hear with?	ears	hear with
+science	preschool	What is the answer to: what hears?	ears	what hears
+science	preschool	What is the answer to: dog is?	animal	dog is
+science	preschool	What is the answer to: is dog animal?	animal	is dog animal
+science	preschool	What is the answer to: we drink?	water	we drink
+science	preschool	What is the answer to: what do we drink?	water	what do we drink
+science	kindergarten	What is the answer to: plants need?	sun	plants need
+science	kindergarten	What is the answer to: what plants need?	sun	what plants need
+science	kindergarten	What is the answer to: plants drink?	water	plants drink
+science	kindergarten	What is the answer to: plants water?	water	plants water
+science	kindergarten	What is the answer to: people need?	water	people need
+science	kindergarten	What is the answer to: what people need?	water	what people need
+science	kindergarten	What is the answer to: red light?	stop	red light
+science	kindergarten	What is the answer to: red light do?	stop	red light do
+science	kindergarten	What is the answer to: winter is?	cold	winter is
+science	kindergarten	What is the answer to: is winter cold?	cold	is winter cold
+science	kindergarten	What is the answer to: summer is?	hot	summer is
+science	kindergarten	What is the answer to: is summer hot?	hot	is summer hot
+science	grade1	What is the answer to: we live on?	earth	we live on
+science	grade1	What is the answer to: home planet?	earth	home planet
+science	grade1	What is the answer to: shows places?	map	shows places
+science	grade1	What is the answer to: find places tool?	map	find places tool
+science	grade1	What is the answer to: living need?	water	living need
+science	grade1	What is the answer to: living things need?	water	living things need
+science	grade1	What is the answer to: ice is?	solid	ice is
+science	grade1	What is the answer to: ice form?	solid	ice form
+science	grade1	What is the answer to: seed grows?	plant	seed grows
+science	grade1	What is the answer to: seed becomes?	plant	seed becomes
+science	grade1	What is the answer to: days in week?	seven	days in week
+science	grade1	What is the answer to: how many days week?	seven	how many days week
+science	grade2	What is the answer to: solid keeps?	shape	solid keeps
+science	grade2	What is the answer to: solid property?	shape	solid property
+science	grade2	What is the answer to: liquid takes?	shape	liquid takes
+science	grade2	What is the answer to: liquid property?	shape	liquid property
+science	grade2	What is the answer to: habitat is?	home	habitat is
+science	grade2	What is the answer to: what is habitat?	home	what is habitat
+science	grade2	What is the answer to: push can?	move	push can
+science	grade2	What is the answer to: what push does?	move	what push does
+science	grade2	What is the answer to: pull can?	move	pull can
+science	grade2	What is the answer to: what pull does?	move	what pull does
+science	grade2	What is the answer to: roots take?	water	roots take
+science	grade2	What is the answer to: what roots do?	water	what roots do
+science	grade2	What is the answer to: weather is?	air	weather is
+science	grade2	What is the answer to: what is weather?	air	what is weather
+science	grade3	What is the answer to: force is?	push	force is
+science	grade3	What is the answer to: what is force?	push	what is force
+science	grade3	What is the answer to: magnet attracts?	iron	magnet attracts
+science	grade3	What is the answer to: what magnets attract?	iron	what magnets attract
+science	grade3	What is the answer to: butterfly cycle?	stages	butterfly cycle
+science	grade3	What is the answer to: butterfly life?	stages	butterfly life
+science	grade3	What is the answer to: plants grow in?	soil	plants grow in
+science	grade3	What is the answer to: where plants grow?	soil	where plants grow
+science	grade3	What is the answer to: sun energy?	energy	sun energy
+science	grade3	What is the answer to: sun is source of?	energy	sun is source of
+science	grade3	What is the answer to: rain part of?	cycle	rain part of
+science	grade3	What is the answer to: rain belongs to?	cycle	rain belongs to
+science	grade4	What is the answer to: matter has?	mass	matter has
+science	grade4	What is the answer to: what matter has?	mass	what matter has
+science	grade4	What is the answer to: energy makes?	happen	energy makes
+science	grade4	What is the answer to: what energy does?	happen	what energy does
+science	grade4	What is the answer to: ecosystem has?	living	ecosystem has
+science	grade4	What is the answer to: ecosystem includes?	living	ecosystem includes
+science	grade4	What is the answer to: earthquake does?	shake	earthquake does
+science	grade4	What is the answer to: what earthquake does?	shake	what earthquake does
+science	grade4	What is the answer to: fossils are?	remains	fossils are
+science	grade4	What is the answer to: what fossils are?	remains	what fossils are
+science	grade4	What is the answer to: closed circuit lets?	flow	closed circuit lets
+science	grade4	What is the answer to: circuit allows?	flow	circuit allows
+science	grade5	What is the answer to: gravity pulls?	earth	gravity pulls
+science	grade5	What is the answer to: gravity toward?	earth	gravity toward
+science	grade5	What is the answer to: plants make food with?	sunlight	plants make food with
+science	grade5	What is the answer to: photosynthesis needs?	sunlight	photosynthesis needs
+science	grade5	What is the answer to: molecules made of?	atoms	molecules made of
+science	grade5	What is the answer to: molecule parts?	atoms	molecule parts
+science	grade5	What is the answer to: earth orbits?	sun	earth orbits
+science	grade5	What is the answer to: earth goes around?	sun	earth goes around
+science	grade5	What is the answer to: food chain shows?	eats	food chain shows
+science	grade5	What is the answer to: food chain is?	eats	food chain is
+science	grade5	What is the answer to: volume measures?	space	volume measures
+science	grade5	What is the answer to: what volume measures?	space	what volume measures
+science	grade6	What is the answer to: basic unit of life?	cell	basic unit of life
+science	grade6	What is the answer to: life unit?	cell	life unit
+science	grade6	What is the answer to: basic unit of matter?	atom	basic unit of matter
+science	grade6	What is the answer to: matter unit?	atom	matter unit
+science	grade6	What is the answer to: ratio compares?	quantities	ratio compares
+science	grade6	What is the answer to: what ratio does?	quantities	what ratio does
+science	grade6	What is the answer to: variable is?	symbol	variable is
+science	grade6	What is the answer to: what is variable?	symbol	what is variable
+science	grade6	What is the answer to: crust made of?	plates	crust made of
+science	grade6	What is the answer to: earth crust?	plates	earth crust
+science	grade6	What is the answer to: kinetic energy is?	motion	kinetic energy is
+science	grade6	What is the answer to: kinetic means?	motion	kinetic means
+science	grade7	What is the answer to: potential energy is?	stored	potential energy is
+science	grade7	What is the answer to: potential means?	stored	potential means
+science	grade7	What is the answer to: element is?	pure	element is
+science	grade7	What is the answer to: what is element?	pure	what is element
+science	grade7	What is the answer to: genes carry?	information	genes carry
+science	grade7	What is the answer to: what genes carry?	information	what genes carry
+science	grade7	What is the answer to: density is?	mass	density is
+science	grade7	What is the answer to: density formula start?	mass	density formula start
+science	grade7	What is the answer to: energy flows through?	ecosystems	energy flows through
+science	grade7	What is the answer to: energy path?	ecosystems	energy path
+science	grade7	What is the answer to: force can change?	motion	force can change
+science	grade7	What is the answer to: force effect?	motion	force effect
+science	grade8	What is the answer to: slope measures?	steepness	slope measures
+science	grade8	What is the answer to: what slope measures?	steepness	what slope measures
+science	grade8	What is the answer to: function maps?	input	function maps
+science	grade8	What is the answer to: function does?	input	function does
+science	grade8	What is the answer to: right triangle theorem?	pythagorean	right triangle theorem
+science	grade8	What is the answer to: a2 plus b2?	pythagorean	a2 plus b2
+science	grade8	What is the answer to: scientific notation uses?	powers	scientific notation uses
+science	grade8	What is the answer to: sci notation?	powers	sci notation
+science	grade8	What is the answer to: waves transfer?	energy	waves transfer
+science	grade8	What is the answer to: what waves transfer?	energy	what waves transfer
+science	grade8	What is the answer to: natural selection helps?	evolution	natural selection helps
+science	grade8	What is the answer to: selection explains?	evolution	selection explains
+science	grade5	What is the answer to: mixture keeps?	properties	mixture keeps
+science	grade5	What is the answer to: mixture property?	properties	mixture property
+science	grade5	What is the answer to: solution looks?	same	solution looks
+science	grade5	What is the answer to: solution is?	same	solution is
+science	grade5	What is the answer to: phase change needs?	heat	phase change needs
+science	grade5	What is the answer to: phase needs?	heat	phase needs
+science	grade6	What is the answer to: mass is amount of?	matter	mass is amount of
+science	grade6	What is the answer to: what mass is?	matter	what mass is
+science	grade6	What is the answer to: volume is?	space	volume is
+science	grade6	What is the answer to: what volume is?	space	what volume is
+science	grade6	What is the answer to: hypothesis is?	prediction	hypothesis is
+science	grade6	What is the answer to: what hypothesis is?	prediction	what hypothesis is
+science	grade6	What is the answer to: control is?	standard	control is
+science	grade6	What is the answer to: experiment control?	standard	experiment control
+science	grade7	What is the answer to: compound has?	elements	compound has
+science	grade7	What is the answer to: compound is?	elements	compound is
+science	grade7	What is the answer to: reaction forms?	substances	reaction forms
+science	grade7	What is the answer to: reaction makes?	substances	reaction makes
+science	grade7	What is the answer to: velocity includes?	direction	velocity includes
+science	grade7	What is the answer to: velocity is?	direction	velocity is
+science	grade7	What is the answer to: acceleration is change in?	velocity	acceleration is change in
+science	grade7	What is the answer to: what acceleration is?	velocity	what acceleration is
+science	grade8	What is the answer to: isotopes differ in?	neutrons	isotopes differ in
+science	grade8	What is the answer to: isotope difference?	neutrons	isotope difference
+vision	kindergarten	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	kindergarten	What is the answer to: name of digit 0?	zero	name of digit 0
+vision	grade2	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	grade3	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	grade4	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	grade5	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	grade6	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	grade7	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	grade8	What is the answer to: digit 0 name?	zero	digit 0 name
+vision	kindergarten	What is the answer to: digit 1 name?	one	digit 1 name
+vision	kindergarten	What is the answer to: name of digit 1?	one	name of digit 1
+vision	grade2	What is the answer to: digit 1 name?	one	digit 1 name
+vision	grade3	What is the answer to: digit 1 name?	one	digit 1 name
+vision	grade4	What is the answer to: digit 1 name?	one	digit 1 name
+vision	grade5	What is the answer to: digit 1 name?	one	digit 1 name
+vision	grade6	What is the answer to: digit 1 name?	one	digit 1 name
+vision	grade7	What is the answer to: digit 1 name?	one	digit 1 name
+vision	grade8	What is the answer to: digit 1 name?	one	digit 1 name
+vision	kindergarten	What is the answer to: digit 2 name?	two	digit 2 name
+vision	kindergarten	What is the answer to: name of digit 2?	two	name of digit 2
+vision	grade2	What is the answer to: digit 2 name?	two	digit 2 name
+vision	grade3	What is the answer to: digit 2 name?	two	digit 2 name
+vision	grade4	What is the answer to: digit 2 name?	two	digit 2 name
+vision	grade5	What is the answer to: digit 2 name?	two	digit 2 name
+vision	grade6	What is the answer to: digit 2 name?	two	digit 2 name
+vision	grade7	What is the answer to: digit 2 name?	two	digit 2 name
+vision	grade8	What is the answer to: digit 2 name?	two	digit 2 name
+vision	kindergarten	What is the answer to: digit 3 name?	three	digit 3 name
+vision	kindergarten	What is the answer to: name of digit 3?	three	name of digit 3
+vision	grade2	What is the answer to: digit 3 name?	three	digit 3 name
+vision	grade3	What is the answer to: digit 3 name?	three	digit 3 name
+vision	grade4	What is the answer to: digit 3 name?	three	digit 3 name
+vision	grade5	What is the answer to: digit 3 name?	three	digit 3 name
+vision	grade6	What is the answer to: digit 3 name?	three	digit 3 name
+vision	grade7	What is the answer to: digit 3 name?	three	digit 3 name
+vision	grade8	What is the answer to: digit 3 name?	three	digit 3 name
+vision	kindergarten	What is the answer to: digit 4 name?	four	digit 4 name
+vision	kindergarten	What is the answer to: name of digit 4?	four	name of digit 4
+vision	grade2	What is the answer to: digit 4 name?	four	digit 4 name
+vision	grade3	What is the answer to: digit 4 name?	four	digit 4 name
+vision	grade4	What is the answer to: digit 4 name?	four	digit 4 name
+vision	grade5	What is the answer to: digit 4 name?	four	digit 4 name
+vision	grade6	What is the answer to: digit 4 name?	four	digit 4 name
+vision	grade7	What is the answer to: digit 4 name?	four	digit 4 name
+vision	grade8	What is the answer to: digit 4 name?	four	digit 4 name
+vision	kindergarten	What is the answer to: digit 5 name?	five	digit 5 name
+vision	kindergarten	What is the answer to: name of digit 5?	five	name of digit 5
+vision	grade2	What is the answer to: digit 5 name?	five	digit 5 name
+vision	grade3	What is the answer to: digit 5 name?	five	digit 5 name
+vision	grade4	What is the answer to: digit 5 name?	five	digit 5 name
+vision	grade5	What is the answer to: digit 5 name?	five	digit 5 name
+vision	grade6	What is the answer to: digit 5 name?	five	digit 5 name
+vision	grade7	What is the answer to: digit 5 name?	five	digit 5 name
+vision	grade8	What is the answer to: digit 5 name?	five	digit 5 name
+vision	grade1	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade1	What is the answer to: name of digit 6?	six	name of digit 6
+vision	grade2	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade3	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade4	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade5	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade6	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade7	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade8	What is the answer to: digit 6 name?	six	digit 6 name
+vision	grade1	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade1	What is the answer to: name of digit 7?	seven	name of digit 7
+vision	grade2	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade3	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade4	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade5	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade6	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade7	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade8	What is the answer to: digit 7 name?	seven	digit 7 name
+vision	grade1	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade1	What is the answer to: name of digit 8?	eight	name of digit 8
+vision	grade2	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade3	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade4	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade5	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade6	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade7	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade8	What is the answer to: digit 8 name?	eight	digit 8 name
+vision	grade1	What is the answer to: digit 9 name?	nine	digit 9 name
+vision	grade1	What is the answer to: name of digit 9?	nine	name of digit 9
+vision	grade2	What is the answer to: digit 9 name?	nine	digit 9 name
+vision	grade3	What is the answer to: digit 9 name?	nine	digit 9 name
+vision	grade4	What is the answer to: digit 9 name?	nine	digit 9 name
+vision	grade5	What is the answer to: digit 9 name?	nine	digit 9 name
+vision	grade6	What is the answer to: digit 9 name?	nine	digit 9 name
+vision	grade7	What is the answer to: digit 9 name?	nine	digit 9 name
+vision	grade8	What is the answer to: digit 9 name?	nine	digit 9 name
