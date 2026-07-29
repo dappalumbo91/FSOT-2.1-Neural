@@ -73,6 +73,7 @@ const host_tts_fixed = @import("host_tts_fixed.zig");
 const language_practice_fixed = @import("language_practice_fixed.zig");
 const grade_practice_fixed = @import("grade_practice_fixed.zig");
 const reason_practice_fixed = @import("reason_practice_fixed.zig");
+const novel_inquiry_fixed = @import("novel_inquiry_fixed.zig");
 const failure_fixed = @import("failure_fixed.zig");
 const autonomous_fixed = @import("autonomous_fixed.zig");
 const wire_around_fixed = @import("wire_around_fixed.zig");
@@ -953,6 +954,30 @@ fn runReasonPractice() void {
     }
 }
 
+fn runNovelInquiry() void {
+    std.debug.print("=== FSOT NOVEL INQUIRY (single complex synthesis from taught facts) ===\n", .{});
+    std.debug.print("doctrine: new idea = compose grounded binds; never free invent\n", .{});
+    if (!novel_inquiry_fixed.selfTest()) {
+        std.debug.print("FSOT_NOVEL FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const r = novel_inquiry_fixed.runNovelInquiry(true);
+    std.debug.print(
+        "NOVEL taught={d} hops={d} grounded={} novel={} spikes={d} lex={d}\n",
+        .{ r.n_taught, r.n_hops, r.grounded, r.novel, r.spikes, r.lexicon_total },
+    );
+    if (r.idea_n > 0) {
+        std.debug.print("NOVEL_IDEA \"{s}\"\n", .{r.idea[0..r.idea_n]});
+    }
+    if (r.ok) {
+        std.debug.print("FSOT_NOVEL PASS\n", .{});
+        std.debug.print("FSOT_NOVEL_SYNTHESIS_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_NOVEL FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runFailure() void {
     std.debug.print("=== FSOT FAILURE BOUNDARIES (expanded catalog, fixed) ===\n", .{});
     const r = failure_fixed.runFailureProbe();
@@ -1601,6 +1626,8 @@ pub fn main() !void {
         runGradePractice();
     } else if (std.mem.eql(u8, mode, "reason") or std.mem.eql(u8, mode, "open-reason") or std.mem.eql(u8, mode, "think") or std.mem.eql(u8, mode, "multi-hop")) {
         runReasonPractice();
+    } else if (std.mem.eql(u8, mode, "novel") or std.mem.eql(u8, mode, "inquiry") or std.mem.eql(u8, mode, "synthesize") or std.mem.eql(u8, mode, "idea")) {
+        runNovelInquiry();
     } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
         runFailure();
     } else if (std.mem.eql(u8, mode, "wire") or std.mem.eql(u8, mode, "wire-around") or std.mem.eql(u8, mode, "wire_around")) {
