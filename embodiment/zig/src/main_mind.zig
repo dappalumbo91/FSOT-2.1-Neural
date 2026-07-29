@@ -52,6 +52,8 @@ const codon_fixed = @import("codon_fixed.zig");
 const memory_fixed = @import("memory_fixed.zig");
 const learning_fixed = @import("learning_fixed.zig");
 const curriculum_fixed = @import("curriculum_fixed.zig");
+const curiosity_fixed = @import("curiosity_fixed.zig");
+const transfer_fixed = @import("transfer_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -508,6 +510,36 @@ fn runCurriculum() void {
     }
 }
 
+fn runCuriosity() void {
+    std.debug.print("=== FSOT MIND CURIOSITY (fixed 5W1H fill) ===\n", .{});
+    const c = curiosity_fixed.runCuriosityProbe();
+    std.debug.print(
+        "CURIOSITY eps={d} q={d} resolved={d} open={d}\n",
+        .{ c.n_episodes, c.questions, c.resolved, c.open_after },
+    );
+    if (c.ok) {
+        std.debug.print("FSOT_CURIOSITY PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_CURIOSITY FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runTransfer() void {
+    std.debug.print("=== FSOT MIND TRANSFER (feature-only retrieve, no title cheat) ===\n", .{});
+    const t = transfer_fixed.runTransferProbe();
+    std.debug.print(
+        "TRANSFER full={d}/{d} top1={e} partial={d}/{d} ptop1={e} spikes={d}\n",
+        .{ t.correct, t.n_items, t.top1, t.partial_correct, t.n_items, t.partial_top1, t.spikes },
+    );
+    if (t.ok) {
+        std.debug.print("FSOT_TRANSFER PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_TRANSFER FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runInjectFile(path: []const u8) !void {
     std.debug.print("=== FSOT MIND INJECT-FILE → FIXED organism ===\n", .{});
     std.debug.print("path={s}\n", .{path});
@@ -913,6 +945,10 @@ pub fn main() !void {
         runLearnFixed();
     } else if (std.mem.eql(u8, mode, "curriculum")) {
         runCurriculum();
+    } else if (std.mem.eql(u8, mode, "curiosity")) {
+        runCuriosity();
+    } else if (std.mem.eql(u8, mode, "transfer")) {
+        runTransfer();
     } else if (std.mem.eql(u8, mode, "live")) {
         runLive();
     } else if (std.mem.eql(u8, mode, "inject")) {
@@ -948,6 +984,8 @@ pub fn main() !void {
         runFixed();
         runLearnFixed();
         runCurriculum();
+        runCuriosity();
+        runTransfer();
         runOrganism();
         runIntel();
         std.debug.print("FSOT_STRESS PASS\n", .{});
@@ -965,6 +1003,8 @@ pub fn main() !void {
         runFixed();
         runLearnFixed();
         runCurriculum();
+        runCuriosity();
+        runTransfer();
         runOrganism();
         runIntel();
         runGenetic();
@@ -973,7 +1013,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|fixed|intel|organism|learn|curriculum|genetic|stress|float-lab|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|fixed|intel|organism|learn|curriculum|curiosity|transfer|stress|float-lab|…]\n", .{});
         std.process.exit(2);
     }
 }
