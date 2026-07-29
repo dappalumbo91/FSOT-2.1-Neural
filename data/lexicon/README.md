@@ -43,6 +43,31 @@ python run_lexicon_teacher.py --llm --model qwen3.5:4b --target 1000
 **Do not** pay for cloud APIs for this. Teacher = Ollama (or offline lists).  
 Remote provider flags exist only as an escape hatch; default is local.
 
-## Fluency later
+## How big a lexicon for “fluid”?
 
-Score: known-word rate, encode/retrieve of machine frames, TTS self-loop — not “chat like GPT.”
+| Goal | Productive words (rough) | Notes |
+|------|--------------------------|--------|
+| Survival chat | **~500** | who/verb/what core — we are here (~450 roles) |
+| Everyday fluid | **~2,000** | most daily life without rare topics |
+| Strong productive | **~5,000** | comfortable general speech |
+| Adult *receptive* | **20,000+** | understanding more than speaking |
+
+Grammar is separate. Grow **coverage first**, polish grammar later.  
+Human child path: concrete words → social → abstract; practice by speaking and hearing self.
+
+## Distill (definition + usage) via Ollama
+
+```powershell
+python run_lexicon_distill.py --report
+python run_lexicon_distill.py --limit 30 --model gemma:7b
+```
+
+Writes `en_distill.jsonl` (word, role, definition, usage, related, hint).
+
+## Practice (student learns by doing)
+
+```text
+fsot_mind practice
+```
+
+Utter → TTS → re-ingest own phrase (self-hear) → encode episode. Fluency score from recovery + frame RT + TTS.

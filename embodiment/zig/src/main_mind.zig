@@ -70,6 +70,7 @@ const machine_encode_fixed = @import("machine_encode_fixed.zig");
 const machine_lang_fixed = @import("machine_lang_fixed.zig");
 const lexicon_en_fixed = @import("lexicon_en_fixed.zig");
 const host_tts_fixed = @import("host_tts_fixed.zig");
+const language_practice_fixed = @import("language_practice_fixed.zig");
 const failure_fixed = @import("failure_fixed.zig");
 const autonomous_fixed = @import("autonomous_fixed.zig");
 const wire_around_fixed = @import("wire_around_fixed.zig");
@@ -860,6 +861,40 @@ fn runEnglishCodec() void {
     }
 }
 
+fn runLanguagePractice() void {
+    std.debug.print("=== FSOT LANGUAGE PRACTICE (utter → TTS → self-hear → encode) ===\n", .{});
+    std.debug.print("doctrine: teacher offline; student learns by doing + hearing own words\n", .{});
+    if (!language_practice_fixed.selfTest()) {
+        std.debug.print("FSOT_LANGUAGE_PRACTICE FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const r = language_practice_fixed.runLanguagePractice();
+    std.debug.print(
+        "PRACTICE trials={d} tts={d} self_recover={d} frame_rt={d} encode={d} known_in={d} known_out={d} lex={d} fluency={e}\n",
+        .{
+            r.n_trials,
+            r.n_tts_spoken,
+            r.n_self_recover,
+            r.n_frame_rt,
+            r.n_encode,
+            r.n_known_in,
+            r.n_known_out,
+            r.lexicon_total,
+            r.fluency,
+        },
+    );
+    if (r.last_phrase_n > 0) {
+        std.debug.print("LAST_PRACTICE \"{s}\"\n", .{r.last_phrase[0..r.last_phrase_n]});
+    }
+    if (r.ok) {
+        std.debug.print("FSOT_LANGUAGE_PRACTICE PASS\n", .{});
+        std.debug.print("FSOT_SELF_HEAR_LANGUAGE_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_LANGUAGE_PRACTICE FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runFailure() void {
     std.debug.print("=== FSOT FAILURE BOUNDARIES (expanded catalog, fixed) ===\n", .{});
     const r = failure_fixed.runFailureProbe();
@@ -1502,6 +1537,8 @@ pub fn main() !void {
         runMachineLangStress();
     } else if (std.mem.eql(u8, mode, "english") or std.mem.eql(u8, mode, "lexicon") or std.mem.eql(u8, mode, "tts") or std.mem.eql(u8, mode, "words")) {
         runEnglishCodec();
+    } else if (std.mem.eql(u8, mode, "practice") or std.mem.eql(u8, mode, "language-practice") or std.mem.eql(u8, mode, "lang-practice") or std.mem.eql(u8, mode, "self-speak")) {
+        runLanguagePractice();
     } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
         runFailure();
     } else if (std.mem.eql(u8, mode, "wire") or std.mem.eql(u8, mode, "wire-around") or std.mem.eql(u8, mode, "wire_around")) {
