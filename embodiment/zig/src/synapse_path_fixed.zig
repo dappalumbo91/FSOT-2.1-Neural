@@ -252,11 +252,11 @@ fn neuralEpoch(
         _ = org.tickOnce();
         global_t += 1;
 
-        // glia: load/clear/supply after spikes
+        // glia: load/clear/supply after spikes; set EAAT for wet cleft
         glia.stepAfterSpikes(&org.brain);
-        // molecular: tag coactive, advance cascade
+        mol.setEaatScale(glia.eaatUptakeScale());
+        // wet biophysics: multi-species ODE cascade on spines
         mol.tagCoactive(&org.brain);
-        mol.cascadeStep();
 
         i = 0;
         while (i < org.brain.n) : (i += 1) {
@@ -481,9 +481,14 @@ pub const SynapseReport = struct {
     n_hebb: u32,
     n_stdp: u32,
     n_molecular_tags: u32,
+    n_releases: u32,
+    n_nmda: u32,
+    n_ca_peaks: u32,
     n_camk_peaks: u32,
     n_ampa_up: u32,
+    n_ltd: u32,
     n_consolidate: u32,
+    n_chem_steps: u32,
     n_glia_clear: u32,
     n_glia_prune: u32,
     n_myelo: u32,
@@ -545,27 +550,32 @@ pub fn runSynapsePathwayProbe() SynapseReport {
     }
 
     // print bio-comparable trace
-    std.debug.print("--- BIO MAP (human ↔ FSOT Fixed + STDP + glia + molecular) ---\n", .{});
-    std.debug.print("  human LTP (causal STDP)      ↔ stdp pre→post · glia η · mol eligibility\n", .{});
-    std.debug.print("  human LTD (anti-causal STDP) ↔ post→pre −fsotPairWeight\n", .{});
-    std.debug.print("  human CaMKII / AMPA cascade  ↔ molecular_fixed tag→camk→ampa→protein\n", .{});
-    std.debug.print("  human late LTP (protein)     ↔ consolidateToW when protein high\n", .{});
-    std.debug.print("  human astrocyte supply/clear ↔ glia supply/load (poof/suction FSOT)\n", .{});
-    std.debug.print("  human microglia prune        ↔ microglialPrune weak edges\n", .{});
-    std.debug.print("  human oligo myelination      ↔ myelinate strong long-range W\n", .{});
-    std.debug.print("  human AHN (hippocampus)      ↔ limited; rewire + hipp, not mass birth\n", .{});
-    std.debug.print("  association / new thought    ↔ FSOT-scaled concept bonds (ψ_con·|pair|)\n", .{});
-    std.debug.print("  genetics as code             ↔ codon→genotype→trinary spin/charge→W\n", .{});
+    std.debug.print("--- BIO MAP (WET BIOPHYSICS + FSOT Fixed) ---\n", .{});
+    std.debug.print("  Glu release / EAAT clear     ↔ spine.glu + glia eaatUptakeScale\n", .{});
+    std.debug.print("  NMDA (glu·Mg-relief(V))      ↔ nmda_open ODE\n", .{});
+    std.debug.print("  Ca2+ influx / pump / buffer  ↔ ca, ca_buf ODEs\n", .{});
+    std.debug.print("  CaMKII bind + autoP          ↔ camk_c, camk_p\n", .{});
+    std.debug.print("  PP1 LTD branch               ↔ pp1 (moderate Ca)\n", .{});
+    std.debug.print("  AMPA traffic + phospho       ↔ ampa_surf, ampa_phos\n", .{});
+    std.debug.print("  late LTP protein synth       ↔ protein → consolidateToW\n", .{});
+    std.debug.print("  STDP timing                  ↔ stdp_fixed · eligibility(spine)\n", .{});
+    std.debug.print("  astrocyte / micro / oligo    ↔ glia_fixed supply/prune/myelo\n", .{});
+    std.debug.print("  genetics as code             ↔ codon→spin/charge→fsotPairWeight\n", .{});
     const route = pathways_f.routeFor(.text);
     std.debug.print("  text query route primary={s} hipp_bind={}\n", .{ regionName(route.primary), route.hipp_bind });
-    std.debug.print("  STDP selftest={} glia={} mol={}\n", .{ stdp_f.selfTest(), glia_f.selfTest(), molecular_f.selfTest() });
+    std.debug.print("  STDP selftest={} glia={} mol(wet)={}\n", .{ stdp_f.selfTest(), glia_f.selfTest(), molecular_f.selfTest() });
     std.debug.print(
-        "  glia supply={e} load={e} clear={d} prune={d} myelo={d}\n",
-        .{ fixed.toF64(glia.meanSupply()), fixed.toF64(glia.meanLoad()), glia.n_clear_events, glia.n_prune_events, glia.n_myelo_events },
+        "  glia supply={e} load={e} eaat={e} clear={d} prune={d} myelo={d}\n",
+        .{ fixed.toF64(glia.meanSupply()), fixed.toF64(glia.meanLoad()), fixed.toF64(glia.eaatUptakeScale()), glia.n_clear_events, glia.n_prune_events, glia.n_myelo_events },
+    );
+    const samp = mol.sampleBusy();
+    std.debug.print(
+        "  wet: releases={d} nmda={d} ca_peaks={d} camk_p_peaks={d} ampa_up={d} ltd={d} consol={d} chem_steps={d}\n",
+        .{ mol.n_releases, mol.n_nmda_events, mol.n_ca_peaks, mol.n_camk_peak, mol.n_ampa_up, mol.n_ltd_events, mol.n_consolidate, mol.n_chem_steps },
     );
     std.debug.print(
-        "  mol tags={d} camk_peaks={d} ampa_up={d} consolidate={d}\n",
-        .{ mol.n_tags, mol.n_camk_peak, mol.n_ampa_up, mol.n_consolidate },
+        "  sample spine: glu={e} ca={e} nmda={e} camk_p={e} pp1={e} ampa_s={e} prot={e}\n",
+        .{ fixed.toF64(samp.glu), fixed.toF64(samp.ca), fixed.toF64(samp.nmda_open), fixed.toF64(samp.camk_p), fixed.toF64(samp.pp1), fixed.toF64(samp.ampa_surf), fixed.toF64(samp.protein) },
     );
 
     std.debug.print("--- SYNAPTIC EDGE TRACE (top carriers this query) ---\n", .{});
@@ -605,6 +615,7 @@ pub fn runSynapsePathwayProbe() SynapseReport {
     const st_ok = stdp_f.selfTest();
     const g_ok = glia_f.selfTest();
     const m_ok = molecular_f.selfTest();
+    // Wet biophysics gate: real multi-species activity, not toy tags
     const ok =
         st_ok and
         g_ok and
@@ -612,6 +623,9 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         stdp_u >= 1 and
         spikes >= 1 and
         glia.n_clear_events >= 1 and
+        mol.n_releases >= 1 and
+        mol.n_chem_steps >= 100 and
+        (mol.n_ca_peaks >= 1 or mol.n_nmda_events >= 1 or mol.n_camk_peak >= 1) and
         mol.n_tags >= 1 and
         th.n_visited >= 4 and
         th.n_novel >= 1 and
@@ -624,9 +638,14 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         .n_hebb = hebb,
         .n_stdp = stdp_u,
         .n_molecular_tags = mol.n_tags,
+        .n_releases = mol.n_releases,
+        .n_nmda = mol.n_nmda_events,
+        .n_ca_peaks = mol.n_ca_peaks,
         .n_camk_peaks = mol.n_camk_peak,
         .n_ampa_up = mol.n_ampa_up,
+        .n_ltd = mol.n_ltd_events,
         .n_consolidate = mol.n_consolidate + ep1.n_consol + ep2.n_consol,
+        .n_chem_steps = mol.n_chem_steps,
         .n_glia_clear = glia.n_clear_events,
         .n_glia_prune = glia.n_prune_events + ep1.n_prune + ep2.n_prune,
         .n_myelo = glia.n_myelo_events + ep1.n_myelo + ep2.n_myelo,

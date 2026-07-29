@@ -193,6 +193,19 @@ pub const GliaState = struct {
         while (i < N_ASTRO) : (i += 1) s = fixed.add(s, self.load[i]);
         return fixed.div(s, fixed.fromInt(N_ASTRO));
     }
+
+    /// EAAT / glutamate uptake scale for wet molecular cleft (astrocyte transporters).
+    /// High supply + low load → strong uptake; overloaded glia → slower clear.
+    pub fn eaatUptakeScale(self: *const GliaState) Fixed {
+        const sup = self.meanSupply();
+        const ld = self.meanLoad();
+        // scale = 0.4 + 1.2*supply - 0.5*load
+        const s = fixed.sub(
+            fixed.add(fixed.fromDecimalStr("0.4"), fixed.mul(sup, fixed.fromDecimalStr("1.2"))),
+            fixed.mul(ld, fixed.fromDecimalStr("0.5")),
+        );
+        return fixed.clamp(s, fixed.fromDecimalStr("0.25"), fixed.fromDecimalStr("2.2"));
+    }
 };
 
 pub fn selfTest() bool {
