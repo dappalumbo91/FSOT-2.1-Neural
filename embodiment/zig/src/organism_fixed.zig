@@ -3,6 +3,8 @@
 const fixed = @import("fixed.zig");
 const brain_f = @import("brain_fixed.zig");
 const memory_f = @import("memory_fixed.zig");
+const inject_f = @import("inject_io_fixed.zig");
+const modulate_f = @import("modulate_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const OrganismF = struct {
@@ -16,6 +18,9 @@ pub const OrganismF = struct {
     inject_feats: [8]Fixed = .{0} ** 8,
     inject_n: usize = 0,
     inject_active: bool = false,
+    /// host plant metric for self-modulation (Fixed)
+    metric: inject_f.MetricF = .{},
+    last_mod: modulate_f.State = .{},
 
     pub fn init() OrganismF {
         var o: OrganismF = .{
@@ -34,27 +39,37 @@ pub const OrganismF = struct {
         self.inject_active = n > 0;
     }
 
+    pub fn setMetric(self: *OrganismF, m: inject_f.MetricF) void {
+        self.metric = m;
+    }
+
     pub fn tickOnce(self: *OrganismF) struct { tick: u32, mean_s: Fixed, spikes: u32, episodes: u32 } {
         const before = self.brain.totalSpikes();
+        // fire_frac proxy from recent spikes density (soft)
+        const fire_frac = fixed.div(fixed.fromInt(@intCast(@min(before, 32))), fixed.fromInt(64));
+        self.last_mod = modulate_f.fromMetric(self.metric, fire_frac);
+        const stim = self.last_mod.stim_scale;
+
         var ext: [brain_f.N_TOTAL]Fixed = undefined;
         var s: u32 = 0;
         while (s < self.steps_per_tick) : (s += 1) {
             const t = self.tick + s;
             if (self.inject_active) {
-                // inject into sens/assoc from feature bus
+                // inject into sens/assoc from feature bus, scaled by autonomic stim
                 var i: usize = 0;
                 while (i < self.brain.n) : (i += 1) {
                     ext[i] = fixed.fromDecimalStr("0.04");
                     if (self.brain.region_of[i] == .sens or self.brain.region_of[i] == .assoc) {
                         const f = self.inject_feats[i % self.inject_n];
-                        ext[i] = fixed.add(ext[i], fixed.mul(fixed.fromDecimalStr("0.55"), f));
+                        ext[i] = fixed.add(ext[i], fixed.mul(fixed.mul(fixed.fromDecimalStr("0.55"), f), stim));
                     }
                     if ((t % 80) < 15 and self.brain.region_of[i] == .thal and self.brain.genotypes[i].synapse_sign > 0) {
-                        ext[i] = fixed.add(ext[i], fixed.fromDecimalStr("0.4"));
+                        ext[i] = fixed.add(ext[i], fixed.mul(fixed.fromDecimalStr("0.4"), stim));
                     }
                 }
             } else {
-                const prim: Fixed = if ((t % 30) < 12) fixed.fromDecimalStr("0.7") else fixed.fromDecimalStr("0.08");
+                const prim_base: Fixed = if ((t % 30) < 12) fixed.fromDecimalStr("0.7") else fixed.fromDecimalStr("0.08");
+                const prim = fixed.mul(prim_base, stim);
                 const reg: brain_f.RegionId = if ((t / 30) % 2 == 0) .sens else .assoc;
                 self.brain.buildExternal(prim, reg, ext[0..]);
             }

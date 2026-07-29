@@ -57,6 +57,8 @@ const transfer_fixed = @import("transfer_fixed.zig");
 const inject_io_fixed = @import("inject_io_fixed.zig");
 const vision_inject_fixed = @import("vision_inject_fixed.zig");
 const pixel_id_fixed = @import("pixel_id_fixed.zig");
+const modulate_fixed = @import("modulate_fixed.zig");
+const teach_fixed = @import("teach_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -529,16 +531,51 @@ fn runCuriosity() void {
 }
 
 fn runTransfer() void {
-    std.debug.print("=== FSOT MIND TRANSFER (feature-only retrieve, no title cheat) ===\n", .{});
+    std.debug.print("=== FSOT MIND TRANSFER (strong: distractors+noise+delay, no title cheat) ===\n", .{});
     const t = transfer_fixed.runTransferProbe();
     std.debug.print(
-        "TRANSFER full={d}/{d} top1={e} partial={d}/{d} ptop1={e} spikes={d}\n",
-        .{ t.correct, t.n_items, t.top1, t.partial_correct, t.n_items, t.partial_top1, t.spikes },
+        "TRANSFER full={d}/{d} top1={e} partial={d}/{d} ptop1={e} noisy={d}/{d} ntop1={e} dist={d} delay={d} spikes={d}\n",
+        .{
+            t.correct,          t.n_items, t.top1,
+            t.partial_correct,  t.n_items, t.partial_top1,
+            t.noisy_correct,    t.n_items, t.noisy_top1,
+            t.n_distractors,    t.delay_steps, t.spikes,
+        },
     );
     if (t.ok) {
         std.debug.print("FSOT_TRANSFER PASS\n", .{});
     } else {
         std.debug.print("FSOT_TRANSFER FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runModulate() void {
+    std.debug.print("=== FSOT MIND MODULATE (fixed POOF/SUCTION homeostasis) ===\n", .{});
+    const m = modulate_fixed.runModulateProbe();
+    std.debug.print(
+        "MODULATE dampen={} explore={} balanced={} emergency={}\n",
+        .{ m.dampen_ok, m.explore_ok, m.balanced_ok, m.emergency_ok },
+    );
+    if (m.ok) {
+        std.debug.print("FSOT_MODULATE PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_MODULATE FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runTeach() void {
+    std.debug.print("=== FSOT MIND TEACH (fixed 5W1H cards + curiosity fill) ===\n", .{});
+    const t = teach_fixed.runTeachProbe();
+    std.debug.print(
+        "TEACH lessons={d} enc={d} slots={d}/{d} top1={e} cur_q={d} cur_res={d} spikes={d}\n",
+        .{ t.n_lessons, t.n_encoded, t.slot_hits, t.slot_probes, t.slot_top1, t.curiosity_questions, t.curiosity_resolved, t.spikes },
+    );
+    if (t.ok) {
+        std.debug.print("FSOT_TEACH PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_TEACH FAIL\n", .{});
         std.process.exit(1);
     }
 }
@@ -634,6 +671,7 @@ fn runInject() void {
     var org = organism_fixed.OrganismF.init();
     org.encode_every = 10;
     org.steps_per_tick = 4;
+    org.setMetric(bus.metric);
     var feats: [8]fixed.Fixed = .{0} ** 8;
     const nf = bus.firstVisionFeats(&feats);
     org.setInject(feats[0..nf]);
@@ -642,13 +680,15 @@ fn runInject() void {
         _ = org.tickOnce();
     }
     std.debug.print(
-        "inject meanS={e} spikes={d} eps={d} metric_cpu={e} packets={d}\n",
+        "inject meanS={e} spikes={d} eps={d} metric_cpu={e} packets={d} mod={s} stim={e}\n",
         .{
             fixed.toF64(org.brain.meanS()),
             org.brain.totalSpikes(),
             org.store.n,
             fixed.toF64(bus.metric.cpu),
             bus.n,
+            modulate_fixed.modeName(org.last_mod.mode),
+            fixed.toF64(org.last_mod.stim_scale),
         },
     );
     if (org.brain.totalSpikes() >= 1) {
@@ -979,6 +1019,10 @@ pub fn main() !void {
         runCuriosity();
     } else if (std.mem.eql(u8, mode, "transfer")) {
         runTransfer();
+    } else if (std.mem.eql(u8, mode, "modulate") or std.mem.eql(u8, mode, "modulation") or std.mem.eql(u8, mode, "sme-mod")) {
+        runModulate();
+    } else if (std.mem.eql(u8, mode, "teach") or std.mem.eql(u8, mode, "5w1h") or std.mem.eql(u8, mode, "teach-5w1h")) {
+        runTeach();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {
@@ -1014,12 +1058,14 @@ pub fn main() !void {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
     } else if (std.mem.eql(u8, mode, "stress")) {
-        // stress authority = fixed stack + fixed learn/curriculum + vision/pixel-id
+        // stress authority = fixed stack + expansions
         runFixed();
         runLearnFixed();
         runCurriculum();
         runCuriosity();
+        runTeach();
         runTransfer();
+        runModulate();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1041,7 +1087,9 @@ pub fn main() !void {
         runLearnFixed();
         runCurriculum();
         runCuriosity();
+        runTeach();
         runTransfer();
+        runModulate();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1053,7 +1101,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|fixed|intel|organism|learn|curriculum|curiosity|transfer|inject|vision|pixel-id|stress|float-lab|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|fixed|teach|transfer|modulate|curiosity|inject|vision|pixel-id|stress|…]\n", .{});
         std.process.exit(2);
     }
 }
