@@ -1,0 +1,10 @@
+{"id": "pk-p-count-1", "grade": "preschool", "domain": "math", "prompt": "Count: one apple and one apple. How many?", "answer": "two", "kind": "count", "keywords": ["one", "two", "apple"]}
+{"id": "pk-p-color-1", "grade": "preschool", "domain": "science", "prompt": "The sun is bright and yellow. Is the sun cold?", "answer": "no", "kind": "yesno", "keywords": ["sun", "cold", "yellow"]}
+{"id": "pk-p-animal-1", "grade": "preschool", "domain": "life", "prompt": "Which is an animal: dog or chair?", "answer": "dog", "kind": "choose", "keywords": ["dog", "chair", "animal"]}
+{"id": "k-p-add-1", "grade": "kindergarten", "domain": "math", "prompt": "Two birds and one bird. How many birds?", "answer": "three", "kind": "count", "keywords": ["two", "one", "three", "bird"]}
+{"id": "k-p-safety-1", "grade": "kindergarten", "domain": "safety", "prompt": "The light is red. Should you go or stop?", "answer": "stop", "kind": "choose", "keywords": ["red", "light", "stop", "go"]}
+{"id": "k-p-share-1", "grade": "kindergarten", "domain": "social", "prompt": "A friend wants a turn. What should you do?", "answer": "share", "kind": "open", "keywords": ["friend", "turn", "share"]}
+{"id": "g1-p-add-2", "grade": "grade1", "domain": "math", "prompt": "Three plus two equals what?", "answer": "five", "kind": "add", "keywords": ["three", "two", "five", "add"]}
+{"id": "g1-p-life-1", "grade": "grade1", "domain": "science", "prompt": "A plant has no water. Will it grow well?", "answer": "no", "kind": "yesno", "keywords": ["plant", "water", "grow"]}
+{"id": "g1-p-map-1", "grade": "grade1", "domain": "geo", "prompt": "You need to find the school. What tool helps?", "answer": "map", "kind": "choose", "keywords": ["school", "map", "find"]}
+{"id": "g1-p-week-1", "grade": "grade1", "domain": "time", "prompt": "How many days are in one week?", "answer": "seven", "kind": "fact", "keywords": ["week", "seven", "day"]}

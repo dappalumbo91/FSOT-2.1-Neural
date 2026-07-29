@@ -99,7 +99,7 @@ const WORDS = [_]struct { []const u8, Role }{
 
 pub const N_WORDS: usize = WORDS.len;
 /// Teacher-grown extras loaded from en_roles.tsv (student codec grows without recompile).
-pub const MAX_EXTRA: usize = 1024;
+pub const MAX_EXTRA: usize = 2048;
 pub const MAX_WORD_LEN: usize = 24;
 
 var extra_buf: [MAX_EXTRA][MAX_WORD_LEN]u8 = undefined;

@@ -71,6 +71,7 @@ const machine_lang_fixed = @import("machine_lang_fixed.zig");
 const lexicon_en_fixed = @import("lexicon_en_fixed.zig");
 const host_tts_fixed = @import("host_tts_fixed.zig");
 const language_practice_fixed = @import("language_practice_fixed.zig");
+const grade_practice_fixed = @import("grade_practice_fixed.zig");
 const failure_fixed = @import("failure_fixed.zig");
 const autonomous_fixed = @import("autonomous_fixed.zig");
 const wire_around_fixed = @import("wire_around_fixed.zig");
@@ -895,6 +896,40 @@ fn runLanguagePractice() void {
     }
 }
 
+fn runGradePractice() void {
+    std.debug.print("=== FSOT GRADE PRACTICE (PK/K/G1 facts + problems) ===\n", .{});
+    std.debug.print("doctrine: teach real facts; quiz & solve — not word-means-word\n", .{});
+    if (!grade_practice_fixed.selfTest()) {
+        std.debug.print("FSOT_GRADE_PRACTICE FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    // speak a few facts so you hear knowledge, not ugga-dugga
+    const r = grade_practice_fixed.runGradePractice(true);
+    std.debug.print(
+        "GRADE lessons={d} taught={d} quiz={d}/{d} top1={e} problems={d}/{d} ptop1={e} apply={e} tts={d} lex={d}\n",
+        .{
+            r.n_lessons,
+            r.n_taught,
+            r.n_quiz_ok,
+            r.n_quiz,
+            r.quiz_top1,
+            r.n_prob_ok,
+            r.n_problems,
+            r.problem_top1,
+            r.apply_score,
+            r.n_tts,
+            r.lexicon_total,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_GRADE_PRACTICE PASS\n", .{});
+        std.debug.print("FSOT_KNOWLEDGE_APPLY_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_GRADE_PRACTICE FAIL (need stronger encode/retrieve on facts)\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runFailure() void {
     std.debug.print("=== FSOT FAILURE BOUNDARIES (expanded catalog, fixed) ===\n", .{});
     const r = failure_fixed.runFailureProbe();
@@ -1539,6 +1574,8 @@ pub fn main() !void {
         runEnglishCodec();
     } else if (std.mem.eql(u8, mode, "practice") or std.mem.eql(u8, mode, "language-practice") or std.mem.eql(u8, mode, "lang-practice") or std.mem.eql(u8, mode, "self-speak")) {
         runLanguagePractice();
+    } else if (std.mem.eql(u8, mode, "grade") or std.mem.eql(u8, mode, "preschool") or std.mem.eql(u8, mode, "kindergarten") or std.mem.eql(u8, mode, "grade1") or std.mem.eql(u8, mode, "curriculum")) {
+        runGradePractice();
     } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
         runFailure();
     } else if (std.mem.eql(u8, mode, "wire") or std.mem.eql(u8, mode, "wire-around") or std.mem.eql(u8, mode, "wire_around")) {

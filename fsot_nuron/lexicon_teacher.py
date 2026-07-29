@@ -158,8 +158,19 @@ def merge_seed(entries: Dict[str, str]) -> Dict[str, str]:
     return entries
 
 
+def load_bulk_tsv(path: Path) -> Dict[str, str]:
+    """Load extra free word lists (e.g. preschool_bulk.tsv)."""
+    return load_tsv(path) if path.is_file() else {}
+
+
 def expand_offline(entries: Dict[str, str], target: int) -> Dict[str, str]:
     entries = merge_seed(entries)
+    # Preschool–G1 bulk file (free, productive core)
+    for w, role in load_bulk_tsv(LEX_DIR / "preschool_bulk.tsv").items():
+        if w not in entries:
+            entries[w] = role
+        if len(entries) >= target:
+            return entries
     for role, words in OFFLINE_BULK.items():
         for w in words:
             wn = _norm_word(w)
