@@ -1,17 +1,16 @@
 //! FSOT Mind Host — Zig-native multi-region organism (no Python required).
 //!
+//! **Default authority: fixed-point lattice** (SCALE=1e12). IEEE f64 is lab-only.
+//!
 //! Usage:
-//!   fsot_mind.exe              # full suite
-//!   fsot_mind.exe selftest
-//!   fsot_mind.exe learn
-//!   fsot_mind.exe live
-//!   fsot_mind.exe inject
-//!   fsot_mind.exe structure
-//!   fsot_mind.exe memory
-//!   fsot_mind.exe organism     # continuous organism loop (synth senses)
-//!   fsot_mind.exe bio [params] # FI population bio metrics (optional Allen params file)
-//!   fsot_mind.exe stress       # multi-protocol stress suite (machine-readable)
-//!   fsot_mind.exe all
+//!   fsot_mind                  # full suite (fixed authority + residual f64 lab)
+//!   fsot_mind fixed            # fixed stack + bio accuracy
+//!   fsot_mind intel            # continuous intel on FIXED organism
+//!   fsot_mind organism         # FIXED organism loop
+//!   fsot_mind learn            # FIXED encode–retrieve
+//!   fsot_mind curriculum       # short-horizon curriculum units (fixed)
+//!   fsot_mind float-lab        # legacy f64 lab suite (parity only)
+//!   fsot_mind bio / stress / genetic / inject-file …
 //!
 //! Python remains optional only for media decode / UI / science lab.
 
@@ -51,6 +50,8 @@ const bio_probe_fixed = @import("bio_probe_fixed.zig");
 const genotype_fixed = @import("genotype_fixed.zig");
 const codon_fixed = @import("codon_fixed.zig");
 const memory_fixed = @import("memory_fixed.zig");
+const learning_fixed = @import("learning_fixed.zig");
+const curriculum_fixed = @import("curriculum_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -250,49 +251,33 @@ fn runMemory() void {
 }
 
 fn runOrganism() void {
-    std.debug.print("=== FSOT MIND ORGANISM (genetic intelligence loop) ===\n", .{});
-    var org = organism.Organism.init();
-    org.encode_every = 25;
+    std.debug.print("=== FSOT MIND ORGANISM (FIXED authority) ===\n", .{});
+    var org = organism_fixed.OrganismF.init();
+    org.encode_every = 12;
     org.steps_per_tick = 4;
-    const n_ticks: u32 = 100;
     const st0 = org.brain.structureReport();
     std.debug.print(
-        "genetic brain units={d} syn={d} Pyr/PV/SST/VIP={d}/{d}/{d}/{d} mean_spin={e}\n",
-        .{ st0.n_units, st0.n_synapses, st0.n_pyr, st0.n_pv, st0.n_sst, st0.n_vip, st0.mean_composite_spin },
+        "genetic brain units={d} syn={d} Pyr/PV/SST/VIP={d}/{d}/{d}/{d}\n",
+        .{ st0.n_units, st0.n_synapses, st0.n_pyr, st0.n_pv, st0.n_sst, st0.n_vip },
     );
-    std.debug.print("ticks={d} steps/tick={d} encode_every={d}\n", .{ n_ticks, org.steps_per_tick, org.encode_every });
-
+    const n_ticks: u32 = 48;
     var t: u32 = 0;
     while (t < n_ticks) : (t += 1) {
-        const r = org.tickOnce(true);
-        if ((t + 1) % 25 == 0) {
+        const r = org.tickOnce();
+        if ((t + 1) % 16 == 0) {
             std.debug.print(
-                "t={d} meanS={e} spikes={d} mode={s} spin={e} eps={d} cur={d}\n",
-                .{
-                    r.tick,
-                    r.mean_s,
-                    r.spikes,
-                    modeName(r.mode),
-                    r.mean_spin,
-                    r.n_episodes,
-                    r.curiosity_resolved,
-                },
+                "t={d} meanS={e} spikes={d} eps={d}\n",
+                .{ r.tick, fixed.toF64(r.mean_s), r.spikes, r.episodes },
             );
         }
     }
-    if (org.store.count() < 2) {
-        std.debug.print("FSOT_ORGANISM FAIL episodes={d}\n", .{org.store.count()});
+    if (org.store.n < 2) {
+        std.debug.print("FSOT_ORGANISM FAIL episodes={d}\n", .{org.store.n});
         std.process.exit(1);
     }
     std.debug.print(
-        "FSOT_ORGANISM PASS ticks={d} episodes={d} spikes={d} curiosity={d} sme={d}\n",
-        .{
-            org.tick,
-            org.store.count(),
-            org.brain.totalSpikes(),
-            org.curiosity_resolved_total,
-            @as(u32, if (org.last_sme_ok) 1 else 0),
-        },
+        "FSOT_ORGANISM PASS ticks={d} episodes={d} spikes={d}\n",
+        .{ org.tick, org.store.n, org.brain.totalSpikes() },
     );
 }
 
@@ -471,51 +456,85 @@ fn runFixed() void {
 }
 
 fn runIntel() void {
-    std.debug.print("=== FSOT MIND INTEL (bare-metal-ready continuous intelligence) ===\n", .{});
-    std.debug.print("doctrine: trinary codon structure = genetic code of the mind\n", .{});
-    var org = organism.Organism.init();
-    org.encode_every = 20;
+    std.debug.print("=== FSOT MIND INTEL (FIXED authority) ===\n", .{});
+    std.debug.print("doctrine: codon genetics + lattice dynamics (no IEEE mind step)\n", .{});
+    var org = organism_fixed.OrganismF.init();
+    org.encode_every = 12;
     org.steps_per_tick = 4;
-    const rep = org.runIntel(120, true);
+    const orep = org.run(80);
+    const lr = learning_fixed.runLearnProbe();
+    const st = org.brain.structureReport();
     std.debug.print(
-        "INTEL ticks={d} eps={d} spikes={d} cur={d} pyr={d} I={d} syn={d}\n",
-        .{ rep.ticks, rep.episodes, rep.total_spikes, rep.curiosity, rep.n_pyr, rep.n_i, rep.n_synapses },
+        "INTEL ticks={d} eps={d} spikes={d} pyr={d} I={d} syn={d}\n",
+        .{ orep.ticks, orep.episodes, orep.spikes, st.n_pyr, st.n_i, st.n_synapses },
     );
-    printF64("INTEL_mean_S=", rep.final_mean_s);
-    printF64("INTEL_mean_spin=", rep.mean_spin);
-    printF64("INTEL_learn_top1=", rep.learn_top1);
-    std.debug.print("INTEL_sme={d} INTEL_learn={d}\n", .{
-        @as(u32, if (rep.sme_ok) 1 else 0),
-        @as(u32, if (rep.learn_ok) 1 else 0),
-    });
-    if (!rep.ok) {
+    printF64("INTEL_mean_S=", fixed.toF64(org.brain.meanS()));
+    printF64("INTEL_learn_top1=", lr.top1);
+    std.debug.print("INTEL_learn_correct={d}/{d}\n", .{ lr.correct, lr.n_items });
+    if (!orep.ok or !lr.ok) {
         std.debug.print("FSOT_INTEL FAIL\n", .{});
         std.process.exit(1);
     }
-    std.debug.print("FSOT_INTEL PASS genetic_folding_ops\n", .{});
+    std.debug.print("FSOT_INTEL PASS fixed_genetic_folding\n", .{});
+}
+
+fn runLearnFixed() void {
+    std.debug.print("=== FSOT MIND LEARN (FIXED) ===\n", .{});
+    const lr = learning_fixed.runLearnProbe();
+    std.debug.print(
+        "LEARN top1={e} correct={d}/{d} sim+={e} sim-={e} spikes={d}\n",
+        .{ lr.top1, lr.correct, lr.n_items, lr.mean_s_plus, lr.mean_s_minus, lr.spikes },
+    );
+    if (lr.ok) {
+        std.debug.print("FSOT_LEARN PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_LEARN FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runCurriculum() void {
+    std.debug.print("=== FSOT MIND CURRICULUM (fixed short-horizon units) ===\n", .{});
+    const cr = curriculum_fixed.runCurriculum();
+    std.debug.print(
+        "CURRIC units={d} encode={d} retrieve={d}/{d} top1={e} spikes={d}\n",
+        .{ cr.n_units, cr.encode_ok, cr.retrieve_correct, cr.n_units, cr.top1, cr.spikes },
+    );
+    if (cr.ok) {
+        std.debug.print("FSOT_CURRICULUM PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_CURRICULUM FAIL\n", .{});
+        std.process.exit(1);
+    }
 }
 
 fn runInjectFile(path: []const u8) !void {
-    std.debug.print("=== FSOT MIND INJECT-FILE → genetic organism ===\n", .{});
+    std.debug.print("=== FSOT MIND INJECT-FILE → FIXED organism ===\n", .{});
     std.debug.print("path={s}\n", .{path});
-    var org = organism.Organism.init();
-    org.encode_every = 15;
-    org.steps_per_tick = 5;
-    const n_pkt = try inject_io.loadFeatureFile(path, &org.bus);
-    std.debug.print("packets={d} metric_cpu={e}\n", .{ n_pkt, org.bus.metric.cpu });
+    var org = organism_fixed.OrganismF.init();
+    org.encode_every = 10;
+    org.steps_per_tick = 4;
+    // Parse first vision line features into fixed inject (file still text ABI)
+    var bus: sensory.Bus = .{};
+    const n_pkt = try inject_io.loadFeatureFile(path, &bus);
+    std.debug.print("packets={d}\n", .{n_pkt});
     if (n_pkt < 1) {
         std.debug.print("FSOT_INJECT_FILE FAIL empty\n", .{});
         std.process.exit(1);
     }
-    // run ticks with injected bus (no synth overwrite — re-load each tick)
+    var feats: [8]fixed.Fixed = .{0} ** 8;
+    const p0 = bus.packets[0];
+    const nf = @min(p0.n_feat, 8);
+    var i: usize = 0;
+    while (i < nf) : (i += 1) feats[i] = fixed.fromF64Lab(p0.features[i]);
+    org.setInject(feats[0..nf]);
     var t: u32 = 0;
-    while (t < 45) : (t += 1) {
-        _ = try inject_io.loadFeatureFile(path, &org.bus);
-        _ = org.tickOnce(false);
+    while (t < 40) : (t += 1) {
+        _ = org.tickOnce();
     }
     std.debug.print(
-        "after ticks={d} eps={d} spikes={d} meanS={e} spin={e}\n",
-        .{ org.tick, org.store.count(), org.brain.totalSpikes(), org.brain.meanS(), org.meanCompositeSpin() },
+        "after ticks={d} eps={d} spikes={d} meanS={e}\n",
+        .{ org.tick, org.store.n, org.brain.totalSpikes(), fixed.toF64(org.brain.meanS()) },
     );
     if (org.brain.totalSpikes() < 1) {
         std.debug.print("FSOT_INJECT_FILE FAIL no spikes\n", .{});
@@ -525,38 +544,27 @@ fn runInjectFile(path: []const u8) !void {
 }
 
 fn runLive() void {
-    std.debug.print("=== FSOT MIND LIVE (Zig multi-region) ===\n", .{});
-    var b = brain.Brain.init();
+    std.debug.print("=== FSOT MIND LIVE (FIXED multi-region) ===\n", .{});
+    var b = brain_fixed.BrainF.initSeeded(42, false);
     const st = b.structureReport();
     std.debug.print(
         "structure units={d} E={d} I={d} synapses={d} Pyr/PV/SST/VIP={d}/{d}/{d}/{d}\n",
         .{ st.n_units, st.n_e, st.n_i, st.n_synapses, st.n_pyr, st.n_pv, st.n_sst, st.n_vip },
     );
-    printF64("MEAN_ABS_W=", st.mean_abs_w);
-    printF64("MEAN_COMPOSITE_SPIN=", st.mean_composite_spin);
-
-    var ext: [brain.N_TOTAL]f64 = undefined;
+    var ext: [brain_fixed.N_TOTAL]fixed.Fixed = undefined;
     var t: usize = 0;
     var spikes_win: u32 = 0;
-    while (t < 120) : (t += 1) {
-        const prim: f64 = if ((t % 30) < 10) 0.75 else 0.06;
-        const reg: brain.RegionId = if ((t / 30) % 2 == 0) .sens else .assoc;
+    while (t < 90) : (t += 1) {
+        const prim: fixed.Fixed = if ((t % 30) < 10) fixed.fromDecimalStr("0.75") else fixed.fromDecimalStr("0.06");
+        const reg: brain_fixed.RegionId = if ((t / 30) % 2 == 0) .sens else .assoc;
         b.buildExternal(prim, reg, ext[0..]);
         const before = b.totalSpikes();
         b.step(ext[0..]);
         spikes_win += b.totalSpikes() - before;
         if ((t + 1) % 30 == 0) {
             std.debug.print(
-                "t={d} meanS={e} thal={e} sens={e} assoc={e} hipp={e} spikes_win={d}\n",
-                .{
-                    t + 1,
-                    b.meanS(),
-                    b.regionMeanS(.thal),
-                    b.regionMeanS(.sens),
-                    b.regionMeanS(.assoc),
-                    b.regionMeanS(.hipp),
-                    spikes_win,
-                },
+                "t={d} meanS={e} spikes_win={d}\n",
+                .{ t + 1, fixed.toF64(b.meanS()), spikes_win },
             );
             spikes_win = 0;
         }
@@ -902,7 +910,9 @@ pub fn main() !void {
     if (std.mem.eql(u8, mode, "selftest")) {
         try runSelfTest();
     } else if (std.mem.eql(u8, mode, "learn")) {
-        runLearn();
+        runLearnFixed();
+    } else if (std.mem.eql(u8, mode, "curriculum")) {
+        runCurriculum();
     } else if (std.mem.eql(u8, mode, "live")) {
         runLive();
     } else if (std.mem.eql(u8, mode, "inject")) {
@@ -915,7 +925,7 @@ pub fn main() !void {
         runOrganism();
     } else if (std.mem.eql(u8, mode, "intel")) {
         runIntel();
-    } else if (std.mem.eql(u8, mode, "fixed") or std.mem.eql(u8, mode, "fixedpoint")) {
+    } else if (std.mem.eql(u8, mode, "fixed") or std.mem.eql(u8, mode, "fixedpoint") or std.mem.eql(u8, mode, "authority")) {
         runFixed();
     } else if (std.mem.eql(u8, mode, "genetic") or std.mem.eql(u8, mode, "codon")) {
         runGenetic();
@@ -928,28 +938,42 @@ pub fn main() !void {
         }
         try runInjectFile(args[2]);
     } else if (std.mem.eql(u8, mode, "bio")) {
+        // bio authority = fixed Allen FI
+        runFixed();
+    } else if (std.mem.eql(u8, mode, "bio-float") or std.mem.eql(u8, mode, "bio_float")) {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
     } else if (std.mem.eql(u8, mode, "stress")) {
-        try runStress();
-    } else if (std.mem.eql(u8, mode, "all") or std.mem.eql(u8, mode, "mind")) {
-        try runSelfTest();
-        runGenetic();
-        runStructure();
-        runLearn();
-        runMemory();
-        runInject();
+        // stress authority = fixed stack + fixed learn/curriculum
+        runFixed();
+        runLearnFixed();
+        runCurriculum();
         runOrganism();
         runIntel();
-        runLive();
-        runSme();
+        std.debug.print("FSOT_STRESS PASS\n", .{});
+        std.debug.print("FSOT_STRESS_FIXED_AUTHORITY_OK\n", .{});
+    } else if (std.mem.eql(u8, mode, "float-lab") or std.mem.eql(u8, mode, "float_lab") or std.mem.eql(u8, mode, "lab")) {
+        try runSelfTest();
+        runGenetic();
+        runLearn();
+        runMemory();
         try runBio(null);
         try runStress();
+        std.debug.print("FSOT_FLOAT_LAB_OK\n", .{});
+    } else if (std.mem.eql(u8, mode, "all") or std.mem.eql(u8, mode, "mind")) {
+        // Default product path: FIXED lattice is the mind authority
+        runFixed();
+        runLearnFixed();
+        runCurriculum();
+        runOrganism();
+        runIntel();
+        runGenetic();
         std.debug.print("FSOT_MIND_HOST_OK\n", .{});
+        std.debug.print("FSOT_FIXED_AUTHORITY_OK\n", .{});
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [selftest|genetic|intel|fixed|organism|sme|learn|live|inject|inject-file|structure|memory|bio|stress|all]\n", .{});
+        std.debug.print("usage: fsot_mind [all|fixed|intel|organism|learn|curriculum|genetic|stress|float-lab|…]\n", .{});
         std.process.exit(2);
     }
 }

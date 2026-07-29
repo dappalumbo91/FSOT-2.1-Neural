@@ -22,7 +22,9 @@ to project doctrine:
 
 | Layer | Authority |
 |-------|-----------|
-| **Neural step, multi-region brain, encode/retrieve** | **Zig** (`embodiment/zig`) |
+| **Neural step, multi-region brain, encode/retrieve** | **Zig fixed lattice** (`SCALE=10¹²`, `*_fixed.zig`) |
+| **Codon genetics** | **Zig exact trinary** (`codon.zig` / `genotype_fixed.zig`) |
+| **IEEE f64 path** | Lab parity only (`float-lab`) — not product mind |
 | **Bare metal body** | **QEMU freestanding kernel** |
 | **Python** | Lab parity, media decode, optional UI inject — **not** the mind owner |
 
@@ -30,7 +32,7 @@ to project doctrine:
 
 | Binary | Role |
 |--------|------|
-| `zig-out/bin/fsot_mind.exe` | **Primary mind host** — multi-region brain + learn + live |
+| `zig-out/bin/fsot_mind.exe` | **Primary mind host** — **fixed** authority (`all`/`fixed`/`intel`) |
 | `zig-out/bin/fsot_trit_host.exe` | Parity / ABI self-test (legacy host) |
 | `zig-out/bin/fsot_trit_kernel` | QEMU Multiboot kernel (serial) |
 

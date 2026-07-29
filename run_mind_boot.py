@@ -69,11 +69,11 @@ def ensure_mind_built() -> Path:
 
 def run_zig_mind(mode: str = "all") -> int:
     exe = ensure_mind_built()
-    print("=== FSOT MIND BOOT (Zig authority) ===")
+    print("=== FSOT MIND BOOT (Zig FIXED authority) ===")
     print(f"binary: {exe}")
     print(f"mode:   {mode}")
-    print("doctrine: organism loop lives in Zig; Python is optional I/O only")
-    print("modes: selftest|learn|memory|organism|live|inject|structure|all\n")
+    print("doctrine: lattice dynamics + codon genetics in Zig; Python is optional I/O only")
+    print("modes: all|fixed|intel|organism|learn|curriculum|stress|float-lab|…\n")
     r = subprocess.run([str(exe), mode], cwd=str(ZIG_DIR))
     return int(r.returncode)
 

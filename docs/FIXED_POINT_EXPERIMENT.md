@@ -93,3 +93,17 @@ zig build -Doptimize=ReleaseSafe
 - Genetics / codon = **exact trinary**  
 - Continuous FSOT fold = **fixed lattice between extremes**, constants from seeds  
 - Never let libm soft-float rewrite structure  
+
+## Promotion (product default)
+
+On this branch, **default mind authority is fixed lattice**:
+
+| Mode | Authority |
+|------|-----------|
+| `all` / `mind` | Fixed stack + learn + curriculum + organism + intel |
+| `intel` / `organism` / `learn` / `live` | Fixed |
+| `stress` | Fixed authority suite |
+| `float-lab` | Legacy f64 lab only |
+| `bio` | Fixed Allen FI (alias of `fixed` bio path) |
+
+Expanding Python → Zig continues on this foundation (`curriculum_fixed`, `learning_fixed`, …).
