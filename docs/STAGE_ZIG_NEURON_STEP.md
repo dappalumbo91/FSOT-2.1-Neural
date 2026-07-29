@@ -20,7 +20,9 @@ This document freezes **how this stage was built**, **why it works**, **the math
 
 **Goal:** Port the **FSOT active-neuron step** from the Python laboratory into **Zig**, prove **numerical parity** on a fixed protocol, boot the same logic under **QEMU serial**, and **cross-check biological timing** against Allen Cell Types ephys when local public data exist.
 
-**Non-goals (this stage):** full multi-region brain in Zig; true multi-level silicon RAM; medical claims; NLP benchmarks.
+**Non-goals (this stage):** true multi-level silicon RAM; medical claims; NLP benchmarks.
+
+**Superseded non-goal:** multi-region brain in Zig is now landed in `brain.zig` / `fsot_mind.exe` — see `docs/ZIG_MIND_AUTHORITY.md`.
 
 ---
 

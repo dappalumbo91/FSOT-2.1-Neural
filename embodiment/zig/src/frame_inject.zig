@@ -3,8 +3,8 @@
 //!   magic "FSOT" | version u8 | path_id u8 | n_trits u32 LE
 //!   word records: pack u64 LE | n_trits u8 | pad 3
 //!
-//! Python lab builds frames; Zig body consumes them for sensory drive.
-//! Full multi-region brain still Python — this is the ABI seam.
+//! Python lab may build frames; Zig mind (brain.zig / fsot_mind) consumes them.
+//! Multi-region neural step authority is Zig — this is the sensory ABI seam.
 
 const std = @import("std");
 const trit = @import("trit.zig");

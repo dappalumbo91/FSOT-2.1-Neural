@@ -20,9 +20,19 @@ Custom trinary substrate in **Zig** (host test + freestanding QEMU kernel).
 
 ```powershell
 cd "I:\fsot nuron\embodiment\zig"
-zig build host     # native self-test
-zig build kernel   # freestanding Multiboot ELF
+zig build -Doptimize=ReleaseSafe   # install all artifacts
+zig build host                     # native trit/neuron parity host
+zig build mind -- all              # **mind authority** (multi-region + learn)
+zig build kernel                   # freestanding Multiboot ELF (QEMU)
 ```
+
+| Binary | Role |
+|--------|------|
+| `fsot_mind.exe` | **Neural authority** — brain + learn + live + inject |
+| `fsot_trit_host.exe` | Parity trace for Python harness |
+| `fsot_trit_kernel` | Bare-metal mind self-test over serial |
+
+From repo root: `python run_mind_boot.py` (spawns Zig; Python does not step neurons).
 
 ## QEMU
 

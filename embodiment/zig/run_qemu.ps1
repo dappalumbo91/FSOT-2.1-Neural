@@ -38,27 +38,39 @@ $errLog = Join-Path $env:TEMP "fsot_trit_qemu_err.log"
 Copy-Item -Force $kernelSrc $kernel
 Remove-Item $serialLog, $errLog -ErrorAction SilentlyContinue
 
-Write-Host "=== QEMU (serial log, ~12s for fingerprints) ==="
+Write-Host "=== QEMU (serial log, lite mind tests) ==="
 $arg = "-display none -serial file:$serialLog -no-reboot -m 64M -kernel `"$kernel`""
 $p = Start-Process -FilePath $qemu -ArgumentList $arg -PassThru -WindowStyle Hidden -RedirectStandardError $errLog
 
-Start-Sleep -Seconds 20
+# Genetic brain init under soft-FPU needs headroom on Windows QEMU
+Start-Sleep -Seconds 90
 if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
 
 Write-Host "--- serial output ---"
 if (Test-Path $serialLog) {
     Get-Content $serialLog
     $txt = Get-Content $serialLog -Raw
+    if ($txt -match "FSOT_STAGE_ZIG_NEURON_FAIL") {
+        Write-Host "=== QEMU GATE FAIL (stage reported FAIL) ==="
+        exit 1
+    }
     if (
+        ($txt -match "FSOT_INTEL_BAREMETAL_OK") -or
+        ($txt -match "FSOT_MIND_BAREMETAL_OK") -or
         ($txt -match "FSOT_STAGE_ZIG_NEURON_OK") -or
         (
             ($txt -match "FSOT_TRIT PASS") -and
             ($txt -match "FSOT_NEURON PASS") -and
-            ($txt -match "FSOT_NETWORK PASS")
+            ($txt -match "FSOT_NETWORK PASS") -and
+            ($txt -match "FSOT_BRAIN PASS")
         )
     ) {
-        if ($txt -match "FSOT_FP PASS") {
-            Write-Host "=== QEMU GATE PASS (incl. fingerprints) ==="
+        if ($txt -match "FSOT_INTEL_BAREMETAL_OK") {
+            Write-Host "=== QEMU GATE PASS (intel bare metal + codon) ==="
+        } elseif ($txt -match "FSOT_MIND_BAREMETAL_OK") {
+            Write-Host "=== QEMU GATE PASS (mind bare metal) ==="
+        } elseif ($txt -match "FSOT_BRAIN PASS") {
+            Write-Host "=== QEMU GATE PASS (incl. multi-region brain) ==="
         } else {
             Write-Host "=== QEMU GATE PASS ==="
         }
