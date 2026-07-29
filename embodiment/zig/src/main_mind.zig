@@ -40,6 +40,8 @@ const genetic = @import("genetic.zig");
 const cell_types = @import("cell_types.zig");
 const bands = @import("bands.zig");
 const inject_io = @import("inject_io.zig");
+const fixed = @import("fixed.zig");
+const scalar_fixed = @import("scalar_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -283,6 +285,50 @@ fn runOrganism() void {
             @as(u32, if (org.last_sme_ok) 1 else 0),
         },
     );
+}
+
+fn runFixed() void {
+    std.debug.print("=== FSOT FIXED-POINT EXPERIMENT (no IEEE float path) ===\n", .{});
+    std.debug.print("SCALE={d} (quantum=1/SCALE)\n", .{fixed.SCALE});
+    std.debug.print("doctrine: seeds as fixed constants; S between extremes [-3,3]\n", .{});
+
+    if (!fixed.selfTest()) {
+        std.debug.print("FSOT_FIXED_ARITH FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_ARITH PASS\n", .{});
+
+    if (!scalar_fixed.selfTest()) {
+        std.debug.print("FSOT_FIXED_SCALAR FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_SCALAR PASS\n", .{});
+
+    // Lab compare: same probe as f64 path
+    const f64_s = scalar.computeNeuro(0.1, 0.0, 1.0);
+    const fx = scalar_fixed.computeNeuro(fixed.fromDecimalStr("0.1"), 0, fixed.fromInt(1));
+    const fx_as_f = fixed.toF64(fx);
+    const abs_err = if (f64_s > fx_as_f) f64_s - fx_as_f else fx_as_f - f64_s;
+    const rel = abs_err / @max(@abs(f64_s), 1e-12);
+
+    std.debug.print("SCALAR_F64={e}\n", .{f64_s});
+    std.debug.print("SCALAR_FIXED_as_f64={e}\n", .{fx_as_f});
+    std.debug.print("SCALAR_FIXED_raw={d}\n", .{fx});
+    std.debug.print("ABS_ERR={e}\n", .{abs_err});
+    std.debug.print("REL_ERR={e}\n", .{rel});
+
+    // gates: same band as bio; track error (tighten as series improve)
+    const ok_band = fx_as_f > 0.25 and fx_as_f < 0.65;
+    const ok_err = abs_err < 0.08; // first experiment gate — refine SCALE/series next
+    std.debug.print("gate_band={s}\n", .{if (ok_band) "PASS" else "FAIL"});
+    std.debug.print("gate_err={s}\n", .{if (ok_err) "PASS" else "FAIL"});
+
+    if (ok_band and ok_err) {
+        std.debug.print("FSOT_FIXED PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_FIXED FAIL (experiment — iterate SCALE/series)\n", .{});
+        std.process.exit(1);
+    }
 }
 
 fn runIntel() void {
@@ -730,6 +776,8 @@ pub fn main() !void {
         runOrganism();
     } else if (std.mem.eql(u8, mode, "intel")) {
         runIntel();
+    } else if (std.mem.eql(u8, mode, "fixed") or std.mem.eql(u8, mode, "fixedpoint")) {
+        runFixed();
     } else if (std.mem.eql(u8, mode, "genetic") or std.mem.eql(u8, mode, "codon")) {
         runGenetic();
     } else if (std.mem.eql(u8, mode, "sme")) {
@@ -762,7 +810,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [selftest|genetic|intel|organism|sme|learn|live|inject|inject-file|structure|memory|bio|stress|all]\n", .{});
+        std.debug.print("usage: fsot_mind [selftest|genetic|intel|fixed|organism|sme|learn|live|inject|inject-file|structure|memory|bio|stress|all]\n", .{});
         std.process.exit(2);
     }
 }
