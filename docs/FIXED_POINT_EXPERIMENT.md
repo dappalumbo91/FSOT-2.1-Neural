@@ -47,12 +47,19 @@ value = integer / SCALE, with SCALE chosen so the entire dynamic range fits with
 
 Seeds are stored as pre-rounded fixed integers (same decimal authority as `seeds.zig`, once).
 
-## Experiment goals
+## Status (this branch)
 
-1. `computeNeuro` / scalar probe in **pure fixed** (no `f64` ops on the path).  
-2. Compare to host `f64` scalar (report abs error, relative).  
-3. Keep codon/genotype path **unchanged** (already integer trits).  
-4. **Do not** switch the live mind to fixed until scalar + neuron step parity gates pass.
+| Layer | Status | Notes |
+|-------|--------|-------|
+| Fixed arith + exp/cos/log/sqrt | **PASS** | `fixed.zig` |
+| Scalar `computeNeuro` | **PASS** | \|dS\| vs f64 ~ 4e-13 |
+| Neuron step 200-trace | **PASS** | max\|dS\| ~ 8e-11, **0** spike mismatch |
+| Network 16-unit | **PASS** | spikes=48 |
+| Genetic brain 32-unit | **PASS** | E/I 26/6, Pyr/PV/SST 26/4/2, syn≥100 |
+| Organism loop | **PASS** | 40 ticks, spikes under fixed dynamics |
+| Codon / genotype | exact trinary | W assembled then quantized to SCALE lattice |
+
+Command: `fsot_mind.exe fixed` → **`FSOT_FIXED_STACK_OK`**
 
 ## Run
 

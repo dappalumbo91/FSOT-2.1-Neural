@@ -42,6 +42,10 @@ const bands = @import("bands.zig");
 const inject_io = @import("inject_io.zig");
 const fixed = @import("fixed.zig");
 const scalar_fixed = @import("scalar_fixed.zig");
+const neuron_fixed = @import("neuron_fixed.zig");
+const network_fixed = @import("network_fixed.zig");
+const brain_fixed = @import("brain_fixed.zig");
+const organism_fixed = @import("organism_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -288,9 +292,9 @@ fn runOrganism() void {
 }
 
 fn runFixed() void {
-    std.debug.print("=== FSOT FIXED-POINT EXPERIMENT (no IEEE float path) ===\n", .{});
-    std.debug.print("SCALE={d} (quantum=1/SCALE)\n", .{fixed.SCALE});
-    std.debug.print("doctrine: seeds as fixed constants; S between extremes [-3,3]\n", .{});
+    std.debug.print("=== FSOT FIXED-POINT STACK (scalar→neuron→net→brain→organism) ===\n", .{});
+    std.debug.print("SCALE={d} quantum=1/SCALE\n", .{fixed.SCALE});
+    std.debug.print("doctrine: seeds fixed; dynamics on lattice; codon genetics exact\n", .{});
 
     if (!fixed.selfTest()) {
         std.debug.print("FSOT_FIXED_ARITH FAIL\n", .{});
@@ -302,33 +306,61 @@ fn runFixed() void {
         std.debug.print("FSOT_FIXED_SCALAR FAIL\n", .{});
         std.process.exit(1);
     }
-    std.debug.print("FSOT_FIXED_SCALAR PASS\n", .{});
-
-    // Lab compare: same probe as f64 path
     const f64_s = scalar.computeNeuro(0.1, 0.0, 1.0);
     const fx = scalar_fixed.computeNeuro(fixed.fromDecimalStr("0.1"), 0, fixed.fromInt(1));
     const fx_as_f = fixed.toF64(fx);
     const abs_err = if (f64_s > fx_as_f) f64_s - fx_as_f else fx_as_f - f64_s;
-    const rel = abs_err / @max(@abs(f64_s), 1e-12);
+    std.debug.print("SCALAR_F64={e} FIXED={e} |dS|={e}\n", .{ f64_s, fx_as_f, abs_err });
+    std.debug.print("FSOT_FIXED_SCALAR PASS\n", .{});
 
-    std.debug.print("SCALAR_F64={e}\n", .{f64_s});
-    std.debug.print("SCALAR_FIXED_as_f64={e}\n", .{fx_as_f});
-    std.debug.print("SCALAR_FIXED_raw={d}\n", .{fx});
-    std.debug.print("ABS_ERR={e}\n", .{abs_err});
-    std.debug.print("REL_ERR={e}\n", .{rel});
-
-    // gates: same band as bio; track error (tighten as series improve)
-    const ok_band = fx_as_f > 0.25 and fx_as_f < 0.65;
-    const ok_err = abs_err < 0.08; // first experiment gate — refine SCALE/series next
-    std.debug.print("gate_band={s}\n", .{if (ok_band) "PASS" else "FAIL"});
-    std.debug.print("gate_err={s}\n", .{if (ok_err) "PASS" else "FAIL"});
-
-    if (ok_band and ok_err) {
-        std.debug.print("FSOT_FIXED PASS\n", .{});
-    } else {
-        std.debug.print("FSOT_FIXED FAIL (experiment — iterate SCALE/series)\n", .{});
+    const nst = neuron_fixed.paritySelfTest();
+    if (!nst.ok) {
+        std.debug.print("FSOT_FIXED_NEURON FAIL\n", .{});
         std.process.exit(1);
     }
+    std.debug.print("FSOT_FIXED_NEURON PASS spikes={d} lastS={e}\n", .{ nst.spikes, fixed.toF64(nst.last_S) });
+    const npar = neuron_fixed.parityVsF64();
+    std.debug.print(
+        "NEURON_PARITY max|dS|={e} spike_mm={d} spikes_f64={d} spikes_fixed={d}\n",
+        .{ npar.max_abs_dS, npar.spike_mm, npar.spikes_f, npar.spikes_z },
+    );
+    if (!npar.ok) {
+        std.debug.print("FSOT_FIXED_NEURON_PARITY FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_NEURON_PARITY PASS\n", .{});
+
+    const netst = network_fixed.networkSelfTest();
+    if (!netst.ok) {
+        std.debug.print("FSOT_FIXED_NETWORK FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_NETWORK PASS spikes={d}\n", .{netst.spikes});
+
+    const bst = brain_fixed.brainSelfTest();
+    if (!bst.ok) {
+        std.debug.print("FSOT_FIXED_BRAIN FAIL\n", .{});
+        std.process.exit(1);
+    }
+    var b = brain_fixed.BrainF.initSeeded(42, false);
+    const st = b.structureReport();
+    std.debug.print(
+        "FSOT_FIXED_BRAIN PASS spikes={d} E={d} I={d} syn={d} Pyr/PV/SST/VIP={d}/{d}/{d}/{d}\n",
+        .{ bst.spikes, st.n_e, st.n_i, st.n_synapses, st.n_pyr, st.n_pv, st.n_sst, st.n_vip },
+    );
+
+    if (!organism_fixed.selfTest()) {
+        std.debug.print("FSOT_FIXED_ORGANISM FAIL\n", .{});
+        std.process.exit(1);
+    }
+    var org = organism_fixed.OrganismF.init();
+    const orep = org.run(40);
+    std.debug.print(
+        "FSOT_FIXED_ORGANISM PASS ticks={d} spikes={d} syn={d} meanS={e}\n",
+        .{ orep.ticks, orep.spikes, orep.n_syn, fixed.toF64(org.brain.meanS()) },
+    );
+
+    std.debug.print("FSOT_FIXED_STACK_OK\n", .{});
 }
 
 fn runIntel() void {
