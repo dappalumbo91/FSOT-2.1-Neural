@@ -47,6 +47,8 @@ def main() -> int:
         "memory_fixed": "FSOT_FIXED_MEMORY PASS" in text,
         "structure_match": "FSOT_FIXED_STRUCTURE PASS" in text,
         "bio_fi": "FSOT_FIXED_BIO PASS" in text,
+        "syn_density": "FSOT_FIXED_SYN_DENSITY PASS" in text,
+        "residuals_closed": "FSOT_FIXED_RESIDUALS_CLOSED" in text,
     }
     m = re.search(r"FIXED_BIO_FI rate_Hz=([^\s]+) isi_ms=([^\s]+) adapt=([^\s]+)", text)
     metrics = {}
@@ -97,6 +99,8 @@ def main() -> int:
             "memory_fixed",
             "structure_match",
             "bio_fi",
+            "syn_density",
+            "residuals_closed",
             "rate_band",
             "isi_band",
         )

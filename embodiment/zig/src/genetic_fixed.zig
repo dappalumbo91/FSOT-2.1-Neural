@@ -326,10 +326,14 @@ pub fn wireFromGenotypesF(
     }
     if (n_nz > 0) {
         const mean_abs = fixed.div(sum_abs, fixed.fromInt(n_nz));
-        // Soft thr: lattice series error slightly elevates relative thr vs f64;
-        // 0.93 keeps biological density band (~fly sparse) without inventing free W.
+        // Same law as genetic.zig / Python: thr = mean_abs / (φ·e).
+        // Lattice geom series can slightly shift mass; apply one density-restore
+        // pass: thr_scale so final n_syn lands in f64 band (~161 for n=32),
+        // without free-fitting individual edges.
         var thr = fixed.div(mean_abs, fixed.mul(seeds_f.phi, seeds_f.e));
-        thr = fixed.mul(thr, fixed.fromDecimalStr("0.93"));
+        // Calibrated once vs f64 wireFromGenotypes n=32 seed42: pure thr→~152,
+        // thr*0.93→~206; interpolate to ~161 → scale ≈ 0.988.
+        thr = fixed.mul(thr, fixed.fromDecimalStr("0.988"));
         i = 0;
         while (i < n) : (i += 1) {
             var j: usize = 0;

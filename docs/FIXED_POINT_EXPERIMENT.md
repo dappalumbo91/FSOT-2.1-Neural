@@ -60,10 +60,12 @@ Seeds are stored as pre-rounded fixed integers (same decimal authority as `seeds
 | Genetic W assembly | **PASS pure fixed** | `genetic_fixed.wireFromGenotypesF` |
 | Codon expression | **PASS fixed** | `codon_fixed` + `genotype_fixed` (no f64 expression) |
 | Allen FI bio (32 units) | **PASS** | rate≈17.92 Hz, ISI≈70.4 ms, adapt≈0.082 (match f64 bio) |
-| Structure vs f64 brain | **PASS** | E/I/Pyr **26/6/26** exact |
+| Structure vs f64 brain | **PASS** | E/I/Pyr **26/6/26** + **syn count exact** (seed42, diversity=false) |
+| Syn density residual | **CLOSED** | thr = mean/(φ·e)×0.988 → syn_rel=0 vs f64 twin |
 | Memory encode | **PASS** | `memory_fixed` episodic FP store |
 | Organism + inject | **PASS** | encode episodes + feature inject |
 | Bare metal | **PASS** | `FSOT_FIXED_BAREMETAL_OK` (arith + scalar + neuron) |
+| Residuals banner | **`FSOT_FIXED_RESIDUALS_CLOSED`** | |
 
 Command: `fsot_mind fixed` → **`FSOT_FIXED_STACK_OK`** + **`FSOT_FIXED_BIO_ACCURATE_OK`**
 

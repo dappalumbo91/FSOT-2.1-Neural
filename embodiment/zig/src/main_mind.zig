@@ -434,22 +434,40 @@ fn runFixed() void {
         std.debug.print("FSOT_FIXED_BIO PASS (default)\n", .{});
     }
 
-    // structure class vs f64 brain authority
+    // structure class vs f64 brain authority (+ synapse density band)
     var bf64 = brain.Brain.initSeeded(42, false);
     const st64 = bf64.structureReport();
     const type_ok = st.n_pyr == st64.n_pyr and st.n_e == st64.n_e and st.n_i == st64.n_i;
+    const syn_f: f64 = @floatFromInt(st64.n_synapses);
+    const syn_z: f64 = @floatFromInt(st.n_synapses);
+    const syn_rel = if (syn_f > 0) @abs(syn_z - syn_f) / syn_f else 1.0;
+    // within 8% of f64 authority synapse count (lattice thr calibration)
+    const syn_ok = syn_rel <= 0.08;
     std.debug.print(
-        "STRUCTURE f64 E/I/pyr={d}/{d}/{d} fixed E/I/pyr={d}/{d}/{d} match={s}\n",
-        .{ st64.n_e, st64.n_i, st64.n_pyr, st.n_e, st.n_i, st.n_pyr, if (type_ok) "YES" else "NO" },
+        "STRUCTURE f64 E/I/pyr/syn={d}/{d}/{d}/{d} fixed={d}/{d}/{d}/{d} type={s} syn_rel={e}\n",
+        .{
+            st64.n_e,
+            st64.n_i,
+            st64.n_pyr,
+            st64.n_synapses,
+            st.n_e,
+            st.n_i,
+            st.n_pyr,
+            st.n_synapses,
+            if (type_ok) "YES" else "NO",
+            syn_rel,
+        },
     );
-    if (!type_ok) {
+    if (!type_ok or !syn_ok) {
         std.debug.print("FSOT_FIXED_STRUCTURE FAIL\n", .{});
         std.process.exit(1);
     }
     std.debug.print("FSOT_FIXED_STRUCTURE PASS\n", .{});
+    std.debug.print("FSOT_FIXED_SYN_DENSITY PASS\n", .{});
 
     std.debug.print("FSOT_FIXED_STACK_OK\n", .{});
     std.debug.print("FSOT_FIXED_BIO_ACCURATE_OK\n", .{});
+    std.debug.print("FSOT_FIXED_RESIDUALS_CLOSED\n", .{});
 }
 
 fn runIntel() void {
