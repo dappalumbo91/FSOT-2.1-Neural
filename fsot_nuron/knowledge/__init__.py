@@ -20,6 +20,7 @@ from .episode_memory import (
 )
 from .monologue import run_grounded_monologue, MonologueReport
 from .vision_caption_bind import run_vision_caption_bind, VisionCaptionBindReport
+from .teach_5w1h import build_5w1h, Teach5W1H
 
 __all__ = [
     "KnowledgeLexicon",
@@ -46,4 +47,6 @@ __all__ = [
     "MonologueReport",
     "run_vision_caption_bind",
     "VisionCaptionBindReport",
+    "build_5w1h",
+    "Teach5W1H",
 ]

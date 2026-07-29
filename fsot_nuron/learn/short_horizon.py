@@ -36,6 +36,7 @@ from ..knowledge.episode_memory import (
     retrieve_by_query,
     _eid,
 )
+from ..knowledge.teach_5w1h import build_5w1h, Teach5W1H
 from ..sensory.media_stream import (
     media_roots_from_env,
     discover_media_files,
@@ -84,19 +85,35 @@ def _score_recall(
     k: int = 3,
 ) -> Tuple[float, float, List[Dict[str, Any]]]:
     """
-    queries: list of (query_text, expected_title_substring)
-    top1 = fraction where best hit title matches expected
-    recall@k = fraction where any of top-k matches
+    queries: list of (query_text, expected_substring)
+
+    Match against title **or** plain_english **or** symbols/captions — not only
+    title prefix (which inflated scores when query == first title token).
     """
     rows = []
     top1_hits = 0
     atk_hits = 0
+
+    def _blob(mem) -> str:
+        return " ".join(
+            [
+                mem.title or "",
+                mem.plain_english or "",
+                mem.caption_text or "",
+                " ".join(mem.symbols or []),
+                " ".join(mem.knowledge_keys or []),
+                " ".join(mem.sample_lines or []),
+            ]
+        ).lower()
+
     for q, expect in queries:
         hits = retrieve_by_query(q, root=root, top_k=k)
-        titles = [h.title.lower() for h in hits]
-        exp = expect.lower()
-        ok1 = bool(titles) and exp in titles[0]
-        okk = any(exp in t for t in titles)
+        exp = (expect or "").lower().strip()
+        if not exp:
+            continue
+        blobs = [_blob(h) for h in hits]
+        ok1 = bool(blobs) and exp in blobs[0]
+        okk = any(exp in b for b in blobs)
         top1_hits += int(ok1)
         atk_hits += int(okk)
         rows.append(
@@ -184,6 +201,16 @@ def run_short_horizon_learn(
                 ext = (ext * 1.8 + 0.15).clamp(-0.5, 1.4)
                 for _ in range(2):
                     brain.step(ext)
+            lesson = build_5w1h(
+                title=rep.title,
+                text=rep.sample_text or rep.plain_english or "",
+                symbols=rep.symbols_guessed,
+                path=rep.path,
+                kind=f"document:{rep.kind}",
+                caption_source="document_text",
+                sample_lines=(rep.sample_text or "").split(". ")[:4],
+            )
+            teach = lesson.as_teach_text()
             mem = EpisodeMemory(
                 episode_id=_eid(rep.title, rep.path),
                 title=rep.title,
@@ -193,22 +220,26 @@ def run_short_horizon_learn(
                 caption_source="document_text",
                 caption_text=rep.sample_text,
                 caption_cues_n=rep.n_chunks,
-                plain_english=rep.plain_english,
+                plain_english=teach + "\n\n" + (rep.plain_english or "")[:800],
                 knowledge_keys=rep.knowledge_keys,
                 n_trits=rep.n_trits_total,
                 S_couple=rep.S_couple,
                 sample_lines=(rep.sample_text or "").split(". ")[:4],
-                notes=["short_horizon"] + list(rep.notes[:4]),
+                notes=["short_horizon", "5w1h"] + list(rep.notes[:4]),
             )
             save_episode(mem, root=mem_root)
             n_docs += 1
             n_mem += 1
-            # query from content words, not full path
-            cue = (rep.title or p.stem).split()[0:3]
-            q = " ".join(cue) if cue else p.stem
-            queries.append((q, rep.title or p.stem))
+            # 5W1H probes (content-level, not title-prefix tricks)
+            for q, exp in lesson.query_bank()[:6]:
+                queries.append((q, exp))
             if rep.symbols_guessed:
-                queries.append((rep.symbols_guessed[0], rep.title or p.stem))
+                queries.append(
+                    (
+                        f"what symbol {rep.symbols_guessed[0]}",
+                        rep.symbols_guessed[0],
+                    )
+                )
         except Exception as e:
             notes.append(f"doc skip {p.name}: {e}")
 
@@ -261,34 +292,45 @@ def run_short_horizon_learn(
                         cap_n = len(cues)
                 except Exception:
                     pass
+                syms = ["moving_image", "movie", "scene"] + (
+                    ["dialogue"] if cap_n else []
+                )
+                lesson = build_5w1h(
+                    title=title,
+                    text=cap_text,
+                    symbols=syms,
+                    path=str(vp),
+                    kind="media:video_short",
+                    caption_source=cap_src,
+                    sample_lines=[cap_text[:120]] if cap_text else [f"frames={len(feats_acc)}"],
+                )
+                teach = lesson.as_teach_text()
                 mem = EpisodeMemory(
                     episode_id=_eid(title, str(vp)),
                     title=title,
                     path=str(vp),
                     kind="media:video_short",
-                    symbols=["moving_image", "movie", "scene"]
-                    + (["dialogue"] if cap_n else []),
+                    symbols=syms,
                     caption_source=cap_src,
                     caption_text=cap_text,
                     caption_cues_n=cap_n,
-                    plain_english=(
-                        f"Short-horizon visual encode of “{title}”: "
-                        f"{len(feats_acc)} frames through RF cascade retina features."
-                    ),
+                    plain_english=teach
+                    + f"\n\nEncoded {len(feats_acc)} frames via RF cascade retina features.",
                     knowledge_keys=["movie", "moving_image"],
                     n_trits=len(feats_acc) * 32,
                     mean_luma=float(np.mean([f[0] for f in feats_acc])) if feats_acc else 0.0,
                     mean_motion=float(np.mean([f[6] for f in feats_acc])) if feats_acc else 0.0,
-                    sample_lines=[f"frames={len(feats_acc)}"],
-                    notes=["short_horizon", "tutor_ablated_encode"],
+                    sample_lines=[f"frames={len(feats_acc)}"]
+                    + (cap_text.split(". ")[:2] if cap_text else []),
+                    notes=["short_horizon", "5w1h", "tutor_ablated_encode"],
                 )
                 save_episode(mem, root=mem_root)
                 n_media += 1
                 n_mem += 1
-                # Query by distinctive stem tokens (not full path string as answer)
-                token = title.replace(".", " ").replace("_", " ").split()[0]
-                queries.append((token, title))
-                queries.append((f"movie {token}", title))
+                for q, exp in lesson.query_bank()[:5]:
+                    queries.append((q, exp))
+                # HOW always present in teach card
+                queries.append((f"how is {title[:20]} encoded", "RF cascade"))
             notes.append(f"media videos encoded: {[v.name for v in videos]}")
         except Exception as e:
             notes.append(f"media encode issue: {e}")

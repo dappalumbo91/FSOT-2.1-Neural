@@ -54,7 +54,53 @@ class CurriculumPlan:
         return d
 
 
+# Allowed curriculum symbol vocabulary (prevents "particularly"/"explain" pollution)
+_CURRICULUM_VOCAB = frozenset(
+    {
+        "person",
+        "human",
+        "face",
+        "animal",
+        "dog",
+        "cat",
+        "dialogue",
+        "music",
+        "action",
+        "cartoon",
+        "movie",
+        "tv_show",
+        "place",
+        "scene",
+        "war",
+        "space",
+        "science",
+        "theory",
+        "neuron",
+        "brain",
+        "codon",
+        "trinary",
+        "consciousness",
+        "finn",
+        "jake",
+        "adventure time",
+        "shakespeare",
+        "moving_image",
+        "document",
+        "emotion",
+        "energy",
+        "night",
+        "day",
+    }
+)
+
+
 def census_from_episodes(root: Optional[Path] = None, limit: int = 40) -> Dict[str, int]:
+    """
+    Count only **allowed** knowledge symbols on episodes.
+
+    Free-text leaks (e.g. 'particularly', 'explain') are excluded so the
+    curriculum targets teachable categories, not English filler words.
+    """
     root = root or default_memory_dir()
     cens: Dict[str, int] = {}
     for row in list_episodes(root=root, limit=limit):
@@ -63,8 +109,12 @@ def census_from_episodes(root: Optional[Path] = None, limit: int = 40) -> Dict[s
             continue
         for s in list(mem.symbols) + list(mem.knowledge_keys):
             k = str(s).lower().strip()
-            if not k:
+            if not k or k not in _CURRICULUM_VOCAB:
                 continue
+            if len(k) < 3 or " " in k and k not in _CURRICULUM_VOCAB:
+                # multiword only if in vocab
+                if k not in _CURRICULUM_VOCAB:
+                    continue
             cens[k] = cens.get(k, 0) + 1
     return dict(sorted(cens.items(), key=lambda kv: -kv[1]))
 
