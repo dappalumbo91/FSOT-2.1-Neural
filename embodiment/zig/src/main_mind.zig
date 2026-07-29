@@ -72,6 +72,7 @@ const lexicon_en_fixed = @import("lexicon_en_fixed.zig");
 const host_tts_fixed = @import("host_tts_fixed.zig");
 const language_practice_fixed = @import("language_practice_fixed.zig");
 const grade_practice_fixed = @import("grade_practice_fixed.zig");
+const grade_ladder_fixed = @import("grade_ladder_fixed.zig");
 const reason_practice_fixed = @import("reason_practice_fixed.zig");
 const novel_inquiry_fixed = @import("novel_inquiry_fixed.zig");
 const checkpoint_fixed = @import("checkpoint_fixed.zig");
@@ -900,14 +901,13 @@ fn runLanguagePractice() void {
 }
 
 fn runGradePractice() void {
-    std.debug.print("=== FSOT GRADE PRACTICE (PK/K/G1 facts + problems) ===\n", .{});
+    std.debug.print("=== FSOT GRADE PRACTICE (legacy soft gate) — prefer 'ladder' for 95% ===\n", .{});
     std.debug.print("doctrine: teach real facts; quiz & solve — not word-means-word\n", .{});
     if (!grade_practice_fixed.selfTest()) {
         std.debug.print("FSOT_GRADE_PRACTICE FAIL selftest\n", .{});
         std.process.exit(1);
     }
-    // speak a few facts so you hear knowledge, not ugga-dugga
-    const r = grade_practice_fixed.runGradePractice(true);
+    const r = grade_practice_fixed.runGradePractice(false);
     std.debug.print(
         "GRADE lessons={d} taught={d} quiz={d}/{d} top1={e} problems={d}/{d} ptop1={e} apply={e} tts={d} lex={d}\n",
         .{
@@ -926,9 +926,65 @@ fn runGradePractice() void {
     );
     if (r.ok) {
         std.debug.print("FSOT_GRADE_PRACTICE PASS\n", .{});
-        std.debug.print("FSOT_KNOWLEDGE_APPLY_OK\n", .{});
     } else {
-        std.debug.print("FSOT_GRADE_PRACTICE FAIL (need stronger encode/retrieve on facts)\n", .{});
+        std.debug.print("FSOT_GRADE_PRACTICE FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn printBand(r: grade_ladder_fixed.BandReport) void {
+    std.debug.print(
+        "BAND {s} score={e} thr={e} PASS={} | facts={d}/{d} rels={d}/{d} paths={d}/{d} probs={d}/{d} taught_f={d} taught_r={d}\n",
+        .{
+            grade_ladder_fixed.bandName(r.band),
+            r.score,
+            r.threshold,
+            r.pass,
+            r.fact_ok,
+            r.fact_n,
+            r.rel_ok,
+            r.rel_n,
+            r.path_ok,
+            r.path_n,
+            r.prob_ok,
+            r.prob_n,
+            r.n_facts,
+            r.n_rels,
+        },
+    );
+}
+
+fn runGradeBand(band: grade_ladder_fixed.GradeBand) void {
+    std.debug.print("=== FSOT GRADE BAND ({s}) straight-A ≥95% ===\n", .{grade_ladder_fixed.bandName(band)});
+    std.debug.print("doctrine: facts + relations + example paths; local GitHub only\n", .{});
+    const r = grade_ladder_fixed.runBand(band);
+    printBand(r);
+    if (r.pass) {
+        std.debug.print("FSOT_BAND_PASS {s}\n", .{grade_ladder_fixed.bandName(band)});
+        std.debug.print("FSOT_STRAIGHT_A_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_BAND_FAIL {s} (need ≥95%)\n", .{grade_ladder_fixed.bandName(band)});
+        std.process.exit(1);
+    }
+}
+
+fn runGradeLadder() void {
+    std.debug.print("=== FSOT GRADE LADDER (straight-A student, ≥95% per band) ===\n", .{});
+    std.debug.print("doctrine: PK→K→G1; relations+paths; no history; stop on first fail\n", .{});
+    if (!grade_ladder_fixed.selfTest()) {
+        std.debug.print("FSOT_LADDER FAIL selftest (preschool not ≥95%)\n", .{});
+        std.process.exit(1);
+    }
+    const r = grade_ladder_fixed.runLadder();
+    std.debug.print(
+        "LADDER_SUMMARY bands_passed={d}/3 stopped_at={s} overall_ok={}\n",
+        .{ r.n_bands_passed, r.stopped_at, r.ok },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_LADDER PASS\n", .{});
+        std.debug.print("FSOT_STRAIGHT_A_LADDER_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_LADDER FAIL at {s}\n", .{r.stopped_at});
         std.process.exit(1);
     }
 }
@@ -1647,8 +1703,16 @@ pub fn main() !void {
         runEnglishCodec();
     } else if (std.mem.eql(u8, mode, "practice") or std.mem.eql(u8, mode, "language-practice") or std.mem.eql(u8, mode, "lang-practice") or std.mem.eql(u8, mode, "self-speak")) {
         runLanguagePractice();
-    } else if (std.mem.eql(u8, mode, "grade") or std.mem.eql(u8, mode, "preschool") or std.mem.eql(u8, mode, "kindergarten") or std.mem.eql(u8, mode, "grade1") or std.mem.eql(u8, mode, "curriculum")) {
+    } else if (std.mem.eql(u8, mode, "grade") or std.mem.eql(u8, mode, "curriculum")) {
         runGradePractice();
+    } else if (std.mem.eql(u8, mode, "ladder") or std.mem.eql(u8, mode, "straight-a") or std.mem.eql(u8, mode, "grades")) {
+        runGradeLadder();
+    } else if (std.mem.eql(u8, mode, "preschool") or std.mem.eql(u8, mode, "pk")) {
+        runGradeBand(.preschool);
+    } else if (std.mem.eql(u8, mode, "kindergarten") or std.mem.eql(u8, mode, "kinder") or std.mem.eql(u8, mode, "k")) {
+        runGradeBand(.kindergarten);
+    } else if (std.mem.eql(u8, mode, "grade1") or std.mem.eql(u8, mode, "g1") or std.mem.eql(u8, mode, "first")) {
+        runGradeBand(.grade1);
     } else if (std.mem.eql(u8, mode, "reason") or std.mem.eql(u8, mode, "open-reason") or std.mem.eql(u8, mode, "think") or std.mem.eql(u8, mode, "multi-hop")) {
         runReasonPractice();
     } else if (std.mem.eql(u8, mode, "novel") or std.mem.eql(u8, mode, "inquiry") or std.mem.eql(u8, mode, "synthesize") or std.mem.eql(u8, mode, "idea")) {
