@@ -74,6 +74,7 @@ const language_practice_fixed = @import("language_practice_fixed.zig");
 const grade_practice_fixed = @import("grade_practice_fixed.zig");
 const reason_practice_fixed = @import("reason_practice_fixed.zig");
 const novel_inquiry_fixed = @import("novel_inquiry_fixed.zig");
+const checkpoint_fixed = @import("checkpoint_fixed.zig");
 const failure_fixed = @import("failure_fixed.zig");
 const autonomous_fixed = @import("autonomous_fixed.zig");
 const wire_around_fixed = @import("wire_around_fixed.zig");
@@ -978,6 +979,30 @@ fn runNovelInquiry() void {
     }
 }
 
+fn runCheckpoint() void {
+    std.debug.print("=== FSOT CHECKPOINT (biological save-game) ===\n", .{});
+    std.debug.print("doctrine: persist episodic memory + meaning; genetic spine remains law\n", .{});
+    if (!checkpoint_fixed.selfTest()) {
+        std.debug.print("FSOT_CHECKPOINT FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const r = checkpoint_fixed.runCheckpointProbe() catch {
+        std.debug.print("FSOT_CHECKPOINT FAIL io\n", .{});
+        std.process.exit(1);
+    };
+    std.debug.print(
+        "CHECKPOINT saved={d} loaded={d} roundtrip={} path={s}\n",
+        .{ r.n_saved, r.n_loaded, r.roundtrip, r.path },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_CHECKPOINT PASS\n", .{});
+        std.debug.print("FSOT_SAVEGAME_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_CHECKPOINT FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runFailure() void {
     std.debug.print("=== FSOT FAILURE BOUNDARIES (expanded catalog, fixed) ===\n", .{});
     const r = failure_fixed.runFailureProbe();
@@ -1628,6 +1653,8 @@ pub fn main() !void {
         runReasonPractice();
     } else if (std.mem.eql(u8, mode, "novel") or std.mem.eql(u8, mode, "inquiry") or std.mem.eql(u8, mode, "synthesize") or std.mem.eql(u8, mode, "idea")) {
         runNovelInquiry();
+    } else if (std.mem.eql(u8, mode, "checkpoint") or std.mem.eql(u8, mode, "savegame") or std.mem.eql(u8, mode, "save-load")) {
+        runCheckpoint();
     } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
         runFailure();
     } else if (std.mem.eql(u8, mode, "wire") or std.mem.eql(u8, mode, "wire-around") or std.mem.eql(u8, mode, "wire_around")) {
