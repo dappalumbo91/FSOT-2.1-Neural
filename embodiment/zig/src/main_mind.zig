@@ -61,6 +61,8 @@ const modulate_fixed = @import("modulate_fixed.zig");
 const teach_fixed = @import("teach_fixed.zig");
 const bands_fixed = @import("bands_fixed.zig");
 const short_horizon_fixed = @import("short_horizon_fixed.zig");
+const speech_organ_fixed = @import("speech_organ_fixed.zig");
+const cross_modal_fixed = @import("cross_modal_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -616,6 +618,43 @@ fn runShortHorizon() void {
     }
 }
 
+fn runSpeechOrgan() void {
+    std.debug.print("=== FSOT SPEECH ORGAN (motor→sound→symbol; NOT next-token) ===\n", .{});
+    std.debug.print("doctrine: tongue/jaw/lips/larynx plant; letters are sound associations\n", .{});
+    const r = speech_organ_fixed.runSpeechOrganProbe();
+    std.debug.print(
+        "SPEECH letters={d} hear={d}/{d} top1={e} roundtrip={d}/{d} rtop1={e}\n",
+        .{ r.n_letters, r.hear_correct, r.n_letters, r.hear_top1, r.roundtrip_correct, r.n_letters, r.roundtrip_top1 },
+    );
+    std.debug.print("path={s}\n", .{r.doctrine});
+    if (r.ok) {
+        std.debug.print("FSOT_SPEECH PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_SPEECH FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runCrossModal() void {
+    std.debug.print("=== FSOT CROSS-MODAL (vision⊗audio joint bind, fixed) ===\n", .{});
+    const r = cross_modal_fixed.runCrossModalProbe();
+    std.debug.print(
+        "CROSS joint={d}/{d} top1={e} vision_only={d}/{d} vtop1={e} audio_only={d}/{d} atop1={e} spikes={d}\n",
+        .{
+            r.joint_correct,        r.n_items, r.joint_top1,
+            r.vision_only_correct,  r.n_items, r.vision_only_top1,
+            r.audio_only_correct,   r.n_items, r.audio_only_top1,
+            r.spikes,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_CROSS_MODAL PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_CROSS_MODAL FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runInjectFile(path: []const u8) !void {
     std.debug.print("=== FSOT MIND INJECT-FILE → FIXED organism ===\n", .{});
     std.debug.print("path={s}\n", .{path});
@@ -1061,6 +1100,10 @@ pub fn main() !void {
         runTeach();
     } else if (std.mem.eql(u8, mode, "short-horizon") or std.mem.eql(u8, mode, "short_horizon") or std.mem.eql(u8, mode, "sh")) {
         runShortHorizon();
+    } else if (std.mem.eql(u8, mode, "speech") or std.mem.eql(u8, mode, "speech-organ") or std.mem.eql(u8, mode, "articulate")) {
+        runSpeechOrgan();
+    } else if (std.mem.eql(u8, mode, "cross-modal") or std.mem.eql(u8, mode, "cross_modal") or std.mem.eql(u8, mode, "av") or std.mem.eql(u8, mode, "crossmodal")) {
+        runCrossModal();
     } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
         runSmeFixed();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
@@ -1111,6 +1154,8 @@ pub fn main() !void {
         runModulate();
         runSmeFixed();
         runShortHorizon();
+        runSpeechOrgan();
+        runCrossModal();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1137,6 +1182,8 @@ pub fn main() !void {
         runModulate();
         runSmeFixed();
         runShortHorizon();
+        runSpeechOrgan();
+        runCrossModal();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1148,7 +1195,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|fixed|teach|transfer|modulate|sme|short-horizon|curiosity|inject|vision|pixel-id|stress|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|fixed|speech|cross-modal|teach|transfer|sme|short-horizon|…]\n", .{});
         std.process.exit(2);
     }
 }
