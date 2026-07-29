@@ -98,6 +98,15 @@ const WORDS = [_]struct { []const u8, Role }{
 };
 
 pub const N_WORDS: usize = WORDS.len;
+/// Teacher-grown extras loaded from en_roles.tsv (student codec grows without recompile).
+pub const MAX_EXTRA: usize = 1024;
+pub const MAX_WORD_LEN: usize = 24;
+
+var extra_buf: [MAX_EXTRA][MAX_WORD_LEN]u8 = undefined;
+var extra_len: [MAX_EXTRA]u8 = .{0} ** MAX_EXTRA;
+var extra_role: [MAX_EXTRA]Role = .{.who} ** MAX_EXTRA;
+var n_extra: usize = 0;
+var load_attempted: bool = false;
 
 fn entryAt(i: usize) Entry {
     return .{
@@ -105,6 +114,124 @@ fn entryAt(i: usize) Entry {
         .role = WORDS[i][1],
         .token = memory_f.hashToken(WORDS[i][0]),
     };
+}
+
+fn entryExtra(i: usize) Entry {
+    const n = extra_len[i];
+    return .{
+        .word = extra_buf[i][0..n],
+        .role = extra_role[i],
+        .token = memory_f.hashToken(extra_buf[i][0..n]),
+    };
+}
+
+pub fn totalWords() usize {
+    return N_WORDS + n_extra;
+}
+
+fn parseRole(s: []const u8) ?Role {
+    if (std.mem.eql(u8, s, "who")) return .who;
+    if (std.mem.eql(u8, s, "verb")) return .verb;
+    if (std.mem.eql(u8, s, "what")) return .what;
+    if (std.mem.eql(u8, s, "where")) return .where;
+    if (std.mem.eql(u8, s, "when")) return .when;
+    if (std.mem.eql(u8, s, "how")) return .how;
+    if (std.mem.eql(u8, s, "adj")) return .adj;
+    if (std.mem.eql(u8, s, "link")) return .link;
+    return null;
+}
+
+fn alreadyKnown(word: []const u8) bool {
+    if (findWordEmbedded(word) != null) return true;
+    var i: usize = 0;
+    while (i < n_extra) : (i += 1) {
+        if (std.ascii.eqlIgnoreCase(extra_buf[i][0..extra_len[i]], word)) return true;
+    }
+    return false;
+}
+
+fn findWordEmbedded(word: []const u8) ?Entry {
+    var i: usize = 0;
+    while (i < N_WORDS) : (i += 1) {
+        if (std.ascii.eqlIgnoreCase(WORDS[i][0], word)) return entryAt(i);
+    }
+    return null;
+}
+
+fn addExtra(word: []const u8, role: Role) bool {
+    if (n_extra >= MAX_EXTRA) return false;
+    if (word.len == 0 or word.len > MAX_WORD_LEN) return false;
+    if (alreadyKnown(word)) return false;
+    const i = n_extra;
+    @memcpy(extra_buf[i][0..word.len], word);
+    // lowercase store for stability
+    var k: usize = 0;
+    while (k < word.len) : (k += 1) {
+        extra_buf[i][k] = std.ascii.toLower(word[k]);
+    }
+    extra_len[i] = @intCast(word.len);
+    extra_role[i] = role;
+    n_extra += 1;
+    return true;
+}
+
+/// Load teacher TSV (word\\trole). Safe to call multiple times (once effective).
+pub fn loadRolesFile(path: []const u8) u32 {
+    const file = std.fs.cwd().openFile(path, .{}) catch return 0;
+    defer file.close();
+    var buf: [256 * 1024]u8 = undefined;
+    const n = file.readAll(buf[0..]) catch return 0;
+    var added: u32 = 0;
+    var start: usize = 0;
+    var i: usize = 0;
+    while (i <= n) : (i += 1) {
+        const at_end = i == n;
+        if (at_end or buf[i] == '\n' or buf[i] == '\r') {
+            var line = buf[start..i];
+            start = i + 1;
+            if (line.len > 0 and line[0] == '#') continue;
+            // trim
+            while (line.len > 0 and (line[0] == ' ' or line[0] == '\t')) line = line[1..];
+            if (line.len == 0) continue;
+            var tab: ?usize = null;
+            var t: usize = 0;
+            while (t < line.len) : (t += 1) {
+                if (line[t] == '\t') {
+                    tab = t;
+                    break;
+                }
+            }
+            if (tab == null) continue;
+            const w = line[0..tab.?];
+            var role_s = line[tab.? + 1 ..];
+            while (role_s.len > 0 and (role_s[role_s.len - 1] == ' ' or role_s[role_s.len - 1] == '\t'))
+                role_s = role_s[0 .. role_s.len - 1];
+            const role = parseRole(role_s) orelse continue;
+            if (addExtra(w, role)) added += 1;
+        }
+    }
+    return added;
+}
+
+/// Try common paths for en_roles.tsv (host may run from zig/ or repo root).
+pub fn tryLoadDefaultRoles() u32 {
+    if (load_attempted) return @intCast(n_extra);
+    load_attempted = true;
+    const paths = [_][]const u8{
+        "data/lexicon/en_roles.tsv",
+        "../data/lexicon/en_roles.tsv",
+        "../../data/lexicon/en_roles.tsv",
+        "I:/fsot nuron/data/lexicon/en_roles.tsv",
+    };
+    var total: u32 = 0;
+    for (paths) |p| {
+        const a = loadRolesFile(p);
+        if (a > 0 or n_extra > 0) {
+            total = a;
+            break;
+        }
+    }
+    return total;
 }
 
 /// Deterministic meaning prototype for a word (same spirit as symbol anchors).
@@ -128,11 +255,12 @@ fn dist2(a: *const [FEAT]Fixed, b: *const [FEAT]Fixed) Fixed {
     return s;
 }
 
-/// Look up exact word (case-insensitive ASCII).
+/// Look up exact word (case-insensitive ASCII) — embedded + teacher extras.
 pub fn findWord(word: []const u8) ?Entry {
+    if (findWordEmbedded(word)) |e| return e;
     var i: usize = 0;
-    while (i < N_WORDS) : (i += 1) {
-        if (std.ascii.eqlIgnoreCase(WORDS[i][0], word)) return entryAt(i);
+    while (i < n_extra) : (i += 1) {
+        if (std.ascii.eqlIgnoreCase(extra_buf[i][0..extra_len[i]], word)) return entryExtra(i);
     }
     return null;
 }
@@ -142,12 +270,17 @@ pub fn findByToken(tok: u32) ?Entry {
     while (i < N_WORDS) : (i += 1) {
         if (memory_f.hashToken(WORDS[i][0]) == tok) return entryAt(i);
     }
+    i = 0;
+    while (i < n_extra) : (i += 1) {
+        if (memory_f.hashToken(extra_buf[i][0..extra_len[i]]) == tok) return entryExtra(i);
+    }
     return null;
 }
 
 /// CHOOSE: nearest lexicon word of a given role to the meaning vector.
 pub fn chooseByRole(meaning: *const [FEAT]Fixed, role: Role) Entry {
-    var best_i: usize = 0;
+    var best_word: []const u8 = WORDS[0][0];
+    var best_role: Role = WORDS[0][1];
     var best_d: Fixed = fixed.fromInt(999);
     var found = false;
     var proto: [FEAT]Fixed = undefined;
@@ -158,20 +291,36 @@ pub fn chooseByRole(meaning: *const [FEAT]Fixed, role: Role) Entry {
         const d = dist2(meaning, &proto);
         if (!found or fixed.lt(d, best_d)) {
             best_d = d;
-            best_i = i;
+            best_word = WORDS[i][0];
+            best_role = WORDS[i][1];
             found = true;
         }
     }
-    if (!found) {
-        // fallback first word of any role
-        return entryAt(0);
+    i = 0;
+    while (i < n_extra) : (i += 1) {
+        if (extra_role[i] != role) continue;
+        const w = extra_buf[i][0..extra_len[i]];
+        wordProto(w, &proto);
+        const d = dist2(meaning, &proto);
+        if (!found or fixed.lt(d, best_d)) {
+            best_d = d;
+            best_word = w;
+            best_role = extra_role[i];
+            found = true;
+        }
     }
-    return entryAt(best_i);
+    if (!found) return entryAt(0);
+    return .{
+        .word = best_word,
+        .role = best_role,
+        .token = memory_f.hashToken(best_word),
+    };
 }
 
 /// Nearest word of any role (free choice under meaning).
 pub fn chooseAny(meaning: *const [FEAT]Fixed) Entry {
-    var best_i: usize = 0;
+    var best_word: []const u8 = WORDS[0][0];
+    var best_role: Role = WORDS[0][1];
     var best_d: Fixed = fixed.fromInt(999);
     var proto: [FEAT]Fixed = undefined;
     var i: usize = 0;
@@ -180,10 +329,26 @@ pub fn chooseAny(meaning: *const [FEAT]Fixed) Entry {
         const d = dist2(meaning, &proto);
         if (i == 0 or fixed.lt(d, best_d)) {
             best_d = d;
-            best_i = i;
+            best_word = WORDS[i][0];
+            best_role = WORDS[i][1];
         }
     }
-    return entryAt(best_i);
+    i = 0;
+    while (i < n_extra) : (i += 1) {
+        const w = extra_buf[i][0..extra_len[i]];
+        wordProto(w, &proto);
+        const d = dist2(meaning, &proto);
+        if (fixed.lt(d, best_d)) {
+            best_d = d;
+            best_word = w;
+            best_role = extra_role[i];
+        }
+    }
+    return .{
+        .word = best_word,
+        .role = best_role,
+        .token = memory_f.hashToken(best_word),
+    };
 }
 
 fn appendStr(dst: []u8, pos: *usize, s: []const u8) void {
@@ -360,9 +525,10 @@ pub const LexReport = struct {
 };
 
 pub fn runLexiconProbe() LexReport {
+    _ = tryLoadDefaultRoles();
     var rep: LexReport = .{
         .ok = false,
-        .n_words = @intCast(N_WORDS),
+        .n_words = @intCast(totalWords()),
         .n_choose_ok = 0,
         .n_input_known = 0,
         .n_input_words = 0,

@@ -124,6 +124,9 @@ pub fn runLiveMind(cfg: LiveConfig) LiveReport {
         .{ cfg.n_ticks, cfg.sleep_ms, cfg.encode_every, cfg.curiosity_every, cfg.teach_every, cfg.speakers },
     );
     std.debug.print("doctrine: senses→scene→attention→routes→brain→memory→curiosity→speech\n", .{});
+    const n_lex = lexicon_en.tryLoadDefaultRoles();
+    std.debug.print("LEXICON total={d} (embedded+teacher TSV)\n", .{lexicon_en.totalWords()});
+    _ = n_lex;
     // EEG / experiment anchors (not free parameters)
     const ar = eeg.report();
     std.debug.print(

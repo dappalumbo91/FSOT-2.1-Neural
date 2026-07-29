@@ -819,7 +819,9 @@ fn runMachineLangStress() void {
 
 fn runEnglishCodec() void {
     std.debug.print("=== FSOT ENGLISH CODEC (lexicon choose + machine frame + TTS plant) ===\n", .{});
-    std.debug.print("doctrine: mind chooses machine tokens; English library translates; TTS speaks words\n", .{});
+    std.debug.print("doctrine: teacher grows TSV; mind owns machine language + choose; TTS plant\n", .{});
+    const n_load = lexicon_en_fixed.tryLoadDefaultRoles();
+    std.debug.print("LEXICON_LOAD extra={d} total={d}\n", .{ n_load, lexicon_en_fixed.totalWords() });
     if (!lexicon_en_fixed.selfTest()) {
         std.debug.print("FSOT_ENGLISH FAIL selftest\n", .{});
         std.process.exit(1);
