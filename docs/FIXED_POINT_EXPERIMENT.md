@@ -57,12 +57,15 @@ Seeds are stored as pre-rounded fixed integers (same decimal authority as `seeds
 | Network 16-unit | **PASS** | spikes=48 |
 | Genetic brain 32-unit | **PASS** | E/I 26/6, Pyr/PV/SST 26/4/2, syn≥100 |
 | Organism loop | **PASS** | 40 ticks, spikes under fixed dynamics |
-| Genetic W assembly | **PASS pure fixed** | `genetic_fixed.zig` — no f64 W path |
-| Codon / genotype | exact trinary | spins quantized once onto lattice |
-| Allen FI bio (32 units) | **PASS** | rate≈17.92 Hz, ISI≈70.4 ms, adapt≈0.082 |
-| Structure vs f64 brain | **PASS** | E/I/Pyr 26/6/26 exact match |
+| Genetic W assembly | **PASS pure fixed** | `genetic_fixed.wireFromGenotypesF` |
+| Codon expression | **PASS fixed** | `codon_fixed` + `genotype_fixed` (no f64 expression) |
+| Allen FI bio (32 units) | **PASS** | rate≈17.92 Hz, ISI≈70.4 ms, adapt≈0.082 (match f64 bio) |
+| Structure vs f64 brain | **PASS** | E/I/Pyr **26/6/26** exact |
+| Memory encode | **PASS** | `memory_fixed` episodic FP store |
+| Organism + inject | **PASS** | encode episodes + feature inject |
+| Bare metal | **PASS** | `FSOT_FIXED_BAREMETAL_OK` (arith + scalar + neuron) |
 
-Command: `fsot_mind.exe fixed` → **`FSOT_FIXED_STACK_OK`** + **`FSOT_FIXED_BIO_ACCURATE_OK`**
+Command: `fsot_mind fixed` → **`FSOT_FIXED_STACK_OK`** + **`FSOT_FIXED_BIO_ACCURATE_OK`**
 
 Bio stress: `python scripts/stress_zig_fixed.py`
 

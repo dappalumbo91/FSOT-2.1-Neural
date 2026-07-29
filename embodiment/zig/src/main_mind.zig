@@ -48,6 +48,9 @@ const brain_fixed = @import("brain_fixed.zig");
 const organism_fixed = @import("organism_fixed.zig");
 const genetic_fixed = @import("genetic_fixed.zig");
 const bio_probe_fixed = @import("bio_probe_fixed.zig");
+const genotype_fixed = @import("genotype_fixed.zig");
+const codon_fixed = @import("codon_fixed.zig");
+const memory_fixed = @import("memory_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -351,21 +354,34 @@ fn runFixed() void {
         .{ bst.spikes, st.n_e, st.n_i, st.n_synapses, st.n_pyr, st.n_pv, st.n_sst, st.n_vip },
     );
 
+    if (!codon_fixed.selfTest() or !genotype_fixed.selfTest()) {
+        std.debug.print("FSOT_FIXED_GENOTYPE FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_GENOTYPE PASS (expression on lattice)\n", .{});
+
     if (!genetic_fixed.selfTest()) {
         std.debug.print("FSOT_FIXED_GENETIC_W FAIL\n", .{});
         std.process.exit(1);
     }
     std.debug.print("FSOT_FIXED_GENETIC_W PASS (pure lattice assembly)\n", .{});
 
+    if (!memory_fixed.selfTest()) {
+        std.debug.print("FSOT_FIXED_MEMORY FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_MEMORY PASS\n", .{});
+
     if (!organism_fixed.selfTest()) {
         std.debug.print("FSOT_FIXED_ORGANISM FAIL\n", .{});
         std.process.exit(1);
     }
     var org = organism_fixed.OrganismF.init();
+    org.encode_every = 12;
     const orep = org.run(40);
     std.debug.print(
-        "FSOT_FIXED_ORGANISM PASS ticks={d} spikes={d} syn={d} meanS={e}\n",
-        .{ orep.ticks, orep.spikes, orep.n_syn, fixed.toF64(org.brain.meanS()) },
+        "FSOT_FIXED_ORGANISM PASS ticks={d} spikes={d} syn={d} eps={d} meanS={e}\n",
+        .{ orep.ticks, orep.spikes, orep.n_syn, orep.episodes, fixed.toF64(org.brain.meanS()) },
     );
 
     // --- Biological accuracy: FI population on fixed neurons ---

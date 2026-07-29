@@ -4,7 +4,6 @@
 const fixed = @import("fixed.zig");
 const seeds_f = @import("seeds_fixed.zig");
 const cell_types = @import("cell_types.zig");
-const genotype = @import("genotype.zig");
 const network_f = @import("network_fixed.zig");
 
 const Fixed = fixed.Fixed;
@@ -89,12 +88,14 @@ const UnitMeta = struct {
     charge: Fixed,
 };
 
-/// Full W builder on Fixed lattice — twin of genetic.wireFromGenotypes.
-pub fn wireFromGenotypes(
+const genotype_f = @import("genotype_fixed.zig");
+
+/// Full W builder — genotypes already on fixed lattice (NeuronGenotypeF).
+pub fn wireFromGenotypesF(
     W: []Fixed,
     max_n: usize,
     n: usize,
-    gts: []const genotype.NeuronGenotype,
+    gts: []const genotype_f.NeuronGenotypeF,
     region_of: []const u8,
     region_local: []const usize,
     local_syn_scale: Fixed,
@@ -113,9 +114,8 @@ pub fn wireFromGenotypes(
             .local_id = region_local[i],
             .ct = gts[i].cell_type,
             .sign = gts[i].synapse_sign,
-            // genotype spins currently f64; quantize once onto lattice
-            .spin = fixed.fromF64Lab(gts[i].composite_spin),
-            .charge = fixed.fromF64Lab(gts[i].composite_charge),
+            .spin = gts[i].composite_spin,
+            .charge = gts[i].composite_charge,
         };
     }
 
@@ -326,7 +326,10 @@ pub fn wireFromGenotypes(
     }
     if (n_nz > 0) {
         const mean_abs = fixed.div(sum_abs, fixed.fromInt(n_nz));
-        const thr = fixed.div(mean_abs, fixed.mul(seeds_f.phi, seeds_f.e));
+        // Soft thr: lattice series error slightly elevates relative thr vs f64;
+        // 0.93 keeps biological density band (~fly sparse) without inventing free W.
+        var thr = fixed.div(mean_abs, fixed.mul(seeds_f.phi, seeds_f.e));
+        thr = fixed.mul(thr, fixed.fromDecimalStr("0.93"));
         i = 0;
         while (i < n) : (i += 1) {
             var j: usize = 0;

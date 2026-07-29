@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 
 def mind() -> Path:
-    for n in ("fsot_mind.exe", "fsot_mind"):
+    for n in ("fsot_mind_fixed.exe", "fsot_mind_fixed", "fsot_mind.exe", "fsot_mind"):
         p = ZIG / "zig-out" / "bin" / n
         if p.is_file():
             return p
@@ -43,6 +43,8 @@ def main() -> int:
         "bio_accurate_ok": "FSOT_FIXED_BIO_ACCURATE_OK" in text,
         "neuron_parity": "FSOT_FIXED_NEURON_PARITY PASS" in text,
         "genetic_w_pure": "FSOT_FIXED_GENETIC_W PASS" in text,
+        "genotype_fixed": "FSOT_FIXED_GENOTYPE PASS" in text,
+        "memory_fixed": "FSOT_FIXED_MEMORY PASS" in text,
         "structure_match": "FSOT_FIXED_STRUCTURE PASS" in text,
         "bio_fi": "FSOT_FIXED_BIO PASS" in text,
     }
@@ -91,6 +93,8 @@ def main() -> int:
             "bio_accurate_ok",
             "neuron_parity",
             "genetic_w_pure",
+            "genotype_fixed",
+            "memory_fixed",
             "structure_match",
             "bio_fi",
             "rate_band",

@@ -1,11 +1,10 @@
-//! Multi-region genetic brain — fixed-point continuous state.
-//! Same structure as brain.zig (codon genotypes → phenotype → W → step)
-//! but unit dynamics and W magnitudes are Fixed (no IEEE float on the path).
+//! Multi-region genetic brain — fixed-point continuous state end-to-end.
+//! Codon ORFs → genotype_fixed expression → genetic_fixed W → neuron_fixed step.
 
 const fixed = @import("fixed.zig");
 const network_f = @import("network_fixed.zig");
 const neuron_f = @import("neuron_fixed.zig");
-const genotype = @import("genotype.zig");
+const genotype_f = @import("genotype_fixed.zig");
 const cell_types = @import("cell_types.zig");
 const genetic_fixed = @import("genetic_fixed.zig");
 const seeds_f = @import("seeds_fixed.zig");
@@ -25,7 +24,7 @@ pub const BrainF = struct {
     region_of: [MAX_N]RegionId = undefined,
     region_local: [MAX_N]usize = undefined,
     cell_of: [MAX_N]cell_types.CellType = undefined,
-    genotypes: [MAX_N]genotype.NeuronGenotype = undefined,
+    genotypes: [MAX_N]genotype_f.NeuronGenotypeF = undefined,
     n: usize = N_TOTAL,
     seed: u32 = 42,
 
@@ -74,7 +73,7 @@ pub const BrainF = struct {
                 const gid = rg.start + local;
                 const ct = labels[local];
                 b.cell_of[gid] = ct;
-                b.genotypes[gid] = genotype.buildCellTypeGenotype(@intCast(ids[local]), ct, diversity);
+                b.genotypes[gid] = genotype_f.buildCellTypeGenotype(@intCast(ids[local]), ct, diversity);
                 b.genotypes[gid].unit_id = @intCast(gid);
                 applyPhenotype(&b.net.units[gid], &b.genotypes[gid]);
             }
@@ -83,24 +82,22 @@ pub const BrainF = struct {
         return b;
     }
 
-    fn applyPhenotype(n: *neuron_f.NeuronF, g: *const genotype.NeuronGenotype) void {
+    fn applyPhenotype(n: *neuron_f.NeuronF, g: *const genotype_f.NeuronGenotypeF) void {
         const ph = g.phenotype;
-        // genotype phenotype is still f64 from codon path — convert once at construction
-        // (codon expression uses f64 seeds today; lattice is for *dynamics*)
-        n.d_eff = fixed.fromF64Lab(ph.d_eff);
-        n.fire_thr = fixed.fromF64Lab(ph.fire_threshold);
-        n.ref_steps = @intFromFloat(@round(ph.refractory_steps));
-        n.adapt_gain = fixed.fromF64Lab(ph.adapt_gain);
-        n.adapt_decay = fixed.fromF64Lab(ph.adapt_decay);
-        n.adapt_step = fixed.fromF64Lab(ph.adapt_step);
-        n.resting_S = fixed.fromF64Lab(ph.resting_bias);
-        n.n_channels = fixed.fromF64Lab(ph.n_channels);
-        n.p_props = fixed.fromF64Lab(ph.p_props);
+        n.d_eff = ph.d_eff;
+        n.fire_thr = ph.fire_threshold;
+        n.ref_steps = @intCast(@divTrunc(ph.refractory_steps, fixed.SCALE));
+        if (n.ref_steps < 1) n.ref_steps = 1;
+        n.adapt_gain = ph.adapt_gain;
+        n.adapt_decay = ph.adapt_decay;
+        n.adapt_step = ph.adapt_step;
+        n.resting_S = ph.resting_bias;
+        n.n_channels = ph.n_channels;
+        n.p_props = ph.p_props;
         n.reset();
     }
 
     pub fn wireGenetic(self: *BrainF) void {
-        // Pure fixed lattice W — no IEEE float assembly (genetic_fixed.zig).
         var reg: [MAX_N]u8 = undefined;
         var loc: [MAX_N]usize = undefined;
         var i: usize = 0;
@@ -108,7 +105,7 @@ pub const BrainF = struct {
             reg[i] = @intFromEnum(self.region_of[i]);
             loc[i] = self.region_local[i];
         }
-        genetic_fixed.wireFromGenotypes(
+        genetic_fixed.wireFromGenotypesF(
             self.net.W[0..],
             network_f.MAX_N,
             self.n,

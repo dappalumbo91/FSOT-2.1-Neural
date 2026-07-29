@@ -12,6 +12,9 @@ const sensory = @import("sensory.zig");
 const modulate = @import("modulate.zig");
 const codon = @import("codon.zig");
 const genotype = @import("genotype.zig");
+const fixed = @import("fixed.zig");
+const neuron_fixed = @import("neuron_fixed.zig");
+const scalar_fixed = @import("scalar_fixed.zig");
 
 const MULTIBOOT_MAGIC: u32 = 0x1BADB002;
 const MULTIBOOT_FLAGS: u32 = 0x00000003;
@@ -146,6 +149,30 @@ fn kmain() noreturn {
         serial.write("FSOT_GENOTYPE FAIL\n");
     }
 
+    serial.write("test:fixed lattice...\n");
+    const fixed_ok = fixed.selfTest();
+    if (fixed_ok) {
+        serial.write("FSOT_FIXED_ARITH PASS\n");
+    } else {
+        serial.write("FSOT_FIXED_ARITH FAIL\n");
+    }
+    const s_fix = scalar_fixed.computeNeuro(fixed.fromDecimalStr("0.1"), 0, fixed.fromInt(1));
+    const fixed_scalar_ok = fixed.gt(s_fix, fixed.fromDecimalStr("0.25")) and fixed.lt(s_fix, fixed.fromDecimalStr("0.65"));
+    if (fixed_scalar_ok) {
+        serial.write("FSOT_FIXED_SCALAR PASS\n");
+    } else {
+        serial.write("FSOT_FIXED_SCALAR FAIL\n");
+    }
+    serial.write("test:fixed neuron...\n");
+    const fnst = neuron_fixed.paritySelfTest();
+    if (fnst.ok) {
+        serial.write("FSOT_FIXED_NEURON PASS spikes=");
+        serial.writeU32(fnst.spikes);
+        serial.write("\n");
+    } else {
+        serial.write("FSOT_FIXED_NEURON FAIL\n");
+    }
+
     serial.write("test:f64...\n");
     // Smoke hard-FPU before transcendental-heavy scalar
     var smoke: f64 = 1.25;
@@ -272,12 +299,13 @@ fn kmain() noreturn {
     }
 
     // bus_ok must show real spikes on genetic brain under inject
-    const stage_ok = tr.ok and codon_ok and geno_ok and pst.ok and nst.ok and bst.ok and path_ok and bus_ok and intel_ok and (s0 == s0) and (gbrain.totalSpikes() >= 1);
+    const stage_ok = tr.ok and codon_ok and geno_ok and fixed_ok and fixed_scalar_ok and fnst.ok and pst.ok and nst.ok and bst.ok and path_ok and bus_ok and intel_ok and (s0 == s0) and (gbrain.totalSpikes() >= 1);
     if (stage_ok) {
         serial.write("FSOT_STAGE_ZIG_NEURON_OK\n");
         serial.write("FSOT_MIND_BAREMETAL_OK\n");
         serial.write("FSOT_ORGANISM_LITE_OK\n");
         serial.write("FSOT_INTEL_BAREMETAL_OK\n");
+        serial.write("FSOT_FIXED_BAREMETAL_OK\n");
     } else {
         serial.write("FSOT_STAGE_ZIG_NEURON_FAIL\n");
     }
