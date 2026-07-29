@@ -1,0 +1,35 @@
+{
+  "n_facts_jsonl": 938,
+  "n_problems_jsonl": 337,
+  "n_bank_rows": 1503,
+  "by_domain": {
+    "math": 980,
+    "literacy": 350,
+    "science": 153,
+    "vision": 20
+  },
+  "by_grade": {
+    "preschool": 322,
+    "kindergarten": 585,
+    "grade1": 596
+  },
+  "by_kind": {
+    "fact": 1150,
+    "problem": 288,
+    "rel": 53,
+    "path": 12
+  },
+  "paths": {
+    "facts": "I:\\fsot nuron\\data\\curriculum\\pk_k_g1\\facts.jsonl",
+    "problems": "I:\\fsot nuron\\data\\curriculum\\pk_k_g1\\problems.jsonl",
+    "bank": "I:\\fsot nuron\\data\\curriculum\\pk_k_g1\\bank.tsv"
+  },
+  "sources": [
+    "public-domain arithmetic tables 0-10 / count 0-20",
+    "Dolch pre-primer + primer + first grade sight words",
+    "standard English letter-sound phonics mappings",
+    "primer-style science/body/safety facts (OER spirit)",
+    "digit name map 0-9 (vision label side)"
+  ],
+  "doctrine": "download/generate open curriculum \u2192 bank.tsv \u2192 Zig teach/quiz; \u226595% domain gates"
+}

@@ -1,10 +1,337 @@
-{"id": "pk-p-count-1", "grade": "preschool", "domain": "math", "prompt": "Count: one apple and one apple. How many?", "answer": "two", "kind": "count", "keywords": ["one", "two", "apple"]}
-{"id": "pk-p-color-1", "grade": "preschool", "domain": "science", "prompt": "The sun is bright and yellow. Is the sun cold?", "answer": "no", "kind": "yesno", "keywords": ["sun", "cold", "yellow"]}
-{"id": "pk-p-animal-1", "grade": "preschool", "domain": "life", "prompt": "Which is an animal: dog or chair?", "answer": "dog", "kind": "choose", "keywords": ["dog", "chair", "animal"]}
-{"id": "k-p-add-1", "grade": "kindergarten", "domain": "math", "prompt": "Two birds and one bird. How many birds?", "answer": "three", "kind": "count", "keywords": ["two", "one", "three", "bird"]}
-{"id": "k-p-safety-1", "grade": "kindergarten", "domain": "safety", "prompt": "The light is red. Should you go or stop?", "answer": "stop", "kind": "choose", "keywords": ["red", "light", "stop", "go"]}
-{"id": "k-p-share-1", "grade": "kindergarten", "domain": "social", "prompt": "A friend wants a turn. What should you do?", "answer": "share", "kind": "open", "keywords": ["friend", "turn", "share"]}
-{"id": "g1-p-add-2", "grade": "grade1", "domain": "math", "prompt": "Three plus two equals what?", "answer": "five", "kind": "add", "keywords": ["three", "two", "five", "add"]}
-{"id": "g1-p-life-1", "grade": "grade1", "domain": "science", "prompt": "A plant has no water. Will it grow well?", "answer": "no", "kind": "yesno", "keywords": ["plant", "water", "grow"]}
-{"id": "g1-p-map-1", "grade": "grade1", "domain": "geo", "prompt": "You need to find the school. What tool helps?", "answer": "map", "kind": "choose", "keywords": ["school", "map", "find"]}
-{"id": "g1-p-week-1", "grade": "grade1", "domain": "time", "prompt": "How many days are in one week?", "answer": "seven", "kind": "fact", "keywords": ["week", "seven", "day"]}
+{"id": "count-next-0", "grade": "preschool", "domain": "math", "prompt": "next after 0", "answer": "1", "kind": "problem", "keywords": ["1", "next", "after", "0"], "source": "open_curriculum"}
+{"id": "count-next-1", "grade": "preschool", "domain": "math", "prompt": "next after 1", "answer": "2", "kind": "problem", "keywords": ["2", "next", "after", "1"], "source": "open_curriculum"}
+{"id": "count-next-2", "grade": "preschool", "domain": "math", "prompt": "next after 2", "answer": "3", "kind": "problem", "keywords": ["3", "next", "after", "2"], "source": "open_curriculum"}
+{"id": "count-next-3", "grade": "preschool", "domain": "math", "prompt": "next after 3", "answer": "4", "kind": "problem", "keywords": ["4", "next", "after", "3"], "source": "open_curriculum"}
+{"id": "count-next-4", "grade": "preschool", "domain": "math", "prompt": "next after 4", "answer": "5", "kind": "problem", "keywords": ["5", "next", "after", "4"], "source": "open_curriculum"}
+{"id": "count-next-5", "grade": "preschool", "domain": "math", "prompt": "next after 5", "answer": "6", "kind": "problem", "keywords": ["6", "next", "after", "5"], "source": "open_curriculum"}
+{"id": "count-next-6", "grade": "kindergarten", "domain": "math", "prompt": "next after 6", "answer": "7", "kind": "problem", "keywords": ["7", "next", "after", "6"], "source": "open_curriculum"}
+{"id": "count-next-7", "grade": "kindergarten", "domain": "math", "prompt": "next after 7", "answer": "8", "kind": "problem", "keywords": ["8", "next", "after", "7"], "source": "open_curriculum"}
+{"id": "count-next-8", "grade": "kindergarten", "domain": "math", "prompt": "next after 8", "answer": "9", "kind": "problem", "keywords": ["9", "next", "after", "8"], "source": "open_curriculum"}
+{"id": "count-next-9", "grade": "kindergarten", "domain": "math", "prompt": "next after 9", "answer": "10", "kind": "problem", "keywords": ["10", "next", "after", "9"], "source": "open_curriculum"}
+{"id": "count-next-10", "grade": "kindergarten", "domain": "math", "prompt": "next after 10", "answer": "11", "kind": "problem", "keywords": ["11", "next", "after", "10"], "source": "open_curriculum"}
+{"id": "count-next-11", "grade": "grade1", "domain": "math", "prompt": "next after 11", "answer": "12", "kind": "problem", "keywords": ["12", "next", "after", "11"], "source": "open_curriculum"}
+{"id": "count-next-12", "grade": "grade1", "domain": "math", "prompt": "next after 12", "answer": "13", "kind": "problem", "keywords": ["13", "next", "after", "12"], "source": "open_curriculum"}
+{"id": "count-next-13", "grade": "grade1", "domain": "math", "prompt": "next after 13", "answer": "14", "kind": "problem", "keywords": ["14", "next", "after", "13"], "source": "open_curriculum"}
+{"id": "count-next-14", "grade": "grade1", "domain": "math", "prompt": "next after 14", "answer": "15", "kind": "problem", "keywords": ["15", "next", "after", "14"], "source": "open_curriculum"}
+{"id": "count-next-15", "grade": "grade1", "domain": "math", "prompt": "next after 15", "answer": "16", "kind": "problem", "keywords": ["16", "next", "after", "15"], "source": "open_curriculum"}
+{"id": "count-next-16", "grade": "grade1", "domain": "math", "prompt": "next after 16", "answer": "17", "kind": "problem", "keywords": ["17", "next", "after", "16"], "source": "open_curriculum"}
+{"id": "count-next-17", "grade": "grade1", "domain": "math", "prompt": "next after 17", "answer": "18", "kind": "problem", "keywords": ["18", "next", "after", "17"], "source": "open_curriculum"}
+{"id": "count-next-18", "grade": "grade1", "domain": "math", "prompt": "next after 18", "answer": "19", "kind": "problem", "keywords": ["19", "next", "after", "18"], "source": "open_curriculum"}
+{"id": "count-next-19", "grade": "grade1", "domain": "math", "prompt": "next after 19", "answer": "20", "kind": "problem", "keywords": ["20", "next", "after", "19"], "source": "open_curriculum"}
+{"id": "addp-0-0", "grade": "preschool", "domain": "math", "prompt": "0+0", "answer": "0", "kind": "problem", "keywords": ["0", "00"], "source": "open_curriculum"}
+{"id": "addpw-0-0", "grade": "preschool", "domain": "math", "prompt": "0 plus 0 word", "answer": "zero", "kind": "problem", "keywords": ["zero", "0", "plus", "word"], "source": "open_curriculum"}
+{"id": "addp-0-1", "grade": "preschool", "domain": "math", "prompt": "0+1", "answer": "1", "kind": "problem", "keywords": ["1", "01"], "source": "open_curriculum"}
+{"id": "addpw-0-1", "grade": "preschool", "domain": "math", "prompt": "0 plus 1 word", "answer": "one", "kind": "problem", "keywords": ["one", "0", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-0-2", "grade": "preschool", "domain": "math", "prompt": "0+2", "answer": "2", "kind": "problem", "keywords": ["2", "02"], "source": "open_curriculum"}
+{"id": "addpw-0-2", "grade": "preschool", "domain": "math", "prompt": "0 plus 2 word", "answer": "two", "kind": "problem", "keywords": ["two", "0", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-0-3", "grade": "preschool", "domain": "math", "prompt": "0+3", "answer": "3", "kind": "problem", "keywords": ["3", "03"], "source": "open_curriculum"}
+{"id": "addpw-0-3", "grade": "preschool", "domain": "math", "prompt": "0 plus 3 word", "answer": "three", "kind": "problem", "keywords": ["three", "0", "plus", "3", "word"], "source": "open_curriculum"}
+{"id": "addp-0-4", "grade": "kindergarten", "domain": "math", "prompt": "0+4", "answer": "4", "kind": "problem", "keywords": ["4", "04"], "source": "open_curriculum"}
+{"id": "addpw-0-4", "grade": "kindergarten", "domain": "math", "prompt": "0 plus 4 word", "answer": "four", "kind": "problem", "keywords": ["four", "0", "plus", "4", "word"], "source": "open_curriculum"}
+{"id": "addp-0-5", "grade": "kindergarten", "domain": "math", "prompt": "0+5", "answer": "5", "kind": "problem", "keywords": ["5", "05"], "source": "open_curriculum"}
+{"id": "addpw-0-5", "grade": "kindergarten", "domain": "math", "prompt": "0 plus 5 word", "answer": "five", "kind": "problem", "keywords": ["five", "0", "plus", "5", "word"], "source": "open_curriculum"}
+{"id": "addp-0-6", "grade": "kindergarten", "domain": "math", "prompt": "0+6", "answer": "6", "kind": "problem", "keywords": ["6", "06"], "source": "open_curriculum"}
+{"id": "addpw-0-6", "grade": "kindergarten", "domain": "math", "prompt": "0 plus 6 word", "answer": "six", "kind": "problem", "keywords": ["six", "0", "plus", "6", "word"], "source": "open_curriculum"}
+{"id": "addp-0-7", "grade": "kindergarten", "domain": "math", "prompt": "0+7", "answer": "7", "kind": "problem", "keywords": ["7", "07"], "source": "open_curriculum"}
+{"id": "addpw-0-7", "grade": "kindergarten", "domain": "math", "prompt": "0 plus 7 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "0", "plus", "7", "word"], "source": "open_curriculum"}
+{"id": "addp-0-8", "grade": "kindergarten", "domain": "math", "prompt": "0+8", "answer": "8", "kind": "problem", "keywords": ["8", "08"], "source": "open_curriculum"}
+{"id": "addpw-0-8", "grade": "kindergarten", "domain": "math", "prompt": "0 plus 8 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "0", "plus", "8", "word"], "source": "open_curriculum"}
+{"id": "addp-0-9", "grade": "kindergarten", "domain": "math", "prompt": "0+9", "answer": "9", "kind": "problem", "keywords": ["9", "09"], "source": "open_curriculum"}
+{"id": "addpw-0-9", "grade": "kindergarten", "domain": "math", "prompt": "0 plus 9 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "0", "plus", "9", "word"], "source": "open_curriculum"}
+{"id": "addp-0-10", "grade": "kindergarten", "domain": "math", "prompt": "0+10", "answer": "10", "kind": "problem", "keywords": ["10", "010"], "source": "open_curriculum"}
+{"id": "addpw-0-10", "grade": "kindergarten", "domain": "math", "prompt": "0 plus 10 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "0", "plus", "10", "word"], "source": "open_curriculum"}
+{"id": "addp-1-0", "grade": "preschool", "domain": "math", "prompt": "1+0", "answer": "1", "kind": "problem", "keywords": ["1", "10"], "source": "open_curriculum"}
+{"id": "addpw-1-0", "grade": "preschool", "domain": "math", "prompt": "1 plus 0 word", "answer": "one", "kind": "problem", "keywords": ["one", "1", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-1-1", "grade": "preschool", "domain": "math", "prompt": "1+1", "answer": "2", "kind": "problem", "keywords": ["2", "11"], "source": "open_curriculum"}
+{"id": "addpw-1-1", "grade": "preschool", "domain": "math", "prompt": "1 plus 1 word", "answer": "two", "kind": "problem", "keywords": ["two", "1", "plus", "word"], "source": "open_curriculum"}
+{"id": "addp-1-2", "grade": "preschool", "domain": "math", "prompt": "1+2", "answer": "3", "kind": "problem", "keywords": ["3", "12"], "source": "open_curriculum"}
+{"id": "addpw-1-2", "grade": "preschool", "domain": "math", "prompt": "1 plus 2 word", "answer": "three", "kind": "problem", "keywords": ["three", "1", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-1-3", "grade": "preschool", "domain": "math", "prompt": "1+3", "answer": "4", "kind": "problem", "keywords": ["4", "13"], "source": "open_curriculum"}
+{"id": "addpw-1-3", "grade": "preschool", "domain": "math", "prompt": "1 plus 3 word", "answer": "four", "kind": "problem", "keywords": ["four", "1", "plus", "3", "word"], "source": "open_curriculum"}
+{"id": "addp-1-4", "grade": "kindergarten", "domain": "math", "prompt": "1+4", "answer": "5", "kind": "problem", "keywords": ["5", "14"], "source": "open_curriculum"}
+{"id": "addpw-1-4", "grade": "kindergarten", "domain": "math", "prompt": "1 plus 4 word", "answer": "five", "kind": "problem", "keywords": ["five", "1", "plus", "4", "word"], "source": "open_curriculum"}
+{"id": "addp-1-5", "grade": "kindergarten", "domain": "math", "prompt": "1+5", "answer": "6", "kind": "problem", "keywords": ["6", "15"], "source": "open_curriculum"}
+{"id": "addpw-1-5", "grade": "kindergarten", "domain": "math", "prompt": "1 plus 5 word", "answer": "six", "kind": "problem", "keywords": ["six", "1", "plus", "5", "word"], "source": "open_curriculum"}
+{"id": "addp-1-6", "grade": "kindergarten", "domain": "math", "prompt": "1+6", "answer": "7", "kind": "problem", "keywords": ["7", "16"], "source": "open_curriculum"}
+{"id": "addpw-1-6", "grade": "kindergarten", "domain": "math", "prompt": "1 plus 6 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "1", "plus", "6", "word"], "source": "open_curriculum"}
+{"id": "addp-1-7", "grade": "kindergarten", "domain": "math", "prompt": "1+7", "answer": "8", "kind": "problem", "keywords": ["8", "17"], "source": "open_curriculum"}
+{"id": "addpw-1-7", "grade": "kindergarten", "domain": "math", "prompt": "1 plus 7 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "1", "plus", "7", "word"], "source": "open_curriculum"}
+{"id": "addp-1-8", "grade": "kindergarten", "domain": "math", "prompt": "1+8", "answer": "9", "kind": "problem", "keywords": ["9", "18"], "source": "open_curriculum"}
+{"id": "addpw-1-8", "grade": "kindergarten", "domain": "math", "prompt": "1 plus 8 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "1", "plus", "8", "word"], "source": "open_curriculum"}
+{"id": "addp-1-9", "grade": "kindergarten", "domain": "math", "prompt": "1+9", "answer": "10", "kind": "problem", "keywords": ["10", "19"], "source": "open_curriculum"}
+{"id": "addpw-1-9", "grade": "kindergarten", "domain": "math", "prompt": "1 plus 9 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "1", "plus", "9", "word"], "source": "open_curriculum"}
+{"id": "addp-1-10", "grade": "grade1", "domain": "math", "prompt": "1+10", "answer": "11", "kind": "problem", "keywords": ["11", "110"], "source": "open_curriculum"}
+{"id": "addp-2-0", "grade": "preschool", "domain": "math", "prompt": "2+0", "answer": "2", "kind": "problem", "keywords": ["2", "20"], "source": "open_curriculum"}
+{"id": "addpw-2-0", "grade": "preschool", "domain": "math", "prompt": "2 plus 0 word", "answer": "two", "kind": "problem", "keywords": ["two", "2", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-2-1", "grade": "preschool", "domain": "math", "prompt": "2+1", "answer": "3", "kind": "problem", "keywords": ["3", "21"], "source": "open_curriculum"}
+{"id": "addpw-2-1", "grade": "preschool", "domain": "math", "prompt": "2 plus 1 word", "answer": "three", "kind": "problem", "keywords": ["three", "2", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-2-2", "grade": "preschool", "domain": "math", "prompt": "2+2", "answer": "4", "kind": "problem", "keywords": ["4", "22"], "source": "open_curriculum"}
+{"id": "addpw-2-2", "grade": "preschool", "domain": "math", "prompt": "2 plus 2 word", "answer": "four", "kind": "problem", "keywords": ["four", "2", "plus", "word"], "source": "open_curriculum"}
+{"id": "addp-2-3", "grade": "preschool", "domain": "math", "prompt": "2+3", "answer": "5", "kind": "problem", "keywords": ["5", "23"], "source": "open_curriculum"}
+{"id": "addpw-2-3", "grade": "preschool", "domain": "math", "prompt": "2 plus 3 word", "answer": "five", "kind": "problem", "keywords": ["five", "2", "plus", "3", "word"], "source": "open_curriculum"}
+{"id": "addp-2-4", "grade": "kindergarten", "domain": "math", "prompt": "2+4", "answer": "6", "kind": "problem", "keywords": ["6", "24"], "source": "open_curriculum"}
+{"id": "addpw-2-4", "grade": "kindergarten", "domain": "math", "prompt": "2 plus 4 word", "answer": "six", "kind": "problem", "keywords": ["six", "2", "plus", "4", "word"], "source": "open_curriculum"}
+{"id": "addp-2-5", "grade": "kindergarten", "domain": "math", "prompt": "2+5", "answer": "7", "kind": "problem", "keywords": ["7", "25"], "source": "open_curriculum"}
+{"id": "addpw-2-5", "grade": "kindergarten", "domain": "math", "prompt": "2 plus 5 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "2", "plus", "5", "word"], "source": "open_curriculum"}
+{"id": "addp-2-6", "grade": "kindergarten", "domain": "math", "prompt": "2+6", "answer": "8", "kind": "problem", "keywords": ["8", "26"], "source": "open_curriculum"}
+{"id": "addpw-2-6", "grade": "kindergarten", "domain": "math", "prompt": "2 plus 6 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "2", "plus", "6", "word"], "source": "open_curriculum"}
+{"id": "addp-2-7", "grade": "kindergarten", "domain": "math", "prompt": "2+7", "answer": "9", "kind": "problem", "keywords": ["9", "27"], "source": "open_curriculum"}
+{"id": "addpw-2-7", "grade": "kindergarten", "domain": "math", "prompt": "2 plus 7 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "2", "plus", "7", "word"], "source": "open_curriculum"}
+{"id": "addp-2-8", "grade": "kindergarten", "domain": "math", "prompt": "2+8", "answer": "10", "kind": "problem", "keywords": ["10", "28"], "source": "open_curriculum"}
+{"id": "addpw-2-8", "grade": "kindergarten", "domain": "math", "prompt": "2 plus 8 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "2", "plus", "8", "word"], "source": "open_curriculum"}
+{"id": "addp-2-9", "grade": "grade1", "domain": "math", "prompt": "2+9", "answer": "11", "kind": "problem", "keywords": ["11", "29"], "source": "open_curriculum"}
+{"id": "addp-2-10", "grade": "grade1", "domain": "math", "prompt": "2+10", "answer": "12", "kind": "problem", "keywords": ["12", "210"], "source": "open_curriculum"}
+{"id": "addp-3-0", "grade": "preschool", "domain": "math", "prompt": "3+0", "answer": "3", "kind": "problem", "keywords": ["3", "30"], "source": "open_curriculum"}
+{"id": "addpw-3-0", "grade": "preschool", "domain": "math", "prompt": "3 plus 0 word", "answer": "three", "kind": "problem", "keywords": ["three", "3", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-3-1", "grade": "preschool", "domain": "math", "prompt": "3+1", "answer": "4", "kind": "problem", "keywords": ["4", "31"], "source": "open_curriculum"}
+{"id": "addpw-3-1", "grade": "preschool", "domain": "math", "prompt": "3 plus 1 word", "answer": "four", "kind": "problem", "keywords": ["four", "3", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-3-2", "grade": "preschool", "domain": "math", "prompt": "3+2", "answer": "5", "kind": "problem", "keywords": ["5", "32"], "source": "open_curriculum"}
+{"id": "addpw-3-2", "grade": "preschool", "domain": "math", "prompt": "3 plus 2 word", "answer": "five", "kind": "problem", "keywords": ["five", "3", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-3-3", "grade": "kindergarten", "domain": "math", "prompt": "3+3", "answer": "6", "kind": "problem", "keywords": ["6", "33"], "source": "open_curriculum"}
+{"id": "addpw-3-3", "grade": "kindergarten", "domain": "math", "prompt": "3 plus 3 word", "answer": "six", "kind": "problem", "keywords": ["six", "3", "plus", "word"], "source": "open_curriculum"}
+{"id": "addp-3-4", "grade": "kindergarten", "domain": "math", "prompt": "3+4", "answer": "7", "kind": "problem", "keywords": ["7", "34"], "source": "open_curriculum"}
+{"id": "addpw-3-4", "grade": "kindergarten", "domain": "math", "prompt": "3 plus 4 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "3", "plus", "4", "word"], "source": "open_curriculum"}
+{"id": "addp-3-5", "grade": "kindergarten", "domain": "math", "prompt": "3+5", "answer": "8", "kind": "problem", "keywords": ["8", "35"], "source": "open_curriculum"}
+{"id": "addpw-3-5", "grade": "kindergarten", "domain": "math", "prompt": "3 plus 5 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "3", "plus", "5", "word"], "source": "open_curriculum"}
+{"id": "addp-3-6", "grade": "kindergarten", "domain": "math", "prompt": "3+6", "answer": "9", "kind": "problem", "keywords": ["9", "36"], "source": "open_curriculum"}
+{"id": "addpw-3-6", "grade": "kindergarten", "domain": "math", "prompt": "3 plus 6 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "3", "plus", "6", "word"], "source": "open_curriculum"}
+{"id": "addp-3-7", "grade": "kindergarten", "domain": "math", "prompt": "3+7", "answer": "10", "kind": "problem", "keywords": ["10", "37"], "source": "open_curriculum"}
+{"id": "addpw-3-7", "grade": "kindergarten", "domain": "math", "prompt": "3 plus 7 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "3", "plus", "7", "word"], "source": "open_curriculum"}
+{"id": "addp-3-8", "grade": "grade1", "domain": "math", "prompt": "3+8", "answer": "11", "kind": "problem", "keywords": ["11", "38"], "source": "open_curriculum"}
+{"id": "addp-3-9", "grade": "grade1", "domain": "math", "prompt": "3+9", "answer": "12", "kind": "problem", "keywords": ["12", "39"], "source": "open_curriculum"}
+{"id": "addp-3-10", "grade": "grade1", "domain": "math", "prompt": "3+10", "answer": "13", "kind": "problem", "keywords": ["13", "310"], "source": "open_curriculum"}
+{"id": "addp-4-0", "grade": "kindergarten", "domain": "math", "prompt": "4+0", "answer": "4", "kind": "problem", "keywords": ["4", "40"], "source": "open_curriculum"}
+{"id": "addpw-4-0", "grade": "kindergarten", "domain": "math", "prompt": "4 plus 0 word", "answer": "four", "kind": "problem", "keywords": ["four", "4", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-4-1", "grade": "kindergarten", "domain": "math", "prompt": "4+1", "answer": "5", "kind": "problem", "keywords": ["5", "41"], "source": "open_curriculum"}
+{"id": "addpw-4-1", "grade": "kindergarten", "domain": "math", "prompt": "4 plus 1 word", "answer": "five", "kind": "problem", "keywords": ["five", "4", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-4-2", "grade": "kindergarten", "domain": "math", "prompt": "4+2", "answer": "6", "kind": "problem", "keywords": ["6", "42"], "source": "open_curriculum"}
+{"id": "addpw-4-2", "grade": "kindergarten", "domain": "math", "prompt": "4 plus 2 word", "answer": "six", "kind": "problem", "keywords": ["six", "4", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-4-3", "grade": "kindergarten", "domain": "math", "prompt": "4+3", "answer": "7", "kind": "problem", "keywords": ["7", "43"], "source": "open_curriculum"}
+{"id": "addpw-4-3", "grade": "kindergarten", "domain": "math", "prompt": "4 plus 3 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "4", "plus", "3", "word"], "source": "open_curriculum"}
+{"id": "addp-4-4", "grade": "kindergarten", "domain": "math", "prompt": "4+4", "answer": "8", "kind": "problem", "keywords": ["8", "44"], "source": "open_curriculum"}
+{"id": "addpw-4-4", "grade": "kindergarten", "domain": "math", "prompt": "4 plus 4 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "4", "plus", "word"], "source": "open_curriculum"}
+{"id": "addp-4-5", "grade": "kindergarten", "domain": "math", "prompt": "4+5", "answer": "9", "kind": "problem", "keywords": ["9", "45"], "source": "open_curriculum"}
+{"id": "addpw-4-5", "grade": "kindergarten", "domain": "math", "prompt": "4 plus 5 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "4", "plus", "5", "word"], "source": "open_curriculum"}
+{"id": "addp-4-6", "grade": "kindergarten", "domain": "math", "prompt": "4+6", "answer": "10", "kind": "problem", "keywords": ["10", "46"], "source": "open_curriculum"}
+{"id": "addpw-4-6", "grade": "kindergarten", "domain": "math", "prompt": "4 plus 6 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "4", "plus", "6", "word"], "source": "open_curriculum"}
+{"id": "addp-4-7", "grade": "grade1", "domain": "math", "prompt": "4+7", "answer": "11", "kind": "problem", "keywords": ["11", "47"], "source": "open_curriculum"}
+{"id": "addp-4-8", "grade": "grade1", "domain": "math", "prompt": "4+8", "answer": "12", "kind": "problem", "keywords": ["12", "48"], "source": "open_curriculum"}
+{"id": "addp-4-9", "grade": "grade1", "domain": "math", "prompt": "4+9", "answer": "13", "kind": "problem", "keywords": ["13", "49"], "source": "open_curriculum"}
+{"id": "addp-4-10", "grade": "grade1", "domain": "math", "prompt": "4+10", "answer": "14", "kind": "problem", "keywords": ["14", "410"], "source": "open_curriculum"}
+{"id": "addp-5-0", "grade": "kindergarten", "domain": "math", "prompt": "5+0", "answer": "5", "kind": "problem", "keywords": ["5", "50"], "source": "open_curriculum"}
+{"id": "addpw-5-0", "grade": "kindergarten", "domain": "math", "prompt": "5 plus 0 word", "answer": "five", "kind": "problem", "keywords": ["five", "5", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-5-1", "grade": "kindergarten", "domain": "math", "prompt": "5+1", "answer": "6", "kind": "problem", "keywords": ["6", "51"], "source": "open_curriculum"}
+{"id": "addpw-5-1", "grade": "kindergarten", "domain": "math", "prompt": "5 plus 1 word", "answer": "six", "kind": "problem", "keywords": ["six", "5", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-5-2", "grade": "kindergarten", "domain": "math", "prompt": "5+2", "answer": "7", "kind": "problem", "keywords": ["7", "52"], "source": "open_curriculum"}
+{"id": "addpw-5-2", "grade": "kindergarten", "domain": "math", "prompt": "5 plus 2 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "5", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-5-3", "grade": "kindergarten", "domain": "math", "prompt": "5+3", "answer": "8", "kind": "problem", "keywords": ["8", "53"], "source": "open_curriculum"}
+{"id": "addpw-5-3", "grade": "kindergarten", "domain": "math", "prompt": "5 plus 3 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "5", "plus", "3", "word"], "source": "open_curriculum"}
+{"id": "addp-5-4", "grade": "kindergarten", "domain": "math", "prompt": "5+4", "answer": "9", "kind": "problem", "keywords": ["9", "54"], "source": "open_curriculum"}
+{"id": "addpw-5-4", "grade": "kindergarten", "domain": "math", "prompt": "5 plus 4 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "5", "plus", "4", "word"], "source": "open_curriculum"}
+{"id": "addp-5-5", "grade": "kindergarten", "domain": "math", "prompt": "5+5", "answer": "10", "kind": "problem", "keywords": ["10", "55"], "source": "open_curriculum"}
+{"id": "addpw-5-5", "grade": "kindergarten", "domain": "math", "prompt": "5 plus 5 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "5", "plus", "word"], "source": "open_curriculum"}
+{"id": "addp-5-6", "grade": "grade1", "domain": "math", "prompt": "5+6", "answer": "11", "kind": "problem", "keywords": ["11", "56"], "source": "open_curriculum"}
+{"id": "addp-5-7", "grade": "grade1", "domain": "math", "prompt": "5+7", "answer": "12", "kind": "problem", "keywords": ["12", "57"], "source": "open_curriculum"}
+{"id": "addp-5-8", "grade": "grade1", "domain": "math", "prompt": "5+8", "answer": "13", "kind": "problem", "keywords": ["13", "58"], "source": "open_curriculum"}
+{"id": "addp-5-9", "grade": "grade1", "domain": "math", "prompt": "5+9", "answer": "14", "kind": "problem", "keywords": ["14", "59"], "source": "open_curriculum"}
+{"id": "addp-5-10", "grade": "grade1", "domain": "math", "prompt": "5+10", "answer": "15", "kind": "problem", "keywords": ["15", "510"], "source": "open_curriculum"}
+{"id": "addp-6-0", "grade": "kindergarten", "domain": "math", "prompt": "6+0", "answer": "6", "kind": "problem", "keywords": ["6", "60"], "source": "open_curriculum"}
+{"id": "addpw-6-0", "grade": "kindergarten", "domain": "math", "prompt": "6 plus 0 word", "answer": "six", "kind": "problem", "keywords": ["six", "6", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-6-1", "grade": "kindergarten", "domain": "math", "prompt": "6+1", "answer": "7", "kind": "problem", "keywords": ["7", "61"], "source": "open_curriculum"}
+{"id": "addpw-6-1", "grade": "kindergarten", "domain": "math", "prompt": "6 plus 1 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "6", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-6-2", "grade": "kindergarten", "domain": "math", "prompt": "6+2", "answer": "8", "kind": "problem", "keywords": ["8", "62"], "source": "open_curriculum"}
+{"id": "addpw-6-2", "grade": "kindergarten", "domain": "math", "prompt": "6 plus 2 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "6", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-6-3", "grade": "kindergarten", "domain": "math", "prompt": "6+3", "answer": "9", "kind": "problem", "keywords": ["9", "63"], "source": "open_curriculum"}
+{"id": "addpw-6-3", "grade": "kindergarten", "domain": "math", "prompt": "6 plus 3 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "6", "plus", "3", "word"], "source": "open_curriculum"}
+{"id": "addp-6-4", "grade": "kindergarten", "domain": "math", "prompt": "6+4", "answer": "10", "kind": "problem", "keywords": ["10", "64"], "source": "open_curriculum"}
+{"id": "addpw-6-4", "grade": "kindergarten", "domain": "math", "prompt": "6 plus 4 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "6", "plus", "4", "word"], "source": "open_curriculum"}
+{"id": "addp-6-5", "grade": "grade1", "domain": "math", "prompt": "6+5", "answer": "11", "kind": "problem", "keywords": ["11", "65"], "source": "open_curriculum"}
+{"id": "addp-6-6", "grade": "grade1", "domain": "math", "prompt": "6+6", "answer": "12", "kind": "problem", "keywords": ["12", "66"], "source": "open_curriculum"}
+{"id": "addp-6-7", "grade": "grade1", "domain": "math", "prompt": "6+7", "answer": "13", "kind": "problem", "keywords": ["13", "67"], "source": "open_curriculum"}
+{"id": "addp-6-8", "grade": "grade1", "domain": "math", "prompt": "6+8", "answer": "14", "kind": "problem", "keywords": ["14", "68"], "source": "open_curriculum"}
+{"id": "addp-6-9", "grade": "grade1", "domain": "math", "prompt": "6+9", "answer": "15", "kind": "problem", "keywords": ["15", "69"], "source": "open_curriculum"}
+{"id": "addp-6-10", "grade": "grade1", "domain": "math", "prompt": "6+10", "answer": "16", "kind": "problem", "keywords": ["16", "610"], "source": "open_curriculum"}
+{"id": "addp-7-0", "grade": "kindergarten", "domain": "math", "prompt": "7+0", "answer": "7", "kind": "problem", "keywords": ["7", "70"], "source": "open_curriculum"}
+{"id": "addpw-7-0", "grade": "kindergarten", "domain": "math", "prompt": "7 plus 0 word", "answer": "seven", "kind": "problem", "keywords": ["seven", "7", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-7-1", "grade": "kindergarten", "domain": "math", "prompt": "7+1", "answer": "8", "kind": "problem", "keywords": ["8", "71"], "source": "open_curriculum"}
+{"id": "addpw-7-1", "grade": "kindergarten", "domain": "math", "prompt": "7 plus 1 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "7", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-7-2", "grade": "kindergarten", "domain": "math", "prompt": "7+2", "answer": "9", "kind": "problem", "keywords": ["9", "72"], "source": "open_curriculum"}
+{"id": "addpw-7-2", "grade": "kindergarten", "domain": "math", "prompt": "7 plus 2 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "7", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-7-3", "grade": "kindergarten", "domain": "math", "prompt": "7+3", "answer": "10", "kind": "problem", "keywords": ["10", "73"], "source": "open_curriculum"}
+{"id": "addpw-7-3", "grade": "kindergarten", "domain": "math", "prompt": "7 plus 3 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "7", "plus", "3", "word"], "source": "open_curriculum"}
+{"id": "addp-7-4", "grade": "grade1", "domain": "math", "prompt": "7+4", "answer": "11", "kind": "problem", "keywords": ["11", "74"], "source": "open_curriculum"}
+{"id": "addp-7-5", "grade": "grade1", "domain": "math", "prompt": "7+5", "answer": "12", "kind": "problem", "keywords": ["12", "75"], "source": "open_curriculum"}
+{"id": "addp-7-6", "grade": "grade1", "domain": "math", "prompt": "7+6", "answer": "13", "kind": "problem", "keywords": ["13", "76"], "source": "open_curriculum"}
+{"id": "addp-7-7", "grade": "grade1", "domain": "math", "prompt": "7+7", "answer": "14", "kind": "problem", "keywords": ["14", "77"], "source": "open_curriculum"}
+{"id": "addp-7-8", "grade": "grade1", "domain": "math", "prompt": "7+8", "answer": "15", "kind": "problem", "keywords": ["15", "78"], "source": "open_curriculum"}
+{"id": "addp-7-9", "grade": "grade1", "domain": "math", "prompt": "7+9", "answer": "16", "kind": "problem", "keywords": ["16", "79"], "source": "open_curriculum"}
+{"id": "addp-7-10", "grade": "grade1", "domain": "math", "prompt": "7+10", "answer": "17", "kind": "problem", "keywords": ["17", "710"], "source": "open_curriculum"}
+{"id": "addp-8-0", "grade": "kindergarten", "domain": "math", "prompt": "8+0", "answer": "8", "kind": "problem", "keywords": ["8", "80"], "source": "open_curriculum"}
+{"id": "addpw-8-0", "grade": "kindergarten", "domain": "math", "prompt": "8 plus 0 word", "answer": "eight", "kind": "problem", "keywords": ["eight", "8", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-8-1", "grade": "kindergarten", "domain": "math", "prompt": "8+1", "answer": "9", "kind": "problem", "keywords": ["9", "81"], "source": "open_curriculum"}
+{"id": "addpw-8-1", "grade": "kindergarten", "domain": "math", "prompt": "8 plus 1 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "8", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-8-2", "grade": "kindergarten", "domain": "math", "prompt": "8+2", "answer": "10", "kind": "problem", "keywords": ["10", "82"], "source": "open_curriculum"}
+{"id": "addpw-8-2", "grade": "kindergarten", "domain": "math", "prompt": "8 plus 2 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "8", "plus", "2", "word"], "source": "open_curriculum"}
+{"id": "addp-8-3", "grade": "grade1", "domain": "math", "prompt": "8+3", "answer": "11", "kind": "problem", "keywords": ["11", "83"], "source": "open_curriculum"}
+{"id": "addp-8-4", "grade": "grade1", "domain": "math", "prompt": "8+4", "answer": "12", "kind": "problem", "keywords": ["12", "84"], "source": "open_curriculum"}
+{"id": "addp-8-5", "grade": "grade1", "domain": "math", "prompt": "8+5", "answer": "13", "kind": "problem", "keywords": ["13", "85"], "source": "open_curriculum"}
+{"id": "addp-8-6", "grade": "grade1", "domain": "math", "prompt": "8+6", "answer": "14", "kind": "problem", "keywords": ["14", "86"], "source": "open_curriculum"}
+{"id": "addp-8-7", "grade": "grade1", "domain": "math", "prompt": "8+7", "answer": "15", "kind": "problem", "keywords": ["15", "87"], "source": "open_curriculum"}
+{"id": "addp-8-8", "grade": "grade1", "domain": "math", "prompt": "8+8", "answer": "16", "kind": "problem", "keywords": ["16", "88"], "source": "open_curriculum"}
+{"id": "addp-8-9", "grade": "grade1", "domain": "math", "prompt": "8+9", "answer": "17", "kind": "problem", "keywords": ["17", "89"], "source": "open_curriculum"}
+{"id": "addp-8-10", "grade": "grade1", "domain": "math", "prompt": "8+10", "answer": "18", "kind": "problem", "keywords": ["18", "810"], "source": "open_curriculum"}
+{"id": "addp-9-0", "grade": "kindergarten", "domain": "math", "prompt": "9+0", "answer": "9", "kind": "problem", "keywords": ["9", "90"], "source": "open_curriculum"}
+{"id": "addpw-9-0", "grade": "kindergarten", "domain": "math", "prompt": "9 plus 0 word", "answer": "nine", "kind": "problem", "keywords": ["nine", "9", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-9-1", "grade": "kindergarten", "domain": "math", "prompt": "9+1", "answer": "10", "kind": "problem", "keywords": ["10", "91"], "source": "open_curriculum"}
+{"id": "addpw-9-1", "grade": "kindergarten", "domain": "math", "prompt": "9 plus 1 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "9", "plus", "1", "word"], "source": "open_curriculum"}
+{"id": "addp-9-2", "grade": "grade1", "domain": "math", "prompt": "9+2", "answer": "11", "kind": "problem", "keywords": ["11", "92"], "source": "open_curriculum"}
+{"id": "addp-9-3", "grade": "grade1", "domain": "math", "prompt": "9+3", "answer": "12", "kind": "problem", "keywords": ["12", "93"], "source": "open_curriculum"}
+{"id": "addp-9-4", "grade": "grade1", "domain": "math", "prompt": "9+4", "answer": "13", "kind": "problem", "keywords": ["13", "94"], "source": "open_curriculum"}
+{"id": "addp-9-5", "grade": "grade1", "domain": "math", "prompt": "9+5", "answer": "14", "kind": "problem", "keywords": ["14", "95"], "source": "open_curriculum"}
+{"id": "addp-9-6", "grade": "grade1", "domain": "math", "prompt": "9+6", "answer": "15", "kind": "problem", "keywords": ["15", "96"], "source": "open_curriculum"}
+{"id": "addp-9-7", "grade": "grade1", "domain": "math", "prompt": "9+7", "answer": "16", "kind": "problem", "keywords": ["16", "97"], "source": "open_curriculum"}
+{"id": "addp-9-8", "grade": "grade1", "domain": "math", "prompt": "9+8", "answer": "17", "kind": "problem", "keywords": ["17", "98"], "source": "open_curriculum"}
+{"id": "addp-9-9", "grade": "grade1", "domain": "math", "prompt": "9+9", "answer": "18", "kind": "problem", "keywords": ["18", "99"], "source": "open_curriculum"}
+{"id": "addp-9-10", "grade": "grade1", "domain": "math", "prompt": "9+10", "answer": "19", "kind": "problem", "keywords": ["19", "910"], "source": "open_curriculum"}
+{"id": "addp-10-0", "grade": "kindergarten", "domain": "math", "prompt": "10+0", "answer": "10", "kind": "problem", "keywords": ["10", "100"], "source": "open_curriculum"}
+{"id": "addpw-10-0", "grade": "kindergarten", "domain": "math", "prompt": "10 plus 0 word", "answer": "ten", "kind": "problem", "keywords": ["ten", "10", "plus", "0", "word"], "source": "open_curriculum"}
+{"id": "addp-10-1", "grade": "grade1", "domain": "math", "prompt": "10+1", "answer": "11", "kind": "problem", "keywords": ["11", "101"], "source": "open_curriculum"}
+{"id": "addp-10-2", "grade": "grade1", "domain": "math", "prompt": "10+2", "answer": "12", "kind": "problem", "keywords": ["12", "102"], "source": "open_curriculum"}
+{"id": "addp-10-3", "grade": "grade1", "domain": "math", "prompt": "10+3", "answer": "13", "kind": "problem", "keywords": ["13", "103"], "source": "open_curriculum"}
+{"id": "addp-10-4", "grade": "grade1", "domain": "math", "prompt": "10+4", "answer": "14", "kind": "problem", "keywords": ["14", "104"], "source": "open_curriculum"}
+{"id": "addp-10-5", "grade": "grade1", "domain": "math", "prompt": "10+5", "answer": "15", "kind": "problem", "keywords": ["15", "105"], "source": "open_curriculum"}
+{"id": "addp-10-6", "grade": "grade1", "domain": "math", "prompt": "10+6", "answer": "16", "kind": "problem", "keywords": ["16", "106"], "source": "open_curriculum"}
+{"id": "addp-10-7", "grade": "grade1", "domain": "math", "prompt": "10+7", "answer": "17", "kind": "problem", "keywords": ["17", "107"], "source": "open_curriculum"}
+{"id": "addp-10-8", "grade": "grade1", "domain": "math", "prompt": "10+8", "answer": "18", "kind": "problem", "keywords": ["18", "108"], "source": "open_curriculum"}
+{"id": "addp-10-9", "grade": "grade1", "domain": "math", "prompt": "10+9", "answer": "19", "kind": "problem", "keywords": ["19", "109"], "source": "open_curriculum"}
+{"id": "addp-10-10", "grade": "grade1", "domain": "math", "prompt": "10+10", "answer": "20", "kind": "problem", "keywords": ["20", "1010"], "source": "open_curriculum"}
+{"id": "subp-0-0", "grade": "preschool", "domain": "math", "prompt": "0-0", "answer": "0", "kind": "problem", "keywords": ["0", "00"], "source": "open_curriculum"}
+{"id": "subp-1-0", "grade": "preschool", "domain": "math", "prompt": "1-0", "answer": "1", "kind": "problem", "keywords": ["1", "10"], "source": "open_curriculum"}
+{"id": "subp-1-1", "grade": "preschool", "domain": "math", "prompt": "1-1", "answer": "0", "kind": "problem", "keywords": ["0", "11"], "source": "open_curriculum"}
+{"id": "subp-2-0", "grade": "preschool", "domain": "math", "prompt": "2-0", "answer": "2", "kind": "problem", "keywords": ["2", "20"], "source": "open_curriculum"}
+{"id": "subp-2-1", "grade": "preschool", "domain": "math", "prompt": "2-1", "answer": "1", "kind": "problem", "keywords": ["1", "21"], "source": "open_curriculum"}
+{"id": "subp-2-2", "grade": "preschool", "domain": "math", "prompt": "2-2", "answer": "0", "kind": "problem", "keywords": ["0", "22"], "source": "open_curriculum"}
+{"id": "subp-3-0", "grade": "preschool", "domain": "math", "prompt": "3-0", "answer": "3", "kind": "problem", "keywords": ["3", "30"], "source": "open_curriculum"}
+{"id": "subp-3-1", "grade": "preschool", "domain": "math", "prompt": "3-1", "answer": "2", "kind": "problem", "keywords": ["2", "31"], "source": "open_curriculum"}
+{"id": "subp-3-2", "grade": "preschool", "domain": "math", "prompt": "3-2", "answer": "1", "kind": "problem", "keywords": ["1", "32"], "source": "open_curriculum"}
+{"id": "subp-3-3", "grade": "preschool", "domain": "math", "prompt": "3-3", "answer": "0", "kind": "problem", "keywords": ["0", "33"], "source": "open_curriculum"}
+{"id": "subp-4-0", "grade": "preschool", "domain": "math", "prompt": "4-0", "answer": "4", "kind": "problem", "keywords": ["4", "40"], "source": "open_curriculum"}
+{"id": "subp-4-1", "grade": "preschool", "domain": "math", "prompt": "4-1", "answer": "3", "kind": "problem", "keywords": ["3", "41"], "source": "open_curriculum"}
+{"id": "subp-4-2", "grade": "preschool", "domain": "math", "prompt": "4-2", "answer": "2", "kind": "problem", "keywords": ["2", "42"], "source": "open_curriculum"}
+{"id": "subp-4-3", "grade": "preschool", "domain": "math", "prompt": "4-3", "answer": "1", "kind": "problem", "keywords": ["1", "43"], "source": "open_curriculum"}
+{"id": "subp-4-4", "grade": "preschool", "domain": "math", "prompt": "4-4", "answer": "0", "kind": "problem", "keywords": ["0", "44"], "source": "open_curriculum"}
+{"id": "subp-5-0", "grade": "preschool", "domain": "math", "prompt": "5-0", "answer": "5", "kind": "problem", "keywords": ["5", "50"], "source": "open_curriculum"}
+{"id": "subp-5-1", "grade": "preschool", "domain": "math", "prompt": "5-1", "answer": "4", "kind": "problem", "keywords": ["4", "51"], "source": "open_curriculum"}
+{"id": "subp-5-2", "grade": "preschool", "domain": "math", "prompt": "5-2", "answer": "3", "kind": "problem", "keywords": ["3", "52"], "source": "open_curriculum"}
+{"id": "subp-5-3", "grade": "preschool", "domain": "math", "prompt": "5-3", "answer": "2", "kind": "problem", "keywords": ["2", "53"], "source": "open_curriculum"}
+{"id": "subp-5-4", "grade": "preschool", "domain": "math", "prompt": "5-4", "answer": "1", "kind": "problem", "keywords": ["1", "54"], "source": "open_curriculum"}
+{"id": "subp-5-5", "grade": "preschool", "domain": "math", "prompt": "5-5", "answer": "0", "kind": "problem", "keywords": ["0", "55"], "source": "open_curriculum"}
+{"id": "subp-6-0", "grade": "kindergarten", "domain": "math", "prompt": "6-0", "answer": "6", "kind": "problem", "keywords": ["6", "60"], "source": "open_curriculum"}
+{"id": "subp-6-1", "grade": "kindergarten", "domain": "math", "prompt": "6-1", "answer": "5", "kind": "problem", "keywords": ["5", "61"], "source": "open_curriculum"}
+{"id": "subp-6-2", "grade": "kindergarten", "domain": "math", "prompt": "6-2", "answer": "4", "kind": "problem", "keywords": ["4", "62"], "source": "open_curriculum"}
+{"id": "subp-6-3", "grade": "kindergarten", "domain": "math", "prompt": "6-3", "answer": "3", "kind": "problem", "keywords": ["3", "63"], "source": "open_curriculum"}
+{"id": "subp-6-4", "grade": "kindergarten", "domain": "math", "prompt": "6-4", "answer": "2", "kind": "problem", "keywords": ["2", "64"], "source": "open_curriculum"}
+{"id": "subp-6-5", "grade": "kindergarten", "domain": "math", "prompt": "6-5", "answer": "1", "kind": "problem", "keywords": ["1", "65"], "source": "open_curriculum"}
+{"id": "subp-6-6", "grade": "kindergarten", "domain": "math", "prompt": "6-6", "answer": "0", "kind": "problem", "keywords": ["0", "66"], "source": "open_curriculum"}
+{"id": "subp-7-0", "grade": "kindergarten", "domain": "math", "prompt": "7-0", "answer": "7", "kind": "problem", "keywords": ["7", "70"], "source": "open_curriculum"}
+{"id": "subp-7-1", "grade": "kindergarten", "domain": "math", "prompt": "7-1", "answer": "6", "kind": "problem", "keywords": ["6", "71"], "source": "open_curriculum"}
+{"id": "subp-7-2", "grade": "kindergarten", "domain": "math", "prompt": "7-2", "answer": "5", "kind": "problem", "keywords": ["5", "72"], "source": "open_curriculum"}
+{"id": "subp-7-3", "grade": "kindergarten", "domain": "math", "prompt": "7-3", "answer": "4", "kind": "problem", "keywords": ["4", "73"], "source": "open_curriculum"}
+{"id": "subp-7-4", "grade": "kindergarten", "domain": "math", "prompt": "7-4", "answer": "3", "kind": "problem", "keywords": ["3", "74"], "source": "open_curriculum"}
+{"id": "subp-7-5", "grade": "kindergarten", "domain": "math", "prompt": "7-5", "answer": "2", "kind": "problem", "keywords": ["2", "75"], "source": "open_curriculum"}
+{"id": "subp-7-6", "grade": "kindergarten", "domain": "math", "prompt": "7-6", "answer": "1", "kind": "problem", "keywords": ["1", "76"], "source": "open_curriculum"}
+{"id": "subp-7-7", "grade": "kindergarten", "domain": "math", "prompt": "7-7", "answer": "0", "kind": "problem", "keywords": ["0", "77"], "source": "open_curriculum"}
+{"id": "subp-8-0", "grade": "kindergarten", "domain": "math", "prompt": "8-0", "answer": "8", "kind": "problem", "keywords": ["8", "80"], "source": "open_curriculum"}
+{"id": "subp-8-1", "grade": "kindergarten", "domain": "math", "prompt": "8-1", "answer": "7", "kind": "problem", "keywords": ["7", "81"], "source": "open_curriculum"}
+{"id": "subp-8-2", "grade": "kindergarten", "domain": "math", "prompt": "8-2", "answer": "6", "kind": "problem", "keywords": ["6", "82"], "source": "open_curriculum"}
+{"id": "subp-8-3", "grade": "kindergarten", "domain": "math", "prompt": "8-3", "answer": "5", "kind": "problem", "keywords": ["5", "83"], "source": "open_curriculum"}
+{"id": "subp-8-4", "grade": "kindergarten", "domain": "math", "prompt": "8-4", "answer": "4", "kind": "problem", "keywords": ["4", "84"], "source": "open_curriculum"}
+{"id": "subp-8-5", "grade": "kindergarten", "domain": "math", "prompt": "8-5", "answer": "3", "kind": "problem", "keywords": ["3", "85"], "source": "open_curriculum"}
+{"id": "subp-8-6", "grade": "kindergarten", "domain": "math", "prompt": "8-6", "answer": "2", "kind": "problem", "keywords": ["2", "86"], "source": "open_curriculum"}
+{"id": "subp-8-7", "grade": "kindergarten", "domain": "math", "prompt": "8-7", "answer": "1", "kind": "problem", "keywords": ["1", "87"], "source": "open_curriculum"}
+{"id": "subp-8-8", "grade": "kindergarten", "domain": "math", "prompt": "8-8", "answer": "0", "kind": "problem", "keywords": ["0", "88"], "source": "open_curriculum"}
+{"id": "subp-9-0", "grade": "grade1", "domain": "math", "prompt": "9-0", "answer": "9", "kind": "problem", "keywords": ["9", "90"], "source": "open_curriculum"}
+{"id": "subp-9-1", "grade": "grade1", "domain": "math", "prompt": "9-1", "answer": "8", "kind": "problem", "keywords": ["8", "91"], "source": "open_curriculum"}
+{"id": "subp-9-2", "grade": "grade1", "domain": "math", "prompt": "9-2", "answer": "7", "kind": "problem", "keywords": ["7", "92"], "source": "open_curriculum"}
+{"id": "subp-9-3", "grade": "grade1", "domain": "math", "prompt": "9-3", "answer": "6", "kind": "problem", "keywords": ["6", "93"], "source": "open_curriculum"}
+{"id": "subp-9-4", "grade": "grade1", "domain": "math", "prompt": "9-4", "answer": "5", "kind": "problem", "keywords": ["5", "94"], "source": "open_curriculum"}
+{"id": "subp-9-5", "grade": "grade1", "domain": "math", "prompt": "9-5", "answer": "4", "kind": "problem", "keywords": ["4", "95"], "source": "open_curriculum"}
+{"id": "subp-9-6", "grade": "grade1", "domain": "math", "prompt": "9-6", "answer": "3", "kind": "problem", "keywords": ["3", "96"], "source": "open_curriculum"}
+{"id": "subp-9-7", "grade": "grade1", "domain": "math", "prompt": "9-7", "answer": "2", "kind": "problem", "keywords": ["2", "97"], "source": "open_curriculum"}
+{"id": "subp-9-8", "grade": "grade1", "domain": "math", "prompt": "9-8", "answer": "1", "kind": "problem", "keywords": ["1", "98"], "source": "open_curriculum"}
+{"id": "subp-9-9", "grade": "grade1", "domain": "math", "prompt": "9-9", "answer": "0", "kind": "problem", "keywords": ["0", "99"], "source": "open_curriculum"}
+{"id": "subp-10-0", "grade": "grade1", "domain": "math", "prompt": "10-0", "answer": "10", "kind": "problem", "keywords": ["10", "100"], "source": "open_curriculum"}
+{"id": "subp-10-1", "grade": "grade1", "domain": "math", "prompt": "10-1", "answer": "9", "kind": "problem", "keywords": ["9", "101"], "source": "open_curriculum"}
+{"id": "subp-10-2", "grade": "grade1", "domain": "math", "prompt": "10-2", "answer": "8", "kind": "problem", "keywords": ["8", "102"], "source": "open_curriculum"}
+{"id": "subp-10-3", "grade": "grade1", "domain": "math", "prompt": "10-3", "answer": "7", "kind": "problem", "keywords": ["7", "103"], "source": "open_curriculum"}
+{"id": "subp-10-4", "grade": "grade1", "domain": "math", "prompt": "10-4", "answer": "6", "kind": "problem", "keywords": ["6", "104"], "source": "open_curriculum"}
+{"id": "subp-10-5", "grade": "grade1", "domain": "math", "prompt": "10-5", "answer": "5", "kind": "problem", "keywords": ["5", "105"], "source": "open_curriculum"}
+{"id": "subp-10-6", "grade": "grade1", "domain": "math", "prompt": "10-6", "answer": "4", "kind": "problem", "keywords": ["4", "106"], "source": "open_curriculum"}
+{"id": "subp-10-7", "grade": "grade1", "domain": "math", "prompt": "10-7", "answer": "3", "kind": "problem", "keywords": ["3", "107"], "source": "open_curriculum"}
+{"id": "subp-10-8", "grade": "grade1", "domain": "math", "prompt": "10-8", "answer": "2", "kind": "problem", "keywords": ["2", "108"], "source": "open_curriculum"}
+{"id": "subp-10-9", "grade": "grade1", "domain": "math", "prompt": "10-9", "answer": "1", "kind": "problem", "keywords": ["1", "109"], "source": "open_curriculum"}
+{"id": "subp-10-10", "grade": "grade1", "domain": "math", "prompt": "10-10", "answer": "0", "kind": "problem", "keywords": ["0", "1010"], "source": "open_curriculum"}
+{"id": "make10p-0", "grade": "kindergarten", "domain": "math", "prompt": "0 and what make ten", "answer": "ten", "kind": "problem", "keywords": ["ten", "0", "and", "what", "make"], "source": "open_curriculum"}
+{"id": "make10p-1", "grade": "kindergarten", "domain": "math", "prompt": "1 and what make ten", "answer": "nine", "kind": "problem", "keywords": ["nine", "1", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-2", "grade": "kindergarten", "domain": "math", "prompt": "2 and what make ten", "answer": "eight", "kind": "problem", "keywords": ["eight", "2", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-3", "grade": "kindergarten", "domain": "math", "prompt": "3 and what make ten", "answer": "seven", "kind": "problem", "keywords": ["seven", "3", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-4", "grade": "kindergarten", "domain": "math", "prompt": "4 and what make ten", "answer": "six", "kind": "problem", "keywords": ["six", "4", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-5", "grade": "kindergarten", "domain": "math", "prompt": "5 and what make ten", "answer": "five", "kind": "problem", "keywords": ["five", "5", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-6", "grade": "grade1", "domain": "math", "prompt": "6 and what make ten", "answer": "four", "kind": "problem", "keywords": ["four", "6", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-7", "grade": "grade1", "domain": "math", "prompt": "7 and what make ten", "answer": "three", "kind": "problem", "keywords": ["three", "7", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-8", "grade": "grade1", "domain": "math", "prompt": "8 and what make ten", "answer": "two", "kind": "problem", "keywords": ["two", "8", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-9", "grade": "grade1", "domain": "math", "prompt": "9 and what make ten", "answer": "one", "kind": "problem", "keywords": ["one", "9", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "make10p-10", "grade": "grade1", "domain": "math", "prompt": "10 and what make ten", "answer": "zero", "kind": "problem", "keywords": ["zero", "10", "and", "what", "make", "ten"], "source": "open_curriculum"}
+{"id": "wp-apples", "grade": "preschool", "domain": "math", "prompt": "one apple and one apple how many", "answer": "two", "kind": "word", "keywords": ["two", "one", "apple", "and", "how", "many"], "source": "open_curriculum"}
+{"id": "wp-birds", "grade": "kindergarten", "domain": "math", "prompt": "two birds and one bird how many", "answer": "three", "kind": "word", "keywords": ["three", "two", "birds", "and", "one", "bird", "how", "many"], "source": "open_curriculum"}
+{"id": "wp-blocks", "grade": "grade1", "domain": "math", "prompt": "three plus two equals what", "answer": "five", "kind": "word", "keywords": ["five", "three", "plus", "two", "equals", "what"], "source": "open_curriculum"}
+{"id": "p-g1-cap", "grade": "grade1", "domain": "literacy", "prompt": "sentence starts", "answer": "capital", "kind": "fact", "keywords": ["capital", "sentence", "starts"], "source": "open_curriculum"}
+{"id": "p-g1-period", "grade": "grade1", "domain": "literacy", "prompt": "sentence ends", "answer": "period", "kind": "fact", "keywords": ["period", "sentence", "ends"], "source": "open_curriculum"}
+{"id": "p-g1-qmark", "grade": "grade1", "domain": "literacy", "prompt": "question ends", "answer": "mark", "kind": "fact", "keywords": ["mark", "question", "ends"], "source": "open_curriculum"}
+{"id": "p-k-book", "grade": "kindergarten", "domain": "literacy", "prompt": "we read", "answer": "book", "kind": "fact", "keywords": ["book", "we", "read"], "source": "open_curriculum"}
+{"id": "p-k-pencil", "grade": "kindergarten", "domain": "literacy", "prompt": "write with", "answer": "pencil", "kind": "fact", "keywords": ["pencil", "write", "with"], "source": "open_curriculum"}
+{"id": "p-pk-see-words", "grade": "preschool", "domain": "literacy", "prompt": "we see words", "answer": "eyes", "kind": "fact", "keywords": ["eyes", "we", "see", "words"], "source": "open_curriculum"}
+{"id": "p-pk-sky", "grade": "preschool", "domain": "science", "prompt": "color of sky", "answer": "blue", "kind": "fact", "keywords": ["blue", "color", "of", "sky"], "source": "open_curriculum"}
+{"id": "p-pk-grass", "grade": "preschool", "domain": "science", "prompt": "color of grass", "answer": "green", "kind": "fact", "keywords": ["green", "color", "of", "grass"], "source": "open_curriculum"}
+{"id": "p-pk-sun-day", "grade": "preschool", "domain": "science", "prompt": "when is sun out", "answer": "day", "kind": "fact", "keywords": ["day", "when", "is", "sun", "out"], "source": "open_curriculum"}
+{"id": "p-pk-moon-night", "grade": "preschool", "domain": "science", "prompt": "when is moon out", "answer": "night", "kind": "fact", "keywords": ["night", "when", "is", "moon", "out"], "source": "open_curriculum"}
+{"id": "p-pk-eyes", "grade": "preschool", "domain": "science", "prompt": "what sees", "answer": "eyes", "kind": "fact", "keywords": ["eyes", "what", "sees"], "source": "open_curriculum"}
+{"id": "p-pk-ears", "grade": "preschool", "domain": "science", "prompt": "what hears", "answer": "ears", "kind": "fact", "keywords": ["ears", "what", "hears"], "source": "open_curriculum"}
+{"id": "p-pk-nose", "grade": "preschool", "domain": "science", "prompt": "what smells", "answer": "nose", "kind": "fact", "keywords": ["nose", "what", "smells"], "source": "open_curriculum"}
+{"id": "p-pk-hands", "grade": "preschool", "domain": "science", "prompt": "what touches", "answer": "hands", "kind": "fact", "keywords": ["hands", "what", "touches"], "source": "open_curriculum"}
+{"id": "p-pk-dog", "grade": "preschool", "domain": "science", "prompt": "is dog animal", "answer": "animal", "kind": "fact", "keywords": ["animal", "is", "dog"], "source": "open_curriculum"}
+{"id": "p-pk-cat", "grade": "preschool", "domain": "science", "prompt": "is cat animal", "answer": "animal", "kind": "fact", "keywords": ["animal", "is", "cat"], "source": "open_curriculum"}
+{"id": "p-pk-bird", "grade": "preschool", "domain": "science", "prompt": "what birds do", "answer": "fly", "kind": "fact", "keywords": ["fly", "what", "birds", "do"], "source": "open_curriculum"}
+{"id": "p-pk-fish", "grade": "preschool", "domain": "science", "prompt": "where fish live", "answer": "water", "kind": "fact", "keywords": ["water", "where", "fish", "live"], "source": "open_curriculum"}
+{"id": "p-pk-apple-red", "grade": "preschool", "domain": "science", "prompt": "color of apple", "answer": "red", "kind": "fact", "keywords": ["red", "color", "of", "apple"], "source": "open_curriculum"}
+{"id": "p-pk-water-drink", "grade": "preschool", "domain": "science", "prompt": "what do we drink", "answer": "water", "kind": "fact", "keywords": ["water", "what", "do", "we", "drink"], "source": "open_curriculum"}
+{"id": "p-pk-circle", "grade": "preschool", "domain": "science", "prompt": "what is round", "answer": "circle", "kind": "fact", "keywords": ["circle", "what", "is", "round"], "source": "open_curriculum"}
+{"id": "p-k-plant-sun", "grade": "kindergarten", "domain": "science", "prompt": "what plants need", "answer": "sun", "kind": "fact", "keywords": ["sun", "what", "plants", "need"], "source": "open_curriculum"}
+{"id": "p-k-plant-water", "grade": "kindergarten", "domain": "science", "prompt": "plants water", "answer": "water", "kind": "fact", "keywords": ["water", "plants"], "source": "open_curriculum"}
+{"id": "p-k-people-water", "grade": "kindergarten", "domain": "science", "prompt": "what people need", "answer": "water", "kind": "fact", "keywords": ["water", "what", "people", "need"], "source": "open_curriculum"}
+{"id": "p-k-people-food", "grade": "kindergarten", "domain": "science", "prompt": "what people eat need", "answer": "food", "kind": "fact", "keywords": ["food", "what", "people", "eat", "need"], "source": "open_curriculum"}
+{"id": "p-k-people-air", "grade": "kindergarten", "domain": "science", "prompt": "what people breathe", "answer": "air", "kind": "fact", "keywords": ["air", "what", "people", "breathe"], "source": "open_curriculum"}
+{"id": "p-k-stop", "grade": "kindergarten", "domain": "science", "prompt": "red light do", "answer": "stop", "kind": "fact", "keywords": ["stop", "red", "light", "do"], "source": "open_curriculum"}
+{"id": "p-k-go-green", "grade": "kindergarten", "domain": "science", "prompt": "green light do", "answer": "go", "kind": "fact", "keywords": ["go", "green", "light", "do"], "source": "open_curriculum"}
+{"id": "p-k-share", "grade": "kindergarten", "domain": "science", "prompt": "what friends do", "answer": "share", "kind": "fact", "keywords": ["share", "what", "friends", "do"], "source": "open_curriculum"}
+{"id": "p-k-winter", "grade": "kindergarten", "domain": "science", "prompt": "is winter cold", "answer": "cold", "kind": "fact", "keywords": ["cold", "is", "winter"], "source": "open_curriculum"}
+{"id": "p-k-summer", "grade": "kindergarten", "domain": "science", "prompt": "is summer hot", "answer": "hot", "kind": "fact", "keywords": ["hot", "is", "summer"], "source": "open_curriculum"}
+{"id": "p-k-rain-wet", "grade": "kindergarten", "domain": "science", "prompt": "what rain does", "answer": "wet", "kind": "fact", "keywords": ["wet", "what", "rain", "does"], "source": "open_curriculum"}
+{"id": "p-k-square", "grade": "kindergarten", "domain": "science", "prompt": "how many sides square", "answer": "four", "kind": "fact", "keywords": ["four", "how", "many", "sides", "square"], "source": "open_curriculum"}
+{"id": "p-k-triangle", "grade": "kindergarten", "domain": "science", "prompt": "how many sides triangle", "answer": "three", "kind": "fact", "keywords": ["three", "how", "many", "sides", "triangle"], "source": "open_curriculum"}
+{"id": "p-k-book", "grade": "kindergarten", "domain": "science", "prompt": "what do we read", "answer": "book", "kind": "fact", "keywords": ["book", "what", "do", "we", "read"], "source": "open_curriculum"}
+{"id": "p-k-write", "grade": "kindergarten", "domain": "science", "prompt": "what writes", "answer": "pencil", "kind": "fact", "keywords": ["pencil", "what", "writes"], "source": "open_curriculum"}
+{"id": "p-k-day-sun", "grade": "kindergarten", "domain": "science", "prompt": "day has", "answer": "sun", "kind": "fact", "keywords": ["sun", "day", "has"], "source": "open_curriculum"}
+{"id": "p-g1-earth", "grade": "grade1", "domain": "science", "prompt": "home planet", "answer": "earth", "kind": "fact", "keywords": ["earth", "home", "planet"], "source": "open_curriculum"}
+{"id": "p-g1-map", "grade": "grade1", "domain": "science", "prompt": "find places tool", "answer": "map", "kind": "fact", "keywords": ["map", "find", "places", "tool"], "source": "open_curriculum"}
+{"id": "p-g1-living-water", "grade": "grade1", "domain": "science", "prompt": "living things need", "answer": "water", "kind": "fact", "keywords": ["water", "living", "things", "need"], "source": "open_curriculum"}
+{"id": "p-g1-living-air", "grade": "grade1", "domain": "science", "prompt": "living things air", "answer": "air", "kind": "fact", "keywords": ["air", "living", "things"], "source": "open_curriculum"}
+{"id": "p-g1-solid", "grade": "grade1", "domain": "science", "prompt": "ice form", "answer": "solid", "kind": "fact", "keywords": ["solid", "ice", "form"], "source": "open_curriculum"}
+{"id": "p-g1-liquid", "grade": "grade1", "domain": "science", "prompt": "liquid water", "answer": "liquid", "kind": "fact", "keywords": ["liquid", "water"], "source": "open_curriculum"}
+{"id": "p-g1-gas", "grade": "grade1", "domain": "science", "prompt": "steam form", "answer": "gas", "kind": "fact", "keywords": ["gas", "steam", "form"], "source": "open_curriculum"}
+{"id": "p-g1-plant-day", "grade": "grade1", "domain": "science", "prompt": "when plants grow", "answer": "day", "kind": "fact", "keywords": ["day", "when", "plants", "grow"], "source": "open_curriculum"}
+{"id": "p-g1-magnet", "grade": "grade1", "domain": "science", "prompt": "what magnet pulls", "answer": "iron", "kind": "fact", "keywords": ["iron", "what", "magnet", "pulls"], "source": "open_curriculum"}
+{"id": "p-g1-shadow", "grade": "grade1", "domain": "science", "prompt": "what shadow needs", "answer": "light", "kind": "fact", "keywords": ["light", "what", "shadow", "needs"], "source": "open_curriculum"}
+{"id": "p-g1-seed", "grade": "grade1", "domain": "science", "prompt": "seed becomes", "answer": "plant", "kind": "fact", "keywords": ["plant", "seed", "becomes"], "source": "open_curriculum"}
+{"id": "p-g1-week", "grade": "grade1", "domain": "science", "prompt": "how many days week", "answer": "seven", "kind": "fact", "keywords": ["seven", "how", "many", "days", "week"], "source": "open_curriculum"}
+{"id": "p-g1-month-approx", "grade": "grade1", "domain": "science", "prompt": "how many months year", "answer": "twelve", "kind": "fact", "keywords": ["twelve", "how", "many", "months", "year"], "source": "open_curriculum"}

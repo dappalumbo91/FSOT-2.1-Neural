@@ -934,45 +934,47 @@ fn runGradePractice() void {
 
 fn printBand(r: grade_ladder_fixed.BandReport) void {
     std.debug.print(
-        "BAND {s} score={e} thr={e} PASS={} | facts={d}/{d} rels={d}/{d} paths={d}/{d} probs={d}/{d} taught_f={d} taught_r={d}\n",
+        "BAND {s} score={e} thr={e} PASS={} file={} taught={d} items={d}\n",
         .{
             grade_ladder_fixed.bandName(r.band),
             r.score,
             r.threshold,
             r.pass,
-            r.fact_ok,
-            r.fact_n,
-            r.rel_ok,
-            r.rel_n,
-            r.path_ok,
-            r.path_n,
-            r.prob_ok,
-            r.prob_n,
-            r.n_facts,
-            r.n_rels,
+            r.from_file,
+            r.n_taught,
+            r.n_items,
+        },
+    );
+    std.debug.print(
+        "  domains math={e}({d}/{d}) science={e}({d}/{d}) literacy={e}({d}/{d}) vision={e}({d}/{d})\n",
+        .{
+            r.math.score,     r.math.ok,     r.math.n,
+            r.science.score,  r.science.ok,  r.science.n,
+            r.literacy.score, r.literacy.ok, r.literacy.n,
+            r.vision.score,   r.vision.ok,   r.vision.n,
         },
     );
 }
 
 fn runGradeBand(band: grade_ladder_fixed.GradeBand) void {
-    std.debug.print("=== FSOT GRADE BAND ({s}) straight-A ≥95% ===\n", .{grade_ladder_fixed.bandName(band)});
-    std.debug.print("doctrine: facts + relations + example paths; local GitHub only\n", .{});
+    std.debug.print("=== FSOT GRADE BAND ({s}) straight-A ≥95% per domain ===\n", .{grade_ladder_fixed.bandName(band)});
+    std.debug.print("doctrine: open curriculum bank + digit vision; math/sci/lit/vis each ≥95%\n", .{});
     const r = grade_ladder_fixed.runBand(band);
     printBand(r);
     if (r.pass) {
         std.debug.print("FSOT_BAND_PASS {s}\n", .{grade_ladder_fixed.bandName(band)});
         std.debug.print("FSOT_STRAIGHT_A_OK\n", .{});
     } else {
-        std.debug.print("FSOT_BAND_FAIL {s} (need ≥95%)\n", .{grade_ladder_fixed.bandName(band)});
+        std.debug.print("FSOT_BAND_FAIL {s} (need ≥95% each domain)\n", .{grade_ladder_fixed.bandName(band)});
         std.process.exit(1);
     }
 }
 
 fn runGradeLadder() void {
-    std.debug.print("=== FSOT GRADE LADDER (straight-A student, ≥95% per band) ===\n", .{});
-    std.debug.print("doctrine: PK→K→G1; relations+paths; no history; stop on first fail\n", .{});
+    std.debug.print("=== FSOT GRADE LADDER (straight-A, ≥95% per band AND domain) ===\n", .{});
+    std.debug.print("doctrine: open curriculum (run_curriculum_open.py) → bank.tsv; stop on first fail\n", .{});
     if (!grade_ladder_fixed.selfTest()) {
-        std.debug.print("FSOT_LADDER FAIL selftest (preschool not ≥95%)\n", .{});
+        std.debug.print("FSOT_LADDER FAIL selftest\n", .{});
         std.process.exit(1);
     }
     const r = grade_ladder_fixed.runLadder();
