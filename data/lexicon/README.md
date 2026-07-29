@@ -26,15 +26,22 @@ ASCII words only for TTS plant. Duplicates ignored on load.
 cd "I:\fsot nuron"
 $env:PYTHONPATH = "I:\fsot nuron"
 
-# Free offline expand (no API) — frequency / role seeds
+# Free offline expand (no network) — seeded role lists
 python run_lexicon_teacher.py --offline --target 500
 
-# Optional teacher LLM (xAI / SpaceXAI) — proposes new words into TSV
-# $env:XAI_API_KEY = "..."
+# Local Ollama teacher (default LLM path — free, on your PC)
+python run_lexicon_teacher.py --list-models
 python run_lexicon_teacher.py --llm --target 800
+python run_lexicon_teacher.py --llm --model qwen3.5:4b --target 1000
+
+# Optional: OLLAMA_HOST / OLLAMA_MODEL env overrides
+# $env:OLLAMA_MODEL = "fsot-gemma:latest"
 
 # Mind loads TSV at boot of english / mind modes (if present)
 ```
+
+**Do not** pay for cloud APIs for this. Teacher = Ollama (or offline lists).  
+Remote provider flags exist only as an escape hatch; default is local.
 
 ## Fluency later
 

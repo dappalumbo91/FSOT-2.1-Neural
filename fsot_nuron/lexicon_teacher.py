@@ -171,44 +171,66 @@ def expand_offline(entries: Dict[str, str], target: int) -> Dict[str, str]:
     return entries
 
 
-def _xai_propose(role: str, existing: List[str], n: int = 40) -> List[str]:
-    """Optional teacher: xAI OpenAI-compatible chat. Env XAI_API_KEY."""
-    key = os.environ.get("XAI_API_KEY") or os.environ.get("XAI_KEY")
-    if not key:
-        raise RuntimeError("XAI_API_KEY not set (teacher LLM optional)")
+# Local teacher first — Ollama on this machine (free). No paid API required.
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+# Prefer smaller/faster local models for bulk word lists; override with OLLAMA_MODEL.
+# Prefer models that return text promptly (some "thinking" builds return empty /api/generate).
+OLLAMA_PREFERRED = [
+    "gemma:7b",
+    "fsot-gemma:latest",
+    "qwen2.5:14b",
+    "phi4:14b",
+    "fsot-articulation-test:latest",
+    "qwen3.5:4b",
+    "qwen3.5:9b",
+    "nemotron-3-nano:4b",
+    "qwen3.5:0.8b",
+]
 
-    sample = ", ".join(existing[:40])
-    prompt = (
-        f"You are a lexicon teacher for a small embodied AI. "
-        f"Propose {n} common English words for grammatical role '{role}'. "
-        f"Output ONLY a JSON array of lowercase strings, no commentary. "
-        f"Avoid duplicates of: {sample}"
+
+def ollama_list_models() -> List[str]:
+    try:
+        req = urllib.request.Request(f"{OLLAMA_HOST}/api/tags", method="GET")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return [m.get("name", "") for m in data.get("models", []) if m.get("name")]
+    except Exception:
+        return []
+
+
+def resolve_ollama_model(explicit: Optional[str] = None) -> str:
+    if explicit:
+        return explicit
+    env = os.environ.get("OLLAMA_MODEL") or os.environ.get("FSOT_TEACHER_MODEL")
+    if env:
+        return env
+    have = set(ollama_list_models())
+    for pref in OLLAMA_PREFERRED:
+        if pref in have:
+            return pref
+    if have:
+        return sorted(have)[0]
+    raise RuntimeError(
+        f"No Ollama models at {OLLAMA_HOST}. Start Ollama and pull a model "
+        f"(e.g. ollama pull qwen3.5:4b)."
     )
-    body = {
-        "model": os.environ.get("XAI_MODEL", "grok-4.5"),
-        "messages": [
-            {"role": "system", "content": "You label English words by role for a fixed dictionary."},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0.4,
-    }
-    req = urllib.request.Request(
-        "https://api.x.ai/v1/chat/completions",
-        data=json.dumps(body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {key}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-    text = data["choices"][0]["message"]["content"]
-    # extract JSON array
+
+
+def _parse_word_array(text: str) -> List[str]:
     m = re.search(r"\[[\s\S]*\]", text)
     if not m:
+        # fallback: lines / commas
+        raw = re.findall(r"[a-zA-Z][a-zA-Z'\-]{0,30}", text)
+        out = []
+        for x in raw:
+            wn = _norm_word(x)
+            if wn and wn not in ("json", "array", "role", "words", "word"):
+                out.append(wn)
+        return out
+    try:
+        arr = json.loads(m.group(0))
+    except json.JSONDecodeError:
         return []
-    arr = json.loads(m.group(0))
     out = []
     for x in arr:
         wn = _norm_word(str(x))
@@ -217,48 +239,194 @@ def _xai_propose(role: str, existing: List[str], n: int = 40) -> List[str]:
     return out
 
 
-def expand_llm(entries: Dict[str, str], target: int) -> Dict[str, str]:
-    entries = expand_offline(entries, target)  # free base first
+def _teacher_prompt(role: str, existing: List[str], n: int) -> str:
+    sample = ", ".join(existing[:40])
+    return (
+        f"You are a lexicon teacher for a small embodied AI (not the AI itself). "
+        f"Propose {n} common everyday English words for grammatical role '{role}'. "
+        f"Output ONLY a JSON array of lowercase strings, no markdown, no commentary. "
+        f"Avoid duplicates of: {sample}"
+    )
+
+
+def ollama_propose(
+    role: str,
+    existing: List[str],
+    n: int = 40,
+    model: Optional[str] = None,
+) -> List[str]:
+    """Local teacher via Ollama /api/generate — free, on your machine."""
+    model_id = resolve_ollama_model(model)
+    prompt = (
+        "System: Output ONLY a JSON array of lowercase English words.\n\n"
+        + _teacher_prompt(role, existing, n)
+    )
+    # /api/generate is more reliable than /api/chat for short JSON dumps
+    # (some local "thinking" chat models stall on chat).
+    body = {
+        "model": model_id,
+        "stream": False,
+        "prompt": prompt,
+        "options": {"temperature": 0.4, "num_predict": 512},
+    }
+    timeout = int(os.environ.get("OLLAMA_TIMEOUT", "180"))
+    req = urllib.request.Request(
+        f"{OLLAMA_HOST}/api/generate",
+        data=json.dumps(body).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    text = data.get("response") or ""
+    if not text and isinstance(data.get("message"), dict):
+        text = data["message"].get("content") or data["message"].get("thinking") or ""
+    # some builds put chain-of-thought only; still try thinking field
+    if not text:
+        text = data.get("thinking") or ""
+    words = _parse_word_array(text)
+    if not words and text:
+        # last resort: any alphabetic tokens
+        for tok in re.findall(r"[A-Za-z][A-Za-z'\-]{1,24}", text):
+            wn = _norm_word(tok)
+            if wn:
+                words.append(wn)
+    return words
+
+
+def openai_compatible_propose(
+    role: str,
+    existing: List[str],
+    n: int = 40,
+    *,
+    base_url: str,
+    api_key: str,
+    model: str,
+) -> List[str]:
+    """Optional remote OpenAI-compatible endpoint (only if you choose — not default)."""
+    prompt = _teacher_prompt(role, existing, n)
+    body = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "You label English words by role for a fixed dictionary."},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.4,
+    }
+    req = urllib.request.Request(
+        f"{base_url.rstrip('/')}/chat/completions",
+        data=json.dumps(body).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=120) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    text = data["choices"][0]["message"]["content"]
+    return _parse_word_array(text)
+
+
+def propose_words(
+    role: str,
+    existing: List[str],
+    n: int = 50,
+    *,
+    provider: str = "ollama",
+    model: Optional[str] = None,
+) -> Tuple[List[str], str]:
+    """
+    Returns (words, teacher_id).
+    Default provider=ollama (local free). Remote only if provider explicitly set.
+    """
+    provider = (provider or "ollama").lower()
+    if provider in ("ollama", "local"):
+        mid = resolve_ollama_model(model)
+        return ollama_propose(role, existing, n=n, model=mid), f"ollama:{mid}"
+    if provider in ("xai", "openai", "remote"):
+        key = os.environ.get("XAI_API_KEY") or os.environ.get("OPENAI_API_KEY") or ""
+        if not key:
+            raise RuntimeError(
+                "Remote teacher needs XAI_API_KEY or OPENAI_API_KEY — "
+                "prefer --provider ollama (local, free)."
+            )
+        base = os.environ.get("OPENAI_BASE_URL", "https://api.x.ai/v1")
+        mid = model or os.environ.get("XAI_MODEL") or os.environ.get("OPENAI_MODEL") or "grok-4.5"
+        return (
+            openai_compatible_propose(role, existing, n=n, base_url=base, api_key=key, model=mid),
+            f"remote:{mid}",
+        )
+    raise RuntimeError(f"Unknown teacher provider: {provider} (use ollama)")
+
+
+def expand_llm(
+    entries: Dict[str, str],
+    target: int,
+    *,
+    provider: str = "ollama",
+    model: Optional[str] = None,
+) -> Tuple[Dict[str, str], str, Optional[str]]:
+    """Expand with local (or optional remote) teacher. Returns entries, teacher_id, error."""
+    entries = expand_offline(entries, min(target, 10_000))  # free base first
+    teacher_id = f"{provider}:pending"
+    err: Optional[str] = None
     if len(entries) >= target:
-        return entries
+        return entries, f"{provider}:offline_enough", None
     for role in ROLES:
         if len(entries) >= target:
             break
         have = [w for w, r in entries.items() if r == role]
         try:
-            props = _xai_propose(role, have, n=50)
+            props, teacher_id = propose_words(
+                role, have, n=50, provider=provider, model=model
+            )
         except Exception as e:
-            # fail soft — offline progress still saved
-            entries["_teacher_error"] = str(e)  # type: ignore
+            err = str(e)
             break
         for w in props:
             if w not in entries:
                 entries[w] = role
             if len(entries) >= target:
                 break
-    entries.pop("_teacher_error", None)
-    return entries
+    return entries, teacher_id, err
 
 
-def teach(offline: bool = True, llm: bool = False, target: int = 500) -> Dict[str, object]:
+def teach(
+    offline: bool = True,
+    llm: bool = False,
+    target: int = 500,
+    *,
+    provider: str = "ollama",
+    model: Optional[str] = None,
+) -> Dict[str, object]:
     LEX_DIR.mkdir(parents=True, exist_ok=True)
     entries = load_tsv()
     before = len(entries)
+    teacher_id = "offline"
+    err = None
     if llm:
-        entries = expand_llm(entries, target)
+        entries, teacher_id, err = expand_llm(
+            entries, target, provider=provider, model=model
+        )
     else:
         entries = expand_offline(entries, target)
-    # strip non-role keys
     clean = {w: r for w, r in entries.items() if r in ROLES}
     save_tsv(clean)
     by_role = {r: sum(1 for x in clean.values() if x == r) for r in ROLES}
+    mode = "offline"
+    if llm:
+        mode = f"llm:{provider}"
     return {
         "path": str(TSV_PATH),
         "before": before,
         "after": len(clean),
         "added": len(clean) - before,
         "by_role": by_role,
-        "mode": "llm" if llm else "offline",
+        "mode": mode,
+        "teacher": teacher_id,
+        "teacher_error": err,
+        "ollama_host": OLLAMA_HOST,
         "target": target,
-        "doctrine": "teacher proposes; student mind owns machine language + TSV codec",
+        "doctrine": "local Ollama teacher by default; student mind owns machine language + TSV",
     }
