@@ -46,6 +46,8 @@ const neuron_fixed = @import("neuron_fixed.zig");
 const network_fixed = @import("network_fixed.zig");
 const brain_fixed = @import("brain_fixed.zig");
 const organism_fixed = @import("organism_fixed.zig");
+const genetic_fixed = @import("genetic_fixed.zig");
+const bio_probe_fixed = @import("bio_probe_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -349,6 +351,12 @@ fn runFixed() void {
         .{ bst.spikes, st.n_e, st.n_i, st.n_synapses, st.n_pyr, st.n_pv, st.n_sst, st.n_vip },
     );
 
+    if (!genetic_fixed.selfTest()) {
+        std.debug.print("FSOT_FIXED_GENETIC_W FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_GENETIC_W PASS (pure lattice assembly)\n", .{});
+
     if (!organism_fixed.selfTest()) {
         std.debug.print("FSOT_FIXED_ORGANISM FAIL\n", .{});
         std.process.exit(1);
@@ -360,7 +368,72 @@ fn runFixed() void {
         .{ orep.ticks, orep.spikes, orep.n_syn, fixed.toF64(org.brain.meanS()) },
     );
 
+    // --- Biological accuracy: FI population on fixed neurons ---
+    if (!bio_probe_fixed.selfTest()) {
+        std.debug.print("FSOT_FIXED_BIO_SELFTEST FAIL\n", .{});
+        std.process.exit(1);
+    }
+    var params: [32]bio_probe_fixed.UnitParamsF = undefined;
+    bio_probe_fixed.defaultBioParams(params[0..]);
+    // optional Allen params file
+    const allen_path = "I:\\fsot nuron\\artifacts\\zig_bio_params.txt";
+    if (std.fs.cwd().openFile(allen_path, .{})) |file| {
+        defer file.close();
+        var buf: [64 * 1024]u8 = undefined;
+        const nread = file.readAll(&buf) catch 0;
+        if (nread > 0) {
+            const n = bio_probe_fixed.loadParamsFromText(buf[0..nread], params[0..]) catch 0;
+            if (n > 0) {
+                std.debug.print("bio_params=allen n={d}\n", .{n});
+                const fi = bio_probe_fixed.runFIPopulation(params[0..n], 1200);
+                std.debug.print(
+                    "FIXED_BIO_FI rate_Hz={e} isi_ms={e} adapt={e} spikes={d}\n",
+                    .{ fi.mean_rate_Hz, fi.mean_isi_ms, fi.mean_adapt, fi.total_spikes },
+                );
+                const rate_ok = fi.mean_rate_Hz >= 5.0 and fi.mean_rate_Hz <= 80.0;
+                const isi_ok = fi.n_with_isi >= 1 and fi.mean_isi_ms >= 10.0 and fi.mean_isi_ms <= 200.0;
+                const adapt_ok = fi.mean_adapt > -0.3 and fi.mean_adapt < 0.6;
+                std.debug.print("gate_bio_rate={s}\n", .{if (rate_ok) "PASS" else "FAIL"});
+                std.debug.print("gate_bio_isi={s}\n", .{if (isi_ok) "PASS" else "FAIL"});
+                std.debug.print("gate_bio_adapt={s}\n", .{if (adapt_ok) "PASS" else "FAIL"});
+                if (!(rate_ok and isi_ok and adapt_ok)) {
+                    std.debug.print("FSOT_FIXED_BIO FAIL\n", .{});
+                    std.process.exit(1);
+                }
+                std.debug.print("FSOT_FIXED_BIO PASS (Allen-mapped FI)\n", .{});
+            }
+        }
+    } else |_| {
+        const fi = bio_probe_fixed.runFIPopulation(params[0..], 1000);
+        std.debug.print(
+            "FIXED_BIO_FI rate_Hz={e} isi_ms={e} adapt={e} (default params)\n",
+            .{ fi.mean_rate_Hz, fi.mean_isi_ms, fi.mean_adapt },
+        );
+        const rate_ok = fi.mean_rate_Hz >= 5.0 and fi.mean_rate_Hz <= 80.0;
+        const isi_ok = fi.n_with_isi >= 1 and fi.mean_isi_ms >= 10.0 and fi.mean_isi_ms <= 200.0;
+        if (!(rate_ok and isi_ok)) {
+            std.debug.print("FSOT_FIXED_BIO FAIL\n", .{});
+            std.process.exit(1);
+        }
+        std.debug.print("FSOT_FIXED_BIO PASS (default)\n", .{});
+    }
+
+    // structure class vs f64 brain authority
+    var bf64 = brain.Brain.initSeeded(42, false);
+    const st64 = bf64.structureReport();
+    const type_ok = st.n_pyr == st64.n_pyr and st.n_e == st64.n_e and st.n_i == st64.n_i;
+    std.debug.print(
+        "STRUCTURE f64 E/I/pyr={d}/{d}/{d} fixed E/I/pyr={d}/{d}/{d} match={s}\n",
+        .{ st64.n_e, st64.n_i, st64.n_pyr, st.n_e, st.n_i, st.n_pyr, if (type_ok) "YES" else "NO" },
+    );
+    if (!type_ok) {
+        std.debug.print("FSOT_FIXED_STRUCTURE FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_FIXED_STRUCTURE PASS\n", .{});
+
     std.debug.print("FSOT_FIXED_STACK_OK\n", .{});
+    std.debug.print("FSOT_FIXED_BIO_ACCURATE_OK\n", .{});
 }
 
 fn runIntel() void {

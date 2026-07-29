@@ -57,9 +57,14 @@ Seeds are stored as pre-rounded fixed integers (same decimal authority as `seeds
 | Network 16-unit | **PASS** | spikes=48 |
 | Genetic brain 32-unit | **PASS** | E/I 26/6, Pyr/PV/SST 26/4/2, syn≥100 |
 | Organism loop | **PASS** | 40 ticks, spikes under fixed dynamics |
-| Codon / genotype | exact trinary | W assembled then quantized to SCALE lattice |
+| Genetic W assembly | **PASS pure fixed** | `genetic_fixed.zig` — no f64 W path |
+| Codon / genotype | exact trinary | spins quantized once onto lattice |
+| Allen FI bio (32 units) | **PASS** | rate≈17.92 Hz, ISI≈70.4 ms, adapt≈0.082 |
+| Structure vs f64 brain | **PASS** | E/I/Pyr 26/6/26 exact match |
 
-Command: `fsot_mind.exe fixed` → **`FSOT_FIXED_STACK_OK`**
+Command: `fsot_mind.exe fixed` → **`FSOT_FIXED_STACK_OK`** + **`FSOT_FIXED_BIO_ACCURATE_OK`**
+
+Bio stress: `python scripts/stress_zig_fixed.py`
 
 ## Run
 

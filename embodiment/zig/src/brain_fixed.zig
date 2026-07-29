@@ -7,7 +7,7 @@ const network_f = @import("network_fixed.zig");
 const neuron_f = @import("neuron_fixed.zig");
 const genotype = @import("genotype.zig");
 const cell_types = @import("cell_types.zig");
-const genetic = @import("genetic.zig");
+const genetic_fixed = @import("genetic_fixed.zig");
 const seeds_f = @import("seeds_fixed.zig");
 const Fixed = fixed.Fixed;
 
@@ -100,8 +100,7 @@ pub const BrainF = struct {
     }
 
     pub fn wireGenetic(self: *BrainF) void {
-        // Genetic W assembled with seed-lawful f64 geometry, then quantized to Fixed lattice.
-        // Codon genotypes remain exact; continuous |W| lives on SCALE quantum.
+        // Pure fixed lattice W — no IEEE float assembly (genetic_fixed.zig).
         var reg: [MAX_N]u8 = undefined;
         var loc: [MAX_N]usize = undefined;
         var i: usize = 0;
@@ -109,16 +108,15 @@ pub const BrainF = struct {
             reg[i] = @intFromEnum(self.region_of[i]);
             loc[i] = self.region_local[i];
         }
-        const network = @import("network.zig");
-        var Wtmp: [network.MAX_N * network.MAX_N]f64 = .{0} ** (network.MAX_N * network.MAX_N);
-        genetic.wireFromGenotypes(Wtmp[0..], network.MAX_N, self.n, self.genotypes[0..self.n], reg[0..self.n], loc[0..self.n], 0.14);
-        i = 0;
-        while (i < self.n) : (i += 1) {
-            var j: usize = 0;
-            while (j < self.n) : (j += 1) {
-                self.net.W[i * network_f.MAX_N + j] = fixed.fromF64Lab(Wtmp[i * network.MAX_N + j]);
-            }
-        }
+        genetic_fixed.wireFromGenotypes(
+            self.net.W[0..],
+            network_f.MAX_N,
+            self.n,
+            self.genotypes[0..self.n],
+            reg[0..self.n],
+            loc[0..self.n],
+            fixed.fromDecimalStr("0.14"),
+        );
     }
 
     pub fn reset(self: *BrainF) void {
