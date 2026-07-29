@@ -49,7 +49,20 @@ Long-range projections: `thal→sens→assoc↔hipp` (see `brain_architecture.py
 | Time | Model-ms still owns rates; wall-clock is separate ([`BIO_ACCURACY.md`](BIO_ACCURACY.md) §0) |
 | Machine language | Text/subtitles/docs → UTF-8→trits (body code), not next-token LM |
 
-Code: `fsot_nuron/sensory/bio_pathways.py` · `bus.py` (`bio_route=True` default).
+Code (Python lab): `fsot_nuron/sensory/bio_pathways.py` · `bus.py` (`bio_route=True` default).
+
+**Zig fixed authority (product path):**
+
+| Module | Role |
+|--------|------|
+| `embodiment/zig/src/pathways_fixed.zig` | Seed-lawful gains + anatomical routes |
+| `embodiment/zig/src/sensory_fixed.zig` | Afferent bus → thal/sens/assoc/hipp |
+| `embodiment/zig/src/speech_organ_fixed.zig` | Efferent plant: meaning→motor→sound |
+| `embodiment/zig/src/bio_io_fixed.zig` | Closed-loop probe (afferent + re-afferent) |
+| `embodiment/zig/src/organism_fixed.zig` | Bio bus + speak re-afference each tick |
+
+Speech is **not** next-token LM. Mode: `fsot_mind bio-io`.  
+Doctrine: [`SPEECH_ORGAN_DOCTRINE.md`](SPEECH_ORGAN_DOCTRINE.md).
 
 ---
 

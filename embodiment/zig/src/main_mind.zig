@@ -63,6 +63,9 @@ const bands_fixed = @import("bands_fixed.zig");
 const short_horizon_fixed = @import("short_horizon_fixed.zig");
 const speech_organ_fixed = @import("speech_organ_fixed.zig");
 const cross_modal_fixed = @import("cross_modal_fixed.zig");
+const bio_io_fixed = @import("bio_io_fixed.zig");
+const pathways_fixed = @import("pathways_fixed.zig");
+const sensory_fixed = @import("sensory_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -655,6 +658,41 @@ fn runCrossModal() void {
     }
 }
 
+fn runBioIo() void {
+    std.debug.print("=== FSOT BIO I/O (afferent routes + efferent speech re-afferent) ===\n", .{});
+    std.debug.print("doctrine: thal/sens/assoc/hipp anatomy; motor→sound; not next-token\n", .{});
+    if (!pathways_fixed.selfTest()) {
+        std.debug.print("FSOT_BIO_IO FAIL pathways\n", .{});
+        std.process.exit(1);
+    }
+    if (!sensory_fixed.selfTest()) {
+        std.debug.print("FSOT_BIO_IO FAIL sensory_bus\n", .{});
+        std.process.exit(1);
+    }
+    const r = bio_io_fixed.runBioIoProbe();
+    std.debug.print(
+        "BIO_IO path={} bus={} V_spikes={d} A_spikes={d} intero={} speak_rt={} syl={d} hear={d}/{d} top1={e}\n",
+        .{
+            r.pathways_ok,
+            r.sensory_bus_ok,
+            r.afferent_vision_spikes,
+            r.afferent_audio_spikes,
+            r.intero_ok,
+            r.efferent_roundtrip_ok,
+            r.syllable_frames,
+            r.hear_correct,
+            r.hear_n,
+            r.hear_top1,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_BIO_IO PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_BIO_IO FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runInjectFile(path: []const u8) !void {
     std.debug.print("=== FSOT MIND INJECT-FILE → FIXED organism ===\n", .{});
     std.debug.print("path={s}\n", .{path});
@@ -1104,6 +1142,8 @@ pub fn main() !void {
         runSpeechOrgan();
     } else if (std.mem.eql(u8, mode, "cross-modal") or std.mem.eql(u8, mode, "cross_modal") or std.mem.eql(u8, mode, "av") or std.mem.eql(u8, mode, "crossmodal")) {
         runCrossModal();
+    } else if (std.mem.eql(u8, mode, "bio-io") or std.mem.eql(u8, mode, "bio_io") or std.mem.eql(u8, mode, "sensory") or std.mem.eql(u8, mode, "io")) {
+        runBioIo();
     } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
         runSmeFixed();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
@@ -1138,8 +1178,9 @@ pub fn main() !void {
         }
         try runInjectFile(args[2]);
     } else if (std.mem.eql(u8, mode, "bio")) {
-        // bio authority = fixed Allen FI
+        // bio authority = fixed Allen FI + bio I/O routes
         runFixed();
+        runBioIo();
     } else if (std.mem.eql(u8, mode, "bio-float") or std.mem.eql(u8, mode, "bio_float")) {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
@@ -1156,6 +1197,7 @@ pub fn main() !void {
         runShortHorizon();
         runSpeechOrgan();
         runCrossModal();
+        runBioIo();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1184,6 +1226,7 @@ pub fn main() !void {
         runShortHorizon();
         runSpeechOrgan();
         runCrossModal();
+        runBioIo();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1195,7 +1238,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|fixed|speech|cross-modal|teach|transfer|sme|short-horizon|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|bio-io|speech|cross-modal|fixed|teach|transfer|…]\n", .{});
         std.process.exit(2);
     }
 }

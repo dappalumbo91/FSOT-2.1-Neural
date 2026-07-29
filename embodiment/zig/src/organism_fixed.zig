@@ -5,6 +5,9 @@ const brain_f = @import("brain_fixed.zig");
 const memory_f = @import("memory_fixed.zig");
 const inject_f = @import("inject_io_fixed.zig");
 const modulate_f = @import("modulate_fixed.zig");
+const sensory_f = @import("sensory_fixed.zig");
+const pathways_f = @import("pathways_fixed.zig");
+const speech_f = @import("speech_organ_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const OrganismF = struct {
@@ -14,13 +17,24 @@ pub const OrganismF = struct {
     steps_per_tick: u32 = 4,
     encode_every: u32 = 15,
     last_encode_id: u32 = 0,
-    /// optional external inject features (vision etc.)
+    /// optional external inject features (vision etc.) — legacy single-stream
     inject_feats: [8]Fixed = .{0} ** 8,
     inject_n: usize = 0,
     inject_active: bool = false,
+    inject_modality: pathways_f.Modality = .vision,
+    /// bio multi-packet bus (anatomical routes)
+    bus: sensory_f.BusF = .{},
+    use_bio_bus: bool = false,
     /// host plant metric for self-modulation (Fixed)
     metric: inject_f.MetricF = .{},
     last_mod: modulate_f.State = .{},
+    /// speech organ (efferent plant — not LM)
+    speech: speech_f.SpeechOrgan = .{},
+    last_motor: speech_f.Motor = .{},
+    last_acoustic: speech_f.Acoustic = .{},
+    speak_every: u32 = 0, // 0 = off; else utter from recent meaning each N ticks
+    last_meaning: [speech_f.MEANING_N]Fixed = .{0} ** speech_f.MEANING_N,
+    has_meaning: bool = false,
 
     pub fn init() OrganismF {
         var o: OrganismF = .{
@@ -28,6 +42,7 @@ pub const OrganismF = struct {
             .store = .{},
         };
         o.store.clear();
+        o.speech.clear();
         return o;
     }
 
@@ -37,10 +52,51 @@ pub const OrganismF = struct {
         while (i < n) : (i += 1) self.inject_feats[i] = feats[i];
         self.inject_n = n;
         self.inject_active = n > 0;
+        // also mirror into bio bus as vision by default
+        self.bus.clear();
+        if (n > 0) {
+            self.bus.push(sensory_f.PacketF.fromSlice(self.inject_modality, feats[0..n], fixed.fromDecimalStr("0.85")));
+            self.use_bio_bus = true;
+        }
     }
 
     pub fn setMetric(self: *OrganismF, m: inject_f.MetricF) void {
         self.metric = m;
+        self.bus.metric = m;
+    }
+
+    /// Push anatomical sensory packet (vision/audio/hid/…).
+    pub fn pushSense(self: *OrganismF, mod: pathways_f.Modality, feats: []const Fixed, strength: Fixed) void {
+        self.bus.push(sensory_f.PacketF.fromSlice(mod, feats, strength));
+        self.use_bio_bus = true;
+    }
+
+    /// Efferent: set concept meaning the speech plant should articulate.
+    pub fn setMeaning(self: *OrganismF, meaning: []const Fixed) void {
+        const n = @min(meaning.len, speech_f.MEANING_N);
+        var i: usize = 0;
+        while (i < n) : (i += 1) self.last_meaning[i] = meaning[i];
+        while (i < speech_f.MEANING_N) : (i += 1) self.last_meaning[i] = 0;
+        self.has_meaning = n > 0;
+    }
+
+    /// One motor→sound frame; re-afference into audio + proprio paths.
+    pub fn speakNow(self: *OrganismF) void {
+        if (!self.has_meaning) return;
+        const u = speech_f.SpeechOrgan.utter(self.last_meaning[0..]);
+        self.last_motor = u.motor;
+        self.last_acoustic = u.acoustic;
+        var a_feats: [8]Fixed = undefined;
+        var m_feats: [8]Fixed = undefined;
+        var i: usize = 0;
+        while (i < 8) : (i += 1) {
+            a_feats[i] = if (i < speech_f.ACOUSTIC_N) u.acoustic.ch[i] else 0;
+            m_feats[i] = if (i < speech_f.MOTOR_N) u.motor.ch[i] else 0;
+        }
+        // re-afferent self-hearing + proprioception (biological closed loop)
+        self.bus.push(sensory_f.PacketF.fromSlice(.speech_sound, a_feats[0..], fixed.fromDecimalStr("0.8")));
+        self.bus.push(sensory_f.PacketF.fromSlice(.motor_proprio, m_feats[0..], fixed.fromDecimalStr("0.45")));
+        self.use_bio_bus = true;
     }
 
     pub fn tickOnce(self: *OrganismF) struct { tick: u32, mean_s: Fixed, spikes: u32, episodes: u32 } {
@@ -50,12 +106,21 @@ pub const OrganismF = struct {
         self.last_mod = modulate_f.fromMetric(self.metric, fire_frac);
         const stim = self.last_mod.stim_scale;
 
+        // scheduled efferent speech (motor plant, not token LM)
+        if (self.speak_every > 0 and self.has_meaning and (self.tick % self.speak_every) == 0) {
+            self.speakNow();
+        }
+
         var ext: [brain_f.N_TOTAL]Fixed = undefined;
         var s: u32 = 0;
         while (s < self.steps_per_tick) : (s += 1) {
             const t = self.tick + s;
-            if (self.inject_active) {
-                // inject into sens/assoc from feature bus, scaled by autonomic stim
+            if (self.use_bio_bus and self.bus.n > 0) {
+                // anatomical multi-modal bus (bio-accurate routes)
+                self.bus.metric = self.metric;
+                self.bus.buildExternal(&self.brain, stim, ext[0..]);
+            } else if (self.inject_active) {
+                // legacy single-stream inject into sens/assoc
                 var i: usize = 0;
                 while (i < self.brain.n) : (i += 1) {
                     ext[i] = fixed.fromDecimalStr("0.04");
