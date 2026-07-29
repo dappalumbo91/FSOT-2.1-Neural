@@ -54,6 +54,9 @@ const learning_fixed = @import("learning_fixed.zig");
 const curriculum_fixed = @import("curriculum_fixed.zig");
 const curiosity_fixed = @import("curiosity_fixed.zig");
 const transfer_fixed = @import("transfer_fixed.zig");
+const inject_io_fixed = @import("inject_io_fixed.zig");
+const vision_inject_fixed = @import("vision_inject_fixed.zig");
+const pixel_id_fixed = @import("pixel_id_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -543,36 +546,49 @@ fn runTransfer() void {
 fn runInjectFile(path: []const u8) !void {
     std.debug.print("=== FSOT MIND INJECT-FILE → FIXED organism ===\n", .{});
     std.debug.print("path={s}\n", .{path});
-    var org = organism_fixed.OrganismF.init();
-    org.encode_every = 10;
-    org.steps_per_tick = 4;
-    // Parse first vision line features into fixed inject (file still text ABI)
-    var bus: sensory.Bus = .{};
-    const n_pkt = try inject_io.loadFeatureFile(path, &bus);
-    std.debug.print("packets={d}\n", .{n_pkt});
-    if (n_pkt < 1) {
-        std.debug.print("FSOT_INJECT_FILE FAIL empty\n", .{});
-        std.process.exit(1);
-    }
-    var feats: [8]fixed.Fixed = .{0} ** 8;
-    const p0 = bus.packets[0];
-    const nf = @min(p0.n_feat, 8);
-    var i: usize = 0;
-    while (i < nf) : (i += 1) feats[i] = fixed.fromF64Lab(p0.features[i]);
-    org.setInject(feats[0..nf]);
-    var t: u32 = 0;
-    while (t < 40) : (t += 1) {
-        _ = org.tickOnce();
-    }
+    // Fixed ABI: text frames → Fixed (no f64 mind core)
+    const r = try vision_inject_fixed.runVisionInject(path);
     std.debug.print(
-        "after ticks={d} eps={d} spikes={d} meanS={e}\n",
-        .{ org.tick, org.store.n, org.brain.totalSpikes(), fixed.toF64(org.brain.meanS()) },
+        "packets={d} vision={d} ticks={d} eps={d} spikes={d} retrieve={}\n",
+        .{ r.n_packets, r.n_vision, r.ticks, r.episodes, r.spikes, r.retrieve_ok },
     );
-    if (org.brain.totalSpikes() < 1) {
-        std.debug.print("FSOT_INJECT_FILE FAIL no spikes\n", .{});
+    if (!r.ok) {
+        std.debug.print("FSOT_INJECT_FILE FAIL\n", .{});
         std.process.exit(1);
     }
     std.debug.print("FSOT_INJECT_FILE PASS\n", .{});
+}
+
+fn runVisionInjectDemo() void {
+    std.debug.print("=== FSOT MIND VISION-INJECT (fixed DEMO frames, no external path) ===\n", .{});
+    const r = vision_inject_fixed.runVisionInject(null) catch {
+        std.debug.print("FSOT_VISION_INJECT FAIL parse\n", .{});
+        std.process.exit(1);
+    };
+    std.debug.print(
+        "packets={d} vision={d} ticks={d} eps={d} spikes={d} retrieve={}\n",
+        .{ r.n_packets, r.n_vision, r.ticks, r.episodes, r.spikes, r.retrieve_ok },
+    );
+    if (!r.ok) {
+        std.debug.print("FSOT_VISION_INJECT FAIL\n", .{});
+        std.process.exit(1);
+    }
+    std.debug.print("FSOT_VISION_INJECT PASS\n", .{});
+}
+
+fn runPixelId() void {
+    std.debug.print("=== FSOT MIND PIXEL-ID (tutor-ablated, fixed synthetic) ===\n", .{});
+    const p = pixel_id_fixed.runPixelIdProbe();
+    std.debug.print(
+        "PIXEL_ID chars={d} train={d} test={d} correct={d}/{d} top1={e} chance={e} tutor_ablated={} spikes={d}\n",
+        .{ p.n_characters, p.n_train, p.n_test, p.correct, p.n_test, p.top1, p.chance, p.tutor_ablated, p.spikes },
+    );
+    if (p.ok) {
+        std.debug.print("FSOT_PIXEL_ID PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_PIXEL_ID FAIL\n", .{});
+        std.process.exit(1);
+    }
 }
 
 fn runLive() void {
@@ -605,23 +621,37 @@ fn runLive() void {
 }
 
 fn runInject() void {
-    std.debug.print("=== FSOT MIND INJECT (sensory bus) ===\n", .{});
-    var b = brain.Brain.init();
-    var bus: sensory.Bus = .{};
-    const feats = [_]f64{ 0.9, -0.4, 0.6, 0.1, -0.8, 0.55, 0.2, -0.15 };
-    bus.push(sensory.Packet.fromSlice(.vision, feats[0..], 0.85));
-    bus.metric = .{ .cpu = 0.25, .mem = 0.3, .disk = 0.1, .net = 0.05, .temp = 0.15 };
-    var ext: [brain.N_TOTAL]f64 = undefined;
-    var t: usize = 0;
-    while (t < 60) : (t += 1) {
-        bus.buildExternal(&b, 1.0, ext[0..]);
-        b.step(ext[0..]);
+    std.debug.print("=== FSOT MIND INJECT (FIXED lattice + inject ABI) ===\n", .{});
+    if (!inject_io_fixed.selfTest()) {
+        std.debug.print("FSOT_INJECT FAIL inject_io_fixed\n", .{});
+        std.process.exit(1);
+    }
+    var bus: inject_io_fixed.BusF = .{};
+    _ = inject_io_fixed.parseFeatureText(inject_io_fixed.DEMO_TEXT, &bus) catch {
+        std.debug.print("FSOT_INJECT FAIL parse\n", .{});
+        std.process.exit(1);
+    };
+    var org = organism_fixed.OrganismF.init();
+    org.encode_every = 10;
+    org.steps_per_tick = 4;
+    var feats: [8]fixed.Fixed = .{0} ** 8;
+    const nf = bus.firstVisionFeats(&feats);
+    org.setInject(feats[0..nf]);
+    var t: u32 = 0;
+    while (t < 40) : (t += 1) {
+        _ = org.tickOnce();
     }
     std.debug.print(
-        "inject meanS={e} sens={e} hipp={e} spikes={d}\n",
-        .{ b.meanS(), b.regionMeanS(.sens), b.regionMeanS(.hipp), b.totalSpikes() },
+        "inject meanS={e} spikes={d} eps={d} metric_cpu={e} packets={d}\n",
+        .{
+            fixed.toF64(org.brain.meanS()),
+            org.brain.totalSpikes(),
+            org.store.n,
+            fixed.toF64(bus.metric.cpu),
+            bus.n,
+        },
     );
-    if (b.totalSpikes() >= 1) {
+    if (org.brain.totalSpikes() >= 1) {
         std.debug.print("FSOT_INJECT PASS\n", .{});
     } else {
         std.debug.print("FSOT_INJECT FAIL\n", .{});
@@ -949,6 +979,10 @@ pub fn main() !void {
         runCuriosity();
     } else if (std.mem.eql(u8, mode, "transfer")) {
         runTransfer();
+    } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
+        runPixelId();
+    } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {
+        runVisionInjectDemo();
     } else if (std.mem.eql(u8, mode, "live")) {
         runLive();
     } else if (std.mem.eql(u8, mode, "inject")) {
@@ -980,12 +1014,15 @@ pub fn main() !void {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
     } else if (std.mem.eql(u8, mode, "stress")) {
-        // stress authority = fixed stack + fixed learn/curriculum
+        // stress authority = fixed stack + fixed learn/curriculum + vision/pixel-id
         runFixed();
         runLearnFixed();
         runCurriculum();
         runCuriosity();
         runTransfer();
+        runInject();
+        runVisionInjectDemo();
+        runPixelId();
         runOrganism();
         runIntel();
         std.debug.print("FSOT_STRESS PASS\n", .{});
@@ -1005,6 +1042,9 @@ pub fn main() !void {
         runCurriculum();
         runCuriosity();
         runTransfer();
+        runInject();
+        runVisionInjectDemo();
+        runPixelId();
         runOrganism();
         runIntel();
         runGenetic();
@@ -1013,7 +1053,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|fixed|intel|organism|learn|curriculum|curiosity|transfer|stress|float-lab|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|fixed|intel|organism|learn|curriculum|curiosity|transfer|inject|vision|pixel-id|stress|float-lab|…]\n", .{});
         std.process.exit(2);
     }
 }
