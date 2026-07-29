@@ -72,6 +72,7 @@ const autonomous_fixed = @import("autonomous_fixed.zig");
 const wire_around_fixed = @import("wire_around_fixed.zig");
 const symbol_assoc_fixed = @import("symbol_assoc_fixed.zig");
 const hardware_metric_fixed = @import("hardware_metric_fixed.zig");
+const host_senses_fixed = @import("host_senses_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -774,6 +775,38 @@ fn runHardware() void {
     }
 }
 
+fn runHostSenses() void {
+    std.debug.print("=== FSOT HOST SENSES (Zig live display+mic → Fixed bus) ===\n", .{});
+    std.debug.print("doctrine: no C/Rust required; framebuffer sample not screenshot files\n", .{});
+    const r = host_senses_fixed.runHostSensesProbe();
+    std.debug.print(
+        "HOST live_disp={} live_mic={} vis={} aud={} {d}x{d} mic_n={d} spikes={d} eps={d} feat_ok={}\n",
+        .{
+            r.live_display,
+            r.live_mic,
+            r.vision_ok,
+            r.audio_ok,
+            r.width,
+            r.height,
+            r.n_audio_samples,
+            r.organism_spikes,
+            r.episodes,
+            r.feat_path_ok,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_HOST_SENSES PASS\n", .{});
+        if (r.live_display or r.live_mic) {
+            std.debug.print("FSOT_HOST_SENSES_LIVE_OK\n", .{});
+        } else {
+            std.debug.print("FSOT_HOST_SENSES_FALLBACK_SYNTHETIC\n", .{});
+        }
+    } else {
+        std.debug.print("FSOT_HOST_SENSES FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runAutonomous() void {
     std.debug.print("=== FSOT AUTONOMOUS (multi-domain chew, no per-item prompt) ===\n", .{});
     const r = autonomous_fixed.runAutonomousProbe();
@@ -1250,6 +1283,8 @@ pub fn main() !void {
         runSymbolAssoc();
     } else if (std.mem.eql(u8, mode, "hardware") or std.mem.eql(u8, mode, "plant") or std.mem.eql(u8, mode, "body")) {
         runHardware();
+    } else if (std.mem.eql(u8, mode, "host-senses") or std.mem.eql(u8, mode, "host_senses") or std.mem.eql(u8, mode, "senses") or std.mem.eql(u8, mode, "host")) {
+        runHostSenses();
     } else if (std.mem.eql(u8, mode, "autonomous") or std.mem.eql(u8, mode, "auto") or std.mem.eql(u8, mode, "chew")) {
         runAutonomous();
     } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
@@ -1292,6 +1327,7 @@ pub fn main() !void {
         runFailure();
         runWireAround();
         runHardware();
+        runHostSenses();
     } else if (std.mem.eql(u8, mode, "bio-float") or std.mem.eql(u8, mode, "bio_float")) {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
@@ -1314,6 +1350,7 @@ pub fn main() !void {
         runWireAround();
         runSymbolAssoc();
         runHardware();
+        runHostSenses();
         runAutonomous();
         runInject();
         runVisionInjectDemo();
@@ -1349,6 +1386,7 @@ pub fn main() !void {
         runWireAround();
         runSymbolAssoc();
         runHardware();
+        runHostSenses();
         runAutonomous();
         runInject();
         runVisionInjectDemo();
@@ -1361,7 +1399,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|wire|symbol|hardware|machine|failure|speech|pixel-id|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|host-senses|wire|symbol|hardware|speech|…]\n", .{});
         std.process.exit(2);
     }
 }

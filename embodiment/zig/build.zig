@@ -29,6 +29,12 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         }),
     });
+    // Windows host senses: live display (gdi32) + mic (winmm)
+    if (target_host.result.os.tag == .windows) {
+        mind.linkSystemLibrary("gdi32");
+        mind.linkSystemLibrary("user32");
+        mind.linkSystemLibrary("winmm");
+    }
     b.installArtifact(mind);
     const run_mind = b.addRunArtifact(mind);
     if (b.args) |args| {
