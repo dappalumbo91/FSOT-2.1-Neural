@@ -75,6 +75,7 @@ const hardware_metric_fixed = @import("hardware_metric_fixed.zig");
 const host_senses_fixed = @import("host_senses_fixed.zig");
 const host_loop_fixed = @import("host_loop_fixed.zig");
 const host_audio_out_fixed = @import("host_audio_out_fixed.zig");
+const mind_live_fixed = @import("mind_live_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -825,8 +826,8 @@ fn runHostLoop() void {
 }
 
 fn runBodyDaemon() void {
-    std.debug.print("=== FSOT BODY DAEMON (boot continuous host loop) ===\n", .{});
-    std.debug.print("doctrine: plant sample → Fixed inject → genetic mind tick\n", .{});
+    // Smoke plant loop only (senses→tick). Full intelligence = runLiveMindConnected.
+    std.debug.print("=== FSOT BODY PLANT SMOKE (senses only — use 'mind' for full brain) ===\n", .{});
     const r = host_loop_fixed.runBodyDaemon();
     std.debug.print(
         "BODY ticks={d} live_disp={d} live_mic={d} spikes={d} eps={d} spoke={} sleep_ms={d}\n",
@@ -835,8 +836,29 @@ fn runBodyDaemon() void {
     if (r.ok) {
         std.debug.print("FSOT_BODY PASS\n", .{});
         std.debug.print("FSOT_BODY_BOOT_OK\n", .{});
+        std.debug.print("NOTE: full connected intelligence → mode 'mind' or BOOT_MIND.cmd\n", .{});
     } else {
         std.debug.print("FSOT_BODY FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runLiveMindConnected() void {
+    // Default product: one organism, all systems wired, not unit-test parade.
+    const r = mind_live_fixed.runLiveMind(.{
+        .n_ticks = 300, // ~6s @20ms — long enough to see mind work; not infinite hang
+        .sleep_ms = 20,
+        .report_every = 30,
+        .speakers = true,
+        .speak_every = 50,
+        .encode_every = 8,
+        .curiosity_every = 25,
+    });
+    if (r.ok) {
+        std.debug.print("FSOT_LIVE_MIND PASS\n", .{});
+        std.debug.print("FSOT_MIND_CONNECTED_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_LIVE_MIND FAIL\n", .{});
         std.process.exit(1);
     }
 }
@@ -1338,7 +1360,11 @@ pub fn main() !void {
     } else if (std.mem.eql(u8, mode, "host-loop") or std.mem.eql(u8, mode, "host_loop") or std.mem.eql(u8, mode, "loop")) {
         runHostLoop();
     } else if (std.mem.eql(u8, mode, "body") or std.mem.eql(u8, mode, "daemon") or std.mem.eql(u8, mode, "boot")) {
+        // plant smoke only
         runBodyDaemon();
+    } else if (std.mem.eql(u8, mode, "mind") or std.mem.eql(u8, mode, "live-mind") or std.mem.eql(u8, mode, "live_mind") or std.mem.eql(u8, mode, "connected") or std.mem.eql(u8, mode, "awake")) {
+        // FULL connected organism (brain+memory+senses+speech)
+        runLiveMindConnected();
     } else if (std.mem.eql(u8, mode, "speakers") or std.mem.eql(u8, mode, "speaker") or std.mem.eql(u8, mode, "audio-out")) {
         runSpeakers();
     } else if (std.mem.eql(u8, mode, "autonomous") or std.mem.eql(u8, mode, "auto") or std.mem.eql(u8, mode, "chew")) {
@@ -1350,6 +1376,7 @@ pub fn main() !void {
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {
         runVisionInjectDemo();
     } else if (std.mem.eql(u8, mode, "live")) {
+        // short brain-only activity (no host) — prefer "mind" for full stack
         runLive();
     } else if (std.mem.eql(u8, mode, "inject")) {
         runInject();
@@ -1427,8 +1454,8 @@ pub fn main() !void {
         try runBio(null);
         try runStress();
         std.debug.print("FSOT_FLOAT_LAB_OK\n", .{});
-    } else if (std.mem.eql(u8, mode, "all") or std.mem.eql(u8, mode, "mind")) {
-        // Default product path: FIXED lattice is the mind authority
+    } else if (std.mem.eql(u8, mode, "all") or std.mem.eql(u8, mode, "suite") or std.mem.eql(u8, mode, "tests")) {
+        // Full unit-test suite (not the live organism — use "mind" for that)
         runFixed();
         runLearnFixed();
         runCurriculum();
@@ -1460,8 +1487,12 @@ pub fn main() !void {
         std.debug.print("FSOT_FIXED_AUTHORITY_OK\n", .{});
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
+        std.debug.print("NOTE: suite is gates only. Live intelligence → BOOT_MIND.cmd or mode 'mind'\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|body|host-senses|host-loop|speakers|stress|…]\n", .{});
+        std.debug.print("usage: fsot_mind mind|body|stress|suite|host-senses|…\n", .{});
+        std.debug.print("  mind  = FULL connected organism (brain+memory+senses+speech)\n", .{});
+        std.debug.print("  body  = plant smoke only (senses loop)\n", .{});
+        std.debug.print("  suite = unit-test gates (not live intelligence)\n", .{});
         std.process.exit(2);
     }
 }

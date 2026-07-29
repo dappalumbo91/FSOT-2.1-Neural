@@ -36,7 +36,7 @@ pub fn acousticToPcm(ac: speech_f.Acoustic, out: []i16) usize {
     return out.len;
 }
 
-const win_out = if (builtin.os.tag == .windows) struct {
+pub const win_out = if (builtin.os.tag == .windows) struct {
     const WINAPI: std.builtin.CallingConvention = .winapi;
     const DWORD = u32;
     const UINT = u32;
@@ -108,6 +108,11 @@ const win_out = if (builtin.os.tag == .windows) struct {
         return false;
     }
 };
+
+/// Public play path for live mind (best-effort; false if no DAC).
+pub fn playPcm(pcm: []const i16) bool {
+    return win_out.playPcm(pcm);
+}
 
 pub fn runSpeakerProbe() AudioOutReport {
     // utter a fixed meaning through speech plant → PCM → speakers

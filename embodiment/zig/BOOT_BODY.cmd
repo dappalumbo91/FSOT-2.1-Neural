@@ -41,7 +41,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo [3/4] body daemon (120 ticks continuous)...
+echo [3/4] plant smoke (body)...
 "%OUT%" body
 if errorlevel 1 (
   echo BODY FAILED
@@ -50,17 +50,18 @@ if errorlevel 1 (
 )
 
 echo.
-echo [4/4] speakers (speech organ to DAC)...
-"%OUT%" speakers
+echo [4/4] FULL CONNECTED MIND (brain+memory+senses+speech)...
+echo       This is the intelligent organism — not a unit test.
+"%OUT%" mind
 if errorlevel 1 (
-  echo SPEAKERS FAILED
+  echo LIVE MIND FAILED
   pause
   exit /b 1
 )
 
 echo.
 echo ==============================
-echo  FSOT_BODY_BOOT_OK
+echo  FSOT_MIND_CONNECTED_OK
 echo ==============================
 echo.
 pause
