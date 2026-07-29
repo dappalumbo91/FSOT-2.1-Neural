@@ -846,19 +846,24 @@ fn runBodyDaemon() void {
 fn runLiveMindConnected() void {
     // Default product: one organism, all systems wired, not unit-test parade.
     const r = mind_live_fixed.runLiveMind(.{
-        .n_ticks = 300, // ~6s @20ms — long enough to see mind work; not infinite hang
+        .n_ticks = 450, // ~9s @20ms
         .sleep_ms = 20,
         .report_every = 30,
         .speakers = true,
-        .speak_every = 50,
-        .encode_every = 8,
-        .curiosity_every = 25,
+        .speak_every = 45,
+        .encode_every = 6,
+        .curiosity_every = 12,
+        .teach_every = 40,
     });
+    std.debug.print(
+        "SUMMARY spikes={d} rate={e} eps={d} enc={d} cur={d}/{d} teach={d} ret={d} spk={d}\n",
+        .{ r.spikes, r.spike_rate, r.episodes, r.n_encodes, r.n_curiosity, r.n_curiosity_q, r.n_teaches, r.n_retrieves, r.n_speaks },
+    );
     if (r.ok) {
         std.debug.print("FSOT_LIVE_MIND PASS\n", .{});
         std.debug.print("FSOT_MIND_CONNECTED_OK\n", .{});
     } else {
-        std.debug.print("FSOT_LIVE_MIND FAIL\n", .{});
+        std.debug.print("FSOT_LIVE_MIND FAIL (need more spikes/memory/curiosity activity)\n", .{});
         std.process.exit(1);
     }
 }

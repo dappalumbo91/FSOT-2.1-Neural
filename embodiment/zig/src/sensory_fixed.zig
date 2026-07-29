@@ -78,8 +78,10 @@ pub const BusF = struct {
         while (pi < self.n) : (pi += 1) {
             const p = self.packets[pi];
             const rt = pathways_f.routeFor(p.modality);
-            const g_pri = fixed.mul(fixed.mul(pathways_f.pathwayGain(.primary), p.strength), stim_scale);
-            const g_rel = fixed.mul(fixed.mul(pathways_f.pathwayGain(.relay), p.strength), stim_scale);
+            // Live plant features are often small in magnitude — scale so cortex actually fires.
+            const live_boost = fixed.fromDecimalStr("1.8");
+            const g_pri = fixed.mul(fixed.mul(fixed.mul(pathways_f.pathwayGain(.primary), p.strength), stim_scale), live_boost);
+            const g_rel = fixed.mul(fixed.mul(fixed.mul(pathways_f.pathwayGain(.relay), p.strength), stim_scale), live_boost);
             injectRegion(b, rt.primary, p.features[0..p.n_feat], g_pri, out);
             if (rt.relay) |rel| {
                 injectRegion(b, rel, p.features[0..p.n_feat], g_rel, out);

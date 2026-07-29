@@ -52,12 +52,20 @@ pub const OrganismF = struct {
         while (i < n) : (i += 1) self.inject_feats[i] = feats[i];
         self.inject_n = n;
         self.inject_active = n > 0;
-        // also mirror into bio bus as vision by default
-        self.bus.clear();
+        // Mirror vision into bio bus WITHOUT wiping other modalities already pushed.
         if (n > 0) {
             self.bus.push(sensory_f.PacketF.fromSlice(self.inject_modality, feats[0..n], fixed.fromDecimalStr("0.85")));
             self.use_bio_bus = true;
         }
+    }
+
+    /// Replace inject feature buffer only (no bus mutation).
+    pub fn setInjectFeatsOnly(self: *OrganismF, feats: []const Fixed) void {
+        const n = @min(feats.len, 8);
+        var i: usize = 0;
+        while (i < n) : (i += 1) self.inject_feats[i] = feats[i];
+        self.inject_n = n;
+        self.inject_active = n > 0;
     }
 
     pub fn setMetric(self: *OrganismF, m: inject_f.MetricF) void {
@@ -119,6 +127,17 @@ pub const OrganismF = struct {
                 // anatomical multi-modal bus (bio-accurate routes)
                 self.bus.metric = self.metric;
                 self.bus.buildExternal(&self.brain, stim, ext[0..]);
+                // wake pulse so continuous plant features still recruit spikes
+                var wi: usize = 0;
+                while (wi < self.brain.n) : (wi += 1) {
+                    if (self.brain.genotypes[wi].synapse_sign > 0) {
+                        ext[wi] = fixed.add(ext[wi], fixed.fromDecimalStr("0.22"));
+                    }
+                    if ((t % 20) < 6 and self.brain.region_of[wi] == .thal and self.brain.genotypes[wi].synapse_sign > 0) {
+                        ext[wi] = fixed.add(ext[wi], fixed.fromDecimalStr("0.35"));
+                    }
+                    ext[wi] = fixed.clamp(ext[wi], fixed.fromDecimalStr("-0.8"), fixed.fromDecimalStr("1.5"));
+                }
             } else if (self.inject_active) {
                 // legacy single-stream inject into sens/assoc
                 var i: usize = 0;

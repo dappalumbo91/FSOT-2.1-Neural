@@ -54,9 +54,9 @@ pub const StoreF = struct {
                         if ((t % 80) < 20) e = fixed.add(e, if (b.genotypes[i].synapse_sign > 0) fixed.fromDecimalStr("0.55") else fixed.fromDecimalStr("0.18"));
                         e = fixed.add(e, fixed.div(fixed.mul(fixed.fromDecimalStr("0.18"), f), @import("seeds_fixed.zig").phi));
                     },
-                    .sens => e = fixed.add(e, fixed.mul(fixed.fromDecimalStr("0.55"), f)),
-                    .assoc => e = fixed.add(e, fixed.mul(fixed.fromDecimalStr("0.42"), f)),
-                    .hipp => e = fixed.add(e, fixed.mul(fixed.fromDecimalStr("0.48"), f)),
+                    .sens => e = fixed.add(e, fixed.mul(fixed.fromDecimalStr("0.85"), f)),
+                    .assoc => e = fixed.add(e, fixed.mul(fixed.fromDecimalStr("0.72"), f)),
+                    .hipp => e = fixed.add(e, fixed.mul(fixed.fromDecimalStr("0.78"), f)),
                 }
                 ext[i] = fixed.clamp(e, fixed.fromDecimalStr("-0.8"), fixed.fromDecimalStr("1.5"));
             }
@@ -97,10 +97,12 @@ pub const StoreF = struct {
             return 0;
         }
         var cue: [FP_DIM]Fixed = undefined;
-        // partial re-encode cue
+        // partial re-encode cue — keep lifetime spike counts (do not erase organism history)
         var u: usize = 0;
         while (u < b.n) : (u += 1) {
+            const kept = b.net.units[u].spike_count;
             b.net.units[u].reset();
+            b.net.units[u].spike_count = kept;
             b.net.last_fired[u] = false;
         }
         var sum_s: [brain_f.N_TOTAL]Fixed = .{0} ** brain_f.N_TOTAL;
