@@ -109,18 +109,23 @@ pub fn pcmToAudioFeats(pcm: []const i16, out: *[FEAT]Fixed) void {
 
 // --- platform backends ---
 
-const win = if (builtin.os.tag == .windows) @import("host_senses_windows.zig") else struct {
-    pub fn captureDisplay(out_gray: []u8, out_w: *usize, out_h: *usize) bool {
-        _ = out_gray;
-        _ = out_w;
-        _ = out_h;
-        return false;
-    }
-    pub fn captureMic(out_pcm: []i16) usize {
-        _ = out_pcm;
-        return 0;
-    }
-};
+const plat = if (builtin.os.tag == .windows)
+    @import("host_senses_windows.zig")
+else if (builtin.os.tag == .linux)
+    @import("host_senses_linux.zig")
+else
+    struct {
+        pub fn captureDisplay(out_gray: []u8, out_w: *usize, out_h: *usize) bool {
+            _ = out_gray;
+            _ = out_w;
+            _ = out_h;
+            return false;
+        }
+        pub fn captureMic(out_pcm: []i16) usize {
+            _ = out_pcm;
+            return 0;
+        }
+    };
 
 /// Synthetic fallback when OS capture unavailable (CI / headless).
 fn syntheticSample(out: *HostSample) void {
@@ -145,18 +150,19 @@ pub fn sampleHost(out: *HostSample) void {
     var gray: [64 * 36]u8 = undefined; // max capture tiles
     var w: usize = 0;
     var h: usize = 0;
-    const disp_ok = win.captureDisplay(gray[0..], &w, &h);
+    const disp_ok = plat.captureDisplay(gray[0..], &w, &h);
     if (disp_ok and w > 0 and h > 0) {
         const n = @min(gray.len, w * h);
         pixelsToVisionFeats(gray[0..n], w, h, &out.vision);
         out.vision_ok = true;
-        out.live_display = true;
+        // Windows GDI = live compositor; Linux urandom field is not "display" — flag only on Windows
+        out.live_display = builtin.os.tag == .windows;
         out.width = @intCast(w);
         out.height = @intCast(h);
     }
 
     var pcm: [4096]i16 = undefined;
-    const ns = win.captureMic(pcm[0..]);
+    const ns = plat.captureMic(pcm[0..]);
     if (ns > 0) {
         pcmToAudioFeats(pcm[0..ns], &out.audio);
         out.audio_ok = true;

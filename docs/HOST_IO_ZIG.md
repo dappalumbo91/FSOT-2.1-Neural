@@ -59,8 +59,18 @@ Most machines have both. Wire immediately when present; degrade gracefully when 
 
 ## Capability growth (honest stages)
 
-1. **Now:** Zig host sample → Fixed inject → bio routes → organism (this tree).  
-2. **Next:** DXGI Desktop Duplication, WASAPI exclusive/loopback, speaker render of speech organ.  
-3. **Later:** richer phoneme hearing, continuous motor trajectories, Linux native backends.
+1. **Now (Windows):** GDI live desktop + waveIn mic + waveOut speakers + continuous `host-loop`.  
+2. **Now (Linux/WSL):** `/proc/loadavg` plant metric; display/mic honest fallback until DRM/PipeWire/ALSA.  
+3. **Next:** DXGI Desktop Duplication, WASAPI, ALSA/PipeWire, DRM/KMS.  
+4. **Portability:** same Fixed mind on Intel/AMD/ARM/Android NDK — only host plant backends change.
 
 Speech *understanding* and deep vision ID remain **capability** work; **wiring** is plant I/O.
+
+### Modes
+
+| Mode | Role |
+|------|------|
+| `host-senses` | one-shot display+mic sample → inject |
+| `host-loop` | continuous body cycle (sample→inject→tick) |
+| `speakers` | speech organ acoustic → DAC |
+| `stress` | full authority gate including host I/O |

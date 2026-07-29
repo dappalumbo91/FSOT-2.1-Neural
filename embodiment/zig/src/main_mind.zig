@@ -73,6 +73,8 @@ const wire_around_fixed = @import("wire_around_fixed.zig");
 const symbol_assoc_fixed = @import("symbol_assoc_fixed.zig");
 const hardware_metric_fixed = @import("hardware_metric_fixed.zig");
 const host_senses_fixed = @import("host_senses_fixed.zig");
+const host_loop_fixed = @import("host_loop_fixed.zig");
+const host_audio_out_fixed = @import("host_audio_out_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -807,6 +809,37 @@ fn runHostSenses() void {
     }
 }
 
+fn runHostLoop() void {
+    std.debug.print("=== FSOT HOST LOOP (continuous sample→inject→tick) ===\n", .{});
+    const r = host_loop_fixed.runHostLoop(24, true);
+    std.debug.print(
+        "HOST_LOOP ticks={d} live_disp={d} live_mic={d} spikes={d} eps={d} spoke={}\n",
+        .{ r.n_ticks, r.n_live_display, r.n_live_mic, r.spikes, r.episodes, r.spoke },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_HOST_LOOP PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_HOST_LOOP FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runSpeakers() void {
+    std.debug.print("=== FSOT SPEAKERS (speech organ acoustic → DAC) ===\n", .{});
+    const r = host_audio_out_fixed.runSpeakerProbe();
+    std.debug.print(
+        "SPEAKERS samples={d} played={} backend={s}\n",
+        .{ r.n_samples, r.played, r.backend },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_SPEAKERS PASS\n", .{});
+        if (r.played) std.debug.print("FSOT_SPEAKERS_PLAYED_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_SPEAKERS FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runAutonomous() void {
     std.debug.print("=== FSOT AUTONOMOUS (multi-domain chew, no per-item prompt) ===\n", .{});
     const r = autonomous_fixed.runAutonomousProbe();
@@ -1285,6 +1318,10 @@ pub fn main() !void {
         runHardware();
     } else if (std.mem.eql(u8, mode, "host-senses") or std.mem.eql(u8, mode, "host_senses") or std.mem.eql(u8, mode, "senses") or std.mem.eql(u8, mode, "host")) {
         runHostSenses();
+    } else if (std.mem.eql(u8, mode, "host-loop") or std.mem.eql(u8, mode, "host_loop") or std.mem.eql(u8, mode, "loop")) {
+        runHostLoop();
+    } else if (std.mem.eql(u8, mode, "speakers") or std.mem.eql(u8, mode, "speaker") or std.mem.eql(u8, mode, "audio-out")) {
+        runSpeakers();
     } else if (std.mem.eql(u8, mode, "autonomous") or std.mem.eql(u8, mode, "auto") or std.mem.eql(u8, mode, "chew")) {
         runAutonomous();
     } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
@@ -1328,6 +1365,8 @@ pub fn main() !void {
         runWireAround();
         runHardware();
         runHostSenses();
+        runHostLoop();
+        runSpeakers();
     } else if (std.mem.eql(u8, mode, "bio-float") or std.mem.eql(u8, mode, "bio_float")) {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
@@ -1351,6 +1390,8 @@ pub fn main() !void {
         runSymbolAssoc();
         runHardware();
         runHostSenses();
+        runHostLoop();
+        runSpeakers();
         runAutonomous();
         runInject();
         runVisionInjectDemo();
@@ -1387,6 +1428,8 @@ pub fn main() !void {
         runSymbolAssoc();
         runHardware();
         runHostSenses();
+        runHostLoop();
+        runSpeakers();
         runAutonomous();
         runInject();
         runVisionInjectDemo();
@@ -1399,7 +1442,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|host-senses|wire|symbol|hardware|speech|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|host-senses|host-loop|speakers|stress|…]\n", .{});
         std.process.exit(2);
     }
 }

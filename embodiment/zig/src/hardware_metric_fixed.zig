@@ -3,6 +3,7 @@
 //! When OS counters unavailable, uses deterministic seed-lawful synthetic plant
 //! (honest: not claiming real sensors until host ABI wired).
 
+const builtin = @import("builtin");
 const fixed = @import("fixed.zig");
 const inject_f = @import("inject_io_fixed.zig");
 const modulate_f = @import("modulate_fixed.zig");
@@ -19,7 +20,7 @@ fn unitFrac(x: u32) Fixed {
     return fixed.div(fixed.fromInt(@intCast(x % 1000)), fixed.fromInt(1000));
 }
 
-/// Discover plant metrics. Host can later replace body with real counters.
+/// Discover plant metrics. Linux: blend /proc/loadavg; else seed-lawful synthetic.
 pub fn discoverPlant(seed: u32) HardwareProfile {
     const a = seed *% 1103515245 +% 12345;
     const b = a *% 1664525 +% 1013904223;
@@ -34,6 +35,14 @@ pub fn discoverPlant(seed: u32) HardwareProfile {
         },
         .source = "synthetic_seed_plant",
     };
+    if (builtin.os.tag == .linux) {
+        const linux = @import("host_senses_linux.zig");
+        const milli = linux.procLoadMilli();
+        if (milli > 0) {
+            p.metric.cpu = fixed.div(fixed.fromInt(@intCast(milli)), fixed.fromInt(1000));
+            p.source = "linux_proc_loadavg";
+        }
+    }
     const load = p.metric.cpu;
     if (fixed.gt(load, fixed.fromDecimalStr("0.7"))) {
         p.n_units_suggest = 16;

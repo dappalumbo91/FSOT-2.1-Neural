@@ -46,10 +46,18 @@ fn audioProto(seed: u32, out: *[FEAT]Fixed) void {
 fn jointFeats(v: *const [FEAT]Fixed, a: *const [FEAT]Fixed, out: *[FEAT]Fixed) void {
     var i: usize = 0;
     while (i < FEAT) : (i += 1) {
-        out[i] = fixed.add(
-            fixed.mul(v[i], fixed.fromDecimalStr("0.55")),
-            fixed.mul(a[i], fixed.fromDecimalStr("0.45")),
-        );
+        // Interleave so either modality retains identity under partial cue
+        if ((i % 2) == 0) {
+            out[i] = fixed.add(
+                fixed.mul(v[i], fixed.fromDecimalStr("0.7")),
+                fixed.mul(a[i], fixed.fromDecimalStr("0.3")),
+            );
+        } else {
+            out[i] = fixed.add(
+                fixed.mul(v[i], fixed.fromDecimalStr("0.3")),
+                fixed.mul(a[i], fixed.fromDecimalStr("0.7")),
+            );
+        }
     }
 }
 
@@ -57,14 +65,22 @@ fn jointFeats(v: *const [FEAT]Fixed, a: *const [FEAT]Fixed, out: *[FEAT]Fixed) v
 fn visionCue(v: *const [FEAT]Fixed, out: *[FEAT]Fixed) void {
     var i: usize = 0;
     while (i < FEAT) : (i += 1) {
-        out[i] = fixed.mul(v[i], fixed.fromDecimalStr("0.55"));
+        if ((i % 2) == 0) {
+            out[i] = fixed.mul(v[i], fixed.fromDecimalStr("0.7"));
+        } else {
+            out[i] = fixed.mul(v[i], fixed.fromDecimalStr("0.3"));
+        }
     }
 }
 
 fn audioCue(a: *const [FEAT]Fixed, out: *[FEAT]Fixed) void {
     var i: usize = 0;
     while (i < FEAT) : (i += 1) {
-        out[i] = fixed.mul(a[i], fixed.fromDecimalStr("0.45"));
+        if ((i % 2) == 0) {
+            out[i] = fixed.mul(a[i], fixed.fromDecimalStr("0.3"));
+        } else {
+            out[i] = fixed.mul(a[i], fixed.fromDecimalStr("0.7"));
+        }
     }
 }
 
