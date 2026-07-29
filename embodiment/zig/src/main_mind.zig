@@ -75,6 +75,7 @@ const grade_practice_fixed = @import("grade_practice_fixed.zig");
 const grade_ladder_fixed = @import("grade_ladder_fixed.zig");
 const mnist_accuracy_fixed = @import("mnist_accuracy_fixed.zig");
 const understand_depth_fixed = @import("understand_depth_fixed.zig");
+const synapse_path_fixed = @import("synapse_path_fixed.zig");
 const reason_practice_fixed = @import("reason_practice_fixed.zig");
 const novel_inquiry_fixed = @import("novel_inquiry_fixed.zig");
 const checkpoint_fixed = @import("checkpoint_fixed.zig");
@@ -1314,6 +1315,37 @@ fn runGradeDepth() void {
     }
 }
 
+fn runSynapsePathways() void {
+    std.debug.print("=== FSOT SYNAPTIC PATHWAYS (trace + plastic bonds + novel thought) ===\n", .{});
+    std.debug.print("doctrine: Hebb LTP-like W update, prune unused, concept cross-domain bonds\n", .{});
+    std.debug.print("compare to human: LTP/LTD, synaptogenesis, limited adult neurogenesis, association\n", .{});
+    const r = synapse_path_fixed.runSynapsePathwayProbe();
+    std.debug.print(
+        "PATH edges={d} hebb={d} spikes={d} concepts={d} bonds {d}→{d} novel={d} cross={d} pruned={d} thought_steps={d} cross_region={d} meanS={e}\n",
+        .{
+            r.n_edge_traces,
+            r.n_hebb,
+            r.spikes,
+            r.n_concepts,
+            r.n_bonds_before,
+            r.n_bonds_after,
+            r.n_novel_bonds,
+            r.n_cross_domain,
+            r.n_pruned,
+            r.n_thought_steps,
+            r.cross_region_edges,
+            r.mean_s,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_SYNAPSE_PATH PASS\n", .{});
+        std.debug.print("FSOT_NOVEL_PATHWAY_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_SYNAPSE_PATH FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runPixelId() void {
     std.debug.print("=== FSOT MIND PIXEL-ID (tutor-ablated multi-seed synthetic) ===\n", .{});
     const p = pixel_id_fixed.runPixelIdProbe();
@@ -1802,6 +1834,8 @@ pub fn main() !void {
         runMnistAccuracy();
     } else if (std.mem.eql(u8, mode, "depth") or std.mem.eql(u8, mode, "understand") or std.mem.eql(u8, mode, "paraphrase") or std.mem.eql(u8, mode, "grade-depth")) {
         runGradeDepth();
+    } else if (std.mem.eql(u8, mode, "pathways") or std.mem.eql(u8, mode, "synapse") or std.mem.eql(u8, mode, "synaptic") or std.mem.eql(u8, mode, "trace") or std.mem.eql(u8, mode, "think-path")) {
+        runSynapsePathways();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {
