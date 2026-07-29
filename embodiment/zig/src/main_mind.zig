@@ -66,6 +66,9 @@ const cross_modal_fixed = @import("cross_modal_fixed.zig");
 const bio_io_fixed = @import("bio_io_fixed.zig");
 const pathways_fixed = @import("pathways_fixed.zig");
 const sensory_fixed = @import("sensory_fixed.zig");
+const machine_encode_fixed = @import("machine_encode_fixed.zig");
+const failure_fixed = @import("failure_fixed.zig");
+const autonomous_fixed = @import("autonomous_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -693,6 +696,51 @@ fn runBioIo() void {
     }
 }
 
+fn runMachineEncode() void {
+    std.debug.print("=== FSOT MACHINE ENCODE (bytes/UTF-8/trit ABI — not Morse/LM) ===\n", .{});
+    const r = machine_encode_fixed.runMachineEncodeProbe();
+    std.debug.print(
+        "MACHINE bytes_rt={} text_rt={} feat_trit={} dna={} words={d}\n",
+        .{ r.bytes_roundtrip, r.text_roundtrip, r.feat_trit_ok, r.dna_codon_ok, r.n_words },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_MACHINE PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_MACHINE FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runFailure() void {
+    std.debug.print("=== FSOT FAILURE BOUNDARIES (lesion envelope, fixed) ===\n", .{});
+    const r = failure_fixed.runFailureProbe();
+    std.debug.print(
+        "FAILURE healthy={d} AD={d} PD={d} ALS={d} envelope={} boundary={}\n",
+        .{ r.healthy_spikes, r.ad_spikes, r.pd_spikes, r.als_spikes, r.healthy_in_envelope, r.boundary_detected },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_FAILURE PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_FAILURE FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runAutonomous() void {
+    std.debug.print("=== FSOT AUTONOMOUS (multi-domain chew, no per-item prompt) ===\n", .{});
+    const r = autonomous_fixed.runAutonomousProbe();
+    std.debug.print(
+        "AUTO domains={d} eps={d} words={d} recall={d}/{d} top1={e} cur={d} spikes={d} spoke={}\n",
+        .{ r.n_domains, r.n_episodes, r.n_machine_words, r.recall_correct, r.recall_n, r.recall_top1, r.curiosity_resolved, r.spikes, r.spoke },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_AUTONOMOUS PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_AUTONOMOUS FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runInjectFile(path: []const u8) !void {
     std.debug.print("=== FSOT MIND INJECT-FILE → FIXED organism ===\n", .{});
     std.debug.print("path={s}\n", .{path});
@@ -1144,6 +1192,12 @@ pub fn main() !void {
         runCrossModal();
     } else if (std.mem.eql(u8, mode, "bio-io") or std.mem.eql(u8, mode, "bio_io") or std.mem.eql(u8, mode, "sensory") or std.mem.eql(u8, mode, "io")) {
         runBioIo();
+    } else if (std.mem.eql(u8, mode, "machine") or std.mem.eql(u8, mode, "machine-encode") or std.mem.eql(u8, mode, "abi")) {
+        runMachineEncode();
+    } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
+        runFailure();
+    } else if (std.mem.eql(u8, mode, "autonomous") or std.mem.eql(u8, mode, "auto") or std.mem.eql(u8, mode, "chew")) {
+        runAutonomous();
     } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
         runSmeFixed();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
@@ -1181,6 +1235,7 @@ pub fn main() !void {
         // bio authority = fixed Allen FI + bio I/O routes
         runFixed();
         runBioIo();
+        runFailure();
     } else if (std.mem.eql(u8, mode, "bio-float") or std.mem.eql(u8, mode, "bio_float")) {
         const path: ?[]const u8 = if (args.len >= 3) args[2] else null;
         try runBio(path);
@@ -1198,6 +1253,9 @@ pub fn main() !void {
         runSpeechOrgan();
         runCrossModal();
         runBioIo();
+        runMachineEncode();
+        runFailure();
+        runAutonomous();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1227,6 +1285,9 @@ pub fn main() !void {
         runSpeechOrgan();
         runCrossModal();
         runBioIo();
+        runMachineEncode();
+        runFailure();
+        runAutonomous();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1238,7 +1299,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|bio-io|speech|cross-modal|fixed|teach|transfer|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|machine|failure|autonomous|bio-io|speech|fixed|…]\n", .{});
         std.process.exit(2);
     }
 }
