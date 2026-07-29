@@ -198,8 +198,8 @@ def run_gate(
 
 def main() -> int:
     p = argparse.ArgumentParser(description="MNIST ≥95% accuracy gate")
-    p.add_argument("--train-per-class", type=int, default=1500)
-    p.add_argument("--test-per-class", type=int, default=100)
+    p.add_argument("--train-per-class", type=int, default=2000)
+    p.add_argument("--test-per-class", type=int, default=150)
     p.add_argument("--k", type=int, default=3)
     args = p.parse_args()
 
