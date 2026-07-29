@@ -147,6 +147,28 @@ Shallow is OK early: deepen curriculum + distill usage while growing toward 2000
 2. Distill definitions for all role words (`--limit` batches).  
 3. Expand `facts.jsonl` / `problems.jsonl` (hand + optional Ollama).  
 4. Deeper apply: multi-step problems, still Fixed mind + codec.  
-5. Grammar templates last.
+5. Grammar templates last.  
+6. **STEM multimodal:** Kaggle datasets → inject (see `STEM_MULTIMODAL_ROADMAP.md`).  
+7. **Public Kaggle demo:** Linux `fsot_mind` binary package (see `KAGGLE_ZIG_MIND.md`) — not bare-metal kernel.  
+8. **Articulability:** every answer must cite hop cues / taught facts (reading–writing track).  
+9. **Checkpoint** after each grade band (`fsot_mind checkpoint`).
 
-**Point:** capability is built into **committed data + Zig student**, not into keeping a teacher online.
+**Point:** capability is built into **committed data + Zig student**, not into keeping a teacher online.  
+**No history curriculum** until math/science/reading/writing reason solidly.
+
+## 7. Accuracy + explain-yourself gates (push criteria)
+
+Before pushing a “smarter” build:
+
+| Gate | Command / artifact |
+|------|---------------------|
+| Machine tongue | `fsot_mind machine-lang` |
+| Knowledge apply | `fsot_mind grade` |
+| Multi-hop | `fsot_mind reason` |
+| Novel synthesis | `fsot_mind novel` |
+| Multimodal STEM | `inject-file` MNIST (or later packs) |
+| Save-game | `fsot_mind checkpoint` |
+| Articulate | Process log shows cues + English “I think X because …” |
+
+If it cannot **explain from taught data**, it is not ready to ship as intelligence growth.
+
