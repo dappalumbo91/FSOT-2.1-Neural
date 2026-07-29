@@ -73,6 +73,7 @@ const host_tts_fixed = @import("host_tts_fixed.zig");
 const language_practice_fixed = @import("language_practice_fixed.zig");
 const grade_practice_fixed = @import("grade_practice_fixed.zig");
 const grade_ladder_fixed = @import("grade_ladder_fixed.zig");
+const mnist_accuracy_fixed = @import("mnist_accuracy_fixed.zig");
 const reason_practice_fixed = @import("reason_practice_fixed.zig");
 const novel_inquiry_fixed = @import("novel_inquiry_fixed.zig");
 const checkpoint_fixed = @import("checkpoint_fixed.zig");
@@ -1277,6 +1278,23 @@ fn runVisionInjectDemo() void {
     std.debug.print("FSOT_VISION_INJECT PASS\n", .{});
 }
 
+fn runMnistAccuracy() void {
+    std.debug.print("=== FSOT MNIST ACCURACY GATE (real held-out, ≥95%) ===\n", .{});
+    std.debug.print("doctrine: 14x14 pool L2 features + k-NN; pack from run_mnist_gate.py\n", .{});
+    const r = mnist_accuracy_fixed.runMnistAccuracy();
+    std.debug.print(
+        "MNIST top1={e} thr={e} correct={d}/{d} train={d} dim={d} k={d} pack={}\n",
+        .{ r.top1, mnist_accuracy_fixed.PASS_THRESHOLD, r.correct, r.n_test, r.n_train, r.dim, r.k, r.from_pack },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_MNIST_GATE PASS\n", .{});
+        std.debug.print("FSOT_MNIST_ACCURACY_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_MNIST_GATE FAIL (run: python run_mnist_gate.py)\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runPixelId() void {
     std.debug.print("=== FSOT MIND PIXEL-ID (tutor-ablated multi-seed synthetic) ===\n", .{});
     const p = pixel_id_fixed.runPixelIdProbe();
@@ -1761,6 +1779,8 @@ pub fn main() !void {
         runSmeFixed();
     } else if (std.mem.eql(u8, mode, "attention") or std.mem.eql(u8, mode, "eeg") or std.mem.eql(u8, mode, "eeg-gates") or std.mem.eql(u8, mode, "attune")) {
         runAttentionEeg();
+    } else if (std.mem.eql(u8, mode, "mnist") or std.mem.eql(u8, mode, "mnist-gate") or std.mem.eql(u8, mode, "mnist_accuracy")) {
+        runMnistAccuracy();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {

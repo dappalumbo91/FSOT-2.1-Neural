@@ -13,7 +13,7 @@ const memory_f = @import("memory_fixed.zig");
 const teach_f = @import("teach_fixed.zig");
 const lexicon_en = @import("lexicon_en_fixed.zig");
 const organism_f = @import("organism_fixed.zig");
-const brain_f = @import("brain_fixed.zig");
+const mnist_acc = @import("mnist_accuracy_fixed.zig");
 const Fixed = fixed.Fixed;
 
 pub const PASS_THRESHOLD: f64 = 0.95;
@@ -308,94 +308,26 @@ fn loadCurriculum() void {
     std.debug.print("CURRICULUM_BANK seed_fallback items={d} (run: python run_curriculum_open.py)\n", .{n_items});
 }
 
-// ---------- vision: digit identity (tutor-ablated feature -> name) ----------
-// Stand-in for MNIST 8-D projection: distinct base per digit + small jitter.
-// Train mean prototypes; test held-out jitter via nearest prototype (features only).
-const DIGIT_NAMES = [_][]const u8{ "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-const N_DIGIT_TRAIN: u32 = 3;
-const N_DIGIT_TEST: u32 = 3;
-const N_DIGIT_SEEDS: u32 = 3;
+// ---------- vision: REAL MNIST held-out accuracy (not synthetic) ----------
+// Pack produced by: python run_mnist_gate.py
+// Features 14x14 pool L2; k-NN; pass ≥95%.
+// Cached once per process so 10-band ladder does not re-run k-NN 10×.
 
-fn digitFrame(digit: u32, sample: u32, seed_tag: u32, out: *[8]Fixed) void {
-    var i: usize = 0;
-    while (i < 8) : (i += 1) {
-        const primary: i64 = if (i == digit % 8) 80 else 12;
-        const sig: i64 = @intCast((digit *% 17 +% @as(u32, @intCast(i)) *% 9 +% 3) % 40);
-        const base_num = primary + sig - 20;
-        const base = fixed.div(fixed.fromInt(base_num), fixed.fromInt(100));
-        const jn: i64 = @intCast((sample *% 5 +% seed_tag *% 3 +% @as(u32, @intCast(i))) % 7);
-        const jit = fixed.div(fixed.sub(fixed.fromInt(jn), fixed.fromInt(3)), fixed.fromInt(120));
-        out[i] = fixed.clamp(fixed.add(base, jit), fixed.fromInt(-1), fixed.fromInt(1));
+var mnist_cache_ready: bool = false;
+var mnist_cache_ok: u32 = 0;
+var mnist_cache_n: u32 = 0;
+var mnist_cache_top1: f64 = 0;
+
+fn runVisionMnist() struct { ok: u32, n: u32, top1: f64 } {
+    if (mnist_cache_ready) {
+        return .{ .ok = mnist_cache_ok, .n = mnist_cache_n, .top1 = mnist_cache_top1 };
     }
-}
-
-fn featDist2(a: *const [8]Fixed, b: *const [8]Fixed) Fixed {
-    var s: Fixed = 0;
-    var i: usize = 0;
-    while (i < 8) : (i += 1) {
-        const d = fixed.sub(a[i], b[i]);
-        s = fixed.add(s, fixed.mul(d, d));
-    }
-    return s;
-}
-
-fn runVisionDigits(max_digit: u32) struct { ok: u32, n: u32, top1: f64 } {
-    var total_ok: u32 = 0;
-    var total_n: u32 = 0;
-    var seed: u32 = 0;
-    while (seed < N_DIGIT_SEEDS) : (seed += 1) {
-        var b = brain_f.BrainF.initSeeded(7 + seed * 13, false);
-        var store: memory_f.StoreF = .{};
-        store.clear();
-        var proto: [10][8]Fixed = .{.{0} ** 8} ** 10;
-        var name_tok: [10]u32 = undefined;
-        var d: u32 = 0;
-        while (d < 10) : (d += 1) name_tok[d] = memory_f.hashToken(DIGIT_NAMES[d]);
-        d = 0;
-        while (d <= max_digit) : (d += 1) {
-            var s: u32 = 0;
-            while (s < N_DIGIT_TRAIN) : (s += 1) {
-                var feats: [8]Fixed = undefined;
-                digitFrame(d, s, seed, &feats);
-                var k: usize = 0;
-                while (k < 8) : (k += 1) proto[d][k] = fixed.add(proto[d][k], feats[k]);
-                const tok = [_]u32{ name_tok[d], memory_f.hashToken("digit"), memory_f.hashToken("vision"), 0, 0, memory_f.hashToken("train") };
-                if (store.n < 30) _ = store.encode(&b, feats[0..], 0b100011, tok);
-            }
-            const den = fixed.fromInt(@intCast(N_DIGIT_TRAIN));
-            var k: usize = 0;
-            while (k < 8) : (k += 1) proto[d][k] = fixed.div(proto[d][k], den);
-        }
-        d = 0;
-        while (d <= max_digit) : (d += 1) {
-            var s: u32 = 0;
-            while (s < N_DIGIT_TEST) : (s += 1) {
-                var feats: [8]Fixed = undefined;
-                digitFrame(d, N_DIGIT_TRAIN + 10 + s, seed, &feats);
-                var best_d: u32 = 0;
-                var best_dist: Fixed = fixed.fromInt(999);
-                var cand: u32 = 0;
-                while (cand <= max_digit) : (cand += 1) {
-                    const dist = featDist2(&feats, &proto[cand]);
-                    if (fixed.lt(dist, best_dist)) {
-                        best_dist = dist;
-                        best_d = cand;
-                    }
-                }
-                total_n += 1;
-                if (best_d == d) total_ok += 1;
-            }
-        }
-    }
-    const top1 = if (total_n > 0) @as(f64, @floatFromInt(total_ok)) / @as(f64, @floatFromInt(total_n)) else 0;
-    return .{ .ok = total_ok, .n = total_n, .top1 = top1 };
-}
-
-fn visionMaxDigit(band: GradeBand) u32 {
-    return switch (band) {
-        .preschool => 5,
-        else => 9,
-    };
+    const r = mnist_acc.runMnistAccuracy();
+    mnist_cache_ok = r.correct;
+    mnist_cache_n = r.n_test;
+    mnist_cache_top1 = r.top1;
+    mnist_cache_ready = true;
+    return .{ .ok = r.correct, .n = r.n_test, .top1 = r.top1 };
 }
 
 // ---------- teach / score ----------
@@ -511,13 +443,13 @@ pub fn runBand(band: GradeBand) BandReport {
     const science = scoreDomainItems(band, .science, false);
     const literacy = scoreDomainItems(band, .literacy, false);
 
-    // vision digit ID (organism / store path — not declarative bank)
-    const vis = runVisionDigits(visionMaxDigit(band));
+    // vision = real MNIST held-out accuracy (same gate every band; must stay ≥95%)
+    const vis = runVisionMnist();
     const vision = DomainScore{
         .ok = vis.ok,
         .n = vis.n,
         .score = vis.top1,
-        .pass = vis.n > 0 and vis.top1 + 1e-12 >= PASS_THRESHOLD,
+        .pass = vis.n >= 100 and vis.top1 + 1e-12 >= PASS_THRESHOLD,
     };
 
     // digit name labels in bank (text side of vision)

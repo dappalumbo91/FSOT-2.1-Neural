@@ -70,8 +70,32 @@ def main() -> int:
         (LOG_DIR / "climb_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
         return 1
 
-    log("=== ZIG BUILD ===")
-    r = run(["zig", "build"], cwd=ZIG_DIR, timeout=600)
+    log("=== MNIST ACCURACY GATE (≥95% held-out) ===")
+    r = run(
+        [
+            sys.executable,
+            str(ROOT / "run_mnist_gate.py"),
+            "--train-per-class",
+            "1000",
+            "--test-per-class",
+            "100",
+            "--k",
+            "1",
+        ],
+        timeout=600,
+    )
+    log(r.stdout[-3000:] if r.stdout else "")
+    report["mnist_rc"] = r.returncode
+    if r.returncode != 0:
+        log(f"MNIST gate FAIL rc={r.returncode}\n{r.stderr[-2000:]}")
+        report["error"] = "mnist_gate"
+        (LOG_DIR / "climb_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        return 1
+
+    log("=== ZIG BUILD (ReleaseFast for MNIST k-NN) ===")
+    r = run(["zig", "build", "-Doptimize=ReleaseFast"], cwd=ZIG_DIR, timeout=600)
+    if r.returncode != 0:
+        r = run(["zig", "build"], cwd=ZIG_DIR, timeout=600)
     if r.returncode != 0:
         log(f"zig build FAIL\n{r.stderr[-3000:]}\n{r.stdout[-1000:]}")
         report["error"] = "zig_build"

@@ -1,0 +1,30 @@
+{
+  "gate": "mnist_accuracy",
+  "threshold": 0.95,
+  "top1": 0.951,
+  "correct": 951,
+  "n_test": 1000,
+  "n_train": 10000,
+  "pass": true,
+  "method": "knn_k1_pool14x14_l2",
+  "dim": 196,
+  "train_per_class": 1000,
+  "test_per_class": 100,
+  "k": 1,
+  "per_digit": {
+    "0": 0.99,
+    "1": 1.0,
+    "2": 0.96,
+    "3": 0.94,
+    "4": 0.91,
+    "5": 0.93,
+    "6": 0.96,
+    "7": 0.94,
+    "8": 0.93,
+    "9": 0.95
+  },
+  "mnist_root": "D:\\fsot_training\\datasets\\mnist_csv",
+  "pack_path": "I:\\fsot nuron\\data\\multimodal\\mnist_gate\\mnist_pack.bin",
+  "timestamp": "2026-07-29T22:19:19.372991+00:00",
+  "doctrine": "real MNIST held-out accuracy \u226595% (not synthetic digit prototypes)"
+}
