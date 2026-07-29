@@ -59,6 +59,8 @@ const vision_inject_fixed = @import("vision_inject_fixed.zig");
 const pixel_id_fixed = @import("pixel_id_fixed.zig");
 const modulate_fixed = @import("modulate_fixed.zig");
 const teach_fixed = @import("teach_fixed.zig");
+const bands_fixed = @import("bands_fixed.zig");
+const short_horizon_fixed = @import("short_horizon_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -580,6 +582,40 @@ fn runTeach() void {
     }
 }
 
+fn runSmeFixed() void {
+    std.debug.print("=== FSOT MIND SME (fixed bands — theta/gamma encode vs rest) ===\n", .{});
+    if (!bands_fixed.selfTest()) {
+        std.debug.print("FSOT_SME_FIXED FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const s = bands_fixed.runSmeProbe();
+    std.debug.print(
+        "SME_FIXED theta_gt={} gamma_gt={} spikes_enc={d} spikes_rest={d} th_enc={e} th_rest={e} ga_enc={e} ga_rest={e}\n",
+        .{ s.theta_gt, s.gamma_gt, s.spikes_enc, s.spikes_rest, s.theta_enc, s.theta_rest, s.gamma_enc, s.gamma_rest },
+    );
+    if (s.ok) {
+        std.debug.print("FSOT_SME_FIXED PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_SME_FIXED FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runShortHorizon() void {
+    std.debug.print("=== FSOT MIND SHORT-HORIZON (fixed quick encode→recall) ===\n", .{});
+    const r = short_horizon_fixed.runShortHorizonProbe();
+    std.debug.print(
+        "SHORT_HORIZON lessons={d} mem={d} recall={d}/{d} top1={e} cur_res={d} sme={} spikes={d}\n",
+        .{ r.n_lessons, r.n_memory, r.recall_correct, r.n_lessons, r.recall_top1, r.curiosity_resolved, r.sme_ok, r.spikes },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_SHORT_HORIZON PASS\n", .{});
+    } else {
+        std.debug.print("FSOT_SHORT_HORIZON FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runInjectFile(path: []const u8) !void {
     std.debug.print("=== FSOT MIND INJECT-FILE → FIXED organism ===\n", .{});
     std.debug.print("path={s}\n", .{path});
@@ -1023,6 +1059,10 @@ pub fn main() !void {
         runModulate();
     } else if (std.mem.eql(u8, mode, "teach") or std.mem.eql(u8, mode, "5w1h") or std.mem.eql(u8, mode, "teach-5w1h")) {
         runTeach();
+    } else if (std.mem.eql(u8, mode, "short-horizon") or std.mem.eql(u8, mode, "short_horizon") or std.mem.eql(u8, mode, "sh")) {
+        runShortHorizon();
+    } else if (std.mem.eql(u8, mode, "sme-fixed") or std.mem.eql(u8, mode, "sme_fixed") or std.mem.eql(u8, mode, "bands-fixed")) {
+        runSmeFixed();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {
@@ -1044,6 +1084,9 @@ pub fn main() !void {
     } else if (std.mem.eql(u8, mode, "genetic") or std.mem.eql(u8, mode, "codon")) {
         runGenetic();
     } else if (std.mem.eql(u8, mode, "sme")) {
+        // default SME authority = fixed bands
+        runSmeFixed();
+    } else if (std.mem.eql(u8, mode, "sme-float") or std.mem.eql(u8, mode, "sme_float")) {
         runSme();
     } else if (std.mem.eql(u8, mode, "inject-file") or std.mem.eql(u8, mode, "inject_file")) {
         if (args.len < 3) {
@@ -1066,6 +1109,8 @@ pub fn main() !void {
         runTeach();
         runTransfer();
         runModulate();
+        runSmeFixed();
+        runShortHorizon();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1090,6 +1135,8 @@ pub fn main() !void {
         runTeach();
         runTransfer();
         runModulate();
+        runSmeFixed();
+        runShortHorizon();
         runInject();
         runVisionInjectDemo();
         runPixelId();
@@ -1101,7 +1148,7 @@ pub fn main() !void {
         std.debug.print("FSOT_NO_PYTHON_CORE_OK\n", .{});
         std.debug.print("FSOT_INTEL_HOST_OK\n", .{});
     } else {
-        std.debug.print("usage: fsot_mind [all|fixed|teach|transfer|modulate|curiosity|inject|vision|pixel-id|stress|…]\n", .{});
+        std.debug.print("usage: fsot_mind [all|fixed|teach|transfer|modulate|sme|short-horizon|curiosity|inject|vision|pixel-id|stress|…]\n", .{});
         std.process.exit(2);
     }
 }
