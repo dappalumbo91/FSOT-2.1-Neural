@@ -72,6 +72,7 @@ const lexicon_en_fixed = @import("lexicon_en_fixed.zig");
 const host_tts_fixed = @import("host_tts_fixed.zig");
 const language_practice_fixed = @import("language_practice_fixed.zig");
 const grade_practice_fixed = @import("grade_practice_fixed.zig");
+const reason_practice_fixed = @import("reason_practice_fixed.zig");
 const failure_fixed = @import("failure_fixed.zig");
 const autonomous_fixed = @import("autonomous_fixed.zig");
 const wire_around_fixed = @import("wire_around_fixed.zig");
@@ -930,6 +931,28 @@ fn runGradePractice() void {
     }
 }
 
+fn runReasonPractice() void {
+    std.debug.print("=== FSOT OPEN REASON (multi-hop over taught knowledge) ===\n", .{});
+    std.debug.print("doctrine: bio process = inject→ticks→retrieve→bind; not LLM chain-of-thought\n", .{});
+    // full run with TTS off first for speed in self-check path; we call with speak=true below
+    if (!reason_practice_fixed.selfTest()) {
+        std.debug.print("FSOT_REASON FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    const r = reason_practice_fixed.runReasonPractice(true);
+    std.debug.print(
+        "REASON taught={d} open={d}/{d} acc={e} hops={d} bank_hits={d} ep_hits={d} spikes={d} lex={d}\n",
+        .{ r.n_taught, r.n_correct, r.n_open, r.accuracy, r.n_hops_total, r.n_bank_hits, r.n_ep_hits, r.total_spikes, r.lexicon_total },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_REASON PASS\n", .{});
+        std.debug.print("FSOT_OPEN_REASON_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_REASON FAIL (multi-hop apply still weak — expected while shallow)\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runFailure() void {
     std.debug.print("=== FSOT FAILURE BOUNDARIES (expanded catalog, fixed) ===\n", .{});
     const r = failure_fixed.runFailureProbe();
@@ -1576,6 +1599,8 @@ pub fn main() !void {
         runLanguagePractice();
     } else if (std.mem.eql(u8, mode, "grade") or std.mem.eql(u8, mode, "preschool") or std.mem.eql(u8, mode, "kindergarten") or std.mem.eql(u8, mode, "grade1") or std.mem.eql(u8, mode, "curriculum")) {
         runGradePractice();
+    } else if (std.mem.eql(u8, mode, "reason") or std.mem.eql(u8, mode, "open-reason") or std.mem.eql(u8, mode, "think") or std.mem.eql(u8, mode, "multi-hop")) {
+        runReasonPractice();
     } else if (std.mem.eql(u8, mode, "failure") or std.mem.eql(u8, mode, "lesion") or std.mem.eql(u8, mode, "boundaries")) {
         runFailure();
     } else if (std.mem.eql(u8, mode, "wire") or std.mem.eql(u8, mode, "wire-around") or std.mem.eql(u8, mode, "wire_around")) {
