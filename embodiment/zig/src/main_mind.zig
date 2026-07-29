@@ -979,8 +979,8 @@ fn runGradeLadder() void {
     }
     const r = grade_ladder_fixed.runLadder();
     std.debug.print(
-        "LADDER_SUMMARY bands_passed={d}/3 stopped_at={s} overall_ok={}\n",
-        .{ r.n_bands_passed, r.stopped_at, r.ok },
+        "LADDER_SUMMARY bands_passed={d}/{d} stopped_at={s} overall_ok={}\n",
+        .{ r.n_bands_passed, r.n_bands_total, r.stopped_at, r.ok },
     );
     if (r.ok) {
         std.debug.print("FSOT_LADDER PASS\n", .{});
@@ -1715,6 +1715,20 @@ pub fn main() !void {
         runGradeBand(.kindergarten);
     } else if (std.mem.eql(u8, mode, "grade1") or std.mem.eql(u8, mode, "g1") or std.mem.eql(u8, mode, "first")) {
         runGradeBand(.grade1);
+    } else if (std.mem.eql(u8, mode, "grade2") or std.mem.eql(u8, mode, "g2")) {
+        runGradeBand(.grade2);
+    } else if (std.mem.eql(u8, mode, "grade3") or std.mem.eql(u8, mode, "g3")) {
+        runGradeBand(.grade3);
+    } else if (std.mem.eql(u8, mode, "grade4") or std.mem.eql(u8, mode, "g4")) {
+        runGradeBand(.grade4);
+    } else if (std.mem.eql(u8, mode, "grade5") or std.mem.eql(u8, mode, "g5")) {
+        runGradeBand(.grade5);
+    } else if (std.mem.eql(u8, mode, "grade6") or std.mem.eql(u8, mode, "g6") or std.mem.eql(u8, mode, "ms6")) {
+        runGradeBand(.grade6);
+    } else if (std.mem.eql(u8, mode, "grade7") or std.mem.eql(u8, mode, "g7") or std.mem.eql(u8, mode, "ms7")) {
+        runGradeBand(.grade7);
+    } else if (std.mem.eql(u8, mode, "grade8") or std.mem.eql(u8, mode, "g8") or std.mem.eql(u8, mode, "ms8")) {
+        runGradeBand(.grade8);
     } else if (std.mem.eql(u8, mode, "reason") or std.mem.eql(u8, mode, "open-reason") or std.mem.eql(u8, mode, "think") or std.mem.eql(u8, mode, "multi-hop")) {
         runReasonPractice();
     } else if (std.mem.eql(u8, mode, "novel") or std.mem.eql(u8, mode, "inquiry") or std.mem.eql(u8, mode, "synthesize") or std.mem.eql(u8, mode, "idea")) {

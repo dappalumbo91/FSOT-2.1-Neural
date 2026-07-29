@@ -1,4 +1,4 @@
-# Open curriculum (PK → K → G1)
+# Open curriculum (PK → Grade 8 / middle school)
 
 ## The point
 

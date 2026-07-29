@@ -22,6 +22,18 @@ pub const GradeBand = enum(u8) {
     preschool = 0,
     kindergarten = 1,
     grade1 = 2,
+    grade2 = 3,
+    grade3 = 4,
+    grade4 = 5,
+    grade5 = 6,
+    grade6 = 7,
+    grade7 = 8,
+    grade8 = 9,
+};
+
+pub const ALL_BANDS = [_]GradeBand{
+    .preschool, .kindergarten, .grade1, .grade2, .grade3,
+    .grade4, .grade5, .grade6, .grade7, .grade8,
 };
 
 pub const Domain = enum(u8) {
@@ -37,6 +49,13 @@ pub fn bandName(b: GradeBand) []const u8 {
         .preschool => "preschool",
         .kindergarten => "kindergarten",
         .grade1 => "grade1",
+        .grade2 => "grade2",
+        .grade3 => "grade3",
+        .grade4 => "grade4",
+        .grade5 => "grade5",
+        .grade6 => "grade6",
+        .grade7 => "grade7",
+        .grade8 => "grade8",
     };
 }
 
@@ -54,6 +73,13 @@ fn parseBand(s: []const u8) ?GradeBand {
     if (std.mem.eql(u8, s, "preschool") or std.mem.eql(u8, s, "pk")) return .preschool;
     if (std.mem.eql(u8, s, "kindergarten") or std.mem.eql(u8, s, "k") or std.mem.eql(u8, s, "kinder")) return .kindergarten;
     if (std.mem.eql(u8, s, "grade1") or std.mem.eql(u8, s, "g1") or std.mem.eql(u8, s, "first")) return .grade1;
+    if (std.mem.eql(u8, s, "grade2") or std.mem.eql(u8, s, "g2")) return .grade2;
+    if (std.mem.eql(u8, s, "grade3") or std.mem.eql(u8, s, "g3")) return .grade3;
+    if (std.mem.eql(u8, s, "grade4") or std.mem.eql(u8, s, "g4")) return .grade4;
+    if (std.mem.eql(u8, s, "grade5") or std.mem.eql(u8, s, "g5")) return .grade5;
+    if (std.mem.eql(u8, s, "grade6") or std.mem.eql(u8, s, "g6") or std.mem.eql(u8, s, "ms6")) return .grade6;
+    if (std.mem.eql(u8, s, "grade7") or std.mem.eql(u8, s, "g7") or std.mem.eql(u8, s, "ms7")) return .grade7;
+    if (std.mem.eql(u8, s, "grade8") or std.mem.eql(u8, s, "g8") or std.mem.eql(u8, s, "ms8")) return .grade8;
     return null;
 }
 
@@ -128,7 +154,7 @@ const SEED = [_]SeedItem{
 };
 
 // ---------- runtime bank (loaded + seed) ----------
-const MAX_ITEMS: usize = 8192;
+const MAX_ITEMS: usize = 32768;
 const MAX_Q: usize = 96;
 const MAX_A: usize = 32;
 
@@ -149,15 +175,25 @@ var n_items: usize = 0;
 var loaded_from_file: bool = false;
 
 // declarative hash bank
-const BANK_CAP: usize = 8192;
+const BANK_CAP: usize = 32768;
 var bq: [BANK_CAP]u32 = .{0} ** BANK_CAP;
 var ba: [BANK_CAP]u32 = .{0} ** BANK_CAP;
 var bn: usize = 0;
 
 fn bankPut(q: []const u8, a: []const u8) void {
+    const h = memory_f.hashToken(q);
+    const ah = memory_f.hashToken(a);
+    // last write wins for same question (avoid stale first-hit mismatches)
+    var i: usize = 0;
+    while (i < bn) : (i += 1) {
+        if (bq[i] == h) {
+            ba[i] = ah;
+            return;
+        }
+    }
     if (bn >= BANK_CAP) return;
-    bq[bn] = memory_f.hashToken(q);
-    ba[bn] = memory_f.hashToken(a);
+    bq[bn] = h;
+    ba[bn] = ah;
     bn += 1;
 }
 
@@ -206,25 +242,26 @@ fn loadSeed() void {
     }
 }
 
+// heap-ish static buffer for bank file (not on stack)
+var file_load_buf: [4 * 1024 * 1024]u8 = undefined;
+
 fn tryLoadBankFile(path: []const u8) bool {
     const file = std.fs.cwd().openFile(path, .{}) catch return false;
     defer file.close();
 
-    var buf: [1024 * 1024]u8 = undefined;
-    const n = file.readAll(buf[0..]) catch return false;
+    const n = file.readAll(file_load_buf[0..]) catch return false;
     if (n == 0) return false;
 
     var start: usize = 0;
     var lines: u32 = 0;
     while (start < n) {
         var end = start;
-        while (end < n and buf[end] != '\n') : (end += 1) {}
-        var line = buf[start..end];
+        while (end < n and file_load_buf[end] != '\n') : (end += 1) {}
+        var line = file_load_buf[start..end];
         if (line.len > 0 and line[line.len - 1] == '\r') line = line[0 .. line.len - 1];
         start = end + 1;
         if (line.len == 0 or line[0] == '#') continue;
 
-        // domain \t grade \t kind \t question \t answer
         var fields: [5][]const u8 = .{ "", "", "", "", "" };
         var fi: usize = 0;
         var p: usize = 0;
@@ -246,10 +283,14 @@ fn tryLoadBankFile(path: []const u8) bool {
 }
 
 const BANK_CANDIDATES = [_][]const u8{
+    "data/curriculum/pk_to_g8/bank.tsv",
+    "../data/curriculum/pk_to_g8/bank.tsv",
+    "../../data/curriculum/pk_to_g8/bank.tsv",
+    "D:/fsot_training/curriculum/pk_to_g8/bank.tsv",
     "data/curriculum/pk_k_g1/bank.tsv",
     "../data/curriculum/pk_k_g1/bank.tsv",
     "../../data/curriculum/pk_k_g1/bank.tsv",
-    "../../../data/curriculum/pk_k_g1/bank.tsv",
+    "I:/fsot nuron/data/curriculum/pk_to_g8/bank.tsv",
     "I:/fsot nuron/data/curriculum/pk_k_g1/bank.tsv",
 };
 
@@ -352,9 +393,8 @@ fn runVisionDigits(max_digit: u32) struct { ok: u32, n: u32, top1: f64 } {
 
 fn visionMaxDigit(band: GradeBand) u32 {
     return switch (band) {
-        .preschool => 5, // 0-5
-        .kindergarten => 9, // 0-9
-        .grade1 => 9,
+        .preschool => 5,
+        else => 9,
     };
 }
 
@@ -456,7 +496,7 @@ pub fn runBand(band: GradeBand) BandReport {
     org.steps_per_tick = 4;
 
     // cumulative teach through this band
-    const bands = [_]GradeBand{ .preschool, .kindergarten, .grade1 };
+    const bands = ALL_BANDS;
     var taught: u32 = 0;
     for (bands) |b| {
         if (@intFromEnum(b) > @intFromEnum(band)) break;
@@ -532,10 +572,9 @@ pub fn runBand(band: GradeBand) BandReport {
 pub const LadderReport = struct {
     ok: bool,
     n_bands_passed: u32,
+    n_bands_total: u32,
     stopped_at: []const u8,
-    preschool: BandReport,
-    kindergarten: BandReport,
-    grade1: BandReport,
+    last: BandReport,
 };
 
 fn printBandLine(r: BandReport) void {
@@ -565,26 +604,28 @@ fn printBandLine(r: BandReport) void {
 }
 
 pub fn runLadder() LadderReport {
-    const pk = runBand(.preschool);
-    printBandLine(pk);
-    if (!pk.pass) {
-        return .{ .ok = false, .n_bands_passed = 0, .stopped_at = "preschool", .preschool = pk, .kindergarten = pk, .grade1 = pk };
+    var passed: u32 = 0;
+    var last: BandReport = undefined;
+    for (ALL_BANDS) |b| {
+        last = runBand(b);
+        printBandLine(last);
+        if (!last.pass) {
+            return .{
+                .ok = false,
+                .n_bands_passed = passed,
+                .n_bands_total = ALL_BANDS.len,
+                .stopped_at = bandName(b),
+                .last = last,
+            };
+        }
+        passed += 1;
     }
-    const k = runBand(.kindergarten);
-    printBandLine(k);
-    if (!k.pass) {
-        return .{ .ok = false, .n_bands_passed = 1, .stopped_at = "kindergarten", .preschool = pk, .kindergarten = k, .grade1 = k };
-    }
-    const g1 = runBand(.grade1);
-    printBandLine(g1);
-    const all = g1.pass;
     return .{
-        .ok = all,
-        .n_bands_passed = if (all) 3 else 2,
-        .stopped_at = if (all) "none" else "grade1",
-        .preschool = pk,
-        .kindergarten = k,
-        .grade1 = g1,
+        .ok = true,
+        .n_bands_passed = passed,
+        .n_bands_total = ALL_BANDS.len,
+        .stopped_at = "none",
+        .last = last,
     };
 }
 
