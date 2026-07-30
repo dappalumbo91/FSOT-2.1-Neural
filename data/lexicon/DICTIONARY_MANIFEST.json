@@ -1,0 +1,22 @@
+{
+  "source": "Princeton WordNet via NLTK",
+  "n_roles": 20000,
+  "n_dictionary_cards": 19956,
+  "n_synonym_entries": 27378,
+  "n_definition_lessons": 400,
+  "by_role": {
+    "link": 68,
+    "who": 1466,
+    "verb": 2320,
+    "adj": 4288,
+    "how": 709,
+    "what": 11149
+  },
+  "doctrine": "Dictionary/thesaurus foundation; TTS generation stays on core grammar templates; extras = recognition + teaching.",
+  "files": [
+    "en_roles.tsv",
+    "en_dictionary.jsonl",
+    "en_synonyms.tsv",
+    "dictionary_lessons.tsv"
+  ]
+}
