@@ -95,6 +95,7 @@ const neuromod_fixed = @import("neuromod_fixed.zig");
 const sleep_replay_fixed = @import("sleep_replay_fixed.zig");
 const claimability_fixed = @import("claimability_fixed.zig");
 const intel_loop_fixed = @import("intel_loop_fixed.zig");
+const intel_frontier_fixed = @import("intel_frontier_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -1424,6 +1425,58 @@ fn runIntelBio() void {
     std.debug.print("FSOT_INTEL_BIO_STACK PASS\n", .{});
 }
 
+fn runIntelFrontier() void {
+    std.debug.print("=== FSOT INTEL FRONTIER (multi-day + curiosity + ladder) ===\n", .{});
+    std.debug.print("schedule: N days of curiosity-select → ACh encode → PE retrieve → sleep → claim\n", .{});
+    std.debug.print("speech path intact (reconnect after frontiers) — see docs/SPEECH_RECONNECT.md\n", .{});
+    const r = intel_frontier_fixed.runFrontier();
+    std.debug.print(
+        "FRONT days={d} taught={d} curio_picks={d} novel={d} pe_hit={d} pe_miss={d} claim0={e} claimF={e} improved={} str={e}\n",
+        .{
+            r.n_days,
+            r.n_taught_total,
+            r.n_curiosity_picks,
+            r.n_novel_picks,
+            r.pe_hits,
+            r.pe_miss,
+            r.claim_day0,
+            r.claim_final,
+            r.claim_improved,
+            r.mean_str_final,
+        },
+    );
+    std.debug.print(
+        "FRONT stdp={d} replay={d} sigma={e} ladder_ok={} depth_ran={} depth_acc={e} depth_ok={} loop_ok={} speech_intact={}\n",
+        .{
+            r.total_stdp,
+            r.total_replay,
+            r.mean_sigma,
+            r.ladder_ok,
+            r.depth_ran,
+            r.depth_acc,
+            r.depth_ok,
+            r.intel_loop_ok,
+            r.speech_path_intact,
+        },
+    );
+    var d: usize = 0;
+    while (d < r.n_days) : (d += 1) {
+        const s = r.days[d];
+        std.debug.print(
+            "  day{d}: sel={d} novel={d} retrieve={e} claim={e} str={e} stdp={d} replay={d}\n",
+            .{ s.day, s.n_selected, s.n_novel, s.retrieve_rate, s.claim_rate, s.mean_str, s.n_stdp, s.n_replay },
+        );
+    }
+    if (r.ok) {
+        std.debug.print("FSOT_INTEL_FRONTIER PASS\n", .{});
+        std.debug.print("FSOT_MULTI_DAY_CURIOSITY_OK\n", .{});
+        std.debug.print("FSOT_SPEECH_PATH_INTACT\n", .{});
+    } else {
+        std.debug.print("FSOT_INTEL_FRONTIER FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runIntelLoop() void {
     std.debug.print("=== FSOT INTEL LOOP (train → retrieve → sleep → prove) ===\n", .{});
     std.debug.print("schedule: ACh encode → spaced PE retrieval → claim/mem probe → NREM replay → re-prove + transfer\n", .{});
@@ -2044,6 +2097,8 @@ pub fn main() !void {
         runIntelBio();
     } else if (std.mem.eql(u8, mode, "intel-loop") or std.mem.eql(u8, mode, "intel_loop") or std.mem.eql(u8, mode, "train-sleep-prove") or std.mem.eql(u8, mode, "loop")) {
         runIntelLoop();
+    } else if (std.mem.eql(u8, mode, "frontier") or std.mem.eql(u8, mode, "intel-frontier") or std.mem.eql(u8, mode, "multi-day") or std.mem.eql(u8, mode, "curiosity-train")) {
+        runIntelFrontier();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {

@@ -71,6 +71,18 @@ zig build-exe -OReleaseFast "-femit-bin=$out" --name fsot_mind_live src/main_min
 & $out intel-loop     # closed train→sleep→prove organism cycle
 ```
 
+### Multi-day curiosity frontier
+
+Mode: **`frontier`** (`multi-day`, `curiosity-train`, `intel-frontier`)
+
+```text
+for day in 1..N:
+  curiositySelect(weakest/novel) → ACh encode → PE retrieve → sleep → claim
+then: ladder selfTest + depth (if bank) + speech path flag intact
+```
+
+Speech / mic / TTS fluent loop is **preserved** for reconnect: [`SPEECH_RECONNECT.md`](SPEECH_RECONNECT.md).
+
 Expect:
 
 ```text
@@ -79,6 +91,8 @@ FSOT_SLEEP_REPLAY PASS / FSOT_CONSOLIDATION_OK
 FSOT_CLAIMABILITY PASS / FSOT_MULTI_HOP_INTEL_OK
 FSOT_INTEL_BIO_STACK PASS
 FSOT_INTEL_LOOP PASS / FSOT_TRAIN_SLEEP_PROVE_OK
+FSOT_INTEL_FRONTIER PASS / FSOT_MULTI_DAY_CURIOSITY_OK
+FSOT_SPEECH_PATH_INTACT
 ```
 
 ## How this ties to curriculum depth
