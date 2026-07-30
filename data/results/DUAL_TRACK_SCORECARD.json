@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-07-30T03:56:30.214405+00:00",
+  "bio": {
+    "wetlab_found": true,
+    "bio_card_found": true,
+    "lean_cert_found": true,
+    "wetlab_pass": true,
+    "wetlab_score": "37/37",
+    "wetlab_critical_fails": [],
+    "wetlab_generated": "2026-07-30T03:54:12.268532+00:00",
+    "bio_operational": true,
+    "bio_strict": true,
+    "bio_gaps": "6/6",
+    "bio_isi_rel_error": 0.012556033995267429,
+    "bio_adapt_rel_error": 0.06742300911743665,
+    "bio_generated": "2026-07-30T03:56:24.917719+00:00",
+    "lean_ok": true,
+    "track_pass": true,
+    "track_pass_strict": true
+  },
+  "math": {
+    "drills_acc": 1.0,
+    "drills_n": 127,
+    "drills_pass": true,
+    "binding_drills": "37/37",
+    "binding_pass": true,
+    "gsm8k_n": 500,
+    "correct": 77,
+    "wrong_fire": 16,
+    "no_fire": 407,
+    "fire_precision": 0.828,
+    "pass_threshold_drills": 0.95,
+    "hard_gate": "drills\u226595% never sacrificed for auto-templates"
+  },
+  "bio_refresh": {},
+  "dual_ok": true
+}

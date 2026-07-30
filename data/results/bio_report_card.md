@@ -1,6 +1,6 @@
 # FSOT-2.1-Neural bio report card
 
-Generated: `2026-07-18T18:49:59.075509+00:00`  
+Generated: `2026-07-30T03:56:24.917719+00:00`  
 Mode: **bio_match** · units=64 · steps=1200 · device=cpu
 
 **Pass (operational):** YES  
@@ -10,9 +10,9 @@ Mode: **bio_match** · units=64 · steps=1200 · device=cpu
 
 | Metric | Sim | Allen | Rel error |
 |--------|-----|-------|-----------|
-| Mean ISI (ms) | 70.6748 | 70.5986 | 0.11% |
-| Adaptation index | 0.0524 | 0.0512 | 2.45% |
-| Evoked rate (Hz) | 19.7917 | — | — |
+| Mean ISI (ms) | 69.7121 | 70.5986 | 1.26% |
+| Adaptation index | 0.0546 | 0.0512 | 6.74% |
+| Evoked rate (Hz) | 19.6484 | — | — |
 
 Gaps closed: **6/6**
 

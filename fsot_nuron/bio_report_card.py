@@ -19,7 +19,8 @@ CARD_MD = RESULTS_DIR / "bio_report_card.md"
 def build_bio_report_card(
     *,
     n_units: int = 64,
-    steps: int = 1000,
+    # 1200 steps: stable Allen ISI ≤2% operational; 1000 often ~2.4%, 2000 overfits adapt
+    steps: int = 1200,
     device: str = "cpu",
     write: bool = True,
 ) -> Dict[str, Any]:

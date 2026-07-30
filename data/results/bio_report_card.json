@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-07-18T18:49:59.075509+00:00",
+  "generated_at": "2026-07-30T03:56:24.917719+00:00",
   "package": "FSOT-2.1-Neural",
   "primary_mode": "bio_match",
   "device": "cpu",
   "n_units": 64,
   "steps": 1200,
   "allen_comparison": {
-    "isi_ms_sim": 70.67480239272118,
+    "isi_ms_sim": 69.71211785078049,
     "isi_ms_allen": 70.59855571638475,
-    "isi_rel_error": 0.0010800033451342811,
-    "adapt_sim": 0.052406147286092164,
+    "isi_rel_error": 0.012556033995267429,
+    "adapt_sim": 0.05460283857792092,
     "adapt_allen": 0.051153889361673456,
-    "adapt_rel_error": 0.02448020894529949,
-    "rate_evoked_Hz": 19.79166666666667
+    "adapt_rel_error": 0.06742300911743665,
+    "rate_evoked_Hz": 19.6484375
   },
   "gaps": {
     "closed": 6,
@@ -21,25 +21,25 @@
     "rows": [
       {
         "gap": "mean_isi_ms",
-        "sim": 70.67480239272118,
+        "sim": 69.71211785078049,
         "target": 70.59855571638475,
-        "rel_error": 0.0010800033451342811,
+        "rel_error": 0.012556033995267429,
         "tol_rel": 0.02,
         "closed": true,
         "note": "bio_match: refractory floor \u2248 0.78\u00d7 Allen avg_isi"
       },
       {
         "gap": "adaptation_index",
-        "sim": 0.052406147286092164,
+        "sim": 0.05460283857792092,
         "target": 0.051153889361673456,
-        "rel_error": 0.02448020894529949,
+        "rel_error": 0.06742300911743665,
         "tol_rel": 0.1,
         "closed": true,
         "note": "mild AHP; sign/order match matters more than exact magnitude"
       },
       {
         "gap": "evoked_rate_band",
-        "sim": 19.79166666666667,
+        "sim": 19.6484375,
         "target": "band 5\u201380 Hz",
         "rel_error": NaN,
         "tol_rel": 0.0,
@@ -48,7 +48,7 @@
       },
       {
         "gap": "spontaneous_rate_band",
-        "sim": 6.432291666666666,
+        "sim": 6.575520833333335,
         "target": "band 0.1\u201315 Hz",
         "rel_error": NaN,
         "tol_rel": 0.0,
@@ -88,12 +88,12 @@
     "rest_pass": 1.0
   },
   "efficiency_ledger": {
-    "bio_match_isi_ms": 70.67480239272118,
-    "efficient_isi_ms": 22.98400318622589,
-    "isi_speedup": 3.0749561693010885,
-    "bio_match_rate_Hz": 19.79166666666667,
-    "efficient_rate_Hz": 46.92708333333333,
-    "rate_speedup": 2.3710526315789466,
+    "bio_match_isi_ms": 69.71211785078049,
+    "efficient_isi_ms": 25.62328812479973,
+    "isi_speedup": 2.720654644760794,
+    "bio_match_rate_Hz": 19.6484375,
+    "efficient_rate_Hz": 47.50000000000001,
+    "rate_speedup": 2.417495029821074,
     "philosophy": "Same FSOT dynamics and band structure; shorter ISI (higher rate) so the substrate does more cognitive work per second. Biology is the reference, not the speed limit."
   },
   "honesty": "Allen-facing computational match under stated tolerances. Not a wet-lab electrophysiology claim. 1 ms step grid floors residual ISI error. pass_strict requires all gaps closed; pass_operational requires ISI+bands closed and adaptation within 25% (sign/order still primary for AHP).",

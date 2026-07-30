@@ -1,10 +1,12 @@
 {
-  "generated_at": "2026-07-30T01:41:21.264602+00:00",
+  "generated_at": "2026-07-30T03:54:40.756958+00:00",
   "certificate": "FSOT-2.1-Neural scientific stage verification",
   "overall": "PASS",
   "lean_build": {
-    "ok": null,
-    "skipped": true
+    "ok": true,
+    "returncode": 0,
+    "stdout_tail": "Build completed successfully (16 jobs).\n",
+    "stderr_tail": ""
   },
   "formal_theorems": [
     "FSOTNeural.formal_panel_ok",
@@ -141,7 +143,7 @@
     "critical_fail_count": 0,
     "critical_fails": [],
     "soft_fails": [],
-    "generated_at": "2026-07-29T12:34:50.908567+00:00"
+    "generated_at": "2026-07-30T03:54:12.268532+00:00"
   },
   "wetlab_battery_path": "I:\\fsot nuron\\data\\results\\wetlab_accuracy_battery.json",
   "formal_dir": "I:\\fsot nuron\\formal",
