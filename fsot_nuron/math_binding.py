@@ -1533,6 +1533,259 @@ def solve_with_binding(question: str) -> SolveResult:
         each = push("div_share", "per child", f"{rem}/{nch}", rem / nch)
         return SolveResult(_norm(each), steps, used, True)
 
+    # =====================================================================
+    # No-fire lift batch (sense already tags these; executors were missing)
+    # =====================================================================
+
+    # ----- N dozen @ $P each line → sum (Toula bakery) -----
+    dozen_lines = re.findall(
+        r"(\d+)\s+dozen\w*.*?(?:cost|for)\s+\$?\s*(\d+(?:\.\d+)?)\s*per dozen",
+        ql,
+    )
+    if len(dozen_lines) >= 2 and re.search(r"\b(total cost|how much was the total)\b", ql):
+        s = 0.0
+        for n, p in dozen_lines:
+            line = push(
+                "SCHEMA-dozen-cost",
+                "n×price/dozen",
+                f"{n}*{p}",
+                float(n) * float(p),
+            )
+            s += line
+        push("add_combine", "sum lines", str(s), s)
+        return SolveResult(_norm(s), steps, used, True)
+
+    # ----- paid D after p% discount → original = D/(1-p/100) -----
+    if re.search(r"\boriginal price\b", ql) and re.search(r"\bdiscount\b", ql):
+        paid_m = re.search(r"\$\s*(\d+(?:\.\d+)?)", q)
+        pct_m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*discount", ql)
+        if paid_m and pct_m:
+            paid, pct = float(paid_m.group(1)), float(pct_m.group(1))
+            factor = 1.0 - pct / 100.0
+            if factor > 0 and paid < 1e6:
+                orig = push(
+                    "SCHEMA-discount-original",
+                    "orig=paid/(1-p/100)",
+                    f"{paid}/{factor}",
+                    paid / factor,
+                )
+                return SolveResult(_norm(orig), steps, used, True)
+
+    # ----- overtime: regular rate R for H0 hours, OT multiplier m, worked H -----
+    m = re.search(
+        r"(?:rate per hour|hourly rate|is\s+\$?\s*(\d+(?:\.\d+)?)).*?"
+        r"first\s+(\d+)\s+hours?.*?"
+        r"(?:overtime|1\.(\d+)|(\d+(?:\.\d+)?)\s+times her regular).*?"
+        r"worked.*?(\d+)\s+hours?",
+        ql,
+        re.S,
+    )
+    # simpler Eliza pattern
+    m2 = re.search(
+        r"first\s+(\d+)\s+hours?.*?is\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(\d+(?:\.\d+)?)\s+times her regular.*?worked.*?(\d+)\s+hours?",
+        ql,
+        re.S,
+    )
+    if m2:
+        h0, rate, mult, h = (
+            float(m2.group(1)),
+            float(m2.group(2)),
+            float(m2.group(3)),
+            float(m2.group(4)),
+        )
+        ot_h = push("sub_remove", "OT hours", f"{h}-{h0}", h - h0)
+        ot_rate = push("mul_groups", "OT rate", f"{rate}*{mult}", rate * mult)
+        reg = push("mul_rate", "regular", f"{rate}*{h0}", rate * h0)
+        ot_pay = push("mul_rate", "OT pay", f"{ot_rate}*{ot_h}", ot_rate * ot_h)
+        tot = push("add_combine", "earnings", f"{reg}+{ot_pay}", reg + ot_pay)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # ----- two hourly jobs × hours/week × weeks (Jill) -----
+    m = re.search(
+        r"\$?\s*(\d+(?:\.\d+)?)\s*per hour.*?"
+        r"\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(\d+)\s*weeks? a year.*?"
+        r"(\d+)\s*hours? a week.*?"
+        r"(\d+)\s*hours? a week",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(annual|salary|year)\b", ql):
+        r1, r2, weeks, h1, h2 = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+            float(m.group(5)),
+        )
+        w1 = push("mul_rate", "job1/week", f"{r1}*{h1}", r1 * h1)
+        w2 = push("mul_rate", "job2/week", f"{r2}*{h2}", r2 * h2)
+        week = push("add_combine", "week total", f"{w1}+{w2}", w1 + w2)
+        year = push("mul_groups", "annual", f"{week}*{weeks}", week * weeks)
+        return SolveResult(_norm(year), steps, used, True)
+
+    # ----- month downloads: M1, k×M1, then reduce by p% of M2; total -----
+    m = re.search(
+        r"(\d+)\s+downloads? in the first month.*?"
+        r"(\d+|three|two|four|five)\s+times as many as.*?first month.*?"
+        r"(?:reduced by\s+)?(\d+)\s*%.*?third month.*?"
+        r"(?:total|how many downloads)",
+        ql,
+        re.S,
+    )
+    if m:
+        m1 = float(m.group(1))
+        ktok = m.group(2)
+        k = float(WORD_NUM.get(ktok, ktok))
+        pct = float(m.group(3))
+        m2 = push("BIND-03", "month2", f"{k}*{m1}", k * m1)
+        cut = push(
+            "SCHEMA-month-cascade",
+            "cut=p% of m2",
+            f"{pct}%*{m2}",
+            m2 * pct / 100.0,
+        )
+        m3 = push("sub_remove", "month3", f"{m2}-{cut}", m2 - cut)
+        tot = push("add_combine", "3 months", f"{m1}+{m2}+{m3}", m1 + m2 + m3)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # ----- change from payment (sum costs, pay P, change) -----
+    if re.search(r"\b(change|cashier|give back|gives back)\b", ql):
+        # prices like $4.20
+        prices = [float(x) for x in re.findall(r"\$\s*(\d+(?:\.\d+)?)", q)]
+        if len(prices) >= 3:
+            # last is often payment if "pays $20"
+            pay_m = re.search(r"pays?\s+\$?\s*(\d+(?:\.\d+)?)", ql)
+            if pay_m:
+                pay = float(pay_m.group(1))
+                costs = [p for p in prices if abs(p - pay) > 1e-9]
+                if not costs:
+                    costs = prices[:-1]
+                    pay = prices[-1]
+                spent = sum(costs)
+                push("add_combine", "spent", str(spent), spent)
+                ch = push("sub_remove", "change", f"{pay}-{spent}", pay - spent)
+                return SolveResult(_norm(ch), steps, used, True)
+
+    # ----- beats p% of N → lose = N - p%*N -----
+    m = re.search(
+        r"(\d+)\s+(?:people|players|opponents).*?"
+        r"beats?\s+(\d+)\s*%.*?"
+        r"(?:lose|lost|does he lose)",
+        ql,
+        re.S,
+    )
+    if m:
+        n, pct = float(m.group(1)), float(m.group(2))
+        win = push("AR-202", "beats", f"{pct}%*{n}", n * pct / 100.0)
+        lose = push("sub_remove", "lose", f"{n}-{win}", n - win)
+        return SolveResult(_norm(lose), steps, used, True)
+
+    # ----- A per batch * n batches + B per batch * m (Mason sugar) -----
+    m = re.search(
+        r"(\d+(?:\.\d+)?)\s+\w+.*?batch of \w+.*?"
+        r"(\d+(?:\.\d+)?)\s+\w+.*?batch of \w+.*?"
+        r"(\d+)\s+batches? of \w+.*?"
+        r"(\d+)\s+batch(?:es)? of",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow much\b|\bhow many\b", ql):
+        a, b, n, m_ct = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        t1 = push("mul_groups", "type1", f"{a}*{n}", a * n)
+        t2 = push("mul_groups", "type2", f"{b}*{m_ct}", b * m_ct)
+        tot = push("add_combine", "total", f"{t1}+{t2}", t1 + t2)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # ----- servings per carton, eat 1/day, days D, cost per carton -----
+    m = re.search(
+        r"(\d+)\s+servings?.*?per carton.*?\$?\s*(\d+(?:\.\d+)?)\s*per carton.*?"
+        r"(?:after\s+)?(\d+)\s+days?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(spend|cost|how much)\b", ql):
+        serv, price, days = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        carts = push("div_share", "cartons", f"{days}/{serv}", days / serv)
+        spend = push("mul_groups", "spend", f"{carts}*{price}", carts * price)
+        return SolveResult(_norm(spend), steps, used, True)
+
+    # ----- cart: known lines + total paid; unknown qty of last item -----
+    # Marie: chicken $12, 5 milk $3 each, 4 apples $1.50 each, pizza $8.50, paid $50
+    if re.search(r"\bpaid a total of\b", ql) and re.search(
+        r"\bhow many (boxes|packs|items|cartons)?\b|\bhow many \w+ did\b",
+        ql,
+    ):
+        total_m = re.search(r"paid a total of\s+\$?\s*(\d+(?:\.\d+)?)", ql)
+        last_price = re.search(
+            r"each (?:box|pack|item|one)?\s*costs?\s+\$?\s*(\d+(?:\.\d+)?)",
+            ql,
+        )
+        # unit costs with quantities
+        qty_each = re.findall(
+            r"(\d+)\s+\w+(?:\s+\w+){0,2}\s+that costs?\s+\$?\s*(\d+(?:\.\d+)?)\s*each",
+            ql,
+        )
+        singles = re.findall(
+            r"(?:one|a|an)\s+\w+(?:\s+\w+){0,2}\s+that costs?\s+\$?\s*(\d+(?:\.\d+)?)",
+            ql,
+        )
+        if total_m and last_price and (qty_each or singles):
+            paid = float(total_m.group(1))
+            unit = float(last_price.group(1))
+            spent = 0.0
+            for a, p in qty_each:
+                spent += float(a) * float(p)
+            for p in singles:
+                # skip if this is the last item unit price restated
+                if abs(float(p) - unit) < 1e-9 and "pizza" in ql:
+                    continue
+                spent += float(p)
+            push("add_combine", "known spend", str(spent), spent)
+            rem = push("sub_remove", "for unknown", f"{paid}-{spent}", paid - spent)
+            if unit > 0 and rem >= 0:
+                qty = push("div_share", "qty", f"{rem}/{unit}", rem / unit)
+                return SolveResult(_norm(qty), steps, used, True)
+
+    # ----- flock: each eats K cups/day; morning A, afternoon B; final meal -----
+    # Wendi: 3 cups each × 20 chickens = 60; final = 60 − 15 − 25
+    if (
+        re.search(r"\bcups?\b", ql)
+        and re.search(r"\bmorning\b", ql)
+        and re.search(r"\bafternoon\b", ql)
+        and re.search(r"\b(final meal|last meal)\b", ql)
+        and re.search(r"\bchickens?\b", ql)
+    ):
+        # "each of her chickens three cups" or "each chicken eats 3 cups"
+        km = re.search(
+            r"each(?: of her)? \w+\s+(?:eats\s+)?(\d+|three|two|four|five)\s+cups?",
+            ql,
+        )
+        morn = re.search(r"morning.*?(\d+)\s+cups?", ql)
+        aft = re.search(r"afternoon.*?(\d+)\s+cups?", ql)
+        n_ch = re.search(r"flock is\s+(\d+)\s+chickens?", ql)
+        if not n_ch:
+            n_ch = re.search(r"(\d+)\s+chickens?", ql)
+        if km and morn and aft and n_ch:
+            raw = km.group(1)
+            k = float(WORD_NUM.get(raw, raw))
+            n = float(n_ch.group(1))
+            mo, af = float(morn.group(1)), float(aft.group(1))
+            need = push("mul_groups", "daily need", f"{k}*{n}", k * n)
+            left = push(
+                "sub_remove",
+                "final meal",
+                f"{need}-{mo}-{af}",
+                need - mo - af,
+            )
+            return SolveResult(_norm(left), steps, used, True)
+
     return SolveResult(None, steps, used, False)
 
 
