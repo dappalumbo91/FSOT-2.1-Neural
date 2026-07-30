@@ -401,6 +401,149 @@ class MathMultihopOrganism:
             "claim_rate": round(self.n_claim_ok / max(1, self.n_claims), 4),
         }
 
+    def study_epoch(
+        self,
+        items: List[Tuple[str, str]],
+        *,
+        epoch: int,
+        teacher_encode: bool = True,
+        practice_frac: float = 0.35,
+        sleep_rounds: int = 4,
+        seed: int = 0,
+    ) -> Dict[str, Any]:
+        """One study epoch (bio schedule):
+
+        1. ENCODE  — teach curriculum items (high ACh proxy = strength boost)
+        2. PRACTICE — spaced retrieval on a subset (prediction-error: hit strengthens)
+        3. REST     — light decay of unused
+        4. SLEEP    — NREM replay densify of strong episodes
+        """
+        import random
+
+        rng = random.Random(seed + epoch * 9973)
+        # shuffle curriculum each epoch (interleaving)
+        deck = list(items)
+        rng.shuffle(deck)
+
+        n_encode = 0
+        if teacher_encode:
+            for q, a in deck:
+                self.teach(_fold_cue(q[:120]), a, rule_id=f"epoch{epoch}", hops=1)
+                n_encode += 1
+
+        # spaced retrieval practice subset
+        n_prac = max(1, int(len(deck) * practice_frac))
+        practice = deck[:n_prac]
+        # reverse half for spacing
+        if epoch % 2 == 1:
+            practice = list(reversed(practice))
+        hit = 0
+        miss = 0
+        for q, a in practice:
+            cue = _fold_cue(q[:120])
+            # Retention probe = episodic retrieve of what was taught (bio: recall)
+            ep = self.episodes.get(cue) or self.retrieve(cue)
+            ok = bool(ep is not None and exact_num(ep.answer, a))
+            # Also try multi-hop compose when pure recall misses (apply skill)
+            if not ok:
+                r = self.multi_hop_solve(q)
+                ok = bool(r.ok and r.answer is not None and exact_num(r.answer, a))
+            if not ok:
+                # prediction-error miss: re-encode (NE reorient + re-teach)
+                self.teach(cue, a, rule_id=f"restudy{epoch}", hops=2)
+                miss += 1
+            else:
+                # hit: DA tag — strengthen
+                ep2 = self.episodes.get(cue)
+                if ep2:
+                    ep2.strength = min(8.0, ep2.strength + 0.55)
+                hit += 1
+
+        # rest: decay weak slightly
+        for e in self.episodes.values():
+            if e.strength < 1.5:
+                e.strength = max(0.15, e.strength * 0.96)
+
+        # sleep
+        self.sleep_replay(sleep_rounds)
+        self.save()
+
+        return {
+            "epoch": epoch,
+            "n_curriculum": len(deck),
+            "n_encode": n_encode,
+            "n_practice": n_prac,
+            "practice_hit": hit,
+            "practice_miss": miss,
+            "practice_acc": round(hit / max(1, hit + miss), 4),
+            "n_episodes": len(self.episodes),
+            "n_replays": self.n_replays,
+            "mean_strength": round(
+                sum(e.strength for e in self.episodes.values()) / max(1, len(self.episodes)),
+                4,
+            ),
+        }
+
+    def study_session(
+        self,
+        items: List[Tuple[str, str]],
+        *,
+        epochs: int = 8,
+        practice_frac: float = 0.35,
+        sleep_rounds: int = 4,
+        seed: int = 42,
+        checkpoint_every: int = 1,
+        log_path: Optional[Path] = None,
+    ) -> Dict[str, Any]:
+        """Long study session: many epochs before any external exam.
+
+        People study over days; we compress into epochs with encode→practice→sleep.
+        """
+        history: List[Dict[str, Any]] = []
+        log_path = log_path or (DATA / "results" / "MATH_STUDY_SESSION.jsonl")
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        # fresh log
+        if log_path.is_file():
+            log_path.unlink()
+
+        for ep in range(1, epochs + 1):
+            row = self.study_epoch(
+                items,
+                epoch=ep,
+                teacher_encode=True,
+                practice_frac=practice_frac,
+                sleep_rounds=sleep_rounds,
+                seed=seed,
+            )
+            history.append(row)
+            with log_path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(row) + "\n")
+            print(
+                f"EPOCH {ep}/{epochs} practice_acc={row['practice_acc']} "
+                f"hit={row['practice_hit']} miss={row['practice_miss']} "
+                f"episodes={row['n_episodes']} mean_str={row['mean_strength']}",
+                flush=True,
+            )
+            if checkpoint_every and ep % checkpoint_every == 0:
+                self.save()
+
+        # final consolidation sleep (like night before exam)
+        print("=== FINAL CONSOLIDATION SLEEP ===", flush=True)
+        self.sleep_replay(sleep_rounds + 2)
+        self.save()
+
+        return {
+            "epochs": epochs,
+            "n_items": len(items),
+            "history": history,
+            "n_episodes_final": len(self.episodes),
+            "mean_strength_final": round(
+                sum(e.strength for e in self.episodes.values()) / max(1, len(self.episodes)),
+                4,
+            ),
+            "log_path": str(log_path),
+        }
+
 
 def _fold_cue(s: str) -> str:
     s = re.sub(r"\s+", " ", (s or "").strip().lower())

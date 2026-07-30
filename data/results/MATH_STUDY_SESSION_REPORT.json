@@ -1,0 +1,100 @@
+{
+  "doctrine": "Long study before test \u2014 encode/practice/sleep epochs (bio intel-loop schedule, not one-shot cram)",
+  "study": {
+    "epochs": 6,
+    "n_items": 9189,
+    "history": [
+      {
+        "epoch": 1,
+        "n_curriculum": 9189,
+        "n_encode": 9189,
+        "n_practice": 2297,
+        "practice_hit": 2289,
+        "practice_miss": 8,
+        "practice_acc": 0.9965,
+        "n_episodes": 17846,
+        "n_replays": 192,
+        "mean_strength": 4.1233
+      },
+      {
+        "epoch": 2,
+        "n_curriculum": 9189,
+        "n_encode": 9189,
+        "n_practice": 2297,
+        "practice_hit": 2289,
+        "practice_miss": 8,
+        "practice_acc": 0.9965,
+        "n_episodes": 17846,
+        "n_replays": 384,
+        "mean_strength": 4.303
+      },
+      {
+        "epoch": 3,
+        "n_curriculum": 9189,
+        "n_encode": 9189,
+        "n_practice": 2297,
+        "practice_hit": 2287,
+        "practice_miss": 10,
+        "practice_acc": 0.9956,
+        "n_episodes": 17846,
+        "n_replays": 576,
+        "mean_strength": 4.4444
+      },
+      {
+        "epoch": 4,
+        "n_curriculum": 9189,
+        "n_encode": 9189,
+        "n_practice": 2297,
+        "practice_hit": 2288,
+        "practice_miss": 9,
+        "practice_acc": 0.9961,
+        "n_episodes": 17846,
+        "n_replays": 768,
+        "mean_strength": 4.5415
+      },
+      {
+        "epoch": 5,
+        "n_curriculum": 9189,
+        "n_encode": 9189,
+        "n_practice": 2297,
+        "practice_hit": 2286,
+        "practice_miss": 11,
+        "practice_acc": 0.9952,
+        "n_episodes": 17846,
+        "n_replays": 960,
+        "mean_strength": 4.597
+      },
+      {
+        "epoch": 6,
+        "n_curriculum": 9189,
+        "n_encode": 9189,
+        "n_practice": 2297,
+        "practice_hit": 2289,
+        "practice_miss": 8,
+        "practice_acc": 0.9965,
+        "n_episodes": 17846,
+        "n_replays": 1152,
+        "mean_strength": 4.6223
+      }
+    ],
+    "n_episodes_final": 17846,
+    "mean_strength_final": 4.6179,
+    "log_path": "I:\\fsot nuron\\data\\results\\MATH_STUDY_SESSION.jsonl"
+  },
+  "exam": {
+    "drills_acc": 1.0,
+    "drills_pass": true,
+    "binding": "37/37",
+    "organism_probe_acc": 0.5974,
+    "organism_probe_n": 77,
+    "gsm8k": {
+      "n": 200,
+      "correct": 57,
+      "wrong_fire": 7,
+      "no_fire": 136,
+      "overall": 0.285,
+      "fire_precision": 0.8906
+    },
+    "n_episodes": 17902
+  }
+}
