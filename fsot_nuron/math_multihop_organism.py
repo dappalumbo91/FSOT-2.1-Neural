@@ -299,28 +299,46 @@ class MathMultihopOrganism:
         top_k: int = 8,
         min_overlap: float = 0.12,
     ) -> List[Tuple[float, EpisodeTrace]]:
-        """Retrieve retained methods by language skeleton similarity + strength."""
+        """Retrieve retained methods by language skeleton similarity + strength.
+
+        Exact skeleton match always wins (taught wording retention).
+        """
         sk = cue_skeleton(question)
         if not sk or not self.traces:
             return []
-        qset = set(sk.split())
         slots = extract_slot_nums(question)
         n = len(slots)
+
+        # exact cue first — A-student: "I remember this lesson"
+        exact: List[Tuple[float, EpisodeTrace]] = []
+        if sk in self.traces:
+            exact.append((1.0, self.traces[sk]))
+        for key, t in self.traces.items():
+            if key.startswith(sk + " ::") or key.startswith(sk + "::"):
+                exact.append((0.99, t))
+        if exact:
+            exact.sort(key=lambda x: (-x[1].strength, -x[1].support))
+            return exact[:top_k]
+
+        qset = set(sk.split())
         scored: List[Tuple[float, EpisodeTrace]] = []
         for t in self.traces.values():
             if t.n_slots and n and t.n_slots != n:
-                # allow small mismatch only if not both set
-                if abs(t.n_slots - n) > 1:
+                if abs(t.n_slots - n) > 0:
                     continue
-            tset = set(t.cue_skeleton.replace("::", " ").split())
+            base_sk = t.cue_skeleton.split(" ::")[0].split("::")[0]
+            tset = set(base_sk.split())
             if not tset or not qset:
                 continue
             inter = len(qset & tset)
             union = len(qset | tset)
             j = inter / max(1, union)
-            if j < min_overlap and inter < 3:
+            if j < min_overlap and inter < 4:
                 continue
-            score = 0.65 * j + 0.25 * min(t.strength, 8.0) / 8.0 + 0.10 * min(t.support, 20) / 20.0
+            # prefer high overlap; soft match is only for transfer, not guesses
+            if j < 0.35 and inter < 6:
+                continue
+            score = 0.70 * j + 0.20 * min(t.strength, 8.0) / 8.0 + 0.10 * min(t.support, 20) / 20.0
             scored.append((score, t))
         scored.sort(key=lambda x: -x[0])
         return scored[:top_k]
@@ -419,7 +437,11 @@ class MathMultihopOrganism:
         cands = self.retrieve_traces(question)
         self.n_trace_tries += 1
         for score, tr in cands:
+            # exact recall may still run if slot count matches method arity
             if tr.n_slots and len(slots) != tr.n_slots:
+                if score < 0.95:  # soft matches must match arity
+                    continue
+                # exact cue but different digit count — skip (number-word lessons)
                 continue
             pred = self.replay_trace(tr.hop_trace, slots)
             if pred is None:
@@ -500,6 +522,65 @@ class MathMultihopOrganism:
             "n_traces": len(self.traces),
         }
 
+    def retention_probe(
+        self,
+        taught: List[Tuple[str, str]],
+        *,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Re-present taught questions (original wording). A/B student check."""
+        items = taught[:limit] if limit else taught
+        hit = 0
+        miss_qs: List[Tuple[str, str]] = []
+        for q, gold in items:
+            r = self.solve_from_experience(q)
+            if r.ok and r.answer is not None and exact_num(r.answer, gold):
+                hit += 1
+            else:
+                miss_qs.append((q, gold))
+        return {
+            "n": len(items),
+            "hit": hit,
+            "acc": round(hit / max(1, len(items)), 4),
+            "misses": miss_qs,
+        }
+
+    def retention_restudy(
+        self,
+        taught_lessons: List[Tuple[str, str, str]],
+        *,
+        max_passes: int = 4,
+        target_acc: float = 0.95,
+    ) -> Dict[str, Any]:
+        """Restudy misses until taught-wording retention hits target (or max passes)."""
+        taught_pairs = [(q, g) for q, _b, g in taught_lessons]
+        history: List[Dict[str, Any]] = []
+        for p in range(1, max_passes + 1):
+            probe = self.retention_probe(taught_pairs)
+            history.append({"pass": p, "acc": probe["acc"], "hit": probe["hit"], "n": probe["n"]})
+            print(
+                f"  RETENTION pass {p}/{max_passes} acc={probe['acc']} "
+                f"({probe['hit']}/{probe['n']})",
+                flush=True,
+            )
+            if probe["acc"] >= target_acc or not probe["misses"]:
+                break
+            # restudy only misses with original worked lesson
+            miss_set = {m[0] for m in probe["misses"]}
+            for q, body, gold in taught_lessons:
+                if q not in miss_set:
+                    continue
+                # re-encode method (prediction-error restudy)
+                self.teach_from_worked(q, body, gold, source="retention_restudy")
+                # also strengthen if hop already known
+                hops = hop_trace_from_worked(q, body, gold)
+                if hops:
+                    self.teach_trace(q, hops, source="retention_restudy", gold=gold)
+            self.sleep_replay(2)
+        final = self.retention_probe(taught_pairs)
+        self.save_traces()
+        return {"history": history, "final": final, "target_acc": target_acc}
+
     def experience_session(
         self,
         lessons: List[Tuple[str, str, str]],
@@ -508,29 +589,64 @@ class MathMultihopOrganism:
         practice_n: int = 32,
         sleep_rounds: int = 4,
         seed: int = 42,
+        retention_target: float = 0.95,
+        retention_passes: int = 5,
     ) -> Dict[str, Any]:
         """Unattended school: teach worked lessons → practice novel numbers → sleep.
 
         lessons: (question, answer_body, gold)
         """
         history: List[Dict[str, Any]] = []
+        taught_lessons: List[Tuple[str, str, str]] = []
         n_taught = 0
         for q, body, gold in lessons:
             if self.teach_from_worked(q, body, gold):
                 n_taught += 1
+                taught_lessons.append((q, body, gold))
         self.sleep_replay(sleep_rounds)
         self.save_traces()
+        print(
+            f"ENCODE done taught_ok={n_taught}/{len(lessons)} traces={len(self.traces)}",
+            flush=True,
+        )
+
+        # push taught-wording retention toward A-range before long practice
+        print("=== RETENTION RESTUDY (taught wording) ===", flush=True)
+        ret0 = self.retention_restudy(
+            taught_lessons,
+            max_passes=retention_passes,
+            target_acc=retention_target,
+        )
 
         for ep in range(1, epochs + 1):
             prac = self.experience_practice(
                 n=practice_n,
                 seed=seed + ep * 97,
             )
+            # interleaved: restudy a slice of taught wording each epoch
+            import random
+
+            rng = random.Random(seed + ep * 13)
+            slice_n = min(len(taught_lessons), max(20, practice_n // 2))
+            slice_lessons = (
+                rng.sample(taught_lessons, slice_n) if taught_lessons else []
+            )
+            ret_slice = self.retention_probe([(q, g) for q, _b, g in slice_lessons])
+            if ret_slice["misses"]:
+                miss_set = {m[0] for m in ret_slice["misses"]}
+                for q, body, gold in slice_lessons:
+                    if q in miss_set:
+                        self.teach_from_worked(q, body, gold, source=f"epoch{ep}_restudy")
             self.sleep_replay(sleep_rounds)
             self.save_traces()
             row = {
                 "epoch": ep,
                 "practice": prac,
+                "retention_slice": {
+                    "n": ret_slice["n"],
+                    "hit": ret_slice["hit"],
+                    "acc": ret_slice["acc"],
+                },
                 "n_traces": len(self.traces),
                 "mean_trace_strength": round(
                     sum(t.strength for t in self.traces.values())
@@ -541,12 +657,32 @@ class MathMultihopOrganism:
             history.append(row)
             print(
                 f"EXP-EPOCH {ep}/{epochs} practice_acc={prac['acc']} "
+                f"retain_slice={ret_slice['acc']} "
                 f"traces={row['n_traces']} mean_str={row['mean_trace_strength']}",
                 flush=True,
             )
 
         prove = self.experience_practice(n=max(24, practice_n), seed=seed + 9001)
-        self.sleep_replay(2)
+        # full retention exam on all successfully taught lessons
+        print("=== FINAL RETENTION EXAM (all taught wording) ===", flush=True)
+        ret_final = self.retention_probe([(q, g) for q, _b, g in taught_lessons])
+        print(
+            f"FINAL retention {ret_final['hit']}/{ret_final['n']} acc={ret_final['acc']}",
+            flush=True,
+        )
+        # one more restudy pass if still under target
+        if ret_final["acc"] < retention_target and taught_lessons:
+            print("=== FINAL RESTUDY PUSH ===", flush=True)
+            ret_push = self.retention_restudy(
+                taught_lessons,
+                max_passes=max(2, retention_passes // 2),
+                target_acc=retention_target,
+            )
+            ret_final = ret_push["final"]
+        else:
+            ret_push = None
+
+        self.sleep_replay(3)
         self.save_traces()
         report = {
             "doctrine": "experience→episodic hop traces→WM atomics→sleep→prove transfer",
@@ -554,11 +690,22 @@ class MathMultihopOrganism:
             "n_taught_ok": n_taught,
             "epochs": epochs,
             "history": history,
+            "retention_after_encode": ret0,
+            "retention_final": {
+                "n": ret_final["n"],
+                "hit": ret_final["hit"],
+                "acc": ret_final["acc"],
+            },
+            "retention_push": ret_push,
             "prove": prove,
             "n_traces_final": len(self.traces),
             "n_trace_teaches": self.n_trace_teaches,
             "n_trace_hits": self.n_trace_hits,
             "n_trace_tries": self.n_trace_tries,
+            "mean_trace_strength_final": round(
+                sum(t.strength for t in self.traces.values()) / max(1, len(self.traces)),
+                4,
+            ),
         }
         EXPERIENCE_REPORT.parent.mkdir(parents=True, exist_ok=True)
         EXPERIENCE_REPORT.write_text(json.dumps(report, indent=2), encoding="utf-8")

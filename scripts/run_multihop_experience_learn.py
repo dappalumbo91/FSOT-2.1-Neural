@@ -126,6 +126,23 @@ def main() -> int:
     ap.add_argument("--sleep-rounds", type=int, default=4)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument(
+        "--retention-target",
+        type=float,
+        default=0.95,
+        help="taught-wording retention target (A-range ~0.90+)",
+    )
+    ap.add_argument(
+        "--retention-passes",
+        type=int,
+        default=5,
+        help="max restudy passes on taught wording",
+    )
+    ap.add_argument(
+        "--long",
+        action="store_true",
+        help="longer school day: 2000 lessons, 12 epochs, heavier practice",
+    )
+    ap.add_argument(
         "--fresh",
         action="store_true",
         help="ignore existing trace bank (in-memory clean student)",
@@ -137,6 +154,21 @@ def main() -> int:
         help="optional secondary GSM8K sample size (not the train target)",
     )
     args = ap.parse_args()
+    if args.long:
+        if args.train_limit == 500:
+            args.train_limit = 2000
+        if args.epochs == 4:
+            args.epochs = 12
+        if args.practice_n == 40:
+            args.practice_n = 80
+        if args.retention_passes == 5:
+            args.retention_passes = 8
+        args.retention_target = max(args.retention_target, 0.97)
+        print(
+            f"LONG mode: limit={args.train_limit} epochs={args.epochs} "
+            f"practice_n={args.practice_n} retention_target={args.retention_target}",
+            flush=True,
+        )
 
     from fsot_nuron.math_multihop_organism import (
         MathMultihopOrganism,
@@ -174,27 +206,15 @@ def main() -> int:
         practice_n=args.practice_n,
         sleep_rounds=args.sleep_rounds,
         seed=args.seed,
+        retention_target=args.retention_target,
+        retention_passes=args.retention_passes,
     )
     org.save()
 
-    # retention: re-present taught lessons (original language) via experience only
-    # = "do you still know the method you were shown?"
-    ret_hit = 0
-    ret_n = 0
-    sample = lessons[:: max(1, len(lessons) // 40)][:40]
-    for q, _body, gold in sample:
-        ret_n += 1
-        r = org.solve_from_experience(q)
-        if r.ok and r.answer is not None and exact_num(r.answer, gold):
-            ret_hit += 1
-    report["retention_taught"] = {
-        "n": ret_n,
-        "hit": ret_hit,
-        "acc": round(ret_hit / max(1, ret_n), 4),
-        "note": "original wording of taught lessons; experience path only",
-    }
+    rf = report.get("retention_final") or {}
     print(
-        f"retention_taught {ret_hit}/{ret_n} acc={report['retention_taught']['acc']}",
+        f"retention_final {rf.get('hit')}/{rf.get('n')} acc={rf.get('acc')} "
+        f"(target {args.retention_target})",
         flush=True,
     )
 
@@ -235,8 +255,13 @@ def main() -> int:
     print(f"Wrote {OUT}", flush=True)
 
     prove = report.get("prove") or {}
-    # pass if we taught something and prove is not total collapse
-    ok = int(report.get("n_taught_ok") or 0) > 0 and float(prove.get("acc") or 0) >= 0.15
+    ret_acc = float((report.get("retention_final") or {}).get("acc") or 0)
+    # pass: taught something, novel-number transfer ok, retention in solid range
+    ok = (
+        int(report.get("n_taught_ok") or 0) > 0
+        and float(prove.get("acc") or 0) >= 0.5
+        and ret_acc >= 0.85
+    )
     return 0 if ok else 1
 
 
