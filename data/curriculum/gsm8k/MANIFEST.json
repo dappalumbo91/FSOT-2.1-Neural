@@ -1,0 +1,71 @@
+{
+  "generated_at": "2026-07-30T02:00:01.585494+00:00",
+  "benchmark": "GSM8K",
+  "why_first": "Flagship LLM multi-hop math reasoning; grade-school domain; worst open-answer baseline; pathways in <<expr=val>> solutions",
+  "source": "D:\\training data\\gsm8k",
+  "n_train_problems": 1500,
+  "n_test_problems": 300,
+  "n_bank_rows": 13130,
+  "n_unique_calc_atoms": 3061,
+  "n_exam_rows": 300,
+  "written_dirs": [
+    "I:\\fsot nuron\\data\\curriculum\\gsm8k",
+    "D:\\fsot_training\\curriculum\\gsm8k"
+  ],
+  "cold": {
+    "final": {
+      "n": 300,
+      "correct": 0,
+      "accuracy": 0.0,
+      "method": "bank_retrieve_final"
+    },
+    "pathways": {
+      "hop_n": 1250,
+      "hop_correct": 0,
+      "hop_accuracy": 0.0,
+      "full_pathway_n": 300,
+      "full_pathway_correct": 0,
+      "full_pathway_accuracy": 0.0,
+      "method": "pathway_hops_plus_final"
+    }
+  },
+  "after_teach": {
+    "final": {
+      "n": 300,
+      "correct": 95,
+      "accuracy": 0.3167,
+      "method": "bank_retrieve_final"
+    },
+    "pathways": {
+      "hop_n": 1250,
+      "hop_correct": 494,
+      "hop_accuracy": 0.3952,
+      "full_pathway_n": 300,
+      "full_pathway_correct": 1,
+      "full_pathway_accuracy": 0.0033,
+      "method": "pathway_hops_plus_final"
+    },
+    "train_self": {
+      "n": 80,
+      "correct": 80,
+      "accuracy": 1.0,
+      "method": "bank_retrieve_final"
+    }
+  },
+  "lift": {
+    "final_acc_delta": 0.3167,
+    "hop_acc_delta": 0.3952,
+    "pathway_acc_delta": 0.0033
+  },
+  "pass_hints": {
+    "final_target": 0.2,
+    "hop_target": 0.5,
+    "note": "Climb toward LLM-reported GSM8K ranges gradually; hop mastery first"
+  },
+  "next_benchmarks_after_gsm8k": [
+    "bbh (hard multi-hop reasoning)",
+    "arc_challenge (science reasoning)",
+    "hellaswag (commonsense)",
+    "mmlu (broad knowledge \u2014 later)"
+  ]
+}
