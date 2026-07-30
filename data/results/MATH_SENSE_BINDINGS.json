@@ -1,0 +1,25 @@
+{
+  "n_senses": 1790,
+  "n_form_bindings": 7389,
+  "n_index_keys": 4963,
+  "by_prefix": {
+    "OP": 28,
+    "SCHEMA": 15,
+    "RULE": 28,
+    "BIND": 4,
+    "RB": 1520,
+    "DEN": 13,
+    "PFLT": 182
+  },
+  "doctrine": "form\u2192SENSE\u2192formula (PFLT twin for math)",
+  "sources": [
+    "CORE_OP_SENSES",
+    "EXTRA_FORM_SENSE",
+    "ARITH_RULES",
+    "LANGUAGE_MAPS",
+    "BINDING_RULES",
+    "math_rulebook MASTER",
+    "densify_bindings.json",
+    "PFLT SenseInterlingua (optional)"
+  ]
+}

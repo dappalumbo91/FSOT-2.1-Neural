@@ -244,6 +244,23 @@ def detect_strategies(q: str) -> List[str]:
     for rx, strat, _cue in LANGUAGE_MAPS:
         if re.search(rx, ql) and strat not in found:
             found.append(strat)
+    # PFLT-style sense interlingua: phrase → OP/SCHEMA sense → strategy
+    # Mass bindings (thousands) densify offline; this only *reads* them.
+    try:
+        from .math_sense_interlingua import MathSenseInterlingua
+
+        # lazy singleton
+        global _MATH_SENSE_IX
+        try:
+            _MATH_SENSE_IX
+        except NameError:
+            _MATH_SENSE_IX = MathSenseInterlingua()
+        cue = _MATH_SENSE_IX.translate_cues(q)
+        for s in cue.strategies:
+            if s and s not in found:
+                found.append(s)
+    except Exception:
+        pass
     return found
 
 
