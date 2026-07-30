@@ -33,6 +33,23 @@ FINAL_RE = re.compile(r"####\s*(.+)\s*$", re.M)
 # tokenize formula into numbers and ops
 TOK_RE = re.compile(r"\d+(?:\.\d+)?|[+\-*/()]")
 
+# number words in question text (teach word-only lessons)
+_WORD_NUM_MAP = {
+    "zero": 0.0, "one": 1.0, "two": 2.0, "three": 3.0, "four": 4.0,
+    "five": 5.0, "six": 6.0, "seven": 7.0, "eight": 8.0, "nine": 9.0,
+    "ten": 10.0, "eleven": 11.0, "twelve": 12.0, "thirteen": 13.0,
+    "fourteen": 14.0, "fifteen": 15.0, "sixteen": 16.0, "seventeen": 17.0,
+    "eighteen": 18.0, "nineteen": 19.0, "twenty": 20.0, "thirty": 30.0,
+    "forty": 40.0, "fifty": 50.0, "sixty": 60.0, "seventy": 70.0,
+    "eighty": 80.0, "ninety": 90.0, "hundred": 100.0, "dozen": 12.0,
+    "half": 0.5, "twice": 2.0, "thrice": 3.0, "quarter": 0.25,
+    "third": 1.0 / 3.0, "fourth": 0.25, "fifth": 0.2,
+}
+_WORD_NUM_RE = re.compile(
+    r"\b(" + "|".join(sorted(_WORD_NUM_MAP.keys(), key=len, reverse=True)) + r")\b",
+    re.I,
+)
+
 # language cues for matching (cheap bag)
 CUE_WORDS = (
     "each every per total together left remain remaining half twice times "
@@ -46,13 +63,31 @@ CUE_WORDS = (
 
 
 def extract_nums(text: str) -> List[float]:
+    """Digits + number words in left-to-right order (for word-only lessons)."""
     t = text.replace(",", "")
-    out: List[float] = []
+    hits: List[Tuple[int, float]] = []
     for m in NUM_RE.finditer(t):
         try:
-            out.append(float(m.group(1)))
+            hits.append((m.start(), float(m.group(1))))
         except ValueError:
             pass
+    for m in _WORD_NUM_RE.finditer(t):
+        # skip if this span overlaps a digit match (e.g. avoid junk)
+        w = m.group(1).lower()
+        if w not in _WORD_NUM_MAP:
+            continue
+        # don't double-count inside larger tokens
+        hits.append((m.start(), float(_WORD_NUM_MAP[w])))
+    hits.sort(key=lambda x: x[0])
+    # de-dupe same position
+    out: List[float] = []
+    last_pos = -1
+    for pos, val in hits:
+        if pos == last_pos:
+            continue
+        # skip adjacent word+digit duplicates at nearly same place
+        out.append(val)
+        last_pos = pos
     return out
 
 
@@ -95,6 +130,159 @@ def _safe_eval(expr: str) -> Optional[float]:
         return float(eval(expr, {"__builtins__": {}}, {}))  # noqa: S307
     except Exception:
         return None
+
+
+def _split_binary(expr: str) -> Optional[Tuple[str, str, str]]:
+    """Split expr into (left, op, right) at lowest-precedence top-level op.
+
+    Precedence: +,- lower than *,/  (so a+b*c → a + (b*c)).
+    Among same precedence, rightmost (left-assoc build via recursion).
+    """
+    e = expr.strip()
+    if not e:
+        return None
+    # strip outer parens if balanced wrap
+    while e.startswith("(") and e.endswith(")"):
+        depth = 0
+        wrap = True
+        for i, ch in enumerate(e):
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0 and i < len(e) - 1:
+                    wrap = False
+                    break
+        if wrap and depth == 0:
+            e = e[1:-1].strip()
+        else:
+            break
+    # find candidate split points
+    depth = 0
+    add_sub: List[Tuple[int, str]] = []
+    mul_div: List[Tuple[int, str]] = []
+    for i, ch in enumerate(e):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        elif depth == 0 and ch in "+-" and i > 0:
+            add_sub.append((i, ch))
+        elif depth == 0 and ch in "*/" and i > 0:
+            mul_div.append((i, ch))
+    pool = add_sub if add_sub else mul_div
+    if not pool:
+        return None
+    # rightmost for left-associativity when folding recursively on left
+    i, op = pool[-1]
+    left, right = e[:i], e[i + 1 :]
+    if not left or not right:
+        return None
+    return left, op, right
+
+
+def _emit_expr_steps(
+    expr: str,
+    rhs: float,
+    q_nums: List[float],
+    intermediates: Dict[float, int],
+    steps_out: List[Dict[str, Any]],
+    op_parts: List[str],
+) -> bool:
+    """Compile arithmetic expr into binary hop steps; final out ≈ rhs."""
+    e = expr.strip().replace(" ", "")
+    got = _safe_eval(e)
+    if got is None:
+        return False
+    if abs(got - rhs) > 0.05 and abs(got - rhs) > 1e-3 * max(1.0, abs(rhs)):
+        # still allow if we'll use computed got
+        pass
+
+    def compile_side(s: str) -> Optional[Tuple[str, float]]:
+        s = s.strip()
+        try:
+            v = float(s)
+            return _leaf_to_ref(v, q_nums, intermediates)
+        except ValueError:
+            pass
+        # compound: emit steps for sub-expr
+        sub = _split_binary(s)
+        if sub is None:
+            vv = _safe_eval(s)
+            if vv is None:
+                return None
+            return _leaf_to_ref(vv, q_nums, intermediates)
+        left, op, right = sub
+        if not compile_side(left):
+            # compile_side already may append — need recursive emit
+            pass
+        return _compile_bin(left, op, right)
+
+    def _compile_bin(left: str, op: str, right: str) -> Optional[Tuple[str, float]]:
+        # recursively ensure left and right are leaves or prior steps
+        def ensure(side: str) -> Optional[Tuple[str, float]]:
+            side = side.strip()
+            try:
+                v = float(side)
+                return _leaf_to_ref(v, q_nums, intermediates)
+            except ValueError:
+                pass
+            sp = _split_binary(side)
+            if sp is None:
+                vv = _safe_eval(side)
+                if vv is None:
+                    return None
+                return _leaf_to_ref(vv, q_nums, intermediates)
+            l2, op2, r2 = sp
+            return _compile_bin(l2, op2, r2)
+
+        la = ensure(left)
+        ra = ensure(right)
+        if la is None or ra is None:
+            return None
+        a = _eval_ref(la, q_nums, [s.get("out", 0) for s in steps_out])
+        b = _eval_ref(ra, q_nums, [s.get("out", 0) for s in steps_out])
+        if a is None or b is None:
+            return None
+        if op == "+":
+            pred = a + b
+        elif op == "-":
+            pred = a - b
+        elif op == "*":
+            pred = a * b
+        elif op == "/":
+            if abs(b) < 1e-12:
+                return None
+            pred = a / b
+        else:
+            return None
+        steps_out.append({"op": op, "args": [list(la), list(ra)], "out": float(pred)})
+        intermediates[float(pred)] = len(steps_out) - 1
+        op_parts.append(op)
+        return ("t", float(len(steps_out) - 1))
+
+    sp = _split_binary(e)
+    if sp is None:
+        try:
+            v = float(e)
+        except ValueError:
+            return False
+        ref = _leaf_to_ref(v, q_nums, intermediates)
+        if ref is None:
+            return False
+        steps_out.append({"op": "id", "args": [list(ref)], "out": float(rhs)})
+        intermediates[float(rhs)] = len(steps_out) - 1
+        op_parts.append("id")
+        return True
+    left, op, right = sp
+    end = _compile_bin(left, op, right)
+    if end is None:
+        return False
+    # snap final out to stated rhs if close
+    if steps_out and abs(float(steps_out[-1]["out"]) - rhs) <= 0.05:
+        steps_out[-1]["out"] = float(rhs)
+        intermediates[float(rhs)] = len(steps_out) - 1
+    return True
 
 
 def parse_calc(step: str) -> Optional[Tuple[str, float]]:
@@ -153,13 +341,57 @@ def _leaf_to_ref(
     return ("c", val)
 
 
+def _matches_gold(val: float, g: float) -> bool:
+    return abs(float(val) - g) <= 1e-3 * max(1.0, abs(g)) or abs(float(val) - g) <= 0.05
+
+
+def _try_close_to_gold(
+    steps_out: List[Dict[str, Any]],
+    q_nums: List[float],
+    g: float,
+) -> bool:
+    """If last step ≠ gold, try one binary op over known values that yields gold."""
+    if not steps_out:
+        return False
+    if _matches_gold(float(steps_out[-1]["out"]), g):
+        return True
+    # known values: slots + step outs
+    known: List[Tuple[Tuple[str, float], float]] = []
+    for i, n in enumerate(q_nums):
+        known.append((("n", float(i)), float(n)))
+    for i, st in enumerate(steps_out):
+        known.append((("t", float(i)), float(st["out"])))
+    ops = ("+", "-", "*", "/")
+    for (ra, va) in known:
+        for (rb, vb) in known:
+            if ra == rb and abs(va - vb) < 1e-12:
+                continue
+            for op in ops:
+                if op == "+":
+                    pred = va + vb
+                elif op == "-":
+                    pred = va - vb
+                elif op == "*":
+                    pred = va * vb
+                else:
+                    if abs(vb) < 1e-12:
+                        continue
+                    pred = va / vb
+                if _matches_gold(pred, g):
+                    steps_out.append(
+                        {"op": op, "args": [list(ra), list(rb)], "out": float(g)}
+                    )
+                    return True
+    return False
+
+
 def abstract_solution(
     question: str,
     answer_body: str,
     gold: str,
 ) -> Optional[Template]:
     q_nums = extract_nums(question)
-    if not q_nums or len(q_nums) > 12:
+    if not q_nums or len(q_nums) > 16:
         return None
     calcs = CALC_RE.findall(answer_body)
     if not calcs:
@@ -171,108 +403,40 @@ def abstract_solution(
     for si, raw in enumerate(calcs):
         parsed = parse_calc(raw)
         if not parsed:
-            return None
+            continue
         lhs, rhs = parsed
-        # tokenize lhs for simple binops a op b or a op b op c
-        # only handle binary + - * / with two sides maybe parenthesized simple
-        # strip outer parens
-        e = lhs
-        # percent style: 80*1.25 or 200*40*.01
-        # find operator at top level
-        depth = 0
-        main_op = None
-        main_i = -1
-        for i, ch in enumerate(e):
-            if ch == "(":
-                depth += 1
-            elif ch == ")":
-                depth -= 1
-            elif depth == 0 and ch in "+-*/" and i > 0:
-                # rightmost top-level for left-assoc chain: take last
-                main_op = ch
-                main_i = i
-        if main_op is None or main_i < 0:
-            # single number?
-            try:
-                v = float(e)
-                ref = _leaf_to_ref(v, q_nums, intermediates)
-                if ref is None:
-                    return None
-                steps_out.append({"op": "id", "args": [list(ref)], "out": rhs})
-                intermediates[rhs] = len(steps_out) - 1
-                op_parts.append("id")
-                continue
-            except ValueError:
-                return None
-        left_s, right_s = e[:main_i], e[main_i + 1 :]
-        # if left still has ops, eval left as nested by recursive simple: only allow left to be number or known
-        def resolve_side(s: str) -> Optional[Tuple[str, float]]:
-            s = s.strip()
-            if not s:
-                return None
-            # try as expression of already-known structure: if pure number
-            try:
-                v = float(s)
-                return _leaf_to_ref(v, q_nums, intermediates)
-            except ValueError:
-                pass
-            # try eval if only numbers and ops matching intermediates — fold by eval leaves
-            # replace numbers with values and eval
-            vv = _safe_eval(s)
-            if vv is None:
-                return None
-            return _leaf_to_ref(vv, q_nums, intermediates)
-
-        # For chains like a*b*c, right is last factor, left is a*b — resolve left as intermediate value
-        lv = _safe_eval(left_s)
-        rv = _safe_eval(right_s)
-        if lv is None or rv is None:
-            # try single-op only
-            la = resolve_side(left_s)
-            ra = resolve_side(right_s)
-            if la is None or ra is None:
-                return None
-        else:
-            la = _leaf_to_ref(lv, q_nums, intermediates)
-            ra = _leaf_to_ref(rv, q_nums, intermediates)
-            if la is None or ra is None:
-                return None
-        # verify
-        a = _eval_ref(la, q_nums, [s.get("out", 0) for s in steps_out])
-        b = _eval_ref(ra, q_nums, [s.get("out", 0) for s in steps_out])
-        if a is None or b is None:
-            return None
-        if main_op == "+":
-            pred = a + b
-        elif main_op == "-":
-            pred = a - b
-        elif main_op == "*":
-            pred = a * b
-        elif main_op == "/":
-            if abs(b) < 1e-12:
-                return None
-            pred = a / b
-        else:
-            return None
-        if abs(pred - rhs) > 1e-3 * max(1.0, abs(rhs)):
-            # allow float noise
-            if abs(pred - rhs) > 0.05:
-                return None
-        steps_out.append(
-            {"op": main_op, "args": [list(la), list(ra)], "out": rhs}
-        )
-        intermediates[rhs] = len(steps_out) - 1
-        op_parts.append(main_op)
+        n_before = len(steps_out)
+        if not _emit_expr_steps(lhs, float(rhs), q_nums, intermediates, steps_out, op_parts):
+            # rollback partial
+            while len(steps_out) > n_before:
+                steps_out.pop()
+            while len(op_parts) > n_before:
+                op_parts.pop()
+            continue
 
     if not steps_out:
         return None
-    # final must match gold
     try:
-        g = float(str(gold).replace(",", ""))
+        g = float(str(gold).replace(",", "").replace("%", ""))
     except ValueError:
         return None
-    last = steps_out[-1]["out"]
-    if abs(float(last) - g) > 1e-3 * max(1.0, abs(g)) and abs(float(last) - g) > 0.05:
+
+    # Prefer prefix of steps ending at gold (solution may compute extras after)
+    end_i = None
+    for i, st in enumerate(steps_out):
+        if _matches_gold(float(st["out"]), g):
+            end_i = i
+            break
+    if end_i is not None:
+        steps_out = steps_out[: end_i + 1]
+        op_parts = op_parts[: end_i + 1]
+    else:
+        # try one closing hop from known values → gold
+        if not _try_close_to_gold(steps_out, q_nums, g):
+            return None
+        op_parts.append(str(steps_out[-1]["op"]))
+
+    if not steps_out or not _matches_gold(float(steps_out[-1]["out"]), g):
         return None
 
     cues = sorted(cue_set(question))

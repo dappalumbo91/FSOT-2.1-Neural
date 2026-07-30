@@ -2465,7 +2465,10 @@ def _fold_cue(s: str) -> str:
 
 
 def cue_skeleton(question: str) -> str:
-    """Language shape with numbers blanked — method cue, not the answer."""
+    """Language shape with numbers blanked — method cue, not the answer.
+
+    Blanks digits *and* number words so slot count matches extract_slot_nums.
+    """
     s = (question or "").lower()
     s = (
         s.replace("\u2019", "'")
@@ -2474,6 +2477,14 @@ def cue_skeleton(question: str) -> str:
         .replace("\u2014", "-")
     )
     s = s.replace(",", "")
+    # blank number words first (longer first to avoid partials)
+    _words = (
+        "thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|"
+        "twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|"
+        "zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|"
+        "dozen|half|twice|thrice|quarter|third|fourth|fifth"
+    )
+    s = re.sub(rf"\b({_words})\b", "N", s)
     s = re.sub(r"\d+(?:\.\d+)?", "N", s)
     s = re.sub(r"[^a-zN %]+", " ", s)
     s = re.sub(r"\s+", " ", s).strip()
@@ -2481,14 +2492,20 @@ def cue_skeleton(question: str) -> str:
 
 
 def extract_slot_nums(question: str) -> List[float]:
-    t = (question or "").replace(",", "")
-    out: List[float] = []
-    for m in NUM_RE.finditer(t):
-        try:
-            out.append(float(m.group(1)))
-        except ValueError:
-            pass
-    return out
+    """Digits + number words — must match teacher abstract_solution slots."""
+    try:
+        from .math_auto_templates import extract_nums as _ext
+
+        return _ext(question or "")
+    except Exception:
+        t = (question or "").replace(",", "")
+        out: List[float] = []
+        for m in NUM_RE.finditer(t):
+            try:
+                out.append(float(m.group(1)))
+            except ValueError:
+                pass
+        return out
 
 
 def _hop_sig(hop_trace: List[Dict[str, Any]]) -> str:
