@@ -1344,8 +1344,8 @@ fn runSynapsePathways() void {
         .{ r.mean_supply, r.mean_load, r.n_glia_clear, r.n_glia_prune, r.n_myelo, r.glia_selftest },
     );
     std.debug.print(
-        "WET releases={d} nmda={d} ca={d} camk={d} ampa={d} ltd={d} consol={d} chem={d} tags={d} self={}\n",
-        .{ r.n_releases, r.n_nmda, r.n_ca_peaks, r.n_camk_peaks, r.n_ampa_up, r.n_ltd, r.n_consolidate, r.n_chem_steps, r.n_molecular_tags, r.mol_selftest },
+        "WET releases={d} quanta={d} silent0={d} ch_tx={d} ampa_o={d} nmda_o={d} nmda_ev={d} ca={d} camk={d} ampa_up={d} ltd={d} consol={d} chem={d} self={}\n",
+        .{ r.n_releases, r.n_quanta, r.n_silent_fail, r.n_channel_transitions, r.n_ampa_openings, r.n_nmda_openings, r.n_nmda, r.n_ca_peaks, r.n_camk_peaks, r.n_ampa_up, r.n_ltd, r.n_consolidate, r.n_chem_steps, r.mol_selftest },
     );
     if (r.ok) {
         std.debug.print("FSOT_SYNAPSE_PATH PASS\n", .{});

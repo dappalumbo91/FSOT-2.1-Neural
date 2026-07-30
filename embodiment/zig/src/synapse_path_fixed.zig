@@ -489,6 +489,11 @@ pub const SynapseReport = struct {
     n_ltd: u32,
     n_consolidate: u32,
     n_chem_steps: u32,
+    n_channel_transitions: u32,
+    n_ampa_openings: u32,
+    n_nmda_openings: u32,
+    n_quanta: u32,
+    n_silent_fail: u32,
     n_glia_clear: u32,
     n_glia_prune: u32,
     n_myelo: u32,
@@ -550,32 +555,36 @@ pub fn runSynapsePathwayProbe() SynapseReport {
     }
 
     // print bio-comparable trace
-    std.debug.print("--- BIO MAP (WET BIOPHYSICS + FSOT Fixed) ---\n", .{});
-    std.debug.print("  Glu release / EAAT clear     ↔ spine.glu + glia eaatUptakeScale\n", .{});
-    std.debug.print("  NMDA (glu·Mg-relief(V))      ↔ nmda_open ODE\n", .{});
-    std.debug.print("  Ca2+ influx / pump / buffer  ↔ ca, ca_buf ODEs\n", .{});
-    std.debug.print("  CaMKII bind + autoP          ↔ camk_c, camk_p\n", .{});
-    std.debug.print("  PP1 LTD branch               ↔ pp1 (moderate Ca)\n", .{});
-    std.debug.print("  AMPA traffic + phospho       ↔ ampa_surf, ampa_phos\n", .{});
-    std.debug.print("  late LTP protein synth       ↔ protein → consolidateToW\n", .{});
-    std.debug.print("  STDP timing                  ↔ stdp_fixed · eligibility(spine)\n", .{});
-    std.debug.print("  astrocyte / micro / oligo    ↔ glia_fixed supply/prune/myelo\n", .{});
+    std.debug.print("--- BIO MAP (STOCHASTIC SINGLE-CHANNEL + WET + FSOT) ---\n", .{});
+    std.debug.print("  quantal release              ↔ binomial vesicles (channel_stoch)\n", .{});
+    std.debug.print("  AMPA Markov C/O/D            ↔ 12 channels/spine Bernoulli steps\n", .{});
+    std.debug.print("  NMDA Markov C/O/B/D + Mg     ↔ 8 channels/spine; B=Mg block\n", .{});
+    std.debug.print("  Ca2+ from open NMDA count    ↔ unitary nmdaCaCurrent\n", .{});
+    std.debug.print("  CaMKII / PP1 / AMPA traffic  ↔ Fixed ODEs on spine\n", .{});
+    std.debug.print("  late LTP protein             ↔ protein → consolidateToW\n", .{});
+    std.debug.print("  EAAT / glia                  ↔ eaatUptakeScale on glu clear\n", .{});
+    std.debug.print("  STDP · eligibility(spine)    ↔ stdp_fixed modulated\n", .{});
     std.debug.print("  genetics as code             ↔ codon→spin/charge→fsotPairWeight\n", .{});
     const route = pathways_f.routeFor(.text);
     std.debug.print("  text query route primary={s} hipp_bind={}\n", .{ regionName(route.primary), route.hipp_bind });
-    std.debug.print("  STDP selftest={} glia={} mol(wet)={}\n", .{ stdp_f.selfTest(), glia_f.selfTest(), molecular_f.selfTest() });
+    const ch_ok = @import("channel_stoch_fixed.zig").selfTest();
+    std.debug.print("  STDP={} glia={} mol={} channel_stoch={}\n", .{ stdp_f.selfTest(), glia_f.selfTest(), molecular_f.selfTest(), ch_ok });
     std.debug.print(
         "  glia supply={e} load={e} eaat={e} clear={d} prune={d} myelo={d}\n",
         .{ fixed.toF64(glia.meanSupply()), fixed.toF64(glia.meanLoad()), fixed.toF64(glia.eaatUptakeScale()), glia.n_clear_events, glia.n_prune_events, glia.n_myelo_events },
     );
     const samp = mol.sampleBusy();
     std.debug.print(
-        "  wet: releases={d} nmda={d} ca_peaks={d} camk_p_peaks={d} ampa_up={d} ltd={d} consol={d} chem_steps={d}\n",
-        .{ mol.n_releases, mol.n_nmda_events, mol.n_ca_peaks, mol.n_camk_peak, mol.n_ampa_up, mol.n_ltd_events, mol.n_consolidate, mol.n_chem_steps },
+        "  wet: releases={d} quanta={d} silent0={d} ch_tx={d} ampa_openings={d} nmda_openings={d}\n",
+        .{ mol.n_releases, mol.n_quanta, mol.n_stoch_fail_silent, mol.n_channel_transitions, mol.n_ampa_openings, mol.n_nmda_openings },
     );
     std.debug.print(
-        "  sample spine: glu={e} ca={e} nmda={e} camk_p={e} pp1={e} ampa_s={e} prot={e}\n",
-        .{ fixed.toF64(samp.glu), fixed.toF64(samp.ca), fixed.toF64(samp.nmda_open), fixed.toF64(samp.camk_p), fixed.toF64(samp.pp1), fixed.toF64(samp.ampa_surf), fixed.toF64(samp.protein) },
+        "  wet: nmda_ev={d} ca_peaks={d} camk_p={d} ampa_up={d} ltd={d} consol={d} chem={d}\n",
+        .{ mol.n_nmda_events, mol.n_ca_peaks, mol.n_camk_peak, mol.n_ampa_up, mol.n_ltd_events, mol.n_consolidate, mol.n_chem_steps },
+    );
+    std.debug.print(
+        "  sample: glu={e} ca={e} n_ampa_o={d} n_nmda_o={d} n_nmda_B={d} camk_p={e} pp1={e} prot={e}\n",
+        .{ fixed.toF64(samp.glu), fixed.toF64(samp.ca), samp.channels.n_ampa_open, samp.channels.n_nmda_open, samp.channels.n_nmda_blocked, fixed.toF64(samp.camk_p), fixed.toF64(samp.pp1), fixed.toF64(samp.protein) },
     );
 
     std.debug.print("--- SYNAPTIC EDGE TRACE (top carriers this query) ---\n", .{});
@@ -625,8 +634,11 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         glia.n_clear_events >= 1 and
         mol.n_releases >= 1 and
         mol.n_chem_steps >= 100 and
+        mol.n_channel_transitions >= 20 and
+        (mol.n_ampa_openings >= 1 or mol.n_nmda_openings >= 1) and
         (mol.n_ca_peaks >= 1 or mol.n_nmda_events >= 1 or mol.n_camk_peak >= 1) and
         mol.n_tags >= 1 and
+        ch_ok and
         th.n_visited >= 4 and
         th.n_novel >= 1 and
         th.n_cross >= 1 and
@@ -646,6 +658,11 @@ pub fn runSynapsePathwayProbe() SynapseReport {
         .n_ltd = mol.n_ltd_events,
         .n_consolidate = mol.n_consolidate + ep1.n_consol + ep2.n_consol,
         .n_chem_steps = mol.n_chem_steps,
+        .n_channel_transitions = mol.n_channel_transitions,
+        .n_ampa_openings = mol.n_ampa_openings,
+        .n_nmda_openings = mol.n_nmda_openings,
+        .n_quanta = mol.n_quanta,
+        .n_silent_fail = mol.n_stoch_fail_silent,
         .n_glia_clear = glia.n_clear_events,
         .n_glia_prune = glia.n_prune_events + ep1.n_prune + ep2.n_prune,
         .n_myelo = glia.n_myelo_events + ep1.n_myelo + ep2.n_myelo,
