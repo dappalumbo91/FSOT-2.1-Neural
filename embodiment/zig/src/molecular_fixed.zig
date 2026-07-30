@@ -20,7 +20,7 @@ const Fixed = fixed.Fixed;
 
 pub const MAX_N: usize = network_f.MAX_N;
 pub const MAX_E: usize = MAX_N * MAX_N;
-pub const CHEM_SUBSTEPS: u32 = 4;
+pub const CHEM_SUBSTEPS: u32 = 5; // outer ms loops; channels do 20×50µs each
 
 fn kCaPump() Fixed {
     return fixed.fromDecimalStr("0.18");
@@ -140,18 +140,19 @@ pub const CascadeState = struct {
 
     fn chemSubstep(self: *CascadeState, sp: *Spine, v_post: Fixed, pre_spike: bool, post_spike: bool) void {
         self.n_chem_steps += 1;
-        const dt = fixed.div(fixed.fromInt(1), fixed.fromInt(CHEM_SUBSTEPS));
+        // each chem substep = 1 ms of network-class time for Ca/kinase ODEs;
+        // channels integrate at 50 µs internally (stepOneMs)
+        const dt = fixed.fromInt(1); // 1 ms for slow ODEs
         const relief = mgRelief(v_post);
 
-        // --- stochastic quantal release ---
+        // --- stochastic multi-site quantal release (with site refractory) ---
         if (pre_spike) {
-            // p_release elevated by residual Ca in terminal (use glu residue as proxy)
             const p_rel = fixed.clamp(
-                fixed.add(fixed.fromDecimalStr("0.25"), fixed.mul(sp.glu, fixed.fromDecimalStr("0.15"))),
-                fixed.fromDecimalStr("0.1"),
-                fixed.fromDecimalStr("0.85"),
+                fixed.add(fixed.fromDecimalStr("0.28"), fixed.mul(sp.glu, fixed.fromDecimalStr("0.12"))),
+                fixed.fromDecimalStr("0.12"),
+                fixed.fromDecimalStr("0.80"),
             );
-            const rel = ch.stochasticRelease(&self.rng, p_rel);
+            const rel = ch.stochasticRelease(&self.rng, &sp.channels, p_rel);
             if (rel.quanta == 0) {
                 self.n_stoch_fail_silent += 1;
             } else {
@@ -163,17 +164,17 @@ pub const CascadeState = struct {
             }
         }
 
-        // --- EAAT / diffusion clear ---
+        // --- EAAT / diffusion clear (ms scale) ---
         const uptake = fixed.mul(kGluUptakeBase(), self.eaat_scale);
-        const d_glu = fixed.mul(fixed.mul(uptake, sp.glu), dt);
+        const d_glu = fixed.mul(fixed.mul(uptake, sp.glu), fixed.fromDecimalStr("0.2")); // fraction of ms clear
         sp.glu = fixed.sub(sp.glu, d_glu);
         if (fixed.lt(sp.glu, 0)) sp.glu = 0;
 
-        // --- FULL STOCHASTIC SINGLE-CHANNEL STEP ---
+        // --- STOCHASTIC SINGLE-CHANNEL: 20 × 50 µs Markov steps ---
         const tr0 = sp.channels.n_transitions;
         const ao0 = sp.channels.n_ampa_openings;
         const no0 = sp.channels.n_nmda_openings;
-        sp.channels.step(&self.rng, sp.glu, relief, dt);
+        sp.channels.stepOneMs(&self.rng, sp.glu, relief);
         self.n_channel_transitions += sp.channels.n_transitions - tr0;
         self.n_ampa_openings += sp.channels.n_ampa_openings - ao0;
         self.n_nmda_openings += sp.channels.n_nmda_openings - no0;

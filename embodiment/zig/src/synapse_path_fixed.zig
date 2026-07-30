@@ -556,9 +556,10 @@ pub fn runSynapsePathwayProbe() SynapseReport {
 
     // print bio-comparable trace
     std.debug.print("--- BIO MAP (STOCHASTIC SINGLE-CHANNEL + WET + FSOT) ---\n", .{});
-    std.debug.print("  quantal release              ↔ binomial vesicles (channel_stoch)\n", .{});
-    std.debug.print("  AMPA Markov C/O/D            ↔ 12 channels/spine Bernoulli steps\n", .{});
-    std.debug.print("  NMDA Markov C/O/B/D + Mg     ↔ 8 channels/spine; B=Mg block\n", .{});
+    std.debug.print("  time base                    ↔ 1 ms tick; channel dt=50 us (20/ms); P=1-exp(-k dt)\n", .{});
+    std.debug.print("  quantal release              ↔ 12 sites + refractory; binomial quanta\n", .{});
+    std.debug.print("  AMPA multi-bind              ↔ 48 ch/spine C0-C1-O-D competing Markov\n", .{});
+    std.debug.print("  NMDA multi-bind + Mg         ↔ 16 ch/spine C0-C1-O-B-D\n", .{});
     std.debug.print("  Ca2+ from open NMDA count    ↔ unitary nmdaCaCurrent\n", .{});
     std.debug.print("  CaMKII / PP1 / AMPA traffic  ↔ Fixed ODEs on spine\n", .{});
     std.debug.print("  late LTP protein             ↔ protein → consolidateToW\n", .{});

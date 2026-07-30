@@ -1,23 +1,29 @@
-# Wet biophysics + full stochastic single-channel kinetics (Zig Fixed)
+# Wet biophysics + refined stochastic single-channel kinetics (Zig Fixed)
 
-## No continuous-P_open shortcut for receptors
+## Time base (no more vague “ms-class handwave”)
 
-Receptor current is **not** `g = P_open(glu,V)`.  
-Each spine has **physical channels** with Markov states updated by Bernoulli trials.
+| Scale | Value |
+|-------|--------|
+| Network tick | **1 ms** |
+| Channel Markov dt | **50 µs** |
+| Channel steps / ms | **20** |
+| Transition law | **P = 1 − exp(−k·dt)** (Fixed `exp`) |
+| Competing exits | rate-weighted choice among transitions |
 
-## Per spine
+## Single-channel (not continuum P_open)
 
 | Layer | Implementation |
 |-------|----------------|
-| Quantal release | Binomial `N_VESICLES=8`, `p_release` → glu quanta (`channel_stoch_fixed`) |
-| AMPA | **12** channels: C ↔ O → D → C |
-| NMDA | **8** channels: C ↔ O ↔ B(Mg) / D |
-| PRNG | Integer xorshift64* (no IEEE float) |
-| Transition | `P = clamp(rate·dt, 0, 1)` then Bernoulli |
+| Quantal release | **12 release sites**, binomial + **site refractory** |
+| AMPA | **48** channels: **C0 → C1 → O**, **D** desens (multi-binding) |
+| NMDA | **16** channels: **C0 → C1 → O ↔ B_Mg**, **D** |
+| PRNG | Integer xorshift64* only |
 | Ca²⁺ | Unitary current × **open NMDA count** |
 | Downstream | CaMKII, PP1, AMPA traffic, late protein (Fixed ODEs) |
 | Glia | EAAT scale on glu clearance |
-| STDP | × spine eligibility (includes open channel counts) |
+| STDP | × spine eligibility (open counts + cascade) |
+
+Still **not** all-atom MD. This is synapse-scale stochastic single-channel Markov at biophysically motivated rates.
 
 ## Files
 
