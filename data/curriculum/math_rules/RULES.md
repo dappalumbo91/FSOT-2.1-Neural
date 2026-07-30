@@ -21,6 +21,12 @@
 - **SCHEMA-win-loss**: `W=(T+d)/2` — Won d more than lost with T games
 - **SCHEMA-clock**: `hours=end−start` — Time-of-day span, then optional rate×hours
 - **SCHEMA-profit-markup**: `new=buy·(1+p/100); profit=new−buy−repair` — Percent increase on purchase price; subtract buy+repair
+- **SCHEMA-inventory-cascade**: `undo half→×2; undo +k→+k; undo 1/3→×3/2` — Recover start from remaining by reversing each sale step
+- **SCHEMA-sequential-fraction**: `left=start·(1−f)−k` — Fraction leave first; then absolute count leaves remainder
+- **SCHEMA-billable-hours**: `hours=n×min/60; profit=hours×(charge−cost)` — Convert patient minutes to hours; margin × hours
+- **SCHEMA-rate-schedule**: `pay=rate×h×days×weeks×(1−d%)` — Recurring hourly work across calendar then optional discount
+- **SCHEMA-fraction-remaining-split**: `rem=start·(1−f); part=rem/2` — After fraction taken, remaining shared equally
+- **SCHEMA-salary-fractions**: `left=start−Σ(fi·start); half rem; −gifts` — Fractions of salary base then half residual then fixed gifts
 
 # Language → strategy maps
 - `altogether means add` → **add**

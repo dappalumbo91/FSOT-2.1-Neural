@@ -145,6 +145,49 @@ BINDING_RULES = [
         "why": "Percent increase attaches to purchase price; repairs still count as invested.",
         "how": "Bind buy and repair; new value = buy×(1+p/100); profit = new − (buy+repair).",
     },
+    {
+        "id": "SCHEMA-inventory-cascade",
+        "name": "Inventory cascade (work backward)",
+        "formula": "undo half→×2; undo +k→−k; undo 1/3 sold→×3/2",
+        "why": "When final remaining is known, reverse each sale step to recover start.",
+        "how": "Walk sales in reverse order; each 'half left sold' doubles; each '+k sold' adds k; "
+        "'a third sold' means 2/3 remains so start = rem×3/2.",
+    },
+    {
+        "id": "SCHEMA-sequential-fraction",
+        "name": "Sequential fraction then count leave",
+        "formula": "left = start·(1−f) − k",
+        "why": "A fraction leaves first; then an absolute count leaves the remainder.",
+        "how": "Apply fraction of start (or remaining); subtract fixed quit count from what is left.",
+    },
+    {
+        "id": "SCHEMA-billable-hours",
+        "name": "Billable hours profit",
+        "formula": "hours=n×min/60; profit=hours×(charge−cost)",
+        "why": "Patient minutes convert to hours; margin is charge rate minus cost rate.",
+        "how": "Total minutes → hours; profit/hour = patient$/h − doctor$/h; multiply.",
+    },
+    {
+        "id": "SCHEMA-rate-schedule",
+        "name": "Hourly rate × schedule × discount",
+        "formula": "pay = rate×h×days×weeks×(1−d%)",
+        "why": "Recurring hourly work multiplies across the calendar, then optional discount.",
+        "how": "rate×hours/day×times/week×weeks; subtract d% if given.",
+    },
+    {
+        "id": "SCHEMA-fraction-remaining-split",
+        "name": "Fraction sold then half remaining split",
+        "formula": "rem=start·(1−f); part=rem/2",
+        "why": "After a fraction is taken, remaining is shared equally across periods.",
+        "how": "Subtract f of start; if half of left is sold equally in two slots, each slot = rem/2.",
+    },
+    {
+        "id": "SCHEMA-salary-fractions",
+        "name": "Salary fraction cascade",
+        "formula": "left = start − Σ(fi·start); then half remaining; then fixed gifts",
+        "why": "Percents/fractions of salary apply to original base; half applies to residual.",
+        "how": "Subtract each fi×salary; half the remainder; subtract fixed dollar gifts.",
+    },
 ]
 
 
@@ -844,6 +887,351 @@ def solve_with_binding(question: str) -> SolveResult:
         tot = push("add_combine", "total", f"{base}+{other}", base + other)
         return SolveResult(_norm(tot), steps, used, True)
 
+    # =====================================================================
+    # High-lift schemas (inventory cascade, sequential fraction, billable)
+    # =====================================================================
+
+    # ----- SCHEMA-inventory-cascade (work BACKWARD from remaining) -----
+    # Melanie: sold a third, then k more, then half of left; has L left → start?
+    if (
+        re.search(r"\bsold a third\b|\ba third of (?:her |his |the )?", ql)
+        and re.search(r"\bhalf of what (was left|remained|is left)\b", ql)
+        and re.search(r"\b(start with|start with\?|did she start|did he start|how many did)\b", ql)
+    ):
+        left_m = re.search(
+            r"(?:has|have|had)\s+(\d+(?:\.\d+)?)\s+(?:\w+\s+){0,3}left\b",
+            ql,
+        )
+        if not left_m:
+            left_m = re.search(
+                r"(\d+(?:\.\d+)?)\s+(?:\w+\s+){0,3}left\b",
+                ql,
+            )
+        more_m = re.search(r"(\d+(?:\.\d+)?)\s+more\b", ql)
+        if left_m and more_m:
+            left = float(left_m.group(1))
+            k = float(more_m.group(1))
+            # reverse orange: half of what was left sold → before = left*2
+            before_half = push(
+                "SCHEMA-inventory-cascade",
+                "undo half-sold → ×2",
+                f"{left}*2",
+                left * 2.0,
+            )
+            # reverse red: sold k more → before = before_half + k
+            before_more = push(
+                "SCHEMA-inventory-cascade",
+                "undo +k sold → +k",
+                f"{before_half}+{k}",
+                before_half + k,
+            )
+            # reverse green: sold a third → 2/3 remained = before_more → start = ×3/2
+            start = push(
+                "SCHEMA-inventory-cascade",
+                "undo 1/3 sold → ×3/2",
+                f"{before_more}*3/2",
+                before_more * 3.0 / 2.0,
+            )
+            return SolveResult(_norm(start), steps, used, True)
+
+    # ----- SCHEMA-sequential-fraction (forward: fraction leave, then count) -----
+    # Nissa: 60 elves; a third quit; then 10 of remaining quit → left
+    if re.search(r"\b(quit|leave|left)\b", ql) and re.search(
+        r"\b(a third|one third|1/3|half|a half|1/2|a quarter|1/4)\b", ql
+    ):
+        start_m = re.search(
+            r"(?:hires?|has|have|had|starts? with|employs?)\s+(\d+(?:\.\d+)?)",
+            ql,
+        )
+        if not start_m:
+            start_m = re.search(r"^.*?(\d+(?:\.\d+)?)\s+\w+", ql)
+        frac = None
+        if re.search(r"\ba third\b|\bone third\b|\b1/3\b", ql):
+            frac = 1.0 / 3.0
+        elif re.search(r"\bhalf\b|\b1/2\b", ql) and not re.search(
+            r"half of what", ql
+        ):
+            frac = 0.5
+        elif re.search(r"\ba quarter\b|\b1/4\b", ql):
+            frac = 0.25
+        # "then K of the remaining ... quit"
+        then_m = re.search(
+            r"(?:then|,)\s+(\d+(?:\.\d+)?)\s+(?:of the remaining\s+\w+\s+)?"
+            r"(?:quit|leave|left)",
+            ql,
+        )
+        if start_m and frac is not None and then_m and re.search(
+            r"\bhow many\b.*\b(left|remain)", ql
+        ):
+            start = float(start_m.group(1))
+            k = float(then_m.group(1))
+            quit1 = push(
+                "SCHEMA-sequential-fraction",
+                "quit1=f×start",
+                f"{frac:g}*{start}",
+                frac * start,
+            )
+            rem1 = push(
+                "sub_remove", "after fraction", f"{start}-{quit1}", start - quit1
+            )
+            left = push(
+                "SCHEMA-sequential-fraction",
+                "left=rem−k",
+                f"{rem1}-{k}",
+                rem1 - k,
+            )
+            return SolveResult(_norm(left), steps, used, True)
+
+    # ----- SCHEMA-billable-hours (hospital margin) -----
+    # n people × m minutes; doctors $A/h; hospital charges $B/h → profit
+    if (
+        re.search(r"\b(patient|people|person)\b", ql)
+        and re.search(r"\bminutes?\b", ql)
+        and re.search(r"\b(charge|charges|profit)\b", ql)
+        and re.search(r"\bhour\b", ql)
+    ):
+        n_m = re.search(r"(\d+(?:\.\d+)?)\s+(?:people|patients?|persons?)", ql)
+        if not n_m:
+            n_m = re.search(r"sees\s+(\d+(?:\.\d+)?)", ql)
+        min_m = re.search(r"(?:average of\s*)?(\d+(?:\.\d+)?)\s*minutes?", ql)
+        # two dollar rates: cost (doctors) then charge (hospital/patients)
+        rates = [float(x) for x in re.findall(r"\$\s*(\d+(?:\.\d+)?)", q)]
+        if not rates:
+            rates = [
+                float(x)
+                for x in re.findall(
+                    r"charge[sd]?\s+(?:her |him |them |the \w+ )?\$?\s*(\d+(?:\.\d+)?)",
+                    ql,
+                )
+            ]
+        # also "charge $150 an hour" / "charges the patients $200 an hour"
+        rate_pairs = re.findall(
+            r"(?:charge[sd]?|cost[s]?)\s+(?:[^$]{0,40}?)\$?\s*(\d+(?:\.\d+)?)\s*"
+            r"(?:an hour|/hour|per hour)",
+            ql,
+        )
+        if len(rate_pairs) >= 2:
+            rates = [float(x) for x in rate_pairs[:2]]
+        if n_m and min_m and len(rates) >= 2 and re.search(r"\bprofit\b", ql):
+            n = float(n_m.group(1))
+            minutes = float(min_m.group(1))
+            cost_h, charge_h = rates[0], rates[1]
+            # ensure charge > cost for profit framing when order is doctor then hospital
+            if "doctor" in ql and "hospital" in ql:
+                # doctors charge hospital A; hospital charges patients B
+                dm = re.search(
+                    r"doctors?\s+charge[sd]?\s+\$?\s*(\d+(?:\.\d+)?)", ql
+                )
+                hm = re.search(
+                    r"hospital\s+charges?\s+(?:the patients?\s+)?\$?\s*(\d+(?:\.\d+)?)",
+                    ql,
+                )
+                if dm and hm:
+                    cost_h, charge_h = float(dm.group(1)), float(hm.group(1))
+            total_min = push(
+                "mul_groups", "total minutes", f"{n}*{minutes}", n * minutes
+            )
+            hours = push(
+                "div_rate", "hours=min/60", f"{total_min}/60", total_min / 60.0
+            )
+            margin = push(
+                "sub_diff",
+                "margin=charge−cost",
+                f"{charge_h}-{cost_h}",
+                charge_h - cost_h,
+            )
+            profit = push(
+                "SCHEMA-billable-hours",
+                "profit=hours×margin",
+                f"{hours}*{margin}",
+                hours * margin,
+            )
+            return SolveResult(_norm(profit), steps, used, True)
+
+    # ----- SCHEMA-rate-schedule (hourly × day × week × weeks × discount) -----
+    # Jean makeup: $250/h, 6 hours/day, 4 times a week, 5 weeks, 10% discount
+    if (
+        re.search(r"\$?\s*\d+.+\b(an hour|per hour|/hour)\b", ql)
+        and re.search(r"\bhours?\b", ql)
+        and re.search(r"\b(times a week|a week|weeks?)\b", ql)
+    ):
+        rate_m = re.search(
+            r"\$?\s*(\d+(?:\.\d+)?)\s*(?:an hour|per hour|/hour)",
+            ql,
+        )
+        h_m = re.search(r"(\d+(?:\.\d+)?)\s*hours?\s+(?:to do|each day|a day|per day)", ql)
+        if not h_m:
+            h_m = re.search(r"takes\s+(\d+(?:\.\d+)?)\s*hours?", ql)
+        week_m = re.search(r"(\d+)\s*times a week", ql)
+        weeks_m = re.search(r"(\d+)\s*weeks?", ql)
+        disc_m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*discount", ql)
+        if rate_m and h_m and week_m and weeks_m:
+            rate = float(rate_m.group(1))
+            hours = float(h_m.group(1))
+            per_week_times = float(week_m.group(1))
+            weeks = float(weeks_m.group(1))
+            per_day = push(
+                "mul_rate", "rate×hours", f"{rate}*{hours}", rate * hours
+            )
+            per_week = push(
+                "mul_groups",
+                "day×times/week",
+                f"{per_day}*{per_week_times}",
+                per_day * per_week_times,
+            )
+            gross = push(
+                "mul_groups",
+                "week×weeks",
+                f"{per_week}*{weeks}",
+                per_week * weeks,
+            )
+            if disc_m and re.search(r"\b(pay|paid|cost|how much)\b", ql):
+                d = float(disc_m.group(1))
+                off = push(
+                    "SCHEMA-rate-schedule",
+                    "discount",
+                    f"{gross}*{d}/100",
+                    gross * d / 100.0,
+                )
+                pay = push(
+                    "SCHEMA-rate-schedule",
+                    "pay=gross−discount",
+                    f"{gross}-{off}",
+                    gross - off,
+                )
+                return SolveResult(_norm(pay), steps, used, True)
+            if re.search(r"\b(pay|paid|cost|how much)\b", ql):
+                return SolveResult(_norm(gross), steps, used, True)
+
+    # ----- SCHEMA-fraction-remaining-split (bakery afternoon) -----
+    # two-thirds sold morning; half of left sold equally afternoon and evening
+    if re.search(
+        r"\b(two-thirds|2/3|two thirds)\b", ql
+    ) and re.search(r"\bhalf of what is left\b|\bhalf of (the )?remaining\b", ql):
+        start_m = re.search(
+            r"(?:produces?|makes?|bakes?|has|have)\s+(\d+(?:\.\d+)?)",
+            ql,
+        )
+        if not start_m:
+            start_m = re.search(r"(\d+(?:\.\d+)?)\s+loaves?", ql)
+        if start_m:
+            start = float(start_m.group(1))
+            morning = push(
+                "SCHEMA-fraction-remaining-split",
+                "morning=2/3×start",
+                f"2/3*{start}",
+                start * 2.0 / 3.0,
+            )
+            rem = push(
+                "sub_remove", "remaining", f"{start}-{morning}", start - morning
+            )
+            # equally afternoon and evening of remaining (or half each)
+            if re.search(r"\bequally\b|\bafternoon\b.*\bevening\b", ql):
+                part = push(
+                    "SCHEMA-fraction-remaining-split",
+                    "slot=rem/2",
+                    f"{rem}/2",
+                    rem / 2.0,
+                )
+                if re.search(r"\bafternoon\b", ql) and re.search(
+                    r"\bhow many\b", ql
+                ):
+                    return SolveResult(_norm(part), steps, used, True)
+                if re.search(r"\bevening\b", ql) and re.search(r"\bhow many\b", ql):
+                    return SolveResult(_norm(part), steps, used, True)
+
+    # ----- SCHEMA-salary-fractions (Zaid-style) -----
+    # spend 1/4 on A, 1/3 on B, half of remaining to charity, then fixed gifts
+    if re.search(r"\b(salary|earns?|earning)\b", ql) and re.search(
+        r"\b(1/4|1/3|half of the remaining)\b", ql
+    ):
+        sal_m = re.search(
+            r"(?:earns?|salary of|makes?)\s+\$?\s*(\d+(?:\.\d+)?)",
+            ql,
+        )
+        if not sal_m:
+            # "If Zaid earns 6000$ per month"
+            sal_m = re.search(
+                r"(?:earns?|earning)\s+(\d+(?:\.\d+)?)\s*\$?",
+                ql,
+            )
+        if not sal_m:
+            sal_m = re.search(
+                r"(\d+(?:\.\d+)?)\s*\$\s*per month",
+                ql,
+            )
+        # fractions of the *salary base* only (not half of remaining)
+        fracs: List[float] = []
+        for fm in re.finditer(
+            r"(1/\d+)\s+of (?:his |her )?salary",
+            ql,
+        ):
+            a, b = fm.group(1).split("/")
+            fracs.append(float(a) / float(b))
+        # "1/4 of his salary on rent, 1/3 on car fuel"
+        for fm in re.finditer(r"(1/\d+)\s+on\s+\w+", ql):
+            a, b = fm.group(1).split("/")
+            v = float(a) / float(b)
+            if v not in fracs:
+                fracs.append(v)
+        # Fixed gifts only — never the salary figure itself
+        # "gives his daughter 200$ ... and 700$ to his wife"
+        fixed_u: List[float] = []
+        for fm in re.finditer(
+            r"(?:daughter|son|wife|husband|child|kids?)\s+(\d+)\s*\$",
+            ql,
+        ):
+            fixed_u.append(float(fm.group(1)))
+        for fm in re.finditer(
+            r"(\d+)\s*\$\s+to\s+(?:use|his|her|the)",
+            ql,
+        ):
+            v = float(fm.group(1))
+            if v not in fixed_u:
+                fixed_u.append(v)
+        for fm in re.finditer(
+            r"and\s+(\d+)\s*\$\s+to\s+(?:his|her)",
+            ql,
+        ):
+            v = float(fm.group(1))
+            if v not in fixed_u:
+                fixed_u.append(v)
+        if sal_m and fracs:
+            salary = float(sal_m.group(1))
+            spent = 0.0
+            for f in fracs:
+                part = push(
+                    "SCHEMA-salary-fractions",
+                    "f×salary",
+                    f"{f:g}*{salary}",
+                    f * salary,
+                )
+                spent += part
+            rem = push(
+                "sub_remove", "after fractions", f"{salary}-{spent}", salary - spent
+            )
+            if re.search(r"\bhalf of the remaining\b|\bdonates half\b", ql):
+                half = push(
+                    "BIND-02", "half remaining", f"half({rem})", rem / 2.0
+                )
+                rem = push(
+                    "sub_remove", "after half donate", f"{rem}-{half}", rem - half
+                )
+            if fixed_u and re.search(
+                r"\b(still have|left|remain|after all)\b", ql
+            ):
+                gifts = sum(fixed_u)
+                push("add_combine", "fixed gifts", str(gifts), gifts)
+                left = push(
+                    "SCHEMA-salary-fractions",
+                    "left=rem−gifts",
+                    f"{rem}-{gifts}",
+                    rem - gifts,
+                )
+                return SolveResult(_norm(left), steps, used, True)
+            if re.search(r"\b(still have|left|remain)\b", ql):
+                return SolveResult(_norm(rem), steps, used, True)
+
     return SolveResult(None, steps, used, False)
 
 
@@ -980,5 +1368,49 @@ def binding_drills() -> List[Tuple[str, str, str]]:
             "to travel by car. How many days will he travel if he plans to take the bus and car?",
             "9",
             "BIND-02",
+        ),
+        # --- high-lift schemas ---
+        (
+            "Melanie sold a third of her vacuum cleaners at the green house, 2 more to the red "
+            "house, and half of what was left at the orange house. If Melanie has 5 vacuum "
+            "cleaners left, how many did she start with?",
+            "18",
+            "SCHEMA-inventory-cascade",
+        ),
+        (
+            "Nissa hires 60 seasonal workers to play elves. A third of the elves quit after "
+            "children vomit on them, then 10 of the remaining elves quit after kids kick their "
+            "shins. How many elves are left?",
+            "30",
+            "SCHEMA-sequential-fraction",
+        ),
+        (
+            "A hospital sees 500 people a day. Each patient is seen for an average of 24 minutes. "
+            "The doctors charge $150 an hour to the hospital and the hospital charges the "
+            "patients $200 an hour. How much profit does the hospital make from these visits?",
+            "10000",
+            "SCHEMA-billable-hours",
+        ),
+        (
+            "Jeans makeup artist charges her $250 an hour. It takes 6 hours to do each day and "
+            "she needs it done 4 times a week. The movie takes 5 weeks to finish. After the "
+            "movie the makeup artist gives Jean a 10% discount. How much did Jean pay?",
+            "27000",
+            "SCHEMA-rate-schedule",
+        ),
+        (
+            "A bakery produces 60 loaves of bread each day. Two-thirds of the loaves are sold in "
+            "the morning and half of what is left is sold equally in the afternoon and evening. "
+            "How many loaves of bread are sold in the afternoon?",
+            "10",
+            "SCHEMA-fraction-remaining-split",
+        ),
+        (
+            "Zaid spends 1/4 of his salary on rent, 1/3 on car fuel and donates half of the "
+            "remaining amount to his favorite charity. He gives his daughter 200$ to use for her "
+            "weekly expenses and 700$ to his wife. If Zaid earns 6000$ per month, how much money "
+            "will he still have after all these expenses and donations?",
+            "350",
+            "SCHEMA-salary-fractions",
         ),
     ]

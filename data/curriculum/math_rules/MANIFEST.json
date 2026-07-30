@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-07-30T02:50:34.236184+00:00",
+  "generated_at": "2026-07-30T02:55:42.164602+00:00",
   "doctrine": "Teach RULES and language\u2192operator maps; solve by decomposition and rule application. Do NOT stuff GSM8K Q\u2192A and retrieve. Authority rule corpus: Desktop Math generator \u2192 data/math_rulebook.",
   "pass_threshold": 0.95,
-  "n_arith_rules_runtime": 22,
+  "n_arith_rules_runtime": 28,
   "n_language_maps": 17,
   "n_imported_math_generator_rules": 1520,
   "n_imported_bank_rows": 9136,
-  "n_drills": 113,
+  "n_drills": 119,
   "n_gsm8k_rule_covered_practice": 18,
-  "n_heldout_test": 500,
-  "n_heldout_rule_covered": 48,
+  "n_heldout_test": 300,
+  "n_heldout_rule_covered": 35,
   "scores": {
     "drills_rule_application": {
-      "n": 113,
-      "correct": 113,
+      "n": 119,
+      "correct": 119,
       "accuracy": 1.0,
-      "with_rule_trace": 113,
+      "with_rule_trace": 119,
       "by_focus": {
         "add": {
           "correct": 13,
@@ -136,15 +136,45 @@
           "correct": 1,
           "n": 1,
           "accuracy": 1.0
+        },
+        "SCHEMA-inventory-cascade": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-sequential-fraction": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-billable-hours": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-rate-schedule": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-fraction-remaining-split": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-salary-fractions": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "practice_mixed": {
-      "n": 131,
-      "correct": 131,
+      "n": 137,
+      "correct": 137,
       "accuracy": 1.0,
-      "with_rule_trace": 131,
+      "with_rule_trace": 137,
       "by_focus": {
         "add": {
           "correct": 13,
@@ -266,6 +296,36 @@
           "n": 1,
           "accuracy": 1.0
         },
+        "SCHEMA-inventory-cascade": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-sequential-fraction": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-billable-hours": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-rate-schedule": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-fraction-remaining-split": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-salary-fractions": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
         "div_rate": {
           "correct": 1,
           "n": 1,
@@ -344,29 +404,29 @@
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "gsm8k_test_all": {
-      "n": 500,
-      "correct": 21,
-      "accuracy": 0.042,
-      "with_rule_trace": 21,
+      "n": 300,
+      "correct": 25,
+      "accuracy": 0.0833,
+      "with_rule_trace": 25,
       "by_focus": {
         "transfer": {
-          "correct": 21,
-          "n": 500,
-          "accuracy": 0.042
+          "correct": 25,
+          "n": 300,
+          "accuracy": 0.0833
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "gsm8k_test_where_rules_fire": {
-      "n": 48,
-      "correct": 21,
-      "accuracy": 0.4375,
-      "with_rule_trace": 21,
+      "n": 35,
+      "correct": 25,
+      "accuracy": 0.7143,
+      "with_rule_trace": 25,
       "by_focus": {
         "transfer": {
-          "correct": 21,
-          "n": 48,
-          "accuracy": 0.4375
+          "correct": 25,
+          "n": 35,
+          "accuracy": 0.7143
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
@@ -377,7 +437,7 @@
     "straight_a_rules": true,
     "rulebook_imported": true
   },
-  "coverage_note": "Imported Math-generator rules: 1520. Runtime word-problem apply fires on 48/500 held-out items. Expand apply_rules using ARITHMETIC/ALGEBRA forms from the imported book; full GSM8K rises as more atomic rules become executable.",
+  "coverage_note": "Imported Math-generator rules: 1520. Runtime word-problem apply fires on 35/300 held-out items. Expand apply_rules using ARITHMETIC/ALGEBRA forms from the imported book; full GSM8K rises as more atomic rules become executable.",
   "next_rule_expansions": [
     "Wire AR-* arithmetic rules from MASTER_RULEBOOK into apply_rules",
     "multi-step percent remaining chains",

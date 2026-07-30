@@ -81,6 +81,48 @@ ARITH_RULES: List[MathRule] = [
         "Percent increase on purchase price; subtract buy+repair",
         "schema",
     ),
+    MathRule(
+        "SCHEMA-inventory-cascade",
+        "inventory cascade backward",
+        "undo half→×2; undo +k→+k; undo 1/3→×3/2",
+        "Recover start from remaining by reversing each sale step",
+        "schema",
+    ),
+    MathRule(
+        "SCHEMA-sequential-fraction",
+        "sequential fraction then count",
+        "left=start·(1−f)−k",
+        "Fraction leave first; then absolute count leaves remainder",
+        "schema",
+    ),
+    MathRule(
+        "SCHEMA-billable-hours",
+        "billable hours profit",
+        "hours=n×min/60; profit=hours×(charge−cost)",
+        "Convert patient minutes to hours; margin × hours",
+        "schema",
+    ),
+    MathRule(
+        "SCHEMA-rate-schedule",
+        "hourly rate schedule discount",
+        "pay=rate×h×days×weeks×(1−d%)",
+        "Recurring hourly work across calendar then optional discount",
+        "schema",
+    ),
+    MathRule(
+        "SCHEMA-fraction-remaining-split",
+        "fraction then remaining split",
+        "rem=start·(1−f); part=rem/2",
+        "After fraction taken, remaining shared equally",
+        "schema",
+    ),
+    MathRule(
+        "SCHEMA-salary-fractions",
+        "salary fraction cascade",
+        "left=start−Σ(fi·start); half rem; −gifts",
+        "Fractions of salary base then half residual then fixed gifts",
+        "schema",
+    ),
 ]
 
 
@@ -516,8 +558,13 @@ def apply_rules(question: str) -> SolveResult:
         amt = push("mul_rate", "amount=rate×time", f"{nums[0]}*{nums[1]}", nums[0] * nums[1])
         return SolveResult(_norm(amt), steps, used, True)
 
-    # groups: n sprints × times/week × meters
-    if re.search(r"\bsprint|times a week|each sprint\b", ql) and len(nums) >= 3:
+    # groups: n sprints × times/week × meters (not hourly pay schedules)
+    if (
+        re.search(r"\bsprint|each sprint\b", ql)
+        and re.search(r"\btimes a week\b", ql)
+        and len(nums) >= 3
+        and not re.search(r"\b(hour|discount|charge|pay)\b", ql)
+    ):
         a, b, c = nums[0], nums[1], nums[2]
         # 3 sprints 3 times a week 60 meters → 3*3*60
         p = push("mul_groups", "total=n×size", f"{a}*{b}", a * b)
@@ -550,12 +597,16 @@ def apply_rules(question: str) -> SolveResult:
             return SolveResult(_norm(part2), steps, used, True)
 
     # bought/had then sold/gave → left (strict: only 2 quantities, clear "left")
+    # Refuse multi-hop inventory (third/half of left/quit cascades) — those are SCHEMA-*.
     if (
         re.search(r"\b(bought|had)\b", ql)
         and re.search(r"\b(sold|gave|ate)\b", ql)
         and re.search(r"\b(left|remain)\b", ql)
         and len(nums) == 2
-        and not re.search(r"%|percent|each|per |times|half|third|more", ql)
+        and not re.search(
+            r"%|percent|each|per |times|half|third|more|quit|remaining",
+            ql,
+        )
     ):
         v = push("sub_remove", "left=had−sold", f"{nums[0]}-{nums[1]}", nums[0] - nums[1])
         return SolveResult(_norm(v), steps, used, True)
@@ -598,9 +649,11 @@ def apply_rules(question: str) -> SolveResult:
         )
         return SolveResult(_norm(left), steps, used, True)
 
-    # simple left/remain with 2 nums
+    # simple left/remain with 2 nums — refuse quit/fraction cascades
     if ("sub" in strats or re.search(r"\b(left|remain)\b", ql)) and len(nums) == 2:
-        if re.search(r"\b(left|remain|use)\b", ql):
+        if re.search(r"\b(left|remain|use)\b", ql) and not re.search(
+            r"\b(quit|third|half of what|of the remaining|a third)\b", ql
+        ):
             v = push("sub_remove", "left=total−used", f"{nums[0]}-{nums[1]}", nums[0] - nums[1])
             return SolveResult(_norm(v), steps, used, True)
 

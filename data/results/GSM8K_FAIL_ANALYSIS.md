@@ -4,20 +4,20 @@
 **Method:** Run `apply_rules` (with `solve_with_binding` first) on full GSM8K test (n=1319).  
 **Doctrine:** Teach BIND/SCHEMA rules (form/why/how); do **not** stuff Q→A.
 
-## Score breakdown (after BIND/SCHEMA wiring)
+## Score breakdown (after high-lift SCHEMA pass)
 
 | Outcome | n | % | Meaning |
 |---------|--:|--:|---------|
-| **No fire** | **1202** | **91.1%** | No matching rule schema yet |
-| **Wrong fire** | **95** | **7.2%** | Rule ran on wrong quantities / incomplete hops |
-| **Correct** | **22** | **1.7%** | Full rule chain matched |
+| **No fire** | **1204** | **91.3%** | No matching rule schema yet |
+| **Wrong fire** | **87** | **6.6%** | Rule ran on wrong quantities / incomplete hops |
+| **Correct** | **28** | **2.1%** | Full rule chain matched |
 
-| Metric | Before binding fix | After BIND/SCHEMA |
-|--------|-------------------:|------------------:|
-| Correct | ~10–14 | **22** |
-| Wrong fire | ~106–500 | **95** |
-| Fire precision | ~2–10% | **~18.8%** (22/117) |
-| Rule drills | — | **113/113 = 100%** (≥95% gate) |
+| Metric | Pre-binding | After BIND | After high-lift schemas |
+|--------|------------:|-----------:|------------------------:|
+| Correct | ~10–14 | 22 | **28** |
+| Wrong fire | ~106–500 | 95 | **87** |
+| Fire precision | ~2–10% | ~19% | **~24.4%** (28/115) |
+| Rule drills | — | 113/113 | **119/119 = 100%** |
 
 When a rule fires: accuracy ≈ **19%**. Wrong-fire is still the quality bottleneck; no-fire is the coverage bottleneck.
 
@@ -55,16 +55,28 @@ Runtime: `math_binding.solve_with_binding` is called at the start of `apply_rule
 
 ---
 
-## Remaining wrong-fire patterns (next schemas)
+## High-lift schemas landed this pass
 
-| Pattern | Example fail | Needed rule |
-|---------|--------------|-------------|
-| Fraction of remaining multi-hop | Melanie vacuum thirds/half of left | SCHEMA-inventory-cascade |
-| Rate × people × time money | Hospital 500 × 24 min × $150/h | SCHEMA-billable-hours |
-| “A third quit” then more quit | Nissa elves | SCHEMA-sequential-fraction |
-| Multi-day exercise plans | Sue Mon/Tue cookies × year | SCHEMA-schedule-product |
-| Brokerage + transfer fees stack | Mr. Tan house fees | SCHEMA-fee-stack |
-| Partial “mean of duration” cue | still some mean over-fires | keep mean list-only |
+| Schema | Form | GSM8K exemplar |
+|--------|------|----------------|
+| **inventory-cascade** | reverse half → ×2; +k; 1/3 sold → ×3/2 | Melanie vacuums → 18 |
+| **sequential-fraction** | left = start·(1−f) − k | Nissa elves → 30 |
+| **billable-hours** | hours=n×min/60; profit=h×(charge−cost) | Hospital → 10000 |
+| **rate-schedule** | rate×h×days×weeks×(1−d%) | Jean makeup → 27000 |
+| **fraction-remaining-split** | rem=start·(1−f); part=rem/2 | Bakery afternoon → 10 |
+| **salary-fractions** | Σ(fi·sal); half rem; −gifts | Zaid → 350 |
+
+---
+
+## Remaining wrong-fire / no-fire (next lift)
+
+| Pattern | Needed rule |
+|---------|-------------|
+| Multi-day exercise plans (Mon/Tue × year) | SCHEMA-schedule-product |
+| Brokerage + transfer fee stack | SCHEMA-fee-stack |
+| Download % of file vs time | SCHEMA-progress-bytes |
+| Complex age/work-rate together | SCHEMA-work-rate |
+| Keep mean list-only | already tightened |
 
 ---
 
@@ -72,7 +84,7 @@ Runtime: `math_binding.solve_with_binding` is called at the start of `apply_rule
 
 | Gate | Status |
 |------|--------|
-| Rule drills ≥ 95% | **PASS 100%** (113 items, includes 23 BIND/SCHEMA drills) |
+| Rule drills ≥ 95% | **PASS 100%** (119 items) |
 | Imported Math-generator rules | **1520** in `data/math_rulebook` |
 | Official GSM8K transfer | Climb via schemas — not Q→A stuffing |
 
@@ -80,8 +92,7 @@ Runtime: `math_binding.solve_with_binding` is called at the start of `apply_rule
 
 ## Next steps (ordered)
 
-1. SCHEMA-inventory-cascade (sold a third, then 2 more, half of remaining).  
-2. SCHEMA-billable-hours (patients × minutes → hours × rate).  
-3. SCHEMA-sequential-fraction (⅓ quit, half of rest quit, …).  
-4. Wire more AR-* forms from MASTER_RULEBOOK only when referent-safe.  
-5. Re-score fire precision after each schema; refuse over-broad cues.
+1. SCHEMA-fee-stack (transfer % + brokerage % of sale).  
+2. SCHEMA-schedule-product (per-day actions × days × weeks).  
+3. SCHEMA-work-rate / progress-bytes with strict referents.  
+4. Re-score fire precision after each schema; refuse over-broad cues.

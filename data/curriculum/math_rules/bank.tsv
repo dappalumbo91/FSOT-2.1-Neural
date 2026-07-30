@@ -1,5 +1,5 @@
 # domain	grade	kind	question	answer
-# Math RULES curriculum 2026-07-30T02:50:34.225947+00:00
+# Math RULES curriculum 2026-07-30T02:55:42.157111+00:00
 # kind=rule | langmap | drill — symbolic laws, not Q/A stuffing
 math	rules	rule	What is the rule addition commutative?	a + b = b + a
 math	rules	rule	Explain add_comm	Order of addends does not change sum
@@ -67,6 +67,24 @@ math	rules	rule	Formula for clock duration	hours=end−start
 math	rules	rule	What is the rule house-flip profit?	new=buy·(1+p/100); profit=new−buy−repair
 math	rules	rule	Explain SCHEMA-profit-markup	Percent increase on purchase price; subtract buy+repair
 math	rules	rule	Formula for house-flip profit	new=buy·(1+p/100); profit=new−buy−repair
+math	rules	rule	What is the rule inventory cascade backward?	undo half→×2; undo +k→+k; undo 1/3→×3/2
+math	rules	rule	Explain SCHEMA-inventory-cascade	Recover start from remaining by reversing each sale step
+math	rules	rule	Formula for inventory cascade backward	undo half→×2; undo +k→+k; undo 1/3→×3/2
+math	rules	rule	What is the rule sequential fraction then count?	left=start·(1−f)−k
+math	rules	rule	Explain SCHEMA-sequential-fraction	Fraction leave first; then absolute count leaves remainder
+math	rules	rule	Formula for sequential fraction then count	left=start·(1−f)−k
+math	rules	rule	What is the rule billable hours profit?	hours=n×min/60; profit=hours×(charge−cost)
+math	rules	rule	Explain SCHEMA-billable-hours	Convert patient minutes to hours; margin × hours
+math	rules	rule	Formula for billable hours profit	hours=n×min/60; profit=hours×(charge−cost)
+math	rules	rule	What is the rule hourly rate schedule discount?	pay=rate×h×days×weeks×(1−d%)
+math	rules	rule	Explain SCHEMA-rate-schedule	Recurring hourly work across calendar then optional discount
+math	rules	rule	Formula for hourly rate schedule discount	pay=rate×h×days×weeks×(1−d%)
+math	rules	rule	What is the rule fraction then remaining split?	rem=start·(1−f); part=rem/2
+math	rules	rule	Explain SCHEMA-fraction-remaining-split	After fraction taken, remaining shared equally
+math	rules	rule	Formula for fraction then remaining split	rem=start·(1−f); part=rem/2
+math	rules	rule	What is the rule salary fraction cascade?	left=start−Σ(fi·start); half rem; −gifts
+math	rules	rule	Explain SCHEMA-salary-fractions	Fractions of salary base then half residual then fixed gifts
+math	rules	rule	Formula for salary fraction cascade	left=start−Σ(fi·start); half rem; −gifts
 math	rules	langmap	What operation for: altogether?	add
 math	rules	langmap	altogether means add	add
 math	rules	langmap	What operation for: left?	sub
@@ -125,6 +143,24 @@ math	rules	rule	How to apply SCHEMA-clock?	Parse H AM/PM or 24h; subtract; handl
 math	rules	rule	What is the rule House-flip profit?	new=buy·(1+p/100); profit=new−buy−repair
 math	rules	rule	Why SCHEMA-profit-markup?	Percent increase attaches to purchase price; repairs still count as invested.
 math	rules	rule	How to apply SCHEMA-profit-markup?	Bind buy and repair; new value = buy×(1+p/100); profit = new − (buy+repair).
+math	rules	rule	What is the rule Inventory cascade (work backward)?	undo half→×2; undo +k→−k; undo 1/3 sold→×3/2
+math	rules	rule	Why SCHEMA-inventory-cascade?	When final remaining is known, reverse each sale step to recover start.
+math	rules	rule	How to apply SCHEMA-inventory-cascade?	Walk sales in reverse order; each 'half left sold' doubles; each '+k sold' adds k; 'a third sold' means 2/3 remains so start = rem×3/2.
+math	rules	rule	What is the rule Sequential fraction then count leave?	left = start·(1−f) − k
+math	rules	rule	Why SCHEMA-sequential-fraction?	A fraction leaves first; then an absolute count leaves the remainder.
+math	rules	rule	How to apply SCHEMA-sequential-fraction?	Apply fraction of start (or remaining); subtract fixed quit count from what is left.
+math	rules	rule	What is the rule Billable hours profit?	hours=n×min/60; profit=hours×(charge−cost)
+math	rules	rule	Why SCHEMA-billable-hours?	Patient minutes convert to hours; margin is charge rate minus cost rate.
+math	rules	rule	How to apply SCHEMA-billable-hours?	Total minutes → hours; profit/hour = patient$/h − doctor$/h; multiply.
+math	rules	rule	What is the rule Hourly rate × schedule × discount?	pay = rate×h×days×weeks×(1−d%)
+math	rules	rule	Why SCHEMA-rate-schedule?	Recurring hourly work multiplies across the calendar, then optional discount.
+math	rules	rule	How to apply SCHEMA-rate-schedule?	rate×hours/day×times/week×weeks; subtract d% if given.
+math	rules	rule	What is the rule Fraction sold then half remaining split?	rem=start·(1−f); part=rem/2
+math	rules	rule	Why SCHEMA-fraction-remaining-split?	After a fraction is taken, remaining is shared equally across periods.
+math	rules	rule	How to apply SCHEMA-fraction-remaining-split?	Subtract f of start; if half of left is sold equally in two slots, each slot = rem/2.
+math	rules	rule	What is the rule Salary fraction cascade?	left = start − Σ(fi·start); then half remaining; then fixed gifts
+math	rules	rule	Why SCHEMA-salary-fractions?	Percents/fractions of salary apply to original base; half applies to residual.
+math	rules	rule	How to apply SCHEMA-salary-fractions?	Subtract each fi×salary; half the remainder; subtract fixed dollar gifts.
 math	rules	drill	What is 3 plus 5 altogether?	8
 math	rules	drill	Combine 3 and 5 in total.	8
 math	rules	drill	What is 12 plus 8 altogether?	20
@@ -238,6 +274,12 @@ math	rules	drill	A juggler can juggle 16 balls. Half of the balls are golf balls
 math	rules	drill	There are 4 roses in the vase. There are 7 more dahlias than roses in the vase. How many flowers are there in the vase in total?	15
 math	rules	drill	Annika brought $50 to the town fair. She spent half of it on food and snacks, and an additional $10 for rides. How much, in dollars, is left?	15
 math	rules	drill	Andrew plans a road trip. It takes 6 days to travel by bus and half as many days to travel by car. How many days will he travel if he plans to take the bus and car?	9
+math	rules	drill	Melanie sold a third of her vacuum cleaners at the green house, 2 more to the red house, and half of what was left at the orange house. If Melanie has 5 vacuum cleaners left, how many did she start with?	18
+math	rules	drill	Nissa hires 60 seasonal workers to play elves. A third of the elves quit after children vomit on them, then 10 of the remaining elves quit after kids kick their shins. How many elves are left?	30
+math	rules	drill	A hospital sees 500 people a day. Each patient is seen for an average of 24 minutes. The doctors charge $150 an hour to the hospital and the hospital charges the patients $200 an hour. How much profit does the hospital make from these visits?	10000
+math	rules	drill	Jeans makeup artist charges her $250 an hour. It takes 6 hours to do each day and she needs it done 4 times a week. The movie takes 5 weeks to finish. After the movie the makeup artist gives Jean a 10% discount. How much did Jean pay?	27000
+math	rules	drill	A bakery produces 60 loaves of bread each day. Two-thirds of the loaves are sold in the morning and half of what is left is sold equally in the afternoon and evening. How many loaves of bread are sold in the afternoon?	10
+math	rules	drill	Zaid spends 1/4 of his salary on rent, 1/3 on car fuel and donates half of the remaining amount to his favorite charity. He gives his daughter 200$ to use for her weekly expenses and 700$ to his wife. If Zaid earns 6000$ per month, how much money will he still have after all these expenses and donations?	350
 math	arithmetic	rule_id	What rule is AR-001?	Numeral denotes value
 math	arithmetic	rule_name	State the form of Numeral denotes value	n → Value(n)
 math	arithmetic	rule_form	AR-001 input form	n
