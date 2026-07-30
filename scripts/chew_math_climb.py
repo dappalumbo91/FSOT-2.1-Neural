@@ -27,7 +27,27 @@ os.environ.setdefault("PYTHONPATH", str(ROOT))
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--test", type=int, default=1319)
+    ap.add_argument(
+        "--remine",
+        action="store_true",
+        help="Re-mine GSM8K train templates before scoring (bulk curriculum)",
+    )
     args = ap.parse_args()
+
+    if args.remine:
+        from fsot_nuron.math_auto_templates import mine_train
+
+        pack = mine_train(min_support=1)
+        print(
+            json.dumps(
+                {
+                    "remine": True,
+                    "n_templates": pack.get("n_templates"),
+                    "n_abstracted_ok": pack.get("n_abstracted_ok"),
+                },
+                indent=2,
+            )
+        )
 
     from fsot_nuron.math_rules import (
         PASS,

@@ -720,6 +720,23 @@ def apply_rules(question: str) -> SolveResult:
         v = push("mul_groups", "total=n×size", f"{nums[0]}*{nums[1]}", nums[0] * nums[1])
         return SolveResult(_norm(v), steps, used, True)
 
+    # Curriculum templates mined from GSM8K *train* (not test stuffing).
+    # Only after hand rules refuse — gated to protect drills / fire precision.
+    try:
+        from .math_auto_templates import solve_with_templates_strict
+
+        # Word-problem shape only: long enough, ≥3 quantities, not pure arithmetic drills
+        if (
+            len(nums) >= 3
+            and len(q) >= 80
+            and not re.match(r"^(what is|evaluate|add fractions|multiply fractions|gcd|lcm)", ql)
+        ):
+            auto = solve_with_templates_strict(q)
+            if auto.ok and auto.answer is not None:
+                return auto
+    except Exception:
+        pass
+
     # Do NOT guess: if no structured rule matched, refuse (honest)
     return SolveResult(None, steps, used, False)
 
