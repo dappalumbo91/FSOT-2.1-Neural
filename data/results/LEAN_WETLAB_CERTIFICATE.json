@@ -1,12 +1,10 @@
 {
-  "generated_at": "2026-07-30T01:12:31.773117+00:00",
+  "generated_at": "2026-07-30T01:34:35.036011+00:00",
   "certificate": "FSOT-2.1-Neural scientific stage verification",
   "overall": "PASS",
   "lean_build": {
-    "ok": true,
-    "returncode": 0,
-    "stdout_tail": "Build completed successfully (15 jobs).\n",
-    "stderr_tail": ""
+    "ok": null,
+    "skipped": true
   },
   "formal_theorems": [
     "FSOTNeural.formal_panel_ok",

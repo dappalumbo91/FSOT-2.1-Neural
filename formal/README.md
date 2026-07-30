@@ -30,6 +30,7 @@ Toolchain: `leanprover/lean4:v4.31.0` (matches physical archive).
 | `FSOTNeural/WetStack.lean` | 48 AMPA / 16 NMDA / 12 quantal / 50µs·20 steps; glia |
 | `FSOTNeural/PairWeight.lean` | FSOT pair kernel shape; zero free params |
 | `FSOTNeural/CurriculumGates.lean` | ≥95% ppt; PK–G8; no history |
+| `FSOTNeural/IntelBio.lean` | 4 neuromods; sleep replay; claim hops ≥95% |
 | `FSOTNeural/Certificate.lean` | **`scientific_panel_ok`** master theorem (no sorry) |
 | `FSOTNeural.lean` | `formal_panel_ok` + `stage_scientific_verification` |
 

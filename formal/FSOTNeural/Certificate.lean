@@ -17,6 +17,7 @@ import FSOTNeural.FixedLattice
 import FSOTNeural.WetStack
 import FSOTNeural.PairWeight
 import FSOTNeural.CurriculumGates
+import FSOTNeural.IntelBio
 
 namespace FSOTNeural
 
@@ -71,8 +72,13 @@ theorem scientific_panel_ok :
     -- Pair weight + curriculum
     (pairWeightFreeParams = 0) ∧
     (passThreshold_ppt = 950) ∧
-    (historyInGradeCurriculum = false) := by
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    (historyInGradeCurriculum = false) ∧
+    -- Forward intelligence (neuromod / sleep / claimability)
+    (allNeuromods.length = 4) ∧
+    (sleepUsesReplay = true) ∧
+    (maxClaimHops = 3) ∧
+    (neuromodFreeParams = 0) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · exact allCodons_card
   · intro c; exact codon_in_own_fiber c
   · exact purine_pos
@@ -106,6 +112,10 @@ theorem scientific_panel_ok :
   · rfl
   · rfl
   · native_decide
+  · rfl
+  · rfl
+  · rfl
+  · exact four_neuromods
   · rfl
   · rfl
   · rfl

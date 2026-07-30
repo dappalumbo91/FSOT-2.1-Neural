@@ -37,6 +37,7 @@ import FSOTNeural.FixedLattice
 import FSOTNeural.WetStack
 import FSOTNeural.PairWeight
 import FSOTNeural.CurriculumGates
+import FSOTNeural.IntelBio
 import FSOTNeural.Certificate
 
 namespace FSOTNeural
@@ -69,6 +70,7 @@ theorem stage_scientific_verification : True := by
   have := wet_stack_ok
   have := pair_weight_ok
   have := curriculum_gates_ok
+  have := intel_bio_ok
   have := full_spine_structural_ok
   have := scientific_panel_ok
   trivial

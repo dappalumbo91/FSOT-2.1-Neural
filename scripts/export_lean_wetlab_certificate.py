@@ -172,6 +172,12 @@ def formal_claims() -> List[Dict[str, str]]:
             "wetlab_check": "curriculum intelligence gates",
         },
         {
+            "lean": "FSOTNeural.intel_bio_ok",
+            "claim": "4 neuromods; sleep replay+STDP; claim hops≥95%; 0 free",
+            "runtime": "neuromod_fixed / sleep_replay_fixed / claimability_fixed",
+            "wetlab_check": "intel-bio stack gate",
+        },
+        {
             "lean": "FSOTNeural.scientific_panel_ok",
             "claim": "Master structural certificate mind stack (no sorry)",
             "runtime": "lake build formal/",

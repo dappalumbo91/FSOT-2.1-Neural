@@ -91,6 +91,9 @@ const mind_live_fixed = @import("mind_live_fixed.zig");
 const eeg_gate_anchors_fixed = @import("eeg_gate_anchors_fixed.zig");
 const attention_fixed = @import("attention_fixed.zig");
 const allatom_md = @import("allatom_md.zig");
+const neuromod_fixed = @import("neuromod_fixed.zig");
+const sleep_replay_fixed = @import("sleep_replay_fixed.zig");
+const claimability_fixed = @import("claimability_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -1316,6 +1319,110 @@ fn runGradeDepth() void {
     }
 }
 
+fn runNeuromod() void {
+    std.debug.print("=== FSOT NEUROMODULATORS (DA/ACh/NE/5-HT Fixed ODEs) ===\n", .{});
+    std.debug.print("doctrine: first-class ODE species; couple STDP η + encode gain; seed-scaled τ\n", .{});
+    std.debug.print("bio: VTA/SNc DA, BF ACh, LC NE, raphe 5-HT — process scale not receptor kinetics\n", .{});
+    if (!neuromod_fixed.selfTest()) {
+        std.debug.print("FSOT_NEUROMOD FAIL selftest\n", .{});
+        std.process.exit(1);
+    }
+    var s: neuromod_fixed.NeuromodState = .{};
+    var t: u32 = 0;
+    while (t < 100) : (t += 1) {
+        neuromod_fixed.step(&s, .wake_encode, 0, 0, 0, 0, fixed.fromInt(1));
+    }
+    const eta = neuromod_fixed.stdpEtaScale(&s);
+    const genc = neuromod_fixed.encodeGain(&s);
+    std.debug.print(
+        "wake_encode da={e} ach={e} ne={e} ht={e} eta_scale={e} encode_gain={e}\n",
+        .{ fixed.toF64(s.da), fixed.toF64(s.ach), fixed.toF64(s.ne), fixed.toF64(s.ht), fixed.toF64(eta), fixed.toF64(genc) },
+    );
+    t = 0;
+    while (t < 100) : (t += 1) {
+        neuromod_fixed.step(&s, .sleep_nrem, 0, 0, 0, 0, fixed.fromInt(1));
+    }
+    std.debug.print(
+        "sleep_nrem da={e} ach={e} ne={e} ht={e} sigma={e}\n",
+        .{ fixed.toF64(s.da), fixed.toF64(s.ach), fixed.toF64(s.ne), fixed.toF64(s.ht), fixed.toF64(neuromod_fixed.sigmaProxy(&s, fixed.fromDecimalStr("0.3"))) },
+    );
+    std.debug.print("FSOT_NEUROMOD PASS\n", .{});
+    std.debug.print("FSOT_NEUROMOD_ODE_OK\n", .{});
+}
+
+fn runSleepReplay() void {
+    std.debug.print("=== FSOT SLEEP REPLAY CONSOLIDATION (offline Fixed) ===\n", .{});
+    std.debug.print("doctrine: wake encode (ACh/NE) → rest → NREM quiet → replay+STDP+DA tag → probe\n", .{});
+    std.debug.print("bio: Creery-style reactivation; not wall-clock PC sleep\n", .{});
+    const r = sleep_replay_fixed.runConsolidationProbe();
+    std.debug.print(
+        "CONSOL items={d} top1_imm={e} top1_delay={e} top1_consol={e} improved={} sigma={e} da={e} ach_w={e} ach_s={e} stdp={d} replay={d} da_pulses={d} nm_self={}\n",
+        .{
+            r.n_items,
+            r.top1_immediate,
+            r.top1_after_delay,
+            r.top1_after_consol,
+            r.consolidate_improved,
+            r.mean_sigma,
+            r.mean_da,
+            r.mean_ach_wake,
+            r.mean_ach_sleep,
+            r.n_stdp_replay,
+            r.n_replay_events,
+            r.n_da_pulses,
+            r.neuromod_selftest,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_SLEEP_REPLAY PASS\n", .{});
+        std.debug.print("FSOT_CONSOLIDATION_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_SLEEP_REPLAY FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runClaimability() void {
+    std.debug.print("=== FSOT CLAIMABILITY (multi-hop grounded intelligence) ===\n", .{});
+    std.debug.print("doctrine: every hop bank-grounded; 1–3 hop chains; neuromod encode tags\n", .{});
+    std.debug.print("not LLM freestyle — claimable iff taught premises retrieve\n", .{});
+    const r = claimability_fixed.runClaimabilityProbe();
+    std.debug.print(
+        "CLAIM chains={d} correct={d} claimable={d} acc={e} claim_rate={e} 1hop={d}/{d} 2hop={d}/{d} 3hop={d}/{d} ach={e} da_pulses={d} nm={}\n",
+        .{
+            r.n_chains,
+            r.n_correct,
+            r.n_claimable,
+            r.accuracy,
+            r.claim_rate,
+            r.correct_1,
+            r.n_1hop,
+            r.correct_2,
+            r.n_2hop,
+            r.correct_3,
+            r.n_3hop,
+            r.mean_ach,
+            r.n_da_pulses,
+            r.neuromod_ok,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_CLAIMABILITY PASS\n", .{});
+        std.debug.print("FSOT_MULTI_HOP_INTEL_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_CLAIMABILITY FAIL (need ≥95% claimable + 3-hop activity)\n", .{});
+        std.process.exit(1);
+    }
+}
+
+fn runIntelBio() void {
+    std.debug.print("=== FSOT INTEL-BIO STACK (neuromod + sleep + claimability) ===\n", .{});
+    runNeuromod();
+    runSleepReplay();
+    runClaimability();
+    std.debug.print("FSOT_INTEL_BIO_STACK PASS\n", .{});
+}
+
 fn runAllAtomMd() void {
     std.debug.print("=== FSOT ALL-ATOM MD LAB (host f64; not cognitive runtime) ===\n", .{});
     std.debug.print("doctrine: Velocity-Verlet + bonds/angles + LJ/Coulomb PBC + Berendsen\n", .{});
@@ -1878,6 +1985,14 @@ pub fn main() !void {
         runSynapsePathways();
     } else if (std.mem.eql(u8, mode, "md") or std.mem.eql(u8, mode, "allatom") or std.mem.eql(u8, mode, "all-atom") or std.mem.eql(u8, mode, "allatom-md") or std.mem.eql(u8, mode, "molecular-dynamics")) {
         runAllAtomMd();
+    } else if (std.mem.eql(u8, mode, "neuromod") or std.mem.eql(u8, mode, "modulators") or std.mem.eql(u8, mode, "da-ach")) {
+        runNeuromod();
+    } else if (std.mem.eql(u8, mode, "sleep") or std.mem.eql(u8, mode, "replay") or std.mem.eql(u8, mode, "consolidate") or std.mem.eql(u8, mode, "consolidation")) {
+        runSleepReplay();
+    } else if (std.mem.eql(u8, mode, "claim") or std.mem.eql(u8, mode, "claimability") or std.mem.eql(u8, mode, "multi-hop") or std.mem.eql(u8, mode, "multihop")) {
+        runClaimability();
+    } else if (std.mem.eql(u8, mode, "intel-bio") or std.mem.eql(u8, mode, "intel_bio") or std.mem.eql(u8, mode, "bio-intel")) {
+        runIntelBio();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {

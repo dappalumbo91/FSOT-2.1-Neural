@@ -221,9 +221,21 @@ Classical MD (Velocity-Verlet, bonds/angles, LJ+Coulomb, PBC, Berendsen) in **ho
 | Grade ladder PK→G8 | ≥ **95%** per domain (straight-A) |
 | MNIST vision | ≥ **95%** held-out top-1 |
 | Paraphrase depth | ≥ **95%** held-out understand exam |
+| Multi-hop claimability | ≥ **95%** grounded 1–3 hop chains |
 | No history pollution | STEM / literacy only |
 
 FSOT does not replace curriculum; it **lawfully couples** genetics → weight → plasticity → memory so learning is substrate-grounded.
+
+### 2.10 Systems intelligence (neuromod + offline consolidate)
+
+| Species / phase | Role on Fixed path |
+|-----------------|--------------------|
+| DA / ACh / NE / 5-HT | First-order ODEs → STDP η + encode/rest gains |
+| Wake encode | High ACh/NE + DA tag |
+| Sleep NREM / replay | Low ACh/NE, soft fingerprint replay + STDP |
+| Claimability | Every hop bank-grounded before claim |
+
+See [`FORWARD_INTELLIGENCE_BIO.md`](FORWARD_INTELLIGENCE_BIO.md). Lean: `IntelBio.lean`.
 
 ---
 
