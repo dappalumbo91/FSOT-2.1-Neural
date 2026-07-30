@@ -1,12 +1,12 @@
 # Lean 4 × Wet-lab scientific certificate
 
-Generated: `2026-07-30T01:41:21.264602+00:00`
+Generated: `2026-07-30T05:17:47.018912+00:00`
 
 ## Verdict
 
 | Gate | Status |
 |------|--------|
-| Lean `lake build` (scientific_panel_ok) | **FAIL** |
+| Lean `lake build` (scientific_panel_ok) | **PASS** |
 | Archive pin D1D38A / seeds | **PASS** |
 | Wet-lab battery critical | **PASS** |
 | Free parameters on scalar | **0** |
@@ -37,7 +37,7 @@ Continuous analytic \(S=K(T_1+T_2+T_3)\) remains in **FSOT-2.1-Lean / physical a
 - Battery: **37/37** pass
 - Critical fails: **0**
 - Soft fails: **0** (1% stretch allowed)
-- Battery timestamp: `2026-07-29T12:34:50.908567+00:00`
+- Battery timestamp: `2026-07-30T03:54:12.268532+00:00`
 
 ## Cross-reference table (Lean ↔ runtime ↔ wet-lab)
 

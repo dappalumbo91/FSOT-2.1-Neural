@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-28T16:43:10.652564+00:00",
-  "n_declarations": 84,
+  "generated_at": "2026-07-30T05:17:44.058849+00:00",
+  "n_declarations": 202,
   "sorry_count": 0,
   "lake_build_ok": true,
   "inventory": [
@@ -125,6 +125,16 @@
       "file": "formal/FSOTNeural/Certificate.lean"
     },
     {
+      "kind": "def",
+      "name": "leanStampLabel",
+      "file": "formal/FSOTNeural/Certificate.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "lean_stamp_label_ok",
+      "file": "formal/FSOTNeural/Certificate.lean"
+    },
+    {
       "kind": "inductive",
       "name": "Base",
       "file": "formal/FSOTNeural/Codon.lean"
@@ -206,6 +216,76 @@
     },
     {
       "kind": "def",
+      "name": "passThreshold_ppt",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pass_is_95",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "def",
+      "name": "accuracyPass",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pass_950",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pass_1000",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "fail_949",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "GradeBand",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "def",
+      "name": "allGradeBands",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "ten_grade_bands",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "def",
+      "name": "historyInGradeCurriculum",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "no_history_pollution",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "def",
+      "name": "depthRequiresParaphrase",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "depth_paraphrase",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "curriculum_gates_ok",
+      "file": "formal/FSOTNeural/CurriculumGates.lean"
+    },
+    {
+      "kind": "def",
       "name": "expressionMilli",
       "file": "formal/FSOTNeural/Expression.lean"
     },
@@ -228,6 +308,351 @@
       "kind": "theorem",
       "name": "expressionPos_true",
       "file": "formal/FSOTNeural/Expression.lean"
+    },
+    {
+      "kind": "def",
+      "name": "fixedScale",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "fixed_scale_eq",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "fixed_scale_gt_one",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "def",
+      "name": "fixedQuantumReciprocal",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "def",
+      "name": "fixedIsCognitiveAuthority",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "def",
+      "name": "float64IsLabOnly",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "fixed_authority",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "f64_lab_only",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "def",
+      "name": "allAtomMdOnCognitivePath",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "def",
+      "name": "allAtomMdHostLabExists",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "md_not_on_mind_path",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "md_lab_exists",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "fixed_lattice_ok",
+      "file": "formal/FSOTNeural/FixedLattice.lean"
+    },
+    {
+      "kind": "def",
+      "name": "consciousnessOnLawPath",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "consciousness_on_path",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "structure",
+      "name": "ObserverChannel",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "def",
+      "name": "quirkActive",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "quirk_on_when_observed",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "quirk_off_when_unobserved",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "DualPole",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "def",
+      "name": "dualOf",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "dual_involutive",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "FluidValve",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "def",
+      "name": "valvePole",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "poof_yin",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "suction_yang",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "AcousticChannel",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "def",
+      "name": "acousticPole",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "def",
+      "name": "cellPole",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pyr_yang",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pv_yin",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "full_spine_structural_ok",
+      "file": "formal/FSOTNeural/FullSpine.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "NeuromodSpecies",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "allNeuromods",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "four_neuromods",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "BioPhase",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "allBioPhases",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "five_bio_phases",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "sleepUsesReplay",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "sleepUsesStdp",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "sleepIsWallClockOs",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "sleep_replay_on",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "sleep_stdp_on",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "sleep_not_os_clock",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "maxClaimHops",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "claimPass_ppt",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "max_hops_3",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "claim_pass_95",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "claimPass",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "claim_950_ok",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "claim_900_fail",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "stdpCoupledToNeuromod",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "stdp_neuromod_coupled",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "neuromodFreeParams",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "neuromod_zero_free",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "IntelLoopStage",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "allLoopStages",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "six_loop_stages",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "usesPredictionErrorDa",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "workingMemorySlots",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pe_da_on",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "wm_slots_4",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "multiDayFrontier",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "curiositySelectsNextItem",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "def",
+      "name": "speechReconnectPathPreserved",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "multi_day_on",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "curiosity_select_on",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "speech_path_preserved",
+      "file": "formal/FSOTNeural/IntelBio.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "intel_bio_ok",
+      "file": "formal/FSOTNeural/IntelBio.lean"
     },
     {
       "kind": "structure",
@@ -283,6 +708,71 @@
       "kind": "theorem",
       "name": "resting_in_band",
       "file": "formal/FSOTNeural/NeuroFold.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "PairSeed",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "def",
+      "name": "pairKernelSeeds",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "three_pair_seeds",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "def",
+      "name": "pairWeightFreeParams",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pair_weight_zero_free",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "TritProductCase",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "def",
+      "name": "baseDominatedBy",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "same_uses_e",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "zero_uses_pi",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "def",
+      "name": "distAtLeastOne",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "dist_zero_becomes_one",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "dist_preserved",
+      "file": "formal/FSOTNeural/PairWeight.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "pair_weight_ok",
+      "file": "formal/FSOTNeural/PairWeight.lean"
     },
     {
       "kind": "inductive",
@@ -413,6 +903,106 @@
       "kind": "theorem",
       "name": "wetlab_structural_ok",
       "file": "formal/FSOTNeural/WetLabGates.lean"
+    },
+    {
+      "kind": "def",
+      "name": "networkTick_us",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "channelDt_us",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "channelStepsPerTick",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "channel_steps_20",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "nAmpaChannels",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "nNmdaChannels",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "nQuantalSites",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "ampa_48",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "nmda_16",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "quantal_12",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "markovTransitionLaw",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "markov_law_named",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "inductive",
+      "name": "GliaRole",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "allGliaRoles",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "three_glia",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "stdpSignValid",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "stdp_signs_ok",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "def",
+      "name": "wetStackUsesAllAtomMd",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "wet_not_all_atom",
+      "file": "formal/FSOTNeural/WetStack.lean"
+    },
+    {
+      "kind": "theorem",
+      "name": "wet_stack_ok",
+      "file": "formal/FSOTNeural/WetStack.lean"
     },
     {
       "kind": "theorem",
