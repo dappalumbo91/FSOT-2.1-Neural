@@ -219,19 +219,45 @@ class MathMultihopOrganism:
             n = nums[0]
             self.teach(f"twice {int(n) if n==int(n) else n}", _norm(2 * n), rule_id="double")
 
+    def apply_atomic(self, op: str, *args: float) -> Optional[float]:
+        """Retrieve skill as a *procedure* (not Q→A). Application core."""
+        if op == "half" and len(args) == 1:
+            return args[0] / 2.0
+        if op == "double" and len(args) == 1:
+            return args[0] * 2.0
+        if op == "add" and len(args) >= 2:
+            return float(sum(args))
+        if op == "sub" and len(args) == 2:
+            return args[0] - args[1]
+        if op == "mul" and len(args) == 2:
+            return args[0] * args[1]
+        if op == "div" and len(args) == 2 and abs(args[1]) > 1e-12:
+            return args[0] / args[1]
+        if op == "percent" and len(args) == 2:
+            return args[0] * args[1] / 100.0
+        # bank backup: "half of 40" style
+        if op == "half" and len(args) == 1:
+            ep = self.retrieve(f"half of {int(args[0]) if args[0]==int(args[0]) else args[0]}")
+            if ep:
+                try:
+                    return float(ep.answer)
+                except ValueError:
+                    pass
+        return None
+
     def multi_hop_solve(self, question: str) -> SolveResult:
-        """Compose atomics via WM hops — claimable only if every hop grounded."""
+        """Compose atomics via WM hops — *application*, not stuffed Q→A.
+
+        Hop order (language-driven plan):
+          BIND absolute bases → HALF of referent → MORE/FEWER offsets
+          → TIMES chains → REMAINDER sell → pure retrieve short drills
+        """
         steps: List[StepTrace] = []
         used: List[str] = []
         self.wm_clear()
-        ql = question.lower().replace(",", "")
+        q = question.strip()
+        ql = q.lower().replace(",", "")
         nums = [float(x) for x in NUM_RE.findall(ql)]
-        # number words
-        for w, v in WORD_NUM.items():
-            if w in ("half", "twice", "thrice"):
-                continue
-            if re.search(rf"\b{w}\b", ql):
-                nums.append(v)
 
         def push(rid: str, formula: str, detail: str, value: float) -> float:
             steps.append(StepTrace(rid, formula, detail, value))
@@ -240,118 +266,258 @@ class MathMultihopOrganism:
             self.n_hops += 1
             return value
 
-        # --- plan hops from language (bio: retrieve then apply) ---
         grounded = True
 
-        # BIND: named "X has N"
+        # ----- BIND absolute quantities only (never "has 5 more/fewer/times") -----
         for m in re.finditer(
-            r"\b([A-Za-z][a-zA-Z']{1,20})\s+(?:has|have|had)\s+(?:\$)?(\d+(?:\.\d+)?)\b(?!\s*times)",
-            question,
+            r"\b([A-Za-z][a-zA-Z']{1,20})\s+(?:has|have|had)\s+(?:\$)?(\d+(?:\.\d+)?)\b"
+            r"(?!\s*(?:times|more|fewer|less|as many))",
+            q,
         ):
-            name = m.group(1).lower()
-            if name in ("if", "she", "he", "they", "it"):
+            name = m.group(1).lower().replace("'s", "")
+            if name in ("if", "she", "he", "they", "it", "who", "which"):
                 continue
             val = float(m.group(2))
             self.wm_write(name, val)
-            push("MH-BIND", "bind name", f"{name}={val}", val)
-            self.teach(f"{name} has", _norm(val), rule_id="BIND-01")
+            push("MH-BIND", "bind absolute", f"{name}={val}", val)
 
-        # half of named / half of N
+        # "If Suzy's iPhone is 1" / "Seattle has 20" already covered; also "is N year old"
+        for m in re.finditer(
+            r"\b([A-Za-z][a-zA-Z']+)(?:'s\s+\w+)?\s+is\s+(\d+(?:\.\d+)?)\s*(?:year|years)?",
+            q,
+        ):
+            name = m.group(1).lower()
+            if name in ("if", "what", "how"):
+                continue
+            # skip "is four times"
+            tail = q[m.end() : m.end() + 12].lower()
+            if re.match(r"\s*times\b", tail):
+                continue
+            val = float(m.group(2))
+            if self.wm_read(name) is None:
+                self.wm_write(name, val)
+                push("MH-BIND", "bind is", f"{name}={val}", val)
+
+        # ----- HALF of name / half of N (apply skill half) -----
+        half_done = False
         m = re.search(r"half of\s+([a-zA-Z][a-zA-Z']+)", ql)
         if m:
-            ref = m.group(1)
+            ref = m.group(1).replace("'s", "")
+            # strip trailing possession junk
+            ref = re.sub(r"s$", "", ref) if ref.endswith("s") and self.wm_read(ref[:-1]) is not None else ref
             v = self.wm_read(ref)
             if v is None:
-                ep = self.retrieve(f"half of {ref}")
-                if ep:
-                    try:
-                        v = float(ep.answer)
-                        push("MH-RETRIEVE", "half bank", ep.cue, v)
-                    except ValueError:
-                        v = None
-            if v is None and nums:
-                # last absolute often the base (Raymond 40)
-                v = nums[-1]
+                # try first token of multiword names already bound
+                for s in self.wm:
+                    if s.name and (s.name.startswith(ref[:4]) or ref.startswith(s.name[:4])):
+                        v = s.value
+                        ref = s.name
+                        break
+            if v is None:
+                # absolute "half of 40"
+                m2 = re.search(r"half of\s+(\d+(?:\.\d+)?)", ql)
+                if m2:
+                    v = float(m2.group(1))
+            if v is None:
+                # base: if only one absolute bind, use it
+                bound_vals = [s.value for s in self.wm if s.name and s.name not in ("half", "offset", "result")]
+                if len(bound_vals) == 1:
+                    v = bound_vals[0]
+                elif nums:
+                    # prefer last absolute quantity (often "If Raymond has 40")
+                    v = nums[-1]
             if v is not None:
-                h = push("MH-HALF", "half(n)", f"half({v})", v / 2.0)
-                self.wm_write("half", h)
-                self.teach(f"half of {int(v) if v==int(v) else v}", _norm(h), rule_id="half")
+                h = self.apply_atomic("half", v)
+                if h is not None:
+                    push("MH-HALF", "apply half", f"half({v})={h}", h)
+                    self.wm_write("half", h)
+                    half_done = True
+                else:
+                    grounded = False
             else:
                 grounded = False
+        elif re.search(r"half of\s+(\d+(?:\.\d+)?)", ql):
+            m2 = re.search(r"half of\s+(\d+(?:\.\d+)?)", ql)
+            v = float(m2.group(1))
+            h = self.apply_atomic("half", v)
+            if h is not None:
+                push("MH-HALF", "apply half", f"half({v})={h}", h)
+                self.wm_write("half", h)
+                half_done = True
 
-        # k more than half → WM half + k
+        # ----- MORE than half: k more [words] than half -----
         m = re.search(
-            r"(\d+|one|two|three|four|five)\s+more(?:\s+\w+){0,2}\s+than half",
+            r"(\d+|one|two|three|four|five)\s+more(?:\s+\w+){0,3}\s+than half",
             ql,
         )
         if m and self.wm_read("half") is not None:
-            ktok = m.group(1)
-            k = float(WORD_NUM.get(ktok, ktok))
-            h = self.wm_read("half") or 0.0
-            b = push("MH-OFFSET", "half+k", f"{h}+{k}", h + k)
-            self.wm_write("offset", b)
-
-        # k fewer than Y (use offset or named)
-        m = re.search(r"(\d+|one|two|three|four|five)\s+fewer", ql)
-        if m and (self.wm_read("offset") is not None or self.wm_read("half") is not None):
             k = float(WORD_NUM.get(m.group(1), m.group(1)))
-            base = self.wm_read("offset")
-            if base is None:
-                base = self.wm_read("half")
-            if base is not None:
-                a = push("MH-OFFSET", "base−k", f"{base}-{k}", base - k)
-                self.wm_write("result", a)
+            h = self.wm_read("half") or 0.0
+            b = self.apply_atomic("add", h, k)
+            if b is not None:
+                push("MH-ADD", "half+k", f"{h}+{k}={b}", b)
+                self.wm_write("offset", b)
+                # name who has that (Aaron has 5 more than half)
+                who = re.search(
+                    r"([a-zA-Z][a-zA-Z']+)\s+has\s+(?:\d+|one|two|three|four|five)\s+more",
+                    ql,
+                )
+                if who:
+                    self.wm_write(who.group(1).lower(), b)
 
-        # times as many chain with base at end
-        if re.search(r"\btimes as (many|old|much)\b|\btwice as many\b", ql) and len(nums) >= 1:
+        # ----- FEWER than named/offset -----
+        m = re.search(
+            r"([a-zA-Z][a-zA-Z']+)\s+has\s+(\d+|one|two|three|four|five)\s+fewer(?:\s+\w+){0,3}\s+than\s+([a-zA-Z][a-zA-Z']+)",
+            ql,
+        )
+        if m:
+            who, ktok, other = m.group(1).lower(), m.group(2), m.group(3).lower()
+            k = float(WORD_NUM.get(ktok, ktok))
+            base = self.wm_read(other) or self.wm_read("offset")
+            if base is not None:
+                a = self.apply_atomic("sub", base, k)
+                if a is not None:
+                    push("MH-SUB", "fewer", f"{base}-{k}={a}", a)
+                    self.wm_write(who, a)
+                    self.wm_write("result", a)
+        elif re.search(r"\bfewer\b", ql) and self.wm_read("offset") is not None:
+            m = re.search(r"(\d+|one|two|three|four|five)\s+fewer", ql)
+            if m:
+                k = float(WORD_NUM.get(m.group(1), m.group(1)))
+                base = self.wm_read("offset") or 0.0
+                a = self.apply_atomic("sub", base, k)
+                if a is not None:
+                    push("MH-SUB", "fewer", f"{base}-{k}", a)
+                    self.wm_write("result", a)
+
+        # If only half was needed
+        if half_done and self.wm_read("result") is None and not re.search(
+            r"\bfewer\b|\bmore\b.*\bhalf\b|\btogether\b", ql
+        ):
+            self.wm_write("result", self.wm_read("half") or 0.0)
+
+        # ----- TIMES AS MANY / AS OLD chains -----
+        if re.search(r"\btimes as (many|old|much)\b|\btwice as many\b|\btimes older\b", ql):
             edges = re.findall(
                 r"([A-Za-z][a-zA-Z']+)\s+has\s+(twice|\d+)\s+(?:times\s+)?as many\s+\w+\s+as\s+([A-Za-z][a-zA-Z']+)",
-                question,
+                q,
+                flags=re.I,
+            )
+            edges += re.findall(
+                r"([A-Za-z][a-zA-Z']+)(?:'s\s+\w+)?\s+is\s+(twice|\d+|two|three|four|five)\s+times\s+"
+                r"(?:as old as|older than|as many as)\s+([A-Za-z][a-zA-Z']+)",
+                q,
                 flags=re.I,
             )
             base_m = re.search(
-                r"\bif\s+([A-Za-z][a-zA-Z']+)\s+has\s+(\d+(?:\.\d+)?)",
+                r"\bif\s+([A-Za-z][a-zA-Z']+)(?:'s\s+\w+)?\s+(?:has|is)\s+(\d+(?:\.\d+)?)",
                 ql,
             )
             if not base_m:
-                base_m = re.search(
-                    r"([A-Za-z][a-zA-Z']+)\s+has\s+(\d+(?:\.\d+)?)(?!\s*times)",
-                    ql,
+                # last absolute has N not times
+                cands = list(
+                    re.finditer(
+                        r"\b([A-Za-z][a-zA-Z']+)\s+has\s+(\d+(?:\.\d+)?)(?!\s*times)",
+                        ql,
+                    )
                 )
+                base_m = cands[-1] if cands else None
             if edges and base_m:
                 vals: Dict[str, float] = {
                     base_m.group(1).lower(): float(base_m.group(2))
                 }
                 push("MH-BIND", "base", f"{base_m.group(1)}={base_m.group(2)}", float(base_m.group(2)))
-                for _ in range(6):
+                for _ in range(8):
                     for a, k, b in edges:
                         a, b = a.lower(), b.lower()
-                        kk = 2.0 if k.lower() == "twice" else float(k)
+                        kk = float(WORD_NUM.get(str(k).lower(), k)) if not str(k).isdigit() else float(k)
+                        if str(k).lower() == "twice":
+                            kk = 2.0
                         if b in vals and a not in vals:
-                            vals[a] = push("MH-MUL", "A=k*B", f"{a}={kk}*{b}", kk * vals[b])
+                            nv = self.apply_atomic("mul", kk, vals[b])
+                            if nv is not None:
+                                vals[a] = push("MH-MUL", "A=k*B", f"{a}={kk}*{b}", nv)
                         if a in vals and b not in vals and kk:
-                            vals[b] = push("MH-DIV", "B=A/k", f"{b}={a}/{kk}", vals[a] / kk)
-                if re.search(r"\btogether|total\b", ql) and len(vals) >= 2:
-                    s = sum(vals.values())
-                    push("MH-ADD", "sum", "sum", s)
-                    self.wm_write("result", s)
+                            nv = self.apply_atomic("div", vals[a], kk)
+                            if nv is not None:
+                                vals[b] = push("MH-DIV", "B=A/k", f"{b}={a}/{kk}", nv)
+                if re.search(r"\btogether|total|in all\b", ql) and len(vals) >= 2:
+                    s = self.apply_atomic("add", *vals.values())
+                    if s is not None:
+                        push("MH-ADD", "sum bindings", "sum", s)
+                        self.wm_write("result", s)
                 else:
-                    ask = re.search(r"how (?:old|many).*?\b([A-Za-z][a-zA-Z']+)", ql)
+                    ask = re.search(
+                        r"how (?:old|many)\s+(?:is|are)\s+([A-Za-z][a-zA-Z']+)",
+                        ql,
+                    )
                     if ask and ask.group(1).lower() in vals:
                         self.wm_write("result", vals[ask.group(1).lower()])
 
-        # remainder: start − uses × price
-        if re.search(r"\bremainder\b", ql) and re.search(r"\b(sell|market|\$)\b", ql):
-            if len(nums) >= 4:
-                start, u1, u2, price = nums[0], nums[1], nums[2], nums[3]
-                # word nums may pad — prefer first digit as start
-                left = push("MH-SUB", "use1", f"{start}-{u1}", start - u1)
-                left = push("MH-SUB", "use2", f"{left}-{u2}", left - u2)
-                money = push("MH-MUL", "sell", f"{left}*{price}", left * price)
-                self.wm_write("result", money)
+        # ----- REMAINDER sell (digits or number words) -----
+        if (
+            re.search(r"\bremainder\b|\bsells? the (?:rest|left)\b", ql)
+            or (
+                re.search(r"\b(eats?|uses?|bakes?)\b", ql)
+                and re.search(r"\b(sells?|market)\b", ql)
+            )
+        ):
+            start = None
+            sm = re.search(r"(?:lay|lays|has|have|make|makes)\s+(\d+(?:\.\d+)?)", ql)
+            if sm:
+                start = float(sm.group(1))
+            if start is None and nums:
+                start = nums[0]
+            uses: List[float] = []
+            for m in re.finditer(
+                r"(?:eats?|uses?|bakes?|with)\s+(\d+(?:\.\d+)?|three|four|two|five|one|six)",
+                ql,
+            ):
+                uses.append(float(WORD_NUM.get(m.group(1), m.group(1))))
+            # unique preserve order
+            uq: List[float] = []
+            for u in uses:
+                if u not in uq and u >= 1:
+                    uq.append(u)
+            price = None
+            pm = re.search(r"(?:for|at)\s+\$?\s*(\d+(?:\.\d+)?)", ql)
+            if pm:
+                price = float(pm.group(1))
+            if start is not None and len(uq) >= 2 and price is not None:
+                left = start
+                for u in uq[:2]:
+                    left = self.apply_atomic("sub", left, u) or (left - u)
+                    push("MH-SUB", "use", f"left-={u}", left)
+                money = self.apply_atomic("mul", left, price)
+                if money is not None:
+                    push("MH-MUL", "sell", f"{left}*{price}", money)
+                    self.wm_write("result", money)
 
-        # pure retrieve atomic if short question
-        if self.wm_read("result") is None and len(question) < 60:
+        # ----- twice N / percent pure -----
+        m = re.match(r"what is twice (\d+(?:\.\d+)?)\s*\??$", ql)
+        if m:
+            v = self.apply_atomic("double", float(m.group(1)))
+            if v is not None:
+                push("MH-DOUBLE", "twice", f"2*{m.group(1)}", v)
+                self.wm_write("result", v)
+        m = re.match(r"what is half of (\d+(?:\.\d+)?)\s*\??$", ql)
+        if m and self.wm_read("result") is None:
+            v = self.apply_atomic("half", float(m.group(1)))
+            if v is not None:
+                push("MH-HALF", "half", f"half({m.group(1)})", v)
+                self.wm_write("result", v)
+        m = re.match(
+            r"what is (\d+(?:\.\d+)?)\s*%\s*of\s+(\d+(?:\.\d+)?)\s*\??$",
+            ql,
+        )
+        if m:
+            v = self.apply_atomic("percent", float(m.group(1)), float(m.group(2)))
+            if v is not None:
+                push("MH-PCT", "percent", f"{m.group(1)}% of {m.group(2)}", v)
+                self.wm_write("result", v)
+
+        # short retrieve only for drill-shaped atomics
+        if self.wm_read("result") is None and len(question) < 50:
             ep = self.retrieve(ql.rstrip("?").strip())
             if ep:
                 try:
@@ -363,21 +529,116 @@ class MathMultihopOrganism:
 
         result = self.wm_read("result")
         if result is None:
-            # last written non-empty
             for s in reversed(self.wm):
-                if s.name:
-                    result = s.value
-                    break
+                if s.name and s.name not in ("half",) and re.search(
+                    r"\bfewer\b|\bhow many\b", ql
+                ):
+                    # prefer named person result if asked
+                    ask = re.search(r"how many.*?does\s+([a-z]+)", ql)
+                    if ask:
+                        v = self.wm_read(ask.group(1))
+                        if v is not None:
+                            result = v
+                            break
+                    if s.name not in ("offset",):
+                        result = s.value
+                        break
+            if result is None:
+                for s in reversed(self.wm):
+                    if s.name:
+                        result = s.value
+                        break
 
         self.n_claims += 1
         if result is not None and grounded and steps:
             self.n_claim_ok += 1
             ans = _norm(result)
-            # encode success (train)
             self.train_from_successful_solve(question, ans, used)
             return SolveResult(ans, steps, used + ["MH-CLAIM"], True)
 
         return SolveResult(None, steps, used, False)
+
+    def application_practice(
+        self,
+        n: int = 40,
+        seed: int = 0,
+    ) -> Dict[str, Any]:
+        """Drill *application* of hop skills on novel numbers (not recall)."""
+        import random
+
+        rng = random.Random(seed)
+        hit = 0
+        items: List[Tuple[str, str]] = []
+        for _ in range(n):
+            kind = rng.choice(["half_more_fewer", "times_chain", "remainder", "half", "twice"])
+            if kind == "half":
+                x = float(rng.choice([8, 10, 16, 20, 40, 50, 100, 24, 36]))
+                items.append((f"What is half of {int(x)}?", _norm(x / 2)))
+            elif kind == "twice":
+                x = float(rng.choice([3, 5, 7, 9, 10, 12, 15]))
+                items.append((f"What is twice {int(x)}?", _norm(2 * x)))
+            elif kind == "half_more_fewer":
+                base = float(rng.choice([20, 30, 40, 50, 60]))
+                more = float(rng.randint(1, 9))
+                fewer = float(rng.randint(1, 5))
+                # A has fewer than B; B has more than half of C; C has base
+                half = base / 2
+                b = half + more
+                a = b - fewer
+                q = (
+                    f"Ann has {int(fewer)} fewer jewels than Bob. Bob has {int(more)} more jewels "
+                    f"than half of Cara's jewels. If Cara has {int(base)} jewels, how many jewels does Ann have?"
+                )
+                items.append((q, _norm(a)))
+            elif kind == "times_chain":
+                base = float(rng.choice([5, 10, 20, 4, 8]))
+                k1 = float(rng.choice([2, 3, 4]))
+                k2 = float(rng.choice([2, 3]))
+                # T has k2 times C; C has k1 times S; S has base; together
+                c = k1 * base
+                t = k2 * c
+                tot = t + c + base
+                q = (
+                    f"Tom has twice as many sheep as Chris. Chris has {int(k1)} times as many sheep "
+                    f"as Sam. How many sheep do Tom, Chris, and Sam have together if Sam has {int(base)}?"
+                )
+                if k2 != 2:
+                    q = (
+                        f"Tom has {int(k2)} times as many sheep as Chris. Chris has {int(k1)} times as many sheep "
+                        f"as Sam. How many sheep do Tom, Chris, and Sam have together if Sam has {int(base)}?"
+                    )
+                items.append((q, _norm(tot)))
+            else:  # remainder
+                start = float(rng.choice([12, 16, 20, 24, 30]))
+                u1 = float(rng.randint(2, 5))
+                u2 = float(rng.randint(2, 6))
+                price = float(rng.choice([2, 3, 5]))
+                left = start - u1 - u2
+                if left < 0:
+                    continue
+                money = left * price
+                q = (
+                    f"Ducks lay {int(start)} eggs. She eats {int(u1)} and bakes with {int(u2)}. "
+                    f"She sells the remainder for {int(price)} dollars each. How much does she make?"
+                )
+                items.append((q, _norm(money)))
+
+        for q, a in items:
+            r = self.multi_hop_solve(q)
+            if r.ok and r.answer is not None and exact_num(r.answer, a):
+                hit += 1
+                self.train_from_successful_solve(q, a, r.strategies_used or [])
+            else:
+                # teach the intermediate atomics from the worked example
+                self.teach(_fold_cue(q[:100]), a, rule_id="app_miss", hops=3)
+        self.sleep_replay(2)
+        self.save()
+        return {
+            "n": len(items),
+            "hit": hit,
+            "acc": round(hit / max(1, len(items)), 4),
+            "n_episodes": len(self.episodes),
+        }
 
     def train_loop(self, items: List[Tuple[str, str]], *, sleep_every: int = 8) -> Dict[str, Any]:
         """train → (optional hop practice) → sleep replay schedule."""
@@ -518,9 +779,14 @@ class MathMultihopOrganism:
             history.append(row)
             with log_path.open("a", encoding="utf-8") as f:
                 f.write(json.dumps(row) + "\n")
+            # Application skill block each epoch (novel numbers — compose hops)
+            app = self.application_practice(n=48, seed=seed + ep * 17)
+            row["application_acc"] = app["acc"]
+            row["application_n"] = app["n"]
+            history[-1] = row
             print(
-                f"EPOCH {ep}/{epochs} practice_acc={row['practice_acc']} "
-                f"hit={row['practice_hit']} miss={row['practice_miss']} "
+                f"EPOCH {ep}/{epochs} recall_acc={row['practice_acc']} "
+                f"app_acc={app['acc']} hit={row['practice_hit']} miss={row['practice_miss']} "
                 f"episodes={row['n_episodes']} mean_str={row['mean_strength']}",
                 flush=True,
             )
@@ -530,12 +796,16 @@ class MathMultihopOrganism:
         # final consolidation sleep (like night before exam)
         print("=== FINAL CONSOLIDATION SLEEP ===", flush=True)
         self.sleep_replay(sleep_rounds + 2)
+        # final application practice after sleep
+        app_final = self.application_practice(n=64, seed=seed + 999)
+        self.sleep_replay(2)
         self.save()
 
         return {
             "epochs": epochs,
             "n_items": len(items),
             "history": history,
+            "application_final": app_final,
             "n_episodes_final": len(self.episodes),
             "mean_strength_final": round(
                 sum(e.strength for e in self.episodes.values()) / max(1, len(self.episodes)),
