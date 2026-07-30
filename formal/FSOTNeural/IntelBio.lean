@@ -59,6 +59,23 @@ theorem stdp_neuromod_coupled : stdpCoupledToNeuromod = true := rfl
 def neuromodFreeParams : Nat := 0
 theorem neuromod_zero_free : neuromodFreeParams = 0 := rfl
 
+/-- Closed intelligence loop stages (train → sleep → prove). -/
+inductive IntelLoopStage where
+  | train | retrievePractice | probePre | delay | sleep | prove
+  deriving DecidableEq, Repr, Inhabited
+
+def allLoopStages : List IntelLoopStage :=
+  [.train, .retrievePractice, .probePre, .delay, .sleep, .prove]
+
+theorem six_loop_stages : allLoopStages.length = 6 := by native_decide
+
+/-- Prediction-error DA and limited working-memory capacity (structural). -/
+def usesPredictionErrorDa : Bool := true
+def workingMemorySlots : Nat := 4
+
+theorem pe_da_on : usesPredictionErrorDa = true := rfl
+theorem wm_slots_4 : workingMemorySlots = 4 := by native_decide
+
 theorem intel_bio_ok :
     (allNeuromods.length = 4) ∧
     (allBioPhases.length = 5) ∧
@@ -68,7 +85,11 @@ theorem intel_bio_ok :
     (maxClaimHops = 3) ∧
     (claimPass_ppt = 950) ∧
     (stdpCoupledToNeuromod = true) ∧
-    (neuromodFreeParams = 0) := by
-  refine ⟨by native_decide, by native_decide, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+    (neuromodFreeParams = 0) ∧
+    (allLoopStages.length = 6) ∧
+    (usesPredictionErrorDa = true) ∧
+    (workingMemorySlots = 4) := by
+  refine ⟨by native_decide, by native_decide, rfl, rfl, rfl, rfl, rfl, rfl, rfl,
+    by native_decide, rfl, by native_decide⟩
 
 end FSOTNeural

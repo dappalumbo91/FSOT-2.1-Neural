@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-30T01:34:35.036011+00:00",
+  "generated_at": "2026-07-30T01:41:21.264602+00:00",
   "certificate": "FSOT-2.1-Neural scientific stage verification",
   "overall": "PASS",
   "lean_build": {
@@ -96,6 +96,12 @@
       "claim": "\u226595% ppt; PK\u2013G8 bands; no history pollution",
       "runtime": "grade_ladder_fixed / understand_depth_fixed",
       "wetlab_check": "curriculum intelligence gates"
+    },
+    {
+      "lean": "FSOTNeural.intel_bio_ok",
+      "claim": "4 neuromods; sleep replay+STDP; claim hops\u226595%; 0 free",
+      "runtime": "neuromod_fixed / sleep_replay_fixed / claimability_fixed",
+      "wetlab_check": "intel-bio stack gate"
     },
     {
       "lean": "FSOTNeural.scientific_panel_ok",

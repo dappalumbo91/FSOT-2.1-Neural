@@ -94,6 +94,7 @@ const allatom_md = @import("allatom_md.zig");
 const neuromod_fixed = @import("neuromod_fixed.zig");
 const sleep_replay_fixed = @import("sleep_replay_fixed.zig");
 const claimability_fixed = @import("claimability_fixed.zig");
+const intel_loop_fixed = @import("intel_loop_fixed.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -1423,6 +1424,54 @@ fn runIntelBio() void {
     std.debug.print("FSOT_INTEL_BIO_STACK PASS\n", .{});
 }
 
+fn runIntelLoop() void {
+    std.debug.print("=== FSOT INTEL LOOP (train → retrieve → sleep → prove) ===\n", .{});
+    std.debug.print("schedule: ACh encode → spaced PE retrieval → claim/mem probe → NREM replay → re-prove + transfer\n", .{});
+    std.debug.print("bio: encoding tags, prediction-error DA, offline consolidation, limited WM slots\n", .{});
+    const r = intel_loop_fixed.runIntelLoop();
+    std.debug.print(
+        "LOOP taught={d} retrieve={e} claim_pre={e} claim_post={e} mem_pre={e} mem_post={e} transfer={e}/{d} pe_hit={d} pe_miss={d}\n",
+        .{
+            r.n_taught,
+            r.retrieval_hit_rate,
+            r.claim_pre,
+            r.claim_post,
+            r.mem_pre,
+            r.mem_post,
+            r.transfer_rate,
+            r.n_transfer,
+            r.pe_hits,
+            r.pe_miss,
+        },
+    );
+    std.debug.print(
+        "LOOP sleep_stdp={d} replay={d} sigma={e} ach_train={e} ach_sleep={e} wm={d} claim_ret={} mem_ret={} nm={} claim_mod={} sleep_mod={} depth_ran={} depth_acc={e} depth_ok={}\n",
+        .{
+            r.n_stdp_sleep,
+            r.n_replay,
+            r.mean_sigma,
+            r.mean_ach_train,
+            r.mean_ach_sleep,
+            r.wm_slots_used,
+            r.claim_retained,
+            r.mem_retained,
+            r.neuromod_ok,
+            r.claim_module_ok,
+            r.sleep_module_ok,
+            r.depth_ran,
+            r.depth_acc,
+            r.depth_ok,
+        },
+    );
+    if (r.ok) {
+        std.debug.print("FSOT_INTEL_LOOP PASS\n", .{});
+        std.debug.print("FSOT_TRAIN_SLEEP_PROVE_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_INTEL_LOOP FAIL\n", .{});
+        std.process.exit(1);
+    }
+}
+
 fn runAllAtomMd() void {
     std.debug.print("=== FSOT ALL-ATOM MD LAB (host f64; not cognitive runtime) ===\n", .{});
     std.debug.print("doctrine: Velocity-Verlet + bonds/angles + LJ/Coulomb PBC + Berendsen\n", .{});
@@ -1993,6 +2042,8 @@ pub fn main() !void {
         runClaimability();
     } else if (std.mem.eql(u8, mode, "intel-bio") or std.mem.eql(u8, mode, "intel_bio") or std.mem.eql(u8, mode, "bio-intel")) {
         runIntelBio();
+    } else if (std.mem.eql(u8, mode, "intel-loop") or std.mem.eql(u8, mode, "intel_loop") or std.mem.eql(u8, mode, "train-sleep-prove") or std.mem.eql(u8, mode, "loop")) {
+        runIntelLoop();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {

@@ -36,6 +36,27 @@ This is the path after wet stack + math stamp: **process-accurate intelligence m
 - Zero free LSQ parameters on the neuromod law path  
 - Lean: `FSOTNeural.IntelBio` · folded into `scientific_panel_ok`
 
+## Closed loop (train → sleep → prove)
+
+Mode: **`intel-loop`** (`train-sleep-prove`, `loop`)
+
+```text
+TRAIN (wake_encode ACh/NE + DA tags)
+  → SPACED RETRIEVAL (prediction-error DA on hit/miss)
+  → PROBE_PRE (claimability + episodic top-1)
+  → DELAY (wake_rest)
+  → SLEEP (NREM + replay STDP)
+  → PROVE (claim post + mem post + transfer chains)
+```
+
+Extras:
+
+| Piece | Role |
+|-------|------|
+| Prediction-error DA | Correct retrieve → DA pulse; miss → NE reorient + re-encode |
+| Working memory | 4 Fixed slots (limited capacity), decay over rest |
+| Transfer probe | Cross-domain 2-cue items after sleep (≥80%) |
+
 ## Run
 
 ```powershell
@@ -47,6 +68,7 @@ zig build-exe -OReleaseFast "-femit-bin=$out" --name fsot_mind_live src/main_min
 & $out sleep          # consolidate / replay
 & $out claim          # multi-hop claimability
 & $out intel-bio      # full stack
+& $out intel-loop     # closed train→sleep→prove organism cycle
 ```
 
 Expect:
@@ -56,6 +78,7 @@ FSOT_NEUROMOD PASS
 FSOT_SLEEP_REPLAY PASS / FSOT_CONSOLIDATION_OK
 FSOT_CLAIMABILITY PASS / FSOT_MULTI_HOP_INTEL_OK
 FSOT_INTEL_BIO_STACK PASS
+FSOT_INTEL_LOOP PASS / FSOT_TRAIN_SLEEP_PROVE_OK
 ```
 
 ## How this ties to curriculum depth
