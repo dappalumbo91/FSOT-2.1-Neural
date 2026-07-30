@@ -1,17 +1,17 @@
 # Linguistics rules teach — reading & writing
 
-Generated: `2026-07-30T02:22:28.781270+00:00`
+Generated: `2026-07-30T02:29:40.271899+00:00`
 
 Teach linguistics RULES with WHY and HOW — phonics, morphology, grammar, reading, writing, composition. Drills practice application, not passage stuffing.
 
-**Rules:** 41 · **Drills:** 177
-**By domain:** {'phonics': 5, 'morphology': 5, 'grammar': 10, 'reading': 11, 'writing': 4, 'composition': 6}
+**Rules:** 55 · **Drills:** 244
+**By domain:** {'phonics': 9, 'morphology': 5, 'grammar': 13, 'reading': 13, 'writing': 6, 'composition': 9}
 
 | Drills acc | n | ≥0.95? |
 |-----------:|--:|:--------:|
-| **1.0000** | 177 | PASS |
+| **1.0000** | 244 | PASS |
 
-By kind: `{'form': {'correct': 41, 'n': 41, 'accuracy': 1.0}, 'apply': {'correct': 54, 'n': 54, 'accuracy': 1.0}, 'why': {'correct': 41, 'n': 41, 'accuracy': 1.0}, 'how': {'correct': 41, 'n': 41, 'accuracy': 1.0}}`
+By kind: `{'form': {'correct': 55, 'n': 55, 'accuracy': 1.0}, 'apply': {'correct': 79, 'n': 79, 'accuracy': 1.0}, 'why': {'correct': 55, 'n': 55, 'accuracy': 1.0}, 'how': {'correct': 55, 'n': 55, 'accuracy': 1.0}}`
 
 ## Next
 

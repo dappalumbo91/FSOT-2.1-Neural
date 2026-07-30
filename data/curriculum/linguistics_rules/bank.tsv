@@ -1,5 +1,5 @@
 # domain	grade	kind	question	answer
-# Linguistics RULES (reading+writing) 2026-07-30T02:22:28.781270+00:00
+# Linguistics RULES (reading+writing) 2026-07-30T02:29:40.271899+00:00
 # kind=form|why|how|apply — teach rules, reasons, procedures
 literacy	rules	form	What is the form of PH-001 Letter-sound map?	letter → primary sound
 literacy	rules	why	Why does PH-001 exist?	Readers decode print by mapping letters to speech sounds.
@@ -219,6 +219,80 @@ literacy	rules	form	What is the form of LIT-030 Theme is message?	theme = messag
 literacy	rules	why	Why does LIT-030 exist?	Theme is what the work says about life or people, not just plot.
 literacy	rules	how	How do you apply LIT-030?	After the story, ask what larger idea it suggests.
 literacy	rules	apply	Theme is the?	message
+literacy	rules	form	What is the form of PH-050 Vowel team ai/ay?	ai/ay → long a
+literacy	rules	why	Why does PH-050 exist?	Vowel teams are multi-letter spellings of one vowel sound.
+literacy	rules	how	How do you apply PH-050?	When you see ai (middle) or ay (end), try long a (rain, play).
+literacy	rules	apply	The team ay usually says long?	a
+literacy	rules	example	Example of PH-050	rain
+literacy	rules	example	Example of PH-050	play
+literacy	rules	form	What is the form of PH-060 Vowel team ee/ea?	ee/ea → long e (often)
+literacy	rules	why	Why does PH-060 exist?	Common long-e spellings reduce guesswork in decoding.
+literacy	rules	how	How do you apply PH-060?	Try long e for ee/ea (tree, read); note ea can also be short e (bread).
+literacy	rules	apply	The team ee usually says long?	e
+literacy	rules	example	Example of PH-060	tree
+literacy	rules	example	Example of PH-060	beach
+literacy	rules	form	What is the form of PH-070 R-controlled vowel?	ar/or/er/ir/ur → r-colored vowel
+literacy	rules	why	Why does PH-070 exist?	R after a vowel changes the vowel sound (bossy r).
+literacy	rules	how	How do you apply PH-070?	When a vowel is followed by r, use the r-controlled sound (car, her, bird).
+literacy	rules	apply	A vowel followed by r is called r-?	controlled
+literacy	rules	example	Example of PH-070	car
+literacy	rules	example	Example of PH-070	her
+literacy	rules	form	What is the form of PH-080 Consonant blend?	bl/st/tr… → two consonants both heard
+literacy	rules	why	Why does PH-080 exist?	Blends keep both sounds (unlike digraphs).
+literacy	rules	how	How do you apply PH-080?	Say both consonants quickly (blue, stop, tree).
+literacy	rules	apply	In a blend you hear both?	sounds
+literacy	rules	example	Example of PH-080	blue
+literacy	rules	example	Example of PH-080	stop
+literacy	rules	form	What is the form of GR-110 Compound sentence with and/but?	independent + FANBOYS + independent
+literacy	rules	why	Why does GR-110 exist?	Compound sentences join equal complete thoughts.
+literacy	rules	how	How do you apply GR-110?	If two complete sentences are joined by and/but/or, use a comma before the conjunction when needed.
+literacy	rules	apply	And/but can join two complete?	sentences
+literacy	rules	example	Example of GR-110	I
+literacy	rules	example	Example of GR-110	 
+literacy	rules	form	What is the form of GR-120 Complex sentence subordinators?	dependent clause + independent clause
+literacy	rules	why	Why does GR-120 exist?	Complex sentences show unequal clause relationships (because, when, if).
+literacy	rules	how	How do you apply GR-120?	Use because/when/if to attach a reason or condition clause to a main clause.
+literacy	rules	apply	Because can introduce a dependent?	clause
+literacy	rules	example	Example of GR-120	I
+literacy	rules	example	Example of GR-120	 
+literacy	rules	form	What is the form of GR-130 Subject-verb agreement?	singular subject → singular verb; plural → plural
+literacy	rules	why	Why does GR-130 exist?	Agreement keeps person/number consistent for the reader.
+literacy	rules	how	How do you apply GR-130?	Match verb form to subject number (he runs / they run).
+literacy	rules	apply	A singular subject takes a singular?	verb
+literacy	rules	example	Example of GR-130	he runs
+literacy	rules	example	Example of GR-130	they run
+literacy	rules	form	What is the form of CO-070 Essay intro-body-conclusion?	intro → body → conclusion
+literacy	rules	why	Why does CO-070 exist?	Macro-structure helps readers track the argument arc.
+literacy	rules	how	How do you apply CO-070?	Open with hook+thesis, develop with body paragraphs, end by wrapping the claim.
+literacy	rules	apply	An essay structure is intro body?	conclusion
+literacy	rules	form	What is the form of CO-080 Body paragraph PEEL?	Point → Evidence → Explain → Link
+literacy	rules	why	Why does CO-080 exist?	PEEL keeps each paragraph claim-driven and supported.
+literacy	rules	how	How do you apply CO-080?	State a point, give evidence, explain it, link to the thesis.
+literacy	rules	apply	In PEEL, E after Point stands for?	evidence
+literacy	rules	form	What is the form of CO-090 Claim-reason-evidence chain?	claim ← reason ← evidence
+literacy	rules	why	Why does CO-090 exist?	Multi-hop writing: each layer supports the one above.
+literacy	rules	how	How do you apply CO-090?	Write claim, then because-reason, then fact/example as evidence.
+literacy	rules	apply	Evidence supports a reason that supports a?	claim
+literacy	rules	form	What is the form of WR-050 Apostrophe possession?	noun + 's → belonging (singular)
+literacy	rules	why	Why does WR-050 exist?	Apostrophes mark possession so ownership is clear.
+literacy	rules	how	How do you apply WR-050?	For most singular nouns, add 's (dog's bone).
+literacy	rules	apply	Add apostrophe s to show?	possession
+literacy	rules	example	Example of WR-050	dog's
+literacy	rules	example	Example of WR-050	Sam's
+literacy	rules	form	What is the form of WR-060 Its vs it's?	its = possessive; it's = it is
+literacy	rules	why	Why does WR-060 exist?	Homophones cause writing errors; rule disambiguates.
+literacy	rules	how	How do you apply WR-060?	Use it's only for it is/it has; use its for belonging.
+literacy	rules	apply	It's is a contraction for it?	is
+literacy	rules	example	Example of WR-060	it's raining
+literacy	rules	example	Example of WR-060	its color
+literacy	rules	form	What is the form of RD-090 Fact vs opinion?	fact = checkable; opinion = belief/feeling
+literacy	rules	why	Why does RD-090 exist?	Critical reading separates verifiable claims from attitudes.
+literacy	rules	how	How do you apply RD-090?	Ask: can this be proven with evidence? If not, it may be opinion.
+literacy	rules	apply	A fact can be checked with?	evidence
+literacy	rules	form	What is the form of RD-100 Author's purpose?	purpose ∈ {persuade, inform, entertain}
+literacy	rules	why	Why does RD-100 exist?	Purpose guides interpretation of tone and structure.
+literacy	rules	how	How do you apply RD-100?	Ask why the author wrote: to persuade, inform, or entertain.
+literacy	rules	apply	PIE purposes include persuade inform?	entertain
 literacy	rules	drill	What does phonics map letters to?	sounds
 literacy	rules	drill	In CVC words the middle vowel is usually?	short
 literacy	rules	drill	Final e in cake is?	silent
@@ -260,6 +334,20 @@ literacy	rules	drill	Tone is the author's?	attitude
 literacy	rules	drill	A simile uses like or?	as
 literacy	rules	drill	A metaphor compares without like or?	as
 literacy	rules	drill	Theme is the?	message
+literacy	rules	drill	The team ay usually says long?	a
+literacy	rules	drill	The team ee usually says long?	e
+literacy	rules	drill	A vowel followed by r is called r-?	controlled
+literacy	rules	drill	In a blend you hear both?	sounds
+literacy	rules	drill	And/but can join two complete?	sentences
+literacy	rules	drill	Because can introduce a dependent?	clause
+literacy	rules	drill	A singular subject takes a singular?	verb
+literacy	rules	drill	An essay structure is intro body?	conclusion
+literacy	rules	drill	In PEEL, E after Point stands for?	evidence
+literacy	rules	drill	Evidence supports a reason that supports a?	claim
+literacy	rules	drill	Add apostrophe s to show?	possession
+literacy	rules	drill	It's is a contraction for it?	is
+literacy	rules	drill	A fact can be checked with?	evidence
+literacy	rules	drill	PIE purposes include persuade inform?	entertain
 literacy	rules	drill	Capitalize the first letter of: the dog ran	The dog ran
 literacy	rules	drill	End this statement correctly: I see a bird	I see a bird.
 literacy	rules	drill	End this question correctly: Where is home	Where is home?
@@ -273,3 +361,14 @@ literacy	rules	drill	brave as a lion is a simile or metaphor?	simile
 literacy	rules	drill	time is a thief is a simile or metaphor?	metaphor
 literacy	rules	drill	CVC middle vowel in cat is long or short?	short
 literacy	rules	drill	In cake the final e is pronounced or silent?	silent
+literacy	rules	drill	The team ay usually says long a or short a?	a
+literacy	rules	drill	A vowel followed by r is called r-controlled or free?	controlled
+literacy	rules	drill	In a blend you hear both letters or one sound?	sounds
+literacy	rules	drill	And/but can join two complete what?	sentences
+literacy	rules	drill	Because can introduce a dependent what?	clause
+literacy	rules	drill	A singular subject takes a singular what?	verb
+literacy	rules	drill	An essay structure is intro body what?	conclusion
+literacy	rules	drill	In PEEL, E after Point stands for what?	evidence
+literacy	rules	drill	It's is a contraction for it what?	is
+literacy	rules	drill	A fact can be checked with what?	evidence
+literacy	rules	drill	PIE purposes include persuade inform what?	entertain

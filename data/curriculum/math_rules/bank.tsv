@@ -1,5 +1,5 @@
 # domain	grade	kind	question	answer
-# Math RULES curriculum 2026-07-30T02:22:28.663381+00:00
+# Math RULES curriculum 2026-07-30T02:29:40.013145+00:00
 # kind=rule | langmap | drill — symbolic laws, not Q/A stuffing
 math	rules	rule	What is the rule addition commutative?	a + b = b + a
 math	rules	rule	Explain add_comm	Order of addends does not change sum
@@ -109,11 +109,46 @@ math	rules	drill	What is 20% of 50?	10
 math	rules	drill	Add fractions 1/4 + 2/4	3/4
 math	rules	drill	Add fractions 1/5 + 2/5	3/5
 math	rules	drill	Add fractions 2/7 + 3/7	5/7
+math	rules	drill	Add fractions 1/2 + 1/3	5/6
+math	rules	drill	Add fractions 1/4 + 1/6	10/24
+math	rules	drill	Multiply fractions 2/3 * 3/4	6/12
+math	rules	drill	Multiply fractions 1/2 * 1/5	1/10
+math	rules	drill	Equivalent fraction 2/3 times 4	8/12
+math	rules	drill	What is 5 + 0?	5
+math	rules	drill	What is 5 - 0?	5
+math	rules	drill	What is 5 - 5?	0
+math	rules	drill	What is 5 * 1?	5
+math	rules	drill	What is 5 * 0?	0
+math	rules	drill	What is 5 / 1?	5
+math	rules	drill	What is 17 + 0?	17
+math	rules	drill	What is 17 - 0?	17
+math	rules	drill	What is 17 - 17?	0
+math	rules	drill	What is 17 * 1?	17
+math	rules	drill	What is 17 * 0?	0
+math	rules	drill	What is 17 / 1?	17
+math	rules	drill	What is 100 + 0?	100
+math	rules	drill	What is 100 - 0?	100
+math	rules	drill	What is 100 - 100?	0
+math	rules	drill	What is 100 * 1?	100
+math	rules	drill	What is 100 * 0?	0
+math	rules	drill	What is 100 / 1?	100
+math	rules	drill	What is 0 / 9?	0
+math	rules	drill	What is 2 ^ 0?	1
+math	rules	drill	What is 5 ^ 1?	5
+math	rules	drill	What is 2 ^ 3?	8
+math	rules	drill	What is 3 ^ 4?	81
+math	rules	drill	What is |-7|?	7
+math	rules	drill	Absolute value of -12	12
+math	rules	drill	gcd(12, 18)	6
+math	rules	drill	lcm(4, 6)	12
+math	rules	drill	What is 3 * (4 + 5)?	27
+math	rules	drill	What is 25% as a decimal?	0.25
 math	rules	drill	What is -(-3)?	3
 math	rules	drill	What is -(-8)?	8
 math	rules	drill	What is -(-12)?	12
 math	rules	drill	Evaluate 2 + 3 * 4	14
 math	rules	drill	Evaluate 10 - 2 * 3	4
+math	rules	drill	Evaluate (2 + 3) * 4	20
 math	rules	drill	She earns 12 dollars per hour. She works 50 minutes. How much does she earn?	10
 math	rules	drill	He runs 3 sprints 3 times a week. He runs 60 meters each sprint. How many total meters does he run a week?	540
 math	rules	drill	Ducks lay 16 eggs per day. She eats 3 and bakes with 4. She sells the remainder for 2 dollars each. How much does she make?	18

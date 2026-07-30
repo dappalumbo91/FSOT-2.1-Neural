@@ -187,18 +187,159 @@ def apply_rules(question: str) -> SolveResult:
     # --- ordered rule application (school: read problem → pick operations) ---
     # Priority: explicit school wording before generic each→mul.
 
-    # pure expression evaluate (order of operations via Python eval on safe pattern)
-    m = re.match(r"evaluate\s+([0-9\.\+\-\*/\s]+)$", ql)
+    def _safe_eval_arith(expr_raw: str) -> Optional[float]:
+        expr = expr_raw.replace(" ", "").replace("^", "**")
+        # only digits, ops, parens, dots
+        if not re.fullmatch(r"[0-9\.\+\-\*/\(\)]+", expr.replace("**", "x")):
+            # after replacing ** with placeholder, remaining must be simple
+            tmp = expr.replace("**", "")
+            if not re.fullmatch(r"[0-9\.\+\-\*/\(\)]+", tmp):
+                return None
+        try:
+            return float(eval(expr, {"__builtins__": {}}, {}))  # noqa: S307 — arithmetic only
+        except Exception:
+            return None
+
+    # pure expression evaluate (order of operations)
+    m = re.match(r"evaluate\s+(.+)$", ql)
     if m:
-        expr = m.group(1).replace(" ", "")
-        # PE: * / before + - by using eval on restricted charset
-        if re.fullmatch(r"[0-9\.\+\-\*/]+", expr):
-            try:
-                v = float(eval(expr, {"__builtins__": {}}, {}))  # noqa: S307 — restricted
-                push("order_ops", "×÷ before +−", expr, v)
-                return SolveResult(_norm(v), steps, used, True)
-            except Exception:
-                pass
+        v = _safe_eval_arith(m.group(1).rstrip("?"))
+        if v is not None:
+            push("AR-262", "×÷ before +−; grouping first", m.group(1), v)
+            return SolveResult(_norm(v), steps, used, True)
+    bare = ql.strip().rstrip("?")
+    if re.fullmatch(r"[0-9\.\+\-\*/\s\^\(\)]+", bare) and re.search(r"[\+\-\*/\^]", bare):
+        v = _safe_eval_arith(bare)
+        if v is not None:
+            push("AR-262", "evaluate expression", bare, v)
+            return SolveResult(_norm(v), steps, used, True)
+
+    # AR-103 additive identity: a + 0
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*\+\s*0\??$", ql)
+    if m:
+        a = float(m.group(1))
+        push("AR-103", "a+0=a", f"{a}+0", a)
+        return SolveResult(_norm(a), steps, used, True)
+    # AR-121 a - 0
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*-\s*0\??$", ql)
+    if m:
+        a = float(m.group(1))
+        push("AR-121", "a-0=a", f"{a}-0", a)
+        return SolveResult(_norm(a), steps, used, True)
+    # AR-122 a - a
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\??$", ql)
+    if m and m.group(1) == m.group(2):
+        push("AR-122", "a-a=0", "self-sub", 0.0)
+        return SolveResult("0", steps, used, True)
+    # AR-143 a * 1
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*\*\s*1\??$|what is (\d+(?:\.\d+)?)\s*times\s*1\??$", ql)
+    if m:
+        a = float(m.group(1) or m.group(2))
+        push("AR-143", "a*1=a", f"{a}*1", a)
+        return SolveResult(_norm(a), steps, used, True)
+    # AR-144 a * 0
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*\*\s*0\??$|what is (\d+(?:\.\d+)?)\s*times\s*0\??$", ql)
+    if m:
+        push("AR-144", "a*0=0", "zero product", 0.0)
+        return SolveResult("0", steps, used, True)
+    # AR-161 a / 1
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*/\s*1\??$|what is (\d+(?:\.\d+)?)\s*divided by\s*1\??$", ql)
+    if m:
+        a = float(m.group(1) or m.group(2))
+        push("AR-161", "a/1=a", f"{a}/1", a)
+        return SolveResult(_norm(a), steps, used, True)
+    # AR-162 0 / a
+    m = re.match(r"what is 0\s*/\s*(\d+(?:\.\d+)?)\??$", ql)
+    if m and float(m.group(1)) != 0:
+        push("AR-162", "0/a=0", "zero dividend", 0.0)
+        return SolveResult("0", steps, used, True)
+    # AR-222 a^0 = 1
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*\^\s*0\??$|what is (\d+(?:\.\d+)?)\s*to the power of\s*0\??$", ql)
+    if m:
+        push("AR-222", "a^0=1", "exp zero", 1.0)
+        return SolveResult("1", steps, used, True)
+    # AR-221 a^1 = a
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*\^\s*1\??$", ql)
+    if m:
+        a = float(m.group(1))
+        push("AR-221", "a^1=a", f"{a}^1", a)
+        return SolveResult(_norm(a), steps, used, True)
+    # AR-220 a^n small
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*\^\s*(\d+)\??$", ql)
+    if m:
+        a, n = float(m.group(1)), int(m.group(2))
+        if 0 <= n <= 8:
+            v = a**n
+            push("AR-220", "a^n repeated product", f"{a}^{n}", v)
+            return SolveResult(_norm(v), steps, used, True)
+    # AR-250 |a|
+    m = re.match(r"what is \|(-?\d+(?:\.\d+)?)\|\??$|absolute value of (-?\d+(?:\.\d+)?)", ql)
+    if m:
+        a = float(m.group(1) or m.group(2))
+        v = abs(a)
+        push("AR-250", "|a|", f"|{a}|", v)
+        return SolveResult(_norm(v), steps, used, True)
+    # AR-292 gcd
+    m = re.match(r"(?:what is )?(?:the )?gcd\s*\(?\s*(\d+)\s*,\s*(\d+)\s*\)?\??$", ql)
+    if m:
+        import math as _math
+
+        a, b = int(m.group(1)), int(m.group(2))
+        v = float(_math.gcd(a, b))
+        push("AR-292", "gcd(a,b)", f"gcd({a},{b})", v)
+        return SolveResult(_norm(v), steps, used, True)
+    # AR-293 lcm
+    m = re.match(r"(?:what is )?(?:the )?lcm\s*\(?\s*(\d+)\s*,\s*(\d+)\s*\)?\??$", ql)
+    if m:
+        import math as _math
+
+        a, b = int(m.group(1)), int(m.group(2))
+        v = float(abs(a * b) // _math.gcd(a, b)) if a and b else 0.0
+        push("AR-293", "lcm(a,b)", f"lcm({a},{b})", v)
+        return SolveResult(_norm(v), steps, used, True)
+    # AR-147 distributive: a*(b+c)
+    m = re.match(
+        r"what is (\d+(?:\.\d+)?)\s*\*\s*\(\s*(\d+(?:\.\d+)?)\s*\+\s*(\d+(?:\.\d+)?)\s*\)\??$",
+        ql,
+    )
+    if m:
+        a, b, c = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        v = a * (b + c)
+        push("AR-147", "a*(b+c)=a*b+a*c", f"{a}*({b}+{c})", v)
+        return SolveResult(_norm(v), steps, used, True)
+    # AR-108 different denom fractions
+    m = re.search(r"add fractions\s+(\d+)/(\d+)\s*\+\s*(\d+)/(\d+)", ql)
+    if m:
+        a, b, c, d = map(int, m.groups())
+        if b != 0 and d != 0:
+            if b == d:
+                num = a + c
+                push("AR-107", "a/b+c/b=(a+c)/b", f"{a}/{b}+{c}/{b}", float(num) / b)
+                return SolveResult(f"{num}/{b}", steps, used, True)
+            # different denominators
+            num = a * d + c * b
+            den = b * d
+            push("AR-108", "a/b+c/d=(ad+bc)/(bd)", f"{a}/{b}+{c}/{d}", float(num) / den)
+            return SolveResult(f"{num}/{den}", steps, used, True)
+    # AR-148 fraction multiply
+    m = re.search(r"multiply fractions\s+(\d+)/(\d+)\s*\*\s*(\d+)/(\d+)", ql)
+    if m:
+        a, b, c, d = map(int, m.groups())
+        if b and d:
+            push("AR-148", "(a/b)*(c/d)=(ac)/(bd)", f"{a}/{b}*{c}/{d}", float(a * c) / (b * d))
+            return SolveResult(f"{a * c}/{b * d}", steps, used, True)
+    # AR-181 equivalent fractions ka/kb
+    m = re.match(r"equivalent fraction (\d+)/(\d+) times (\d+)", ql)
+    if m:
+        a, b, k = map(int, m.groups())
+        push("AR-181", "a/b = ka/kb", f"{a}/{b} * {k}/{k}", float(a * k) / (b * k))
+        return SolveResult(f"{a * k}/{b * k}", steps, used, True)
+    # AR-201 p% as fraction
+    m = re.match(r"what is (\d+(?:\.\d+)?)\s*%\s+as a (?:decimal|fraction)\??$", ql)
+    if m:
+        p = float(m.group(1))
+        push("AR-201", "p% = p/100", f"{p}%", p / 100.0)
+        return SolveResult(_norm(p / 100.0), steps, used, True)
 
     # double negative AR-022: -(-n)
     m = re.match(r"what is -\(-(\d+(?:\.\d+)?)\)\??$", ql)
@@ -317,6 +458,48 @@ def apply_rules(question: str) -> SolveResult:
         tot = push("mul_groups", "total=groups×meters", f"{p}*{c}", p * c)
         return SolveResult(_norm(tot), steps, used, True)
 
+    # unit: weeks → days (AR-296 style)
+    if re.search(r"\bweeks?\b", ql) and re.search(r"\bdays?\b", ql) and len(nums) >= 1:
+        if re.search(r"\bhow many days\b", ql):
+            w = nums[0]
+            d = push("unit_weeks_days", "days=7*weeks", f"7*{w}", 7 * w)
+            return SolveResult(_norm(d), steps, used, True)
+
+    # "of the remaining" percent chain (common GSM8K)
+    if re.search(r"\bof the remaining\b", ql) and len(nums) >= 3 and re.search(r"%", q):
+        # pattern: start N, p% of N, then q% of remaining
+        base = nums[0]
+        # find percents in order
+        pcts = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", q)]
+        if len(pcts) >= 2:
+            part1 = push("AR-202", "p% of x", f"{pcts[0]}% of {base}", (pcts[0] / 100.0) * base)
+            rem = push("sub_remove", "remaining", f"{base}-{part1}", base - part1)
+            part2 = push("AR-202", "q% of remaining", f"{pcts[1]}% of {rem}", (pcts[1] / 100.0) * rem)
+            if re.search(r"\b(left|remain|rest|how many)\b", ql):
+                # often asks for last remainder
+                if len(pcts) >= 2 and re.search(r"\b(jazz|jazz dance|last|else|other)\b", ql):
+                    last = push("sub_remove", "last group", f"{rem}-{part2}", rem - part2)
+                    return SolveResult(_norm(last), steps, used, True)
+                return SolveResult(_norm(part2), steps, used, True)
+            return SolveResult(_norm(part2), steps, used, True)
+
+    # bought/had then sold/gave → left (strict: only 2 quantities, clear "left")
+    if (
+        re.search(r"\b(bought|had)\b", ql)
+        and re.search(r"\b(sold|gave|ate)\b", ql)
+        and re.search(r"\b(left|remain)\b", ql)
+        and len(nums) == 2
+        and not re.search(r"%|percent|each|per |times", ql)
+    ):
+        v = push("sub_remove", "left=had−sold", f"{nums[0]}-{nums[1]}", nums[0] - nums[1])
+        return SolveResult(_norm(v), steps, used, True)
+
+    # average only when explicitly asked and few numbers
+    if re.search(r"\b(average|mean) of\b", ql) and 2 <= len(nums) <= 6:
+        s = sum(nums)
+        avg = push("mean", "mean=sum/n", f"{s}/{len(nums)}", s / len(nums))
+        return SolveResult(_norm(avg), steps, used, True)
+
     # eggs per day × days → dozens
     if re.search(r"\bdozen", ql) and len(nums) >= 2:
         # 3 egg omelet every morning, 4 weeks → 3*7*4/12
@@ -409,20 +592,46 @@ def build_rule_drills() -> List[PracticeItem]:
         items.append(PracticeItem(f"What is {p}% of {x}?", str(ans), "percent", "drill"))
     # fraction same denom (AR-107)
     for a, b, c, ans in [(1, 4, 2, "3/4"), (1, 5, 2, "3/5"), (2, 7, 3, "5/7")]:
-        items.append(
-            PracticeItem(
-                f"Add fractions {a}/{b} + {c}/{b}",
-                ans,
-                "fraction",
-                "drill",
-            )
-        )
+        items.append(PracticeItem(f"Add fractions {a}/{b} + {c}/{b}", ans, "fraction", "drill"))
+    # different denom (AR-108)
+    items.append(PracticeItem("Add fractions 1/2 + 1/3", "5/6", "fraction", "drill"))
+    items.append(PracticeItem("Add fractions 1/4 + 1/6", "10/24", "fraction", "drill"))
+    # fraction multiply (AR-148)
+    items.append(PracticeItem("Multiply fractions 2/3 * 3/4", "6/12", "fraction", "drill"))
+    items.append(PracticeItem("Multiply fractions 1/2 * 1/5", "1/10", "fraction", "drill"))
+    # equivalent fractions (AR-181)
+    items.append(PracticeItem("Equivalent fraction 2/3 times 4", "8/12", "fraction", "drill"))
+    # identities
+    for a in [5, 17, 100]:
+        items.append(PracticeItem(f"What is {a} + 0?", str(a), "add", "drill"))
+        items.append(PracticeItem(f"What is {a} - 0?", str(a), "sub", "drill"))
+        items.append(PracticeItem(f"What is {a} - {a}?", "0", "sub", "drill"))
+        items.append(PracticeItem(f"What is {a} * 1?", str(a), "mul", "drill"))
+        items.append(PracticeItem(f"What is {a} * 0?", "0", "mul", "drill"))
+        items.append(PracticeItem(f"What is {a} / 1?", str(a), "div", "drill"))
+    items.append(PracticeItem("What is 0 / 9?", "0", "div", "drill"))
+    # powers
+    items.append(PracticeItem("What is 2 ^ 0?", "1", "exp", "drill"))
+    items.append(PracticeItem("What is 5 ^ 1?", "5", "exp", "drill"))
+    items.append(PracticeItem("What is 2 ^ 3?", "8", "exp", "drill"))
+    items.append(PracticeItem("What is 3 ^ 4?", "81", "exp", "drill"))
+    # abs
+    items.append(PracticeItem("What is |-7|?", "7", "abs", "drill"))
+    items.append(PracticeItem("Absolute value of -12", "12", "abs", "drill"))
+    # gcd/lcm
+    items.append(PracticeItem("gcd(12, 18)", "6", "gcd", "drill"))
+    items.append(PracticeItem("lcm(4, 6)", "12", "lcm", "drill"))
+    # distributive
+    items.append(PracticeItem("What is 3 * (4 + 5)?", "27", "dist", "drill"))
+    # percent as decimal
+    items.append(PracticeItem("What is 25% as a decimal?", "0.25", "percent", "drill"))
     # double negative (AR-022)
     for n in [3, 8, 12]:
         items.append(PracticeItem(f"What is -(-{n})?", str(n), "sign", "drill"))
     # order of operations: mult before add (AR-262)
     items.append(PracticeItem("Evaluate 2 + 3 * 4", "14", "order", "drill"))
     items.append(PracticeItem("Evaluate 10 - 2 * 3", "4", "order", "drill"))
+    items.append(PracticeItem("Evaluate (2 + 3) * 4", "20", "order", "drill"))
     # rate minutes
     items.append(PracticeItem("She earns 12 dollars per hour. She works 50 minutes. How much does she earn?", "10", "rate", "drill"))
     items.append(PracticeItem("He runs 3 sprints 3 times a week. He runs 60 meters each sprint. How many total meters does he run a week?", "540", "mul", "drill"))

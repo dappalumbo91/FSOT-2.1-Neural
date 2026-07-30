@@ -382,6 +382,121 @@ LING_RULES: List[LingRule] = [
         (),
         "Theme is the?", "message",
     ),
+    # --- expanded phonics ---
+    LingRule(
+        "PH-050", "phonics", "Vowel team ai/ay",
+        "ai/ay → long a",
+        "Vowel teams are multi-letter spellings of one vowel sound.",
+        "When you see ai (middle) or ay (end), try long a (rain, play).",
+        ("rain", "play", "day"),
+        "The team ay usually says long?", "a",
+    ),
+    LingRule(
+        "PH-060", "phonics", "Vowel team ee/ea",
+        "ee/ea → long e (often)",
+        "Common long-e spellings reduce guesswork in decoding.",
+        "Try long e for ee/ea (tree, read); note ea can also be short e (bread).",
+        ("tree", "beach"),
+        "The team ee usually says long?", "e",
+    ),
+    LingRule(
+        "PH-070", "phonics", "R-controlled vowel",
+        "ar/or/er/ir/ur → r-colored vowel",
+        "R after a vowel changes the vowel sound (bossy r).",
+        "When a vowel is followed by r, use the r-controlled sound (car, her, bird).",
+        ("car", "her", "bird", "for", "turn"),
+        "A vowel followed by r is called r-?", "controlled",
+    ),
+    LingRule(
+        "PH-080", "phonics", "Consonant blend",
+        "bl/st/tr… → two consonants both heard",
+        "Blends keep both sounds (unlike digraphs).",
+        "Say both consonants quickly (blue, stop, tree).",
+        ("blue", "stop", "tree"),
+        "In a blend you hear both?", "sounds",
+    ),
+    # --- clause / sentence combining ---
+    LingRule(
+        "GR-110", "grammar", "Compound sentence with and/but",
+        "independent + FANBOYS + independent",
+        "Compound sentences join equal complete thoughts.",
+        "If two complete sentences are joined by and/but/or, use a comma before the conjunction when needed.",
+        ("I ran, and she walked."),
+        "And/but can join two complete?", "sentences",
+    ),
+    LingRule(
+        "GR-120", "grammar", "Complex sentence subordinators",
+        "dependent clause + independent clause",
+        "Complex sentences show unequal clause relationships (because, when, if).",
+        "Use because/when/if to attach a reason or condition clause to a main clause.",
+        ("I stayed because it rained."),
+        "Because can introduce a dependent?", "clause",
+    ),
+    LingRule(
+        "GR-130", "grammar", "Subject-verb agreement",
+        "singular subject → singular verb; plural → plural",
+        "Agreement keeps person/number consistent for the reader.",
+        "Match verb form to subject number (he runs / they run).",
+        ("he runs", "they run"),
+        "A singular subject takes a singular?", "verb",
+    ),
+    # --- essay multi-hop composition ---
+    LingRule(
+        "CO-070", "composition", "Essay intro-body-conclusion",
+        "intro → body → conclusion",
+        "Macro-structure helps readers track the argument arc.",
+        "Open with hook+thesis, develop with body paragraphs, end by wrapping the claim.",
+        (),
+        "An essay structure is intro body?", "conclusion",
+    ),
+    LingRule(
+        "CO-080", "composition", "Body paragraph PEEL",
+        "Point → Evidence → Explain → Link",
+        "PEEL keeps each paragraph claim-driven and supported.",
+        "State a point, give evidence, explain it, link to the thesis.",
+        (),
+        "In PEEL, E after Point stands for?", "evidence",
+    ),
+    LingRule(
+        "CO-090", "composition", "Claim-reason-evidence chain",
+        "claim ← reason ← evidence",
+        "Multi-hop writing: each layer supports the one above.",
+        "Write claim, then because-reason, then fact/example as evidence.",
+        (),
+        "Evidence supports a reason that supports a?", "claim",
+    ),
+    LingRule(
+        "WR-050", "writing", "Apostrophe possession",
+        "noun + 's → belonging (singular)",
+        "Apostrophes mark possession so ownership is clear.",
+        "For most singular nouns, add 's (dog's bone).",
+        ("dog's", "Sam's"),
+        "Add apostrophe s to show?", "possession",
+    ),
+    LingRule(
+        "WR-060", "writing", "Its vs it's",
+        "its = possessive; it's = it is",
+        "Homophones cause writing errors; rule disambiguates.",
+        "Use it's only for it is/it has; use its for belonging.",
+        ("it's raining", "its color"),
+        "It's is a contraction for it?", "is",
+    ),
+    LingRule(
+        "RD-090", "reading", "Fact vs opinion",
+        "fact = checkable; opinion = belief/feeling",
+        "Critical reading separates verifiable claims from attitudes.",
+        "Ask: can this be proven with evidence? If not, it may be opinion.",
+        (),
+        "A fact can be checked with?", "evidence",
+    ),
+    LingRule(
+        "RD-100", "reading", "Author's purpose",
+        "purpose ∈ {persuade, inform, entertain}",
+        "Purpose guides interpretation of tone and structure.",
+        "Ask why the author wrote: to persuade, inform, or entertain.",
+        (),
+        "PIE purposes include persuade inform?", "entertain",
+    ),
 ]
 
 
@@ -437,6 +552,17 @@ def build_drills() -> List[PracticeItem]:
         ("time is a thief is a simile or metaphor?", "metaphor", "LIT-020", "apply"),
         ("CVC middle vowel in cat is long or short?", "short", "PH-010", "apply"),
         ("In cake the final e is pronounced or silent?", "silent", "PH-020", "apply"),
+        ("The team ay usually says long a or short a?", "a", "PH-050", "apply"),
+        ("A vowel followed by r is called r-controlled or free?", "controlled", "PH-070", "apply"),
+        ("In a blend you hear both letters or one sound?", "sounds", "PH-080", "apply"),
+        ("And/but can join two complete what?", "sentences", "GR-110", "apply"),
+        ("Because can introduce a dependent what?", "clause", "GR-120", "apply"),
+        ("A singular subject takes a singular what?", "verb", "GR-130", "apply"),
+        ("An essay structure is intro body what?", "conclusion", "CO-070", "apply"),
+        ("In PEEL, E after Point stands for what?", "evidence", "CO-080", "apply"),
+        ("It's is a contraction for it what?", "is", "WR-060", "apply"),
+        ("A fact can be checked with what?", "evidence", "RD-090", "apply"),
+        ("PIE purposes include persuade inform what?", "entertain", "RD-100", "apply"),
     ]
     for q, a, rid, k in extra:
         items.append(PracticeItem(q, a, rid, k))
@@ -509,6 +635,28 @@ def apply_ling_rule(question: str) -> Optional[str]:
         return "short"
     if "final e is pronounced or silent" in ql or "final e is" in ql:
         return "silent"
+    if "team ay usually says long" in ql:
+        return "a"
+    if "vowel followed by r is called r-" in ql or "r-controlled or free" in ql:
+        return "controlled"
+    if "blend you hear both" in ql:
+        return "sounds"
+    if "and/but can join two complete" in ql:
+        return "sentences"
+    if "because can introduce a dependent" in ql:
+        return "clause"
+    if "singular subject takes a singular" in ql:
+        return "verb"
+    if "essay structure is intro body" in ql:
+        return "conclusion"
+    if "peel" in ql and "after point" in ql:
+        return "evidence"
+    if "it's is a contraction for it" in ql:
+        return "is"
+    if "fact can be checked with" in ql:
+        return "evidence"
+    if "pie purposes include persuade inform" in ql:
+        return "entertain"
 
     # canned drill questions from rules
     for r in LING_RULES:

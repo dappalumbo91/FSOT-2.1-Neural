@@ -1,41 +1,41 @@
 {
-  "generated_at": "2026-07-30T02:22:28.781270+00:00",
+  "generated_at": "2026-07-30T02:29:40.271899+00:00",
   "doctrine": "Teach linguistics RULES with WHY and HOW \u2014 phonics, morphology, grammar, reading, writing, composition. Drills practice application, not passage stuffing.",
   "pass_threshold": 0.95,
-  "n_rules": 41,
+  "n_rules": 55,
   "by_domain": {
-    "phonics": 5,
+    "phonics": 9,
     "morphology": 5,
-    "grammar": 10,
-    "reading": 11,
-    "writing": 4,
-    "composition": 6
+    "grammar": 13,
+    "reading": 13,
+    "writing": 6,
+    "composition": 9
   },
-  "n_drills": 177,
+  "n_drills": 244,
   "scores": {
     "drills": {
-      "n": 177,
-      "correct": 177,
+      "n": 244,
+      "correct": 244,
       "accuracy": 1.0,
       "by_kind": {
         "form": {
-          "correct": 41,
-          "n": 41,
+          "correct": 55,
+          "n": 55,
           "accuracy": 1.0
         },
         "apply": {
-          "correct": 54,
-          "n": 54,
+          "correct": 79,
+          "n": 79,
           "accuracy": 1.0
         },
         "why": {
-          "correct": 41,
-          "n": 41,
+          "correct": 55,
+          "n": 55,
           "accuracy": 1.0
         },
         "how": {
-          "correct": 41,
-          "n": 41,
+          "correct": 55,
+          "n": 55,
           "accuracy": 1.0
         }
       },

@@ -248,3 +248,92 @@ Each rule states **form**, **why**, and **how**.
 - **Why:** Theme is what the work says about life or people, not just plot.
 - **How:** After the story, ask what larger idea it suggests.
 
+## phonics
+
+### PH-050: Vowel team ai/ay
+- **Form:** `ai/ay → long a`
+- **Why:** Vowel teams are multi-letter spellings of one vowel sound.
+- **How:** When you see ai (middle) or ay (end), try long a (rain, play).
+- **Examples:** rain, play, day
+
+### PH-060: Vowel team ee/ea
+- **Form:** `ee/ea → long e (often)`
+- **Why:** Common long-e spellings reduce guesswork in decoding.
+- **How:** Try long e for ee/ea (tree, read); note ea can also be short e (bread).
+- **Examples:** tree, beach
+
+### PH-070: R-controlled vowel
+- **Form:** `ar/or/er/ir/ur → r-colored vowel`
+- **Why:** R after a vowel changes the vowel sound (bossy r).
+- **How:** When a vowel is followed by r, use the r-controlled sound (car, her, bird).
+- **Examples:** car, her, bird, for, turn
+
+### PH-080: Consonant blend
+- **Form:** `bl/st/tr… → two consonants both heard`
+- **Why:** Blends keep both sounds (unlike digraphs).
+- **How:** Say both consonants quickly (blue, stop, tree).
+- **Examples:** blue, stop, tree
+
+## grammar
+
+### GR-110: Compound sentence with and/but
+- **Form:** `independent + FANBOYS + independent`
+- **Why:** Compound sentences join equal complete thoughts.
+- **How:** If two complete sentences are joined by and/but/or, use a comma before the conjunction when needed.
+- **Examples:** I,  , r, a, n, ,,  , a, n, d,  , s, h, e,  , w, a, l, k, e, d, .
+
+### GR-120: Complex sentence subordinators
+- **Form:** `dependent clause + independent clause`
+- **Why:** Complex sentences show unequal clause relationships (because, when, if).
+- **How:** Use because/when/if to attach a reason or condition clause to a main clause.
+- **Examples:** I,  , s, t, a, y, e, d,  , b, e, c, a, u, s, e,  , i, t,  , r, a, i, n, e, d, .
+
+### GR-130: Subject-verb agreement
+- **Form:** `singular subject → singular verb; plural → plural`
+- **Why:** Agreement keeps person/number consistent for the reader.
+- **How:** Match verb form to subject number (he runs / they run).
+- **Examples:** he runs, they run
+
+## composition
+
+### CO-070: Essay intro-body-conclusion
+- **Form:** `intro → body → conclusion`
+- **Why:** Macro-structure helps readers track the argument arc.
+- **How:** Open with hook+thesis, develop with body paragraphs, end by wrapping the claim.
+
+### CO-080: Body paragraph PEEL
+- **Form:** `Point → Evidence → Explain → Link`
+- **Why:** PEEL keeps each paragraph claim-driven and supported.
+- **How:** State a point, give evidence, explain it, link to the thesis.
+
+### CO-090: Claim-reason-evidence chain
+- **Form:** `claim ← reason ← evidence`
+- **Why:** Multi-hop writing: each layer supports the one above.
+- **How:** Write claim, then because-reason, then fact/example as evidence.
+
+## writing
+
+### WR-050: Apostrophe possession
+- **Form:** `noun + 's → belonging (singular)`
+- **Why:** Apostrophes mark possession so ownership is clear.
+- **How:** For most singular nouns, add 's (dog's bone).
+- **Examples:** dog's, Sam's
+
+### WR-060: Its vs it's
+- **Form:** `its = possessive; it's = it is`
+- **Why:** Homophones cause writing errors; rule disambiguates.
+- **How:** Use it's only for it is/it has; use its for belonging.
+- **Examples:** it's raining, its color
+
+## reading
+
+### RD-090: Fact vs opinion
+- **Form:** `fact = checkable; opinion = belief/feeling`
+- **Why:** Critical reading separates verifiable claims from attitudes.
+- **How:** Ask: can this be proven with evidence? If not, it may be opinion.
+
+### RD-100: Author's purpose
+- **Form:** `purpose ∈ {persuade, inform, entertain}`
+- **Why:** Purpose guides interpretation of tone and structure.
+- **How:** Ask why the author wrote: to persuade, inform, or entertain.
+
