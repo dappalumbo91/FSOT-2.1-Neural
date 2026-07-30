@@ -90,6 +90,7 @@ const host_audio_out_fixed = @import("host_audio_out_fixed.zig");
 const mind_live_fixed = @import("mind_live_fixed.zig");
 const eeg_gate_anchors_fixed = @import("eeg_gate_anchors_fixed.zig");
 const attention_fixed = @import("attention_fixed.zig");
+const allatom_md = @import("allatom_md.zig");
 
 fn printF64(label: []const u8, x: f64) void {
     std.debug.print("{s}{e}\n", .{ label, x });
@@ -1315,6 +1316,34 @@ fn runGradeDepth() void {
     }
 }
 
+fn runAllAtomMd() void {
+    std.debug.print("=== FSOT ALL-ATOM MD LAB (host f64; not cognitive runtime) ===\n", .{});
+    std.debug.print("doctrine: Velocity-Verlet + bonds/angles + LJ/Coulomb PBC + Berendsen\n", .{});
+    std.debug.print("systems: TIP3P-like water box; K+ carbonyl selectivity filter\n", .{});
+    std.debug.print("see docs/WHY_NOT_ALL_ATOM_MD.md — implemented as lab tool, not mind loop\n", .{});
+
+    const w = allatom_md.runMd(.water, 300);
+    std.debug.print(
+        "WATER system={s} atoms={d} bonds={d} angles={d} steps={d} dt_fs={e} T={e} pe={e} ke={e} drift={e} maxF={e} feval={d} ok={}\n",
+        .{ w.system, w.n_atoms, w.n_bonds, w.n_angles, w.n_steps, w.dt_fs, w.final_T, w.pe, w.ke, w.energy_drift, w.max_force, w.force_evals, w.ok },
+    );
+
+    const f = allatom_md.runMd(.ion_filter, 300);
+    std.debug.print(
+        "FILTER system={s} atoms={d} bonds={d} angles={d} steps={d} dt_fs={e} T={e} pe={e} ke={e} drift={e} maxF={e} feval={d} ok={}\n",
+        .{ f.system, f.n_atoms, f.n_bonds, f.n_angles, f.n_steps, f.dt_fs, f.final_T, f.pe, f.ke, f.energy_drift, f.max_force, f.force_evals, f.ok },
+    );
+
+    const st = allatom_md.selfTest();
+    if (w.ok and f.ok and st) {
+        std.debug.print("FSOT_ALLATOM_MD PASS\n", .{});
+        std.debug.print("FSOT_MD_LAB_OK\n", .{});
+    } else {
+        std.debug.print("FSOT_ALLATOM_MD FAIL (water={} filter={} self={})\n", .{ w.ok, f.ok, st });
+        std.process.exit(1);
+    }
+}
+
 fn runSynapsePathways() void {
     std.debug.print("=== FSOT SYNAPTIC PATHWAYS (trace + plastic bonds + novel thought) ===\n", .{});
     std.debug.print("doctrine: Hebb LTP-like W update, prune unused, concept cross-domain bonds\n", .{});
@@ -1847,6 +1876,8 @@ pub fn main() !void {
         runGradeDepth();
     } else if (std.mem.eql(u8, mode, "pathways") or std.mem.eql(u8, mode, "synapse") or std.mem.eql(u8, mode, "synaptic") or std.mem.eql(u8, mode, "trace") or std.mem.eql(u8, mode, "think-path") or std.mem.eql(u8, mode, "glia") or std.mem.eql(u8, mode, "molecular") or std.mem.eql(u8, mode, "cascade")) {
         runSynapsePathways();
+    } else if (std.mem.eql(u8, mode, "md") or std.mem.eql(u8, mode, "allatom") or std.mem.eql(u8, mode, "all-atom") or std.mem.eql(u8, mode, "allatom-md") or std.mem.eql(u8, mode, "molecular-dynamics")) {
+        runAllAtomMd();
     } else if (std.mem.eql(u8, mode, "pixel-id") or std.mem.eql(u8, mode, "pixel_id") or std.mem.eql(u8, mode, "pixelid")) {
         runPixelId();
     } else if (std.mem.eql(u8, mode, "vision") or std.mem.eql(u8, mode, "vision-inject") or std.mem.eql(u8, mode, "vision_inject")) {
