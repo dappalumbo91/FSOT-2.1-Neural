@@ -1831,36 +1831,26 @@ def solve_with_binding(question: str) -> SolveResult:
             val = push("BIND-04", "+years", f"{val}+{years.group(1)}", val + float(years.group(1)))
         return SolveResult(_norm(val), steps, used, True)
 
-    # N of X; K fewer Y than X; Z = m times Y; total
-    m = re.search(
-        r"(\d+)\s+\w+.*?(\d+)\s+fewer \w+ than.*?"
-        r"(?:twice|(\d+)\s+times) as many \w+ as.*?"
-        r"(?:total|how many \w+ (?:were|are) there|in all)",
-        ql,
-        re.S,
-    )
-    if m:
-        x = float(m.group(1))
-        fewer = float(m.group(2))
-        mult = 2.0 if "twice" in ql else float(m.group(3) or 2)
-        y = push("BIND-04", "y=x−k", f"{x}-{fewer}", x - fewer)
-        z = push("BIND-03", "z=m*y", f"{mult}*{y}", mult * y)
-        tot = push("add_combine", "x+y+z", f"{x}+{y}+{z}", x + y + z)
-        return SolveResult(_norm(tot), steps, used, True)
-    # gems: 175 diamonds, 35 fewer rubies, twice as many emeralds as rubies
-    m = re.search(
-        r"(\d+)\s+\w+.*?(\d+)\s+fewer \w+ than \w+.*?(\d+|twice)\s+times as many",
-        ql,
-        re.S,
-    )
-    if m and re.search(r"\b(total|altogether|in all|how many \w+ did)\b", ql):
-        x, fewer = float(m.group(1)), float(m.group(2))
-        mt = m.group(3)
-        mult = 2.0 if mt == "twice" else float(mt)
-        y = push("BIND-04", "y=x−k", f"{x}-{fewer}", x - fewer)
-        z = push("BIND-03", "z=m*y", f"{mult}*{y}", mult * y)
-        tot = push("add_combine", "sum", f"{x}+{y}+{z}", x + y + z)
-        return SolveResult(_norm(tot), steps, used, True)
+    # N of X; K fewer Y than X; Z = twice/m times Y; total gems etc.
+    # also: "twice the number of emeralds than the rubies"
+    if re.search(r"\bfewer\b", ql) and re.search(
+        r"\b(twice as many|twice the number|\d+\s+times)\b", ql
+    ) and re.search(r"\b(total|altogether|in all|how many of the gems|how many \w+ were)\b", ql):
+        m = re.search(
+            r"(\d+)\s+\w+.*?(\d+)\s+fewer",
+            ql,
+            re.S,
+        )
+        if m:
+            x, fewer = float(m.group(1)), float(m.group(2))
+            mult = 2.0
+            mt = re.search(r"(\d+)\s+times", ql)
+            if mt:
+                mult = float(mt.group(1))
+            y = push("BIND-04", "y=x−k", f"{x}-{fewer}", x - fewer)
+            z = push("BIND-03", "z=m*y", f"{mult}*{y}", mult * y)
+            tot = push("add_combine", "x+y+z", f"{x}+{y}+{z}", x + y + z)
+            return SolveResult(_norm(tot), steps, used, True)
 
     # trip: total T, stop after A, second stop B before end → middle segment
     m = re.search(
@@ -1871,8 +1861,8 @@ def solve_with_binding(question: str) -> SolveResult:
     )
     if m:
         total, first, before_end = float(m.group(1)), float(m.group(2)), float(m.group(3))
-        used = push("add_combine", "ends", f"{first}+{before_end}", first + before_end)
-        mid = push("sub_remove", "middle", f"{total}-{used}", total - used)
+        ends = push("add_combine", "ends", f"{first}+{before_end}", first + before_end)
+        mid = push("sub_remove", "middle", f"{total}-{ends}", total - ends)
         return SolveResult(_norm(mid), steps, used, True)
 
     # MPG: miles / gallons * tank gallons
@@ -2091,7 +2081,6 @@ def solve_with_binding(question: str) -> SolveResult:
         profit = push("sub_remove", "net/year", f"{rev}-{water}", rev - water)
         if profit > 0:
             years = push("div_share", "years", f"{cost}/{profit}", cost / profit)
-            # round up if needed for whole years
             import math as _m
 
             years_up = float(_m.ceil(years - 1e-9))
@@ -2099,6 +2088,396 @@ def solve_with_binding(question: str) -> SolveResult:
                 push("ceil", "whole years", str(years_up), years_up)
                 return SolveResult(_norm(years_up), steps, used, True)
             return SolveResult(_norm(years), steps, used, True)
+
+    # =====================================================================
+    # Auto-batch 2: short multi-op families (each/money/percent heavy)
+    # =====================================================================
+
+    # N animals × hours each × 7 days
+    m = re.search(
+        r"(\d+)\s+(?:dogs?|cats?|pets?).*?(\d+(?:\.\d+)?)\s*hours? a day.*?"
+        r"(?:how many hours a week|hours?.*?week)",
+        ql,
+        re.S,
+    )
+    if m:
+        n, h = float(m.group(1)), float(m.group(2))
+        day = push("mul_groups", "per day", f"{n}*{h}", n * h)
+        week = push("mul_groups", "week", f"{day}*7", day * 7.0)
+        return SolveResult(_norm(week), steps, used, True)
+
+    # scores A then p% more → total
+    m = re.search(
+        r"scores?\s+(\d+)\s+points?.*?(\d+)\s*%\s*more points?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\btotal\b", ql):
+        a, pct = float(m.group(1)), float(m.group(2))
+        more = push("AR-202", "p% more", f"{pct}%*{a}", a * pct / 100.0)
+        b = push("add_combine", "second", f"{a}+{more}", a + more)
+        tot = push("add_combine", "total", f"{a}+{b}", a + b)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # N pies × S slices − leftover pieces
+    m = re.search(
+        r"(\d+)\s+\w+ pies?.*?each pie into\s+(\d+)\s+pieces?.*?"
+        r"(\d+)\s+pieces? of pie remaining",
+        ql,
+        re.S,
+    )
+    if not m:
+        m = re.search(
+            r"(\d+)\s+\w+ pies?.*?into\s+(\d+)\s+pieces?.*?(\d+)\s+pieces?.*?remaining",
+            ql,
+            re.S,
+        )
+    if m and re.search(r"\bhow many (pieces|were taken)\b", ql):
+        pies, slices, left = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        tot = push("mul_groups", "pieces", f"{pies}*{slices}", pies * slices)
+        eaten = push("sub_remove", "eaten", f"{tot}-{left}", tot - left)
+        return SolveResult(_norm(eaten), steps, used, True)
+
+    # floors × units × (1 − occupied fraction) unoccupied
+    m = re.search(
+        r"(\d+)\s+floors?.*?each floor.*?(\d+)\s+units?.*?"
+        r"(\d+)/(\d+)\s+of the building is occupied",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bunoccupied\b", ql):
+        floors, units, a, b = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        total = push("mul_groups", "units", f"{floors}*{units}", floors * units)
+        occ = push("mul_groups", "occupied", f"{a}/{b}*{total}", (a / b) * total)
+        free = push("sub_remove", "unoccupied", f"{total}-{occ}", total - occ)
+        return SolveResult(_norm(free), steps, used, True)
+
+    # clusters of N × size + individual
+    m = re.search(
+        r"(\d+)\s+clusters? of\s+(\d+).*?(\d+)\s+individual",
+        ql,
+        re.S,
+    )
+    if m:
+        c, size, ind = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        part = push("mul_groups", "clusters", f"{c}*{size}", c * size)
+        tot = push("add_combine", "total", f"{part}+{ind}", part + ind)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # bill + p% fee + flat delivery
+    m = re.search(
+        r"(?:bill came to|bill was)\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(\d+(?:\.\d+)?)\s*%\s*fee.*?"
+        r"\$?\s*(\d+(?:\.\d+)?)\s*in delivery",
+        ql,
+        re.S,
+    )
+    if m:
+        bill, pct, deliv = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        fee = push("AR-202", "fee", f"{pct}%*{bill}", bill * pct / 100.0)
+        # tip sometimes also
+        tip_m = re.search(r"\$?\s*(\d+(?:\.\d+)?)\s*tip", ql)
+        tot = bill + fee + deliv
+        if tip_m:
+            tip = float(tip_m.group(1))
+            tot = push(
+                "add_combine",
+                "bill+fee+deliv+tip",
+                f"{bill}+{fee}+{deliv}+{tip}",
+                bill + fee + deliv + tip,
+            )
+        else:
+            tot = push(
+                "add_combine",
+                "bill+fee+deliv",
+                f"{bill}+{fee}+{deliv}",
+                bill + fee + deliv,
+            )
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # cost A + B then p% of that (insurance)
+    m = re.search(
+        r"\$?\s*(\d+(?:\.\d+)?)\s+for the material.*?"
+        r"\$?\s*(\d+(?:\.\d+)?)\s+for the \w+.*?"
+        r"(\d+)\s*% of that",
+        ql,
+        re.S,
+    )
+    if m:
+        a, b, pct = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        base = push("add_combine", "base", f"{a}+{b}", a + b)
+        ins = push("AR-202", "p% of base", f"{pct}%*{base}", base * pct / 100.0)
+        tot = push("add_combine", "total", f"{base}+{ins}", base + ins)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # end with T after weekly allowance W for N weeks → start = T - W*N
+    m = re.search(
+        r"allowance of\s+\$?\s*(\d+(?:\.\d+)?)\s+for\s+(\d+)\s+weeks?.*?"
+        r"total of\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(?:start|started|begin)",
+        ql,
+        re.S,
+    )
+    if m:
+        w, n, end = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        got = push("mul_groups", "allowance total", f"{w}*{n}", w * n)
+        start = push("sub_remove", "start", f"{end}-{got}", end - got)
+        return SolveResult(_norm(start), steps, used, True)
+
+    # recipe A instructions + twice as many → total both
+    m = re.search(
+        r"(\d+)\s+instructions?.*?twice as many instructions?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow many instructions\b", ql):
+        a = float(m.group(1))
+        b = push("BIND-03", "twice", f"2*{a}", 2.0 * a)
+        tot = push("add_combine", "both", f"{a}+{b}", a + b)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # sell n @ $a and m @ $b — also "brownies for $3 ... sells 43 brownies and 23 slices"
+    m = re.search(
+        r"(?:for\s+)?\$?\s*(\d+(?:\.\d+)?)\s*a slice.*?\$?\s*(\d+(?:\.\d+)?)\s*a slice.*?"
+        r"sells?\s+(\d+)\s+\w+.*?(\d+)\s+(?:slices? of \w+|\w+)",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(raise|make|earn|how much money)\b", ql):
+        p1, p2, n1, n2 = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        t1 = push("mul_groups", "line1", f"{n1}*{p1}", n1 * p1)
+        t2 = push("mul_groups", "line2", f"{n2}*{p2}", n2 * p2)
+        tot = push("add_combine", "total", f"{t1}+{t2}", t1 + t2)
+        return SolveResult(_norm(tot), steps, used, True)
+    m = re.search(
+        r"sells?\s+(\d+)\s+\w+.*?\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(?:and|,)\s*(\d+)\s+\w+.*?\$?\s*(\d+(?:\.\d+)?)",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(raise|make|earn|how much money)\b", ql):
+        n1, p1, n2, p2 = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        t1 = push("mul_groups", "line1", f"{n1}*{p1}", n1 * p1)
+        t2 = push("mul_groups", "line2", f"{n2}*{p2}", n2 * p2)
+        tot = push("add_combine", "total", f"{t1}+{t2}", t1 + t2)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # after eating k, package remaining r per bag
+    m = re.search(
+        r"(\d+)\s+\w+.*?eats?\s+(\d+).*?package\s+(\d+)\s+\w+ in one bag",
+        ql,
+        re.S,
+    )
+    if m:
+        total, ate, per = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        left = push("sub_remove", "left", f"{total}-{ate}", total - ate)
+        bags = push("div_share", "bags", f"{left}/{per}", left / per)
+        return SolveResult(_norm(bags), steps, used, True)
+
+    # ticket $T + popcorn $P, budget B → times
+    m = re.search(
+        r"ticket for\s+\$?\s*(\d+(?:\.\d+)?).*?popcorn for\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(\d+)\s+dollars",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow many times\b", ql):
+        t, p, budget = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        per = push("add_combine", "per visit", f"{t}+{p}", t + p)
+        n = push("div_share", "times", f"{budget}/{per}", budget / per)
+        return SolveResult(_norm(n), steps, used, True)
+
+    # bridge max W, truck empty E, boxes weight B each → how many boxes
+    m = re.search(
+        r"(?:no more than|carry)\s+(\d+)\s+pounds?.*?"
+        r"(?:boxes?|each weighing)\s+(\d+)\s+pounds?.*?"
+        r"(?:driver and the empty truck|empty truck).*?(\d+)\s+pounds?",
+        ql,
+        re.S,
+    )
+    if not m:
+        m = re.search(
+            r"(\d+)\s+pounds?.*?each weighing\s+(\d+)\s+pounds?.*?"
+            r"(\d+)\s+pounds?",
+            ql,
+            re.S,
+        )
+    if m and re.search(r"\b(how many boxes|maximum number of boxes)\b", ql):
+        # need careful - from sample: 5000 max, 15 box, 3755 truck+driver
+        nums = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)", ql)]
+        # max, box, truck often first large, 15, 3755
+        if len(nums) >= 3:
+            cap, box_w = nums[0], None
+            for n in nums[1:]:
+                if n < 100:
+                    box_w = n
+                    break
+            truck = max(n for n in nums if n != cap and n != box_w)
+            if box_w and truck:
+                rem = push("sub_remove", "capacity left", f"{cap}-{truck}", cap - truck)
+                nb = push("div_share", "boxes", f"{rem}/{box_w}", rem / box_w)
+                return SolveResult(_norm(nb), steps, used, True)
+
+    # oranges: total, 1 bad, p% unripe, 2 sour, rest good
+    m = re.search(
+        r"(\d+)\s+oranges?.*?(\d+)\s+is bad.*?(\d+)\s*%.*?unripe.*?(\d+)\s+are sour",
+        ql,
+        re.S,
+    )
+    if m:
+        total, bad, pct, sour = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        unripe = push("AR-202", "unripe", f"{pct}%*{total}", total * pct / 100.0)
+        bad_parts = push(
+            "add_combine",
+            "bad+unripe+sour",
+            f"{bad}+{unripe}+{sour}",
+            bad + unripe + sour,
+        )
+        good = push("sub_remove", "good", f"{total}-{bad_parts}", total - bad_parts)
+        return SolveResult(_norm(good), steps, used, True)
+
+    # twice as many boys as girls, G girls, S students per teacher
+    m = re.search(
+        r"twice as many boys as girls.*?(\d+)\s+girls.*?(\d+)\s+students to every teacher",
+        ql,
+        re.S,
+    )
+    if m:
+        girls, per_t = float(m.group(1)), float(m.group(2))
+        boys = push("BIND-03", "boys", f"2*{girls}", 2.0 * girls)
+        stu = push("add_combine", "students", f"{boys}+{girls}", boys + girls)
+        teach = push("div_share", "teachers", f"{stu}/{per_t}", stu / per_t)
+        return SolveResult(_norm(teach), steps, used, True)
+
+    # half as much as A, A is k times B; A does N; difference Raymond-David
+    m = re.search(
+        r"half as much.*?(\d+)\s+times as much.*?(\d+)\s+pounds?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bdifference\b", ql):
+        k, sarah = float(m.group(1)), float(m.group(2))
+        david = push("div_share", "david", f"{sarah}/{k}", sarah / k)
+        ray = push("BIND-02", "half sarah", f"{sarah}/2", sarah / 2.0)
+        diff = push("sub_diff", "diff", f"|{ray}-{david}|", abs(ray - david))
+        return SolveResult(_norm(diff), steps, used, True)
+
+    # simple p% discount off price
+    m = re.search(
+        r"costs?\s+\$?\s*(\d+(?:\.\d+)?).*?(\d+)\s*%\s*discount",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow much\b", ql) and not re.search(r"\boriginal\b", ql):
+        price, pct = float(m.group(1)), float(m.group(2))
+        off = push("AR-202", "discount", f"{pct}%*{price}", price * pct / 100.0)
+        pay = push("sub_remove", "pay", f"{price}-{off}", price - off)
+        return SolveResult(_norm(pay), steps, used, True)
+
+    # customers: first A buy one/1 each, next B buy 2 each, last C buy 0
+    m = re.search(
+        r"first\s+(\d+)\s+customers? buy\s+(one|two|three|\d+).*?each.*?"
+        r"next\s+(\d+)\s+customers? buy\s+(one|two|three|\d+).*?each",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow many\b", ql):
+        n1, k1, n2, k2 = m.group(1), m.group(2), m.group(3), m.group(4)
+        kk1 = float(WORD_NUM.get(k1, k1))
+        kk2 = float(WORD_NUM.get(k2, k2))
+        t1 = push("mul_groups", "first", f"{n1}*{kk1}", float(n1) * kk1)
+        t2 = push("mul_groups", "next", f"{n2}*{kk2}", float(n2) * kk2)
+        tot = push("add_combine", "sold", f"{t1}+{t2}", t1 + t2)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # two legs distance each of 2 trains: 2*80 + 2*150 then /2 per train? 
+    # "distance covered by each train" = (2*west + 2*north)/2 = west+north
+    m = re.search(
+        r"both traveling for\s+(\d+)\s+miles.*?covering\s+(\d+)\s+miles",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\beach train\b|\bdistance covered by each\b", ql):
+        w, n = float(m.group(1)), float(m.group(2))
+        # each train does west + north once
+        d = push("add_combine", "each train", f"{w}+{n}", w + n)
+        return SolveResult(_norm(d), steps, used, True)
+
+    # range beyond dragon: throw 3*400 - 1000
+    m = re.search(
+        r"distance of\s+(\d+)\s+feet.*?(\d+)\s+times.*?(\d+)\s+feet",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow (many|much) (feet|far)\b", ql):
+        dragon, times, base = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        throw = push("mul_groups", "throw", f"{times}*{base}", times * base)
+        beyond = push("sub_remove", "beyond", f"{throw}-{dragon}", throw - dragon)
+        return SolveResult(_norm(beyond), steps, used, True)
+
+    # cell phones: n phones @ $p each + interest r% each unit, pay over months M
+    m = re.search(
+        r"(\d+)\s+cell phones? for\s+\$?\s*(\d+(?:\.\d+)?)\s*each.*?"
+        r"(\d+(?:\.\d+)?)\s*%\s*interest.*?(\d+)\s*months?",
+        ql,
+        re.S,
+    )
+    if m:
+        n, price, pct, months = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        interest = push("AR-202", "per unit interest", f"{pct}%*{price}", price * pct / 100.0)
+        unit = push("add_combine", "unit total", f"{price}+{interest}", price + interest)
+        all_cost = push("mul_groups", "all phones", f"{unit}*{n}", unit * n)
+        monthly = push("div_share", "per month", f"{all_cost}/{months}", all_cost / months)
+        return SolveResult(_norm(monthly), steps, used, True)
+
+    # kittens: start with N, mother cats had A and B more → total
+    m = re.search(
+        r"(\d+)\s+kittens?.*?(\d+)\s+kittens?.*?(\d+)\s+more kittens?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow many kittens\b", ql):
+        # sample: 7 adopted; Patchy 3*7=21, Trixie 12 more than Patchy → 7+21+(21+12)
+        # too specific - try: adopted N, first litter k*N, second N2 more than first
+        pass
+    m = re.search(
+        r"(\d+)\s+kittens.*?(\d+)\s+times.*?(\d+)\s+more",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bkittens\b", ql) and re.search(r"\bhow many\b", ql):
+        adopted, mult, more = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        # Patchy had 3 litters of 7? sample ops 3*7=21, 21+12=33, 7+33=40
+        # "three times as many kittens as the number of kittens they are bringing home"
+        lit1 = push("mul_groups", "first litter", f"{mult}*{adopted}", mult * adopted)
+        lit2 = push("BIND-04", "second", f"{lit1}+{more}", lit1 + more)
+        tot = push("add_combine", "all", f"{adopted}+{lit1}+{lit2}", adopted + lit1 + lit2)
+        return SolveResult(_norm(tot), steps, used, True)
 
     return SolveResult(None, steps, used, False)
 

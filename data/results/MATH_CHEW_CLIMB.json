@@ -1,27 +1,27 @@
 {
-  "generated_at": "2026-07-30T03:27:44.386970+00:00",
+  "generated_at": "2026-07-30T03:36:01.321430+00:00",
   "drills_acc": 1.0,
   "drills_n": 127,
   "drills_pass": true,
   "binding_drills": "37/37",
   "gsm8k": {
     "n": 1319,
-    "correct": 57,
-    "wrong_fire": 61,
-    "no_fire": 1201,
-    "fire": 118,
-    "precision": 0.4831,
-    "recall": 0.0432
+    "correct": 77,
+    "wrong_fire": 67,
+    "no_fire": 1175,
+    "fire": 144,
+    "precision": 0.5347,
+    "recall": 0.0584
   },
-  "nofire_sense_ready": 1168,
+  "nofire_sense_ready": 1142,
   "nofire_tags": {
-    "each": 400,
-    "money": 368,
-    "percent": 158,
-    "left": 136,
-    "week": 131,
-    "times": 62,
+    "each": 389,
+    "money": 358,
+    "percent": 151,
+    "left": 133,
+    "week": 128,
     "rate": 61,
+    "times": 61,
     "ratio": 8
   },
   "note": "Local only. Sense-ready no-fires need executors, not more chat. Wire largest tag families in one batch."
