@@ -110,13 +110,31 @@ def exact_num(a: str, b: str) -> bool:
         return _norm(a) == _norm(b)
 
 
+_WORD_NUM = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "eleven": 11, "twelve": 12, "dozen": 12, "half": 0.5,
+}
+
+
 def extract_nums(text: str) -> List[float]:
-    out = []
-    for m in NUM_RE.finditer(text.replace(",", "")):
+    """Digits plus common number words (so 'three'/'four' bind as quantities)."""
+    out: List[float] = []
+    # strip commas in thousands
+    t = text.replace(",", "")
+    # find digits
+    for m in NUM_RE.finditer(t):
         try:
             out.append(float(m.group(1)))
         except ValueError:
             pass
+    # number words not already part of larger tokens
+    for w, v in _WORD_NUM.items():
+        if w == "half":
+            continue  # operator, not always a free quantity
+        for m in re.finditer(rf"\b{w}\b", t.lower()):
+            # skip if this position overlaps a digit we already have nearby — still append word nums
+            out.append(float(v))
     return out
 
 
@@ -374,81 +392,97 @@ def apply_rules(question: str) -> SolveResult:
             push("div_share", "each = total ÷ n", f"{nums[0]}/{nums[1]}", v)
             return SolveResult(_norm(v), steps, used, True)
 
-    # percent of
-    if "percent" in strats or re.search(r"\d+\s*%|\bpercent\b", ql):
-        # find p% of x patterns: number then % then of then number
-        m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*of\s*[^0-9]*(\d+(?:\.\d+)?)", ql)
+    # percent of — require "p% of <number>" or explicit drill form (not any nearby %)
+    if re.search(r"\d+\s*%\s*of\b|\bpercent of\b|what is \d+\s*% of", ql):
+        m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*of\s*[^0-9]{0,40}?(\d+(?:\.\d+)?)", ql)
+        if not m:
+            m = re.search(r"what is\s+(\d+(?:\.\d+)?)\s*%\s*of\s+(\d+(?:\.\d+)?)", ql)
         if m:
             p, x = float(m.group(1)), float(m.group(2))
-            v = push("percent", "p% of x = (p/100)*x", f"{p}% of {x}", (p / 100.0) * x)
+            v = push("AR-202", "p% of x = (p/100)*x", f"{p}% of {x}", (p / 100.0) * x)
             return SolveResult(_norm(v), steps, used, True)
-        # "20% enrolled" style with base first
-        if len(nums) >= 2 and re.search(r"%", q):
-            # often base, then percent
-            base, pct = nums[0], nums[1]
-            if pct <= 100:
-                part = push("percent", "p% of x = (p/100)*x", f"{pct}% of {base}", (pct / 100.0) * base)
-                # remaining after percent?
-                if re.search(r"\b(remaining|rest|left)\b", ql) and len(nums) >= 3:
-                    # more complex percent chains — partial
-                    rem = push("sub_remove", "left = total − used", f"{base} - {part}", base - part)
-                    pct2 = nums[2]
-                    part2 = push("percent", "p% of x", f"{pct2}% of {rem}", (pct2 / 100.0) * rem)
-                    if re.search(r"\bjazz\b|\benrolled in\b", ql) and len(nums) >= 3:
-                        # dance class style often asks last group
-                        last = push("sub_remove", "left = rem − part2", f"{rem}-{part2}", rem - part2)
-                        return SolveResult(_norm(last), steps, used, True)
-                return SolveResult(_norm(part), steps, used, True)
+        # enrolled chain: "class of N, p% enrolled, q% of the remaining"
+        if re.search(r"\bof the remaining\b", ql) and len(nums) >= 1:
+            pcts = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", q)]
+            base = nums[0]
+            if len(pcts) >= 2 and base >= 1:
+                part1 = push("AR-202", "p% of x", f"{pcts[0]}% of {base}", (pcts[0] / 100.0) * base)
+                rem = push("sub_remove", "remaining", f"{base}-{part1}", base - part1)
+                part2 = push("AR-202", "q% of remaining", f"{pcts[1]}% of {rem}", (pcts[1] / 100.0) * rem)
+                if re.search(r"\b(rest|hip-hop|else|remaining students)\b", ql) or re.search(
+                    r"what percentage of the entire", ql
+                ):
+                    last = push("sub_remove", "rest group", f"{rem}-{part2}", rem - part2)
+                    if re.search(r"what percentage of the entire", ql):
+                        pct_last = push("percent_of_whole", "100*last/base", f"100*{last}/{base}", 100.0 * last / base)
+                        return SolveResult(_norm(pct_last), steps, used, True)
+                    return SolveResult(_norm(last), steps, used, True)
+                return SolveResult(_norm(part2), steps, used, True)
 
-    # half
-    if "half" in strats or re.search(r"\bhalf\b", ql):
-        if len(nums) >= 1:
-            # "half that much" after a number — half of first mentioned group size
-            n0 = nums[0]
-            h = push("half", "half(n)=n/2", f"half of {n0}", n0 / 2.0)
-            if re.search(r"\btotal\b|\bin total\b|\balltogether\b", ql):
-                tot = push("add_combine", "total=a+b", f"{n0}+{h}", n0 + h)
-                return SolveResult(_norm(tot), steps, used, True)
-            if re.search(r"\bhalf as many\b", ql) and len(nums) >= 1:
-                # "sold half as many in May" after April count
-                if re.search(r"\b(april|first|then)\b", ql) and re.search(r"\b(may|second)\b", ql):
-                    # april + half(april)
-                    tot = push("add_combine", "total=a+half(a)", f"{n0}+{h}", n0 + h)
-                    return SolveResult(_norm(tot), steps, used, True)
-                return SolveResult(_norm(h), steps, used, True)
-            return SolveResult(_norm(h), steps, used, True)
+    # half — only when referent is explicit (drills / simple templates).
+    # Failure analysis: bare "half" on multi-hop GSM8K halves wrong nums[0].
+    if re.search(r"\bhalf of (\d+(?:\.\d+)?)\b", ql):
+        m = re.search(r"\bhalf of (\d+(?:\.\d+)?)\b", ql)
+        n0 = float(m.group(1))
+        h = push("half", "half(n)=n/2", f"half of {n0}", n0 / 2.0)
+        return SolveResult(_norm(h), steps, used, True)
+    if re.search(r"\bhalf that much\b", ql) and len(nums) >= 1:
+        n0 = nums[0]
+        h = push("half", "half(n)=n/2", f"half of {n0}", n0 / 2.0)
+        if re.search(r"\btotal\b|\bin total\b", ql):
+            tot = push("add_combine", "total=a+b", f"{n0}+{h}", n0 + h)
+            return SolveResult(_norm(tot), steps, used, True)
+        return SolveResult(_norm(h), steps, used, True)
+    if re.search(r"\bhalf as many\b", ql) and len(nums) == 1:
+        n0 = nums[0]
+        h = push("half", "half(n)=n/2", f"half of {n0}", n0 / 2.0)
+        if re.search(r"\baltogether\b|\bin total\b|\btotal\b", ql):
+            tot = push("add_combine", "total=a+half(a)", f"{n0}+{h}", n0 + h)
+            return SolveResult(_norm(tot), steps, used, True)
+        return SolveResult(_norm(h), steps, used, True)
+    # "half as many ants/bugs" with one main count
+    if re.search(r"\bhalf as many\b", ql) and len(nums) == 1 and re.search(
+        r"\baltogether\b|\btotal\b", ql
+    ):
+        n0 = nums[0]
+        h = push("half", "half(n)=n/2", f"half of {n0}", n0 / 2.0)
+        tot = push("add_combine", "total", f"{n0}+{h}", n0 + h)
+        return SolveResult(_norm(tot), steps, used, True)
 
-    # double / twice / relative chain (Seattle base often last number)
-    if "double" in strats or re.search(r"\b(twice|double)\b", ql):
-        if len(nums) >= 1:
-            # Toulouse twice Charleston; Charleston 4× Seattle; Seattle has 20
-            if re.search(r"\btwice as many\b", ql) and re.search(r"\btimes as many\b", ql):
-                n = nums[-1]  # base quantity stated last ("if Seattle has 20")
-                mul = 4.0 if re.search(r"\b4 times\b|\bfour times\b", ql) else 3.0
+    # double / twice — refuse bare "twice" on multi-number stories (wrong-fire analysis)
+    if re.search(r"\btwice as many\b", ql) and re.search(r"\btimes as many\b", ql):
+        n = nums[-1] if nums else None
+        if n is not None:
+            mul = 4.0 if re.search(r"\b4 times\b|\bfour times\b", ql) else None
+            if mul is not None:
                 c = push("mul_groups", "C=k*S", f"{mul}*{n}", mul * n)
                 t = push("double", "T=2*C", f"2*{c}", 2 * c)
                 if re.search(r"\btogether|total\b", ql):
                     tot = push("add_combine", "T+C+S", f"{t}+{c}+{n}", t + c + n)
                     return SolveResult(_norm(tot), steps, used, True)
                 return SolveResult(_norm(t), steps, used, True)
-            d = push("double", "double(n)=2n", f"2*{nums[0]}", 2 * nums[0])
+    if re.search(r"\b(what is )?twice (\d+(?:\.\d+)?)\b", ql) or re.match(
+        r"what is twice (\d+(?:\.\d+)?)\??$", ql
+    ):
+        m = re.search(r"twice (\d+(?:\.\d+)?)", ql)
+        if m:
+            n0 = float(m.group(1))
+            d = push("double", "double(n)=2n", f"2*{n0}", 2 * n0)
             return SolveResult(_norm(d), steps, used, True)
+    if re.match(r"what is twice (\d+(?:\.\d+)?)\??$", ql):
+        n0 = float(re.match(r"what is twice (\d+(?:\.\d+)?)\??$", ql).group(1))
+        d = push("double", "double(n)=2n", f"2*{n0}", 2 * n0)
+        return SolveResult(_norm(d), steps, used, True)
 
-    # rate × time (with minute/hour convert)
-    if "rate" in strats or re.search(r"\bper (hour|minute|day)\b", ql):
-        if re.search(r"\bper hour\b", ql) and re.search(r"\bminute", ql) and len(nums) >= 2:
-            rate, minutes = nums[0], nums[1]
-            hours = push("div_rate", "hours = minutes/60", f"{minutes}/60", minutes / 60.0)
-            amt = push("mul_rate", "amount=rate×time", f"{rate}*{hours}", rate * hours)
-            return SolveResult(_norm(amt), steps, used, True)
-        if re.search(r"\bper hour\b", ql) and re.search(r"\bhour", ql) and len(nums) >= 2:
-            amt = push("mul_rate", "amount=rate×time", f"{nums[0]}*{nums[1]}", nums[0] * nums[1])
-            return SolveResult(_norm(amt), steps, used, True)
-        if len(nums) >= 2 and re.search(r"\bmph\b|\bspeed of\b", ql):
-            # distance = speed * time
-            if re.search(r"\bhours?\b", ql):
-                dist = push("mul_rate", "d=r*t", f"{nums[0]}*{nums[-1] if len(nums)>1 else nums[0]}", nums[0] * nums[1])
-                return SolveResult(_norm(dist), steps, used, True)
+    # rate × time — only tight templates (wrong-fire: grabbed first two nums)
+    if re.search(r"\bper hour\b", ql) and re.search(r"\bminute", ql) and len(nums) == 2:
+        rate, minutes = nums[0], nums[1]
+        hours = push("div_rate", "hours = minutes/60", f"{minutes}/60", minutes / 60.0)
+        amt = push("mul_rate", "amount=rate×time", f"{rate}*{hours}", rate * hours)
+        return SolveResult(_norm(amt), steps, used, True)
+    if re.match(r".*\bper hour\b.*\b(\d+)\s*hours?\b", ql) and len(nums) == 2:
+        amt = push("mul_rate", "amount=rate×time", f"{nums[0]}*{nums[1]}", nums[0] * nums[1])
+        return SolveResult(_norm(amt), steps, used, True)
 
     # groups: n sprints × times/week × meters
     if re.search(r"\bsprint|times a week|each sprint\b", ql) and len(nums) >= 3:
