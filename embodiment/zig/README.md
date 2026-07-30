@@ -1,12 +1,15 @@
-# FSOT trinary Zig body
+# FSOT trinary Zig neurological body
 
-Custom trinary substrate in **Zig** (host test + freestanding QEMU kernel).
+Custom trinary substrate in **Zig** — host mind, freestanding QEMU kernel, genetic neurons.
+
+**Learned capacity snapshot (repo-wide):** [`docs/LEARNED_CAPACITY.md`](../../docs/LEARNED_CAPACITY.md)
 
 ## Why Zig here
 
 - Less “batteries included” than Rust → we design trit ops ourselves  
 - Matches SR-ITE Zig lineage on the physical archive  
 - Freestanding + QEMU serial bring-up  
+- **Mind authority** lives here: multi-region brain, learn/sleep, claimability, intel-loop  
 
 ## I/O planes (see `docs/BARE_METAL_IO.md`)
 

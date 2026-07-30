@@ -42,3 +42,9 @@ data/external/**/*
 *.log
 .mypy_cache/
 .pytest_cache/
+
+# local experience-learn backups
+data/math_learn/*.bak*
+embodiment/zig/$out
+embodiment/zig/$out.pdb
+

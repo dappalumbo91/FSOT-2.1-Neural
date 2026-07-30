@@ -1,0 +1,177 @@
+{
+  "doctrine": "experience\u2192episodic hop traces\u2192WM atomics\u2192sleep\u2192prove transfer",
+  "n_lessons": 7378,
+  "n_taught_ok": 7284,
+  "epochs": 8,
+  "history": [
+    {
+      "epoch": 1,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.114
+    },
+    {
+      "epoch": 2,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.1251
+    },
+    {
+      "epoch": 3,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.1361
+    },
+    {
+      "epoch": 4,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.1452
+    },
+    {
+      "epoch": 5,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.1502
+    },
+    {
+      "epoch": 6,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.1532
+    },
+    {
+      "epoch": 7,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.1556
+    },
+    {
+      "epoch": 8,
+      "practice": {
+        "n": 100,
+        "hit": 100,
+        "acc": 1.0,
+        "n_traces": 7283
+      },
+      "retention_slice": {
+        "n": 50,
+        "hit": 50,
+        "acc": 1.0
+      },
+      "n_traces": 7283,
+      "mean_trace_strength": 2.158
+    }
+  ],
+  "retention_after_encode": {
+    "history": [
+      {
+        "pass": 1,
+        "acc": 0.9999,
+        "hit": 7283,
+        "n": 7284
+      }
+    ],
+    "final": {
+      "n": 7284,
+      "hit": 7283,
+      "acc": 0.9999,
+      "misses": [
+        [
+          "For breakfast, Anna bought a bagel for $0.95 and a glass of orange juice for $0.85. At lunch, Anna spent $4.65 on a sandwich and $1.15 on a carton of milk. How much more money did Anna spend on lunch than on breakfast?",
+          "4"
+        ]
+      ]
+    },
+    "target_acc": 0.99
+  },
+  "retention_final": {
+    "n": 7284,
+    "hit": 7283,
+    "acc": 0.9999
+  },
+  "retention_push": null,
+  "prove": {
+    "n": 100,
+    "hit": 100,
+    "acc": 1.0,
+    "n_traces": 7283
+  },
+  "n_traces_final": 7283,
+  "n_trace_teaches": 7284,
+  "n_trace_hits": 23152,
+  "n_trace_tries": 23152,
+  "mean_trace_strength_final": 2.5057,
+  "gsm8k_probe": null,
+  "trace_bank": "I:\\fsot nuron\\data\\math_learn\\trace_bank.json"
+}

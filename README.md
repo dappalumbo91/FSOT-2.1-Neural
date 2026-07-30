@@ -21,6 +21,8 @@ Biologically structured **FSOT neurons** whose identity and wiring come from the
 | **License** | Apache-2.0 |
 | **GitHub** | [FSOT-2.1-Neural](https://github.com/dappalumbo91/FSOT-2.1-Neural) |
 | **Results** | `data/results/GENETIC_NETWORK.md` · legacy NLP demos under `RESULTS.md` |
+| **Learned capacity** | [`docs/LEARNED_CAPACITY.md`](docs/LEARNED_CAPACITY.md) — Zig mind + multi-hop experience bank |
+| **Zig neurological body** | [`embodiment/zig/`](embodiment/zig/) · `zig build mind` · QEMU kernel |
 | **Hardware** | CPU (small nets) · NVIDIA CUDA (large populations) |
 
 > Neurological failure modes are **substrate engineering boundaries**. This is **not** a medical device, diagnosis, or treatment.
@@ -110,13 +112,17 @@ python run_precision_climb.py
 
 # 5) Zig neuron step parity vs Python + Allen bio card
 python scripts/parity_zig_neuron.py
-cd embodiment\zig; powershell -File .\run_qemu.ps1
+cd embodiment\zig; zig build mind -- all; powershell -File .\run_qemu.ps1
 
-# 6) Wet-lab class rates (≤2%) + intelligence encode/retrieve
+# 6) Multi-hop experience school (retain methods from worked lessons)
+python scripts/run_multihop_experience_learn.py --train-limit 8000 --epochs 8
+# → docs/LEARNED_CAPACITY.md · data/math_learn/trace_bank.json
+
+# 7) Wet-lab class rates (≤2%) + intelligence encode/retrieve
 python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.02
 python run_intelligence_probe.py --tol 0.02 --items 6
 
-# 7) CI smoke
+# 8) CI smoke
 python scripts/ci_smoke.py
 ```
 
