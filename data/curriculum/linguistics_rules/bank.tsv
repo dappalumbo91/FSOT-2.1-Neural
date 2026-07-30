@@ -1,0 +1,275 @@
+# domain	grade	kind	question	answer
+# Linguistics RULES (reading+writing) 2026-07-30T02:22:28.781270+00:00
+# kind=form|why|how|apply — teach rules, reasons, procedures
+literacy	rules	form	What is the form of PH-001 Letter-sound map?	letter → primary sound
+literacy	rules	why	Why does PH-001 exist?	Readers decode print by mapping letters to speech sounds.
+literacy	rules	how	How do you apply PH-001?	See the letter; say its usual sound; blend sounds left to right.
+literacy	rules	apply	What does phonics map letters to?	sounds
+literacy	rules	example	Example of PH-001	b → /b/
+literacy	rules	example	Example of PH-001	s → /s/
+literacy	rules	form	What is the form of PH-010 CVC short vowel?	C V C → short vowel sound
+literacy	rules	why	Why does PH-010 exist?	Three-letter CVC words keep the middle vowel short in English patterns.
+literacy	rules	how	How do you apply PH-010?	Identify consonant-vowel-consonant; pronounce vowel as short (cat, bed, sit).
+literacy	rules	apply	In CVC words the middle vowel is usually?	short
+literacy	rules	example	Example of PH-010	cat
+literacy	rules	example	Example of PH-010	bed
+literacy	rules	form	What is the form of PH-020 Silent final e?	CVCe → long vowel; final e silent
+literacy	rules	why	Why does PH-020 exist?	Final e often marks the preceding vowel as long (makes the vowel say its name).
+literacy	rules	how	How do you apply PH-020?	If a word ends in vowel-consonant-e, try long vowel + silent e (cake, like, hope).
+literacy	rules	apply	Final e in cake is?	silent
+literacy	rules	example	Example of PH-020	cake
+literacy	rules	example	Example of PH-020	like
+literacy	rules	form	What is the form of PH-030 Consonant digraph?	two letters → one sound (sh, ch, th, wh)
+literacy	rules	why	Why does PH-030 exist?	Some letter pairs stand for a single sound, not two separate sounds.
+literacy	rules	how	How do you apply PH-030?	When you see sh/ch/th/wh, produce one combined sound.
+literacy	rules	apply	sh in ship is a?	digraph
+literacy	rules	example	Example of PH-030	ship=/sh/
+literacy	rules	example	Example of PH-030	chip=/ch/
+literacy	rules	form	What is the form of PH-040 Blend left to right?	sound1+sound2+… → spoken word
+literacy	rules	why	Why does PH-040 exist?	Blending turns decoded sounds into a recognizable word.
+literacy	rules	how	How do you apply PH-040?	Say each sound in order without stopping; then say the whole word smoothly.
+literacy	rules	apply	Blending joins sounds from?	left
+literacy	rules	example	Example of PH-040	c
+literacy	rules	example	Example of PH-040	-
+literacy	rules	form	What is the form of MO-010 Plural -s?	noun + s → more than one (regular)
+literacy	rules	why	Why does MO-010 exist?	English marks many plurals by adding -s so number is clear in writing and speech.
+literacy	rules	how	How do you apply MO-010?	If the noun is regular plural, add -s (cats, dogs). Watch irregulars separately.
+literacy	rules	apply	Many plurals add?	s
+literacy	rules	example	Example of MO-010	cat→cats
+literacy	rules	example	Example of MO-010	book→books
+literacy	rules	form	What is the form of MO-020 Past tense -ed?	verb + ed → past (regular)
+literacy	rules	why	Why does MO-020 exist?	Regular past tense uses -ed so time of action is marked.
+literacy	rules	how	How do you apply MO-020?	For regular verbs, add -ed for past (walk→walked). Check irregulars (go→went).
+literacy	rules	apply	Many past tense verbs end in?	ed
+literacy	rules	example	Example of MO-020	walk→walked
+literacy	rules	example	Example of MO-020	jump→jumped
+literacy	rules	form	What is the form of MO-030 Prefix un-?	un- + base → not / opposite
+literacy	rules	why	Why does MO-030 exist?	Prefixes change meaning systematically without rewriting the whole word.
+literacy	rules	how	How do you apply MO-030?	If un- is attached, interpret as not or opposite (happy→unhappy).
+literacy	rules	apply	Prefix un often means?	not
+literacy	rules	example	Example of MO-030	unhappy=not happy
+literacy	rules	example	Example of MO-030	unlock=reverse lock
+literacy	rules	form	What is the form of MO-040 Suffix -er (agent)?	verb + er → one who does
+literacy	rules	why	Why does MO-040 exist?	Agentive -er names a person or thing that performs the action.
+literacy	rules	how	How do you apply MO-040?	Teach + er → teacher (one who teaches), when the pattern fits.
+literacy	rules	apply	Suffix er can mean?	one
+literacy	rules	example	Example of MO-040	teach→teacher
+literacy	rules	example	Example of MO-040	read→reader
+literacy	rules	form	What is the form of MO-050 Progressive -ing?	verb + ing → ongoing action
+literacy	rules	why	Why does MO-050 exist?	-ing marks continuous/progressive aspect (action in progress).
+literacy	rules	how	How do you apply MO-050?	Add -ing for ongoing action (run→running; drop silent-e: make→making).
+literacy	rules	apply	Ending ing often shows action is?	ongoing
+literacy	rules	example	Example of MO-050	run→running
+literacy	rules	example	Example of MO-050	make→making
+literacy	rules	form	What is the form of GR-010 Sentence capital start?	sentence → starts with capital letter
+literacy	rules	why	Why does GR-010 exist?	Capitals mark the beginning of a sentence so the reader can segment text.
+literacy	rules	how	How do you apply GR-010?	Begin every sentence with an uppercase letter.
+literacy	rules	apply	A sentence starts with a?	capital
+literacy	rules	example	Example of GR-010	T
+literacy	rules	example	Example of GR-010	h
+literacy	rules	form	What is the form of GR-020 Statement ends with period?	statement → ends with .
+literacy	rules	why	Why does GR-020 exist?	End punctuation tells the reader how to read the sentence type.
+literacy	rules	how	How do you apply GR-020?	End a telling sentence with a period.
+literacy	rules	apply	A sentence ends with a?	period
+literacy	rules	example	Example of GR-020	I
+literacy	rules	example	Example of GR-020	 
+literacy	rules	form	What is the form of GR-030 Question ends with ??	question → ends with ?
+literacy	rules	why	Why does GR-030 exist?	Question marks signal that the sentence asks for information.
+literacy	rules	how	How do you apply GR-030?	If the sentence asks, end with a question mark.
+literacy	rules	apply	A question ends with a question?	mark
+literacy	rules	example	Example of GR-030	W
+literacy	rules	example	Example of GR-030	h
+literacy	rules	form	What is the form of GR-040 Noun names?	noun → person | place | thing | idea
+literacy	rules	why	Why does GR-040 exist?	Nouns name entities so propositions can refer to them.
+literacy	rules	how	How do you apply GR-040?	Ask: is this a who/what naming word? If yes, treat as noun.
+literacy	rules	apply	A noun can name a person place or?	thing
+literacy	rules	example	Example of GR-040	dog
+literacy	rules	example	Example of GR-040	school
+literacy	rules	form	What is the form of GR-050 Verb action?	verb → action | state
+literacy	rules	why	Why does GR-050 exist?	Verbs carry the action or state of the clause.
+literacy	rules	how	How do you apply GR-050?	Find what the subject does or is; that word is the verb.
+literacy	rules	apply	A verb names an?	action
+literacy	rules	example	Example of GR-050	run
+literacy	rules	example	Example of GR-050	is
+literacy	rules	form	What is the form of GR-060 Adjective describes noun?	adjective + noun → described noun
+literacy	rules	why	Why does GR-060 exist?	Adjectives add properties so referents are distinguished.
+literacy	rules	how	How do you apply GR-060?	If a word answers what kind / which one / how many about a noun, it is an adjective.
+literacy	rules	apply	An adjective describes a?	noun
+literacy	rules	example	Example of GR-060	red ball
+literacy	rules	example	Example of GR-060	three cats
+literacy	rules	form	What is the form of GR-070 Subject does action?	subject → does the action
+literacy	rules	why	Why does GR-070 exist?	Subject is the clause’s actor/topic for the predicate.
+literacy	rules	how	How do you apply GR-070?	Ask who or what is doing the action; that is the subject.
+literacy	rules	apply	The subject does the?	action
+literacy	rules	example	Example of GR-070	T
+literacy	rules	example	Example of GR-070	h
+literacy	rules	form	What is the form of GR-080 Predicate tells action?	predicate → tells the action/state
+literacy	rules	why	Why does GR-080 exist?	Predicate completes the claim about the subject.
+literacy	rules	how	How do you apply GR-080?	Everything that tells what the subject does/is is the predicate.
+literacy	rules	apply	The predicate tells the?	action
+literacy	rules	example	Example of GR-080	T
+literacy	rules	example	Example of GR-080	h
+literacy	rules	form	What is the form of GR-090 Pronoun replaces noun?	pronoun ↔ noun (same referent)
+literacy	rules	why	Why does GR-090 exist?	Pronouns avoid repeating nouns while keeping reference.
+literacy	rules	how	How do you apply GR-090?	Replace a known noun with he/she/it/they when clear.
+literacy	rules	apply	A pronoun replaces a?	noun
+literacy	rules	example	Example of GR-090	Sam → he
+literacy	rules	example	Example of GR-090	the cats → they
+literacy	rules	form	What is the form of GR-100 Comma separates list items?	A, B, and C
+literacy	rules	why	Why does GR-100 exist?	Commas segment list items so the reader does not fuse them.
+literacy	rules	how	How do you apply GR-100?	In a list of three or more, separate items with commas.
+literacy	rules	apply	A comma can separate?	items
+literacy	rules	example	Example of GR-100	a
+literacy	rules	example	Example of GR-100	p
+literacy	rules	form	What is the form of RD-010 Main idea?	main idea = central point of text
+literacy	rules	why	Why does RD-010 exist?	Main idea focuses comprehension on what the text is mostly about.
+literacy	rules	how	How do you apply RD-010?	After reading, ask: what is this mostly about? State it in one sentence.
+literacy	rules	apply	The main idea is the central?	point
+literacy	rules	form	What is the form of RD-020 Context clues?	unknown word + nearby text → meaning
+literacy	rules	why	Why does RD-020 exist?	Context lets readers infer unfamiliar words without stopping for a dictionary every time.
+literacy	rules	how	How do you apply RD-020?	Read the sentence before/after the hard word; test a meaning that fits.
+literacy	rules	apply	Context clues help find?	meaning
+literacy	rules	form	What is the form of RD-030 Summary?	summary = retell main points (brief)
+literacy	rules	why	Why does RD-030 exist?	Summaries check understanding and compress information.
+literacy	rules	how	How do you apply RD-030?	Select main points; drop minor details; retell in fewer words.
+literacy	rules	apply	A summary retells?	main
+literacy	rules	form	What is the form of RD-040 Synonym?	synonym ≈ same meaning
+literacy	rules	why	Why does RD-040 exist?	Synonyms expand vocabulary flexibility and paraphrase skill.
+literacy	rules	how	How do you apply RD-040?	If two words mean nearly the same, they are synonyms (big/large).
+literacy	rules	apply	A synonym means nearly the?	same
+literacy	rules	example	Example of RD-040	big≈large
+literacy	rules	example	Example of RD-040	happy≈glad
+literacy	rules	form	What is the form of RD-050 Antonym?	antonym = opposite meaning
+literacy	rules	why	Why does RD-050 exist?	Antonyms sharpen contrast and precision.
+literacy	rules	how	How do you apply RD-050?	If two words mean opposites, they are antonyms (hot/cold).
+literacy	rules	apply	An antonym means the?	opposite
+literacy	rules	example	Example of RD-050	hot↔cold
+literacy	rules	example	Example of RD-050	up↔down
+literacy	rules	form	What is the form of RD-060 Infer from evidence?	text evidence → inference (not wild guess)
+literacy	rules	why	Why does RD-060 exist?	Inference builds meaning beyond literal lines while staying grounded.
+literacy	rules	how	How do you apply RD-060?	Combine what the text says with what must follow; cite the clue.
+literacy	rules	apply	An inference should be based on?	evidence
+literacy	rules	form	What is the form of RD-070 Setting?	setting = where + when
+literacy	rules	why	Why does RD-070 exist?	Setting situates events so causal and social cues make sense.
+literacy	rules	how	How do you apply RD-070?	Ask where and when the events happen.
+literacy	rules	apply	Setting is where and?	when
+literacy	rules	form	What is the form of RD-080 Plot?	plot = sequence of events
+literacy	rules	why	Why does RD-080 exist?	Plot is the ordered chain that carries the story’s change.
+literacy	rules	how	How do you apply RD-080?	List beginning → middle → end (or key events in order).
+literacy	rules	apply	Plot is the sequence of?	events
+literacy	rules	form	What is the form of WR-010 Complete sentence?	sentence ≥ subject + predicate
+literacy	rules	why	Why does WR-010 exist?	Complete sentences express full claims; fragments confuse readers.
+literacy	rules	how	How do you apply WR-010?	Check for subject and verb; if missing, rewrite as complete.
+literacy	rules	apply	A complete sentence needs a subject and a?	predicate
+literacy	rules	example	Example of WR-010	She runs.
+literacy	rules	example	Example of WR-010	NOT: Running fast.
+literacy	rules	form	What is the form of WR-020 Topic sentence?	paragraph → topic sentence + support
+literacy	rules	why	Why does WR-020 exist?	Topic sentences guide the reader and organize ideas.
+literacy	rules	how	How do you apply WR-020?	Open a paragraph with the main point; then give reasons/details.
+literacy	rules	apply	A paragraph has a topic?	sentence
+literacy	rules	form	What is the form of WR-030 Indent / new idea → new paragraph?	new idea → new paragraph
+literacy	rules	why	Why does WR-030 exist?	Paragraphs chunk related ideas so structure is visible.
+literacy	rules	how	How do you apply WR-030?	When the idea shifts, start a new paragraph.
+literacy	rules	apply	Start a new paragraph for a new?	idea
+literacy	rules	form	What is the form of WR-040 Spelling: i before e?	i before e except after c (common pattern)
+literacy	rules	why	Why does WR-040 exist?	Spelling patterns reduce arbitrary memory load (with known exceptions).
+literacy	rules	how	How do you apply WR-040?	Try i before e except after c (believe, receive); learn exceptions (their, weird).
+literacy	rules	apply	Common pattern: i before e except after?	c
+literacy	rules	example	Example of WR-040	believe
+literacy	rules	example	Example of WR-040	receive
+literacy	rules	form	What is the form of CO-010 Thesis states claim?	thesis → main claim
+literacy	rules	why	Why does CO-010 exist?	A thesis focuses an essay so evidence has a job.
+literacy	rules	how	How do you apply CO-010?	State what you claim in one clear sentence near the opening.
+literacy	rules	apply	A thesis states the main?	claim
+literacy	rules	form	What is the form of CO-020 Evidence supports claim?	claim ← evidence
+literacy	rules	why	Why does CO-020 exist?	Claims without evidence are opinions; evidence makes writing accountable.
+literacy	rules	how	How do you apply CO-020?	For each claim, add a fact, example, or quote that supports it.
+literacy	rules	apply	Evidence supports a?	claim
+literacy	rules	form	What is the form of CO-030 Conclusion wraps ideas?	conclusion → wrap + significance
+literacy	rules	why	Why does CO-030 exist?	Conclusions help the reader leave with the point, not a hard stop.
+literacy	rules	how	How do you apply CO-030?	Restate the main claim in new words; note why it matters.
+literacy	rules	apply	A conclusion wraps up?	ideas
+literacy	rules	form	What is the form of CO-040 Transition connects ideas?	idea1 —transition→ idea2
+literacy	rules	why	Why does CO-040 exist?	Transitions show logical relation (cause, contrast, addition).
+literacy	rules	how	How do you apply CO-040?	Use words like however, therefore, also to show how ideas link.
+literacy	rules	apply	A transition connects?	ideas
+literacy	rules	example	Example of CO-040	however=contrast
+literacy	rules	example	Example of CO-040	therefore=result
+literacy	rules	form	What is the form of CO-050 Audience is the reader?	write for intended audience
+literacy	rules	why	Why does CO-050 exist?	Audience choice controls vocabulary, tone, and detail level.
+literacy	rules	how	How do you apply CO-050?	Ask who will read this; adjust words and explanations for them.
+literacy	rules	apply	Audience is the intended?	reader
+literacy	rules	form	What is the form of CO-060 Tone is attitude?	tone = author's attitude
+literacy	rules	why	Why does CO-060 exist?	Tone shapes how the message is received (formal, playful, serious).
+literacy	rules	how	How do you apply CO-060?	Choose words that match the attitude you intend.
+literacy	rules	apply	Tone is the author's?	attitude
+literacy	rules	form	What is the form of LIT-010 Simile uses like/as?	simile: A like/as B
+literacy	rules	why	Why does LIT-010 exist?	Similes make comparisons explicit for the reader.
+literacy	rules	how	How do you apply LIT-010?	If comparison uses like or as, label it simile.
+literacy	rules	apply	A simile uses like or?	as
+literacy	rules	example	Example of LIT-010	b
+literacy	rules	example	Example of LIT-010	r
+literacy	rules	form	What is the form of LIT-020 Metaphor without like/as?	metaphor: A is B (figurative)
+literacy	rules	why	Why does LIT-020 exist?	Metaphors compress comparison into identity language.
+literacy	rules	how	How do you apply LIT-020?	If comparison does not use like/as, consider metaphor.
+literacy	rules	apply	A metaphor compares without like or?	as
+literacy	rules	example	Example of LIT-020	t
+literacy	rules	example	Example of LIT-020	i
+literacy	rules	form	What is the form of LIT-030 Theme is message?	theme = message / insight
+literacy	rules	why	Why does LIT-030 exist?	Theme is what the work says about life or people, not just plot.
+literacy	rules	how	How do you apply LIT-030?	After the story, ask what larger idea it suggests.
+literacy	rules	apply	Theme is the?	message
+literacy	rules	drill	What does phonics map letters to?	sounds
+literacy	rules	drill	In CVC words the middle vowel is usually?	short
+literacy	rules	drill	Final e in cake is?	silent
+literacy	rules	drill	sh in ship is a?	digraph
+literacy	rules	drill	Blending joins sounds from?	left
+literacy	rules	drill	Many plurals add?	s
+literacy	rules	drill	Many past tense verbs end in?	ed
+literacy	rules	drill	Prefix un often means?	not
+literacy	rules	drill	Suffix er can mean?	one
+literacy	rules	drill	Ending ing often shows action is?	ongoing
+literacy	rules	drill	A sentence starts with a?	capital
+literacy	rules	drill	A sentence ends with a?	period
+literacy	rules	drill	A question ends with a question?	mark
+literacy	rules	drill	A noun can name a person place or?	thing
+literacy	rules	drill	A verb names an?	action
+literacy	rules	drill	An adjective describes a?	noun
+literacy	rules	drill	The subject does the?	action
+literacy	rules	drill	The predicate tells the?	action
+literacy	rules	drill	A pronoun replaces a?	noun
+literacy	rules	drill	A comma can separate?	items
+literacy	rules	drill	The main idea is the central?	point
+literacy	rules	drill	Context clues help find?	meaning
+literacy	rules	drill	A summary retells?	main
+literacy	rules	drill	A synonym means nearly the?	same
+literacy	rules	drill	An antonym means the?	opposite
+literacy	rules	drill	An inference should be based on?	evidence
+literacy	rules	drill	Setting is where and?	when
+literacy	rules	drill	Plot is the sequence of?	events
+literacy	rules	drill	A complete sentence needs a subject and a?	predicate
+literacy	rules	drill	A paragraph has a topic?	sentence
+literacy	rules	drill	Start a new paragraph for a new?	idea
+literacy	rules	drill	Common pattern: i before e except after?	c
+literacy	rules	drill	A thesis states the main?	claim
+literacy	rules	drill	Evidence supports a?	claim
+literacy	rules	drill	A conclusion wraps up?	ideas
+literacy	rules	drill	A transition connects?	ideas
+literacy	rules	drill	Audience is the intended?	reader
+literacy	rules	drill	Tone is the author's?	attitude
+literacy	rules	drill	A simile uses like or?	as
+literacy	rules	drill	A metaphor compares without like or?	as
+literacy	rules	drill	Theme is the?	message
+literacy	rules	drill	Capitalize the first letter of: the dog ran	The dog ran
+literacy	rules	drill	End this statement correctly: I see a bird	I see a bird.
+literacy	rules	drill	End this question correctly: Where is home	Where is home?
+literacy	rules	drill	Plural of cat	cats
+literacy	rules	drill	Past tense of walk	walked
+literacy	rules	drill	Add prefix un- to happy	unhappy
+literacy	rules	drill	Add suffix -er to teach	teacher
+literacy	rules	drill	Is big/large synonym or antonym?	synonym
+literacy	rules	drill	Is hot/cold synonym or antonym?	antonym
+literacy	rules	drill	brave as a lion is a simile or metaphor?	simile
+literacy	rules	drill	time is a thief is a simile or metaphor?	metaphor
+literacy	rules	drill	CVC middle vowel in cat is long or short?	short
+literacy	rules	drill	In cake the final e is pronounced or silent?	silent

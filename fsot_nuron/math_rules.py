@@ -187,6 +187,35 @@ def apply_rules(question: str) -> SolveResult:
     # --- ordered rule application (school: read problem → pick operations) ---
     # Priority: explicit school wording before generic each→mul.
 
+    # pure expression evaluate (order of operations via Python eval on safe pattern)
+    m = re.match(r"evaluate\s+([0-9\.\+\-\*/\s]+)$", ql)
+    if m:
+        expr = m.group(1).replace(" ", "")
+        # PE: * / before + - by using eval on restricted charset
+        if re.fullmatch(r"[0-9\.\+\-\*/]+", expr):
+            try:
+                v = float(eval(expr, {"__builtins__": {}}, {}))  # noqa: S307 — restricted
+                push("order_ops", "×÷ before +−", expr, v)
+                return SolveResult(_norm(v), steps, used, True)
+            except Exception:
+                pass
+
+    # double negative AR-022: -(-n)
+    m = re.match(r"what is -\(-(\d+(?:\.\d+)?)\)\??$", ql)
+    if m:
+        n = float(m.group(1))
+        push("AR-022", "-(-a)=a", f"-(-{n})", n)
+        return SolveResult(_norm(n), steps, used, True)
+
+    # fraction same denominator AR-107: a/b + c/b
+    m = re.search(r"add fractions\s+(\d+)/(\d+)\s*\+\s*(\d+)/(\d+)", ql)
+    if m:
+        a, b, c, d = map(int, m.groups())
+        if b == d and b != 0:
+            num = a + c
+            push("AR-107", "a/b+c/b=(a+c)/b", f"{a}/{b}+{c}/{b}", float(num) / b)
+            return SolveResult(f"{num}/{b}", steps, used, True)
+
     # "Start with X. Use Y. How many left?"
     m = re.search(
         r"start with\s+(\d+(?:\.\d+)?).{0,40}?use\s+(\d+(?:\.\d+)?)",
@@ -375,9 +404,25 @@ def build_rule_drills() -> List[PracticeItem]:
     for n in [8, 16, 50, 100, 24]:
         items.append(PracticeItem(f"What is half of {n}?", str(n // 2), "half", "drill"))
         items.append(PracticeItem(f"What is twice {n}?", str(n * 2), "double", "drill"))
-    # percent
+    # percent (AR-202)
     for p, x, ans in [(50, 80, 40), (25, 200, 50), (10, 90, 9), (20, 50, 10)]:
         items.append(PracticeItem(f"What is {p}% of {x}?", str(ans), "percent", "drill"))
+    # fraction same denom (AR-107)
+    for a, b, c, ans in [(1, 4, 2, "3/4"), (1, 5, 2, "3/5"), (2, 7, 3, "5/7")]:
+        items.append(
+            PracticeItem(
+                f"Add fractions {a}/{b} + {c}/{b}",
+                ans,
+                "fraction",
+                "drill",
+            )
+        )
+    # double negative (AR-022)
+    for n in [3, 8, 12]:
+        items.append(PracticeItem(f"What is -(-{n})?", str(n), "sign", "drill"))
+    # order of operations: mult before add (AR-262)
+    items.append(PracticeItem("Evaluate 2 + 3 * 4", "14", "order", "drill"))
+    items.append(PracticeItem("Evaluate 10 - 2 * 3", "4", "order", "drill"))
     # rate minutes
     items.append(PracticeItem("She earns 12 dollars per hour. She works 50 minutes. How much does she earn?", "10", "rate", "drill"))
     items.append(PracticeItem("He runs 3 sprints 3 times a week. He runs 60 meters each sprint. How many total meters does he run a week?", "540", "mul", "drill"))

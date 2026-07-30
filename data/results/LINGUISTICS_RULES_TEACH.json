@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-07-30T02:22:28.781270+00:00",
+  "doctrine": "Teach linguistics RULES with WHY and HOW \u2014 phonics, morphology, grammar, reading, writing, composition. Drills practice application, not passage stuffing.",
+  "pass_threshold": 0.95,
+  "n_rules": 41,
+  "by_domain": {
+    "phonics": 5,
+    "morphology": 5,
+    "grammar": 10,
+    "reading": 11,
+    "writing": 4,
+    "composition": 6
+  },
+  "n_drills": 177,
+  "scores": {
+    "drills": {
+      "n": 177,
+      "correct": 177,
+      "accuracy": 1.0,
+      "by_kind": {
+        "form": {
+          "correct": 41,
+          "n": 41,
+          "accuracy": 1.0
+        },
+        "apply": {
+          "correct": 54,
+          "n": 54,
+          "accuracy": 1.0
+        },
+        "why": {
+          "correct": 41,
+          "n": 41,
+          "accuracy": 1.0
+        },
+        "how": {
+          "correct": 41,
+          "n": 41,
+          "accuracy": 1.0
+        }
+      },
+      "sample_fails": [],
+      "method": "apply_reading_writing_rules_why_how"
+    }
+  },
+  "gates": {
+    "straight_a_drills": true,
+    "drills_ge_95": true
+  },
+  "next_expansions": [
+    "Import structured rules from FSOT linguistics / UD treebank insights",
+    "More phonics patterns (vowel teams, r-controlled)",
+    "Clause combining and complex sentence rules",
+    "Essay structure (intro-body-conclusion) multi-hop composition",
+    "Couple with speech reconnect: speak rule, self-hear, rewrite"
+  ]
+}

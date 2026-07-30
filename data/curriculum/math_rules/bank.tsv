@@ -1,5 +1,5 @@
 # domain	grade	kind	question	answer
-# Math RULES curriculum 2026-07-30T02:17:49.046187+00:00
+# Math RULES curriculum 2026-07-30T02:22:28.663381+00:00
 # kind=rule | langmap | drill — symbolic laws, not Q/A stuffing
 math	rules	rule	What is the rule addition commutative?	a + b = b + a
 math	rules	rule	Explain add_comm	Order of addends does not change sum
@@ -106,6 +106,14 @@ math	rules	drill	What is 50% of 80?	40
 math	rules	drill	What is 25% of 200?	50
 math	rules	drill	What is 10% of 90?	9
 math	rules	drill	What is 20% of 50?	10
+math	rules	drill	Add fractions 1/4 + 2/4	3/4
+math	rules	drill	Add fractions 1/5 + 2/5	3/5
+math	rules	drill	Add fractions 2/7 + 3/7	5/7
+math	rules	drill	What is -(-3)?	3
+math	rules	drill	What is -(-8)?	8
+math	rules	drill	What is -(-12)?	12
+math	rules	drill	Evaluate 2 + 3 * 4	14
+math	rules	drill	Evaluate 10 - 2 * 3	4
 math	rules	drill	She earns 12 dollars per hour. She works 50 minutes. How much does she earn?	10
 math	rules	drill	He runs 3 sprints 3 times a week. He runs 60 meters each sprint. How many total meters does he run a week?	540
 math	rules	drill	Ducks lay 16 eggs per day. She eats 3 and bakes with 4. She sells the remainder for 2 dollars each. How much does she make?	18

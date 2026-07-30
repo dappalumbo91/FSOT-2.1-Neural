@@ -45,6 +45,23 @@ python scripts/run_math_rules_teach.py
 
 Legacy GSM8K stuffing path remains as contrast only; **doctrine is math_rules + imported rulebook**.
 
+## Linguistics (reading + writing) — same rule pedagogy
+
+```powershell
+python scripts/run_linguistics_rules_teach.py
+# form + WHY + HOW + apply drills ≥95%
+# data/curriculum/linguistics_rules/RULES.md
+```
+
+Domains: phonics · morphology · grammar · reading · writing · composition.
+
+Combined:
+
+```powershell
+python scripts/run_rules_teach_all.py
+# import math generator + math drills + linguistics drills
+```
+
 ## Run GSM8K (active)
 
 ```powershell
