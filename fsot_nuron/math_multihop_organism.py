@@ -22,7 +22,9 @@ from .math_rules import SolveResult, StepTrace, _norm, exact_num
 from .paths import DATA
 
 BANK_PATH = DATA / "math_learn" / "episode_bank.json"
+TRACE_BANK_PATH = DATA / "math_learn" / "trace_bank.json"
 REPORT_PATH = DATA / "results" / "MATH_MULTIHOP_LEARN.json"
+EXPERIENCE_REPORT = DATA / "results" / "MATH_EXPERIENCE_LEARN.json"
 
 WM_SLOTS = 4
 NUM_RE = re.compile(r"(?<![\w])(\d+(?:\.\d+)?)(?![\d])")
@@ -32,6 +34,22 @@ WORD_NUM = {
     "five": 5.0, "six": 6.0, "seven": 7.0, "eight": 8.0, "nine": 9.0,
     "ten": 10.0, "eleven": 11.0, "twelve": 12.0, "dozen": 12.0,
     "twice": 2.0, "half": 0.5, "thrice": 3.0,
+}
+
+# map teacher calc ops → apply_atomic names
+_OP_MAP = {
+    "+": "add",
+    "-": "sub",
+    "*": "mul",
+    "/": "div",
+    "add": "add",
+    "sub": "sub",
+    "mul": "mul",
+    "div": "div",
+    "half": "half",
+    "double": "double",
+    "percent": "percent",
+    "id": "id",
 }
 
 
@@ -45,6 +63,23 @@ class Episode:
 
 
 @dataclass
+class EpisodeTrace:
+    """Learned multi-hop method retained from experience (not hand rules).
+
+    hop_trace ops run through apply_atomic with slot:/t:/const: args so the
+    same method transfers to novel numbers when the language cue matches.
+    """
+
+    cue_skeleton: str
+    hop_trace: List[Dict[str, Any]]
+    n_slots: int
+    strength: float = 1.25
+    support: int = 1
+    source: str = "lesson"
+    last_answer: str = ""  # diagnostic only — never used as solve target
+
+
+@dataclass
 class WmSlot:
     name: str = ""
     value: float = 0.0
@@ -52,17 +87,26 @@ class WmSlot:
 
 
 class MathMultihopOrganism:
-    """Learn multi-hop arithmetic by teaching + WM composition + replay."""
+    """Learn multi-hop arithmetic by teaching + WM composition + replay.
+
+    Pure-bio path: experience → episodic hop traces → WM atomics → sleep → apply.
+    Plans live in memory (trace_bank), not as growing regex in source.
+    """
 
     def __init__(self) -> None:
         self.episodes: Dict[str, Episode] = {}
+        self.traces: Dict[str, EpisodeTrace] = {}
         self.wm: List[WmSlot] = [WmSlot() for _ in range(WM_SLOTS)]
         self.n_teaches = 0
         self.n_hops = 0
         self.n_replays = 0
         self.n_claims = 0
         self.n_claim_ok = 0
+        self.n_trace_teaches = 0
+        self.n_trace_hits = 0
+        self.n_trace_tries = 0
         self._load()
+        self._load_traces()
         self._seed_atomics()
 
     def _load(self) -> None:
@@ -81,6 +125,27 @@ class MathMultihopOrganism:
         except Exception:
             pass
 
+    def _load_traces(self) -> None:
+        if not TRACE_BANK_PATH.is_file():
+            return
+        try:
+            raw = json.loads(TRACE_BANK_PATH.read_text(encoding="utf-8"))
+            for e in raw.get("traces") or []:
+                sk = str(e.get("cue_skeleton") or "")
+                if not sk:
+                    continue
+                self.traces[sk] = EpisodeTrace(
+                    cue_skeleton=sk,
+                    hop_trace=list(e.get("hop_trace") or []),
+                    n_slots=int(e.get("n_slots") or 0),
+                    strength=float(e.get("strength", 1.25)),
+                    support=int(e.get("support") or 1),
+                    source=str(e.get("source") or "lesson"),
+                    last_answer=str(e.get("last_answer") or ""),
+                )
+        except Exception:
+            pass
+
     def save(self) -> None:
         BANK_PATH.parent.mkdir(parents=True, exist_ok=True)
         rows = [
@@ -95,6 +160,33 @@ class MathMultihopOrganism:
         ]
         BANK_PATH.write_text(
             json.dumps({"n": len(rows), "episodes": rows}, indent=2),
+            encoding="utf-8",
+        )
+        self.save_traces()
+
+    def save_traces(self) -> None:
+        TRACE_BANK_PATH.parent.mkdir(parents=True, exist_ok=True)
+        rows = [
+            {
+                "cue_skeleton": t.cue_skeleton,
+                "hop_trace": t.hop_trace,
+                "n_slots": t.n_slots,
+                "strength": t.strength,
+                "support": t.support,
+                "source": t.source,
+                "last_answer": t.last_answer,
+            }
+            for t in self.traces.values()
+        ]
+        TRACE_BANK_PATH.write_text(
+            json.dumps(
+                {
+                    "n": len(rows),
+                    "doctrine": "experience→episodic hop traces→WM atomics→sleep",
+                    "traces": rows,
+                },
+                indent=2,
+            ),
             encoding="utf-8",
         )
 
@@ -116,6 +208,361 @@ class MathMultihopOrganism:
                 cue=cue, answer=ans, strength=1.25, hops=hops, rule_id=rule_id
             )
         self.n_teaches += 1
+
+    # ----- pure-bio: experience → episodic hop traces -----
+
+    def teach_trace(
+        self,
+        question: str,
+        hop_trace: List[Dict[str, Any]],
+        *,
+        n_slots: Optional[int] = None,
+        source: str = "lesson",
+        gold: str = "",
+    ) -> Optional[EpisodeTrace]:
+        """Retain a multi-hop *method* from a worked lesson (not the exam answer)."""
+        if not hop_trace:
+            return None
+        sk = cue_skeleton(question)
+        if not sk:
+            return None
+        slots = extract_slot_nums(question)
+        ns = n_slots if n_slots is not None else len(slots)
+        prev = self.traces.get(sk)
+        if prev and _hop_sig(prev.hop_trace) == _hop_sig(hop_trace):
+            prev.strength = min(8.0, prev.strength + 0.45)
+            prev.support += 1
+            if gold:
+                prev.last_answer = _norm(gold)
+            self.n_trace_teaches += 1
+            return prev
+        # same skeleton, different method: keep stronger / higher support
+        if prev and prev.strength >= 2.5 and prev.support >= 3:
+            # don't overwrite a well-consolidated method lightly
+            if _hop_sig(prev.hop_trace) != _hop_sig(hop_trace):
+                # store under extended key if conflict
+                sk = f"{sk} ::{_hop_sig(hop_trace)[:24]}"
+        tr = EpisodeTrace(
+            cue_skeleton=sk,
+            hop_trace=hop_trace,
+            n_slots=ns,
+            strength=1.4,
+            support=1,
+            source=source,
+            last_answer=_norm(gold) if gold else "",
+        )
+        self.traces[sk] = tr
+        self.n_trace_teaches += 1
+        self.n_teaches += 1
+        return tr
+
+    def teach_from_worked(
+        self,
+        question: str,
+        answer_body: str,
+        gold: str,
+        *,
+        source: str = "train_lesson",
+    ) -> bool:
+        """Teacher uses solution key to build a hop trace; organism only retains memory.
+
+        Abstraction of <<calcs>> lives on the *school* side. Student stores the trace.
+        """
+        hops = hop_trace_from_worked(question, answer_body, gold)
+        if not hops:
+            return False
+        slots = extract_slot_nums(question)
+        # verify replay on the lesson numbers before encoding (grounded teach)
+        pred = self.replay_trace(hops, slots)
+        if pred is None:
+            return False
+        if gold and not exact_num(_norm(pred), _norm(gold)):
+            # still teach if close? require exact for integrity
+            try:
+                if abs(float(_norm(pred)) - float(_norm(gold))) > 0.05:
+                    return False
+            except ValueError:
+                return False
+        self.teach_trace(
+            question,
+            hops,
+            n_slots=len(slots),
+            source=source,
+            gold=gold,
+        )
+        return True
+
+    def retrieve_traces(
+        self,
+        question: str,
+        *,
+        top_k: int = 8,
+        min_overlap: float = 0.12,
+    ) -> List[Tuple[float, EpisodeTrace]]:
+        """Retrieve retained methods by language skeleton similarity + strength."""
+        sk = cue_skeleton(question)
+        if not sk or not self.traces:
+            return []
+        qset = set(sk.split())
+        slots = extract_slot_nums(question)
+        n = len(slots)
+        scored: List[Tuple[float, EpisodeTrace]] = []
+        for t in self.traces.values():
+            if t.n_slots and n and t.n_slots != n:
+                # allow small mismatch only if not both set
+                if abs(t.n_slots - n) > 1:
+                    continue
+            tset = set(t.cue_skeleton.replace("::", " ").split())
+            if not tset or not qset:
+                continue
+            inter = len(qset & tset)
+            union = len(qset | tset)
+            j = inter / max(1, union)
+            if j < min_overlap and inter < 3:
+                continue
+            score = 0.65 * j + 0.25 * min(t.strength, 8.0) / 8.0 + 0.10 * min(t.support, 20) / 20.0
+            scored.append((score, t))
+        scored.sort(key=lambda x: -x[0])
+        return scored[:top_k]
+
+    def replay_trace(
+        self,
+        hop_trace: List[Dict[str, Any]],
+        slots: List[float],
+    ) -> Optional[float]:
+        """Replay a retained hop plan through apply_atomic (physiology)."""
+        step_vals: List[float] = []
+        for hop in hop_trace:
+            op = _OP_MAP.get(str(hop.get("op", "")), str(hop.get("op", "")))
+            raw_args = hop.get("args") or []
+            vals: List[float] = []
+            for a in raw_args:
+                v = self._resolve_hop_arg(a, slots, step_vals)
+                if v is None:
+                    return None
+                vals.append(v)
+            if op == "id":
+                if not vals:
+                    return None
+                step_vals.append(vals[0])
+                self.n_hops += 1
+                continue
+            if op == "half":
+                if len(vals) < 1:
+                    return None
+                r = self.apply_atomic("half", vals[0])
+            elif op == "double":
+                if len(vals) < 1:
+                    return None
+                r = self.apply_atomic("double", vals[0])
+            elif op in ("add", "sub", "mul", "div", "percent"):
+                if len(vals) < 2:
+                    return None
+                r = self.apply_atomic(op, vals[0], vals[1])
+            else:
+                return None
+            if r is None:
+                return None
+            step_vals.append(float(r))
+            self.n_hops += 1
+        return step_vals[-1] if step_vals else None
+
+    def _resolve_hop_arg(
+        self,
+        arg: Any,
+        slots: List[float],
+        step_vals: List[float],
+    ) -> Optional[float]:
+        # string form: slot:0 / t:1 / const:5
+        if isinstance(arg, str):
+            if arg.startswith("slot:"):
+                i = int(arg.split(":", 1)[1])
+                return slots[i] if 0 <= i < len(slots) else None
+            if arg.startswith("t:") or arg.startswith("wm:"):
+                i = int(arg.split(":", 1)[1])
+                return step_vals[i] if 0 <= i < len(step_vals) else None
+            if arg.startswith("const:"):
+                return float(arg.split(":", 1)[1])
+            try:
+                return float(arg)
+            except ValueError:
+                return None
+        # template-style [kind, val]
+        if isinstance(arg, (list, tuple)) and len(arg) >= 2:
+            kind, val = arg[0], arg[1]
+            if kind == "n":
+                i = int(val)
+                return slots[i] if 0 <= i < len(slots) else None
+            if kind == "t":
+                i = int(val)
+                return step_vals[i] if 0 <= i < len(step_vals) else None
+            if kind == "c":
+                return float(val)
+        if isinstance(arg, (int, float)):
+            return float(arg)
+        return None
+
+    def solve_from_experience(self, question: str) -> SolveResult:
+        """Apply retained hop traces — what was learned from information, not regex."""
+        steps: List[StepTrace] = []
+        used: List[str] = []
+        self.wm_clear()
+        slots = extract_slot_nums(question)
+        if not slots:
+            return SolveResult(None, steps, used, False)
+
+        # bind slots into WM for visibility
+        for i, v in enumerate(slots[:WM_SLOTS]):
+            self.wm_write(f"slot{i}", v)
+            steps.append(StepTrace("MH-BIND", "slot", f"slot{i}={v}", v))
+
+        cands = self.retrieve_traces(question)
+        self.n_trace_tries += 1
+        for score, tr in cands:
+            if tr.n_slots and len(slots) != tr.n_slots:
+                continue
+            pred = self.replay_trace(tr.hop_trace, slots)
+            if pred is None:
+                continue
+            if pred != pred or abs(pred) > 1e12:
+                continue
+            steps.append(
+                StepTrace(
+                    "MH-TRACE",
+                    f"replay n={len(tr.hop_trace)}",
+                    f"score={score:.2f} str={tr.strength:.1f} sup={tr.support}",
+                    float(pred),
+                )
+            )
+            used.extend(["MH-TRACE", "MH-CLAIM"])
+            # strengthen on successful grounded use
+            tr.strength = min(8.0, tr.strength + 0.35)
+            tr.support += 1
+            self.n_trace_hits += 1
+            self.n_claims += 1
+            self.n_claim_ok += 1
+            self.wm_write("result", float(pred))
+            return SolveResult(_norm(pred), steps, used, True)
+
+        return SolveResult(None, steps, used, False)
+
+    def experience_practice(
+        self,
+        *,
+        n: int = 40,
+        seed: int = 0,
+        top_traces: int = 48,
+    ) -> Dict[str, Any]:
+        """Practice retained methods on novel numbers (transfer, not Q→A recall)."""
+        import random
+
+        rng = random.Random(seed)
+        # strongest / most supported traces
+        bank = sorted(
+            self.traces.values(),
+            key=lambda t: (-t.strength, -t.support),
+        )[:top_traces]
+        if not bank:
+            return {"n": 0, "hit": 0, "acc": 0.0, "n_traces": 0}
+
+        hit = 0
+        total = 0
+        for _ in range(n):
+            tr = rng.choice(bank)
+            if tr.n_slots < 1 or not tr.hop_trace:
+                continue
+            # novel positive slots (avoid div-by-zero extremes)
+            slots = [float(rng.randint(2, 40)) for _ in range(tr.n_slots)]
+            gold = self.replay_trace(tr.hop_trace, slots)
+            if gold is None:
+                continue
+            # resurface language skeleton with new numbers for retrieval
+            q = _resurfaced_question(tr.cue_skeleton, slots)
+            r = self.solve_from_experience(q)
+            total += 1
+            if r.ok and r.answer is not None and exact_num(r.answer, _norm(gold)):
+                hit += 1
+            else:
+                # restudy: re-encode the same method (prediction error)
+                self.teach_trace(
+                    q,
+                    tr.hop_trace,
+                    n_slots=tr.n_slots,
+                    source="restudy",
+                    gold=_norm(gold),
+                )
+        self.sleep_replay(2)
+        self.save_traces()
+        return {
+            "n": total,
+            "hit": hit,
+            "acc": round(hit / max(1, total), 4),
+            "n_traces": len(self.traces),
+        }
+
+    def experience_session(
+        self,
+        lessons: List[Tuple[str, str, str]],
+        *,
+        epochs: int = 3,
+        practice_n: int = 32,
+        sleep_rounds: int = 4,
+        seed: int = 42,
+    ) -> Dict[str, Any]:
+        """Unattended school: teach worked lessons → practice novel numbers → sleep.
+
+        lessons: (question, answer_body, gold)
+        """
+        history: List[Dict[str, Any]] = []
+        n_taught = 0
+        for q, body, gold in lessons:
+            if self.teach_from_worked(q, body, gold):
+                n_taught += 1
+        self.sleep_replay(sleep_rounds)
+        self.save_traces()
+
+        for ep in range(1, epochs + 1):
+            prac = self.experience_practice(
+                n=practice_n,
+                seed=seed + ep * 97,
+            )
+            self.sleep_replay(sleep_rounds)
+            self.save_traces()
+            row = {
+                "epoch": ep,
+                "practice": prac,
+                "n_traces": len(self.traces),
+                "mean_trace_strength": round(
+                    sum(t.strength for t in self.traces.values())
+                    / max(1, len(self.traces)),
+                    4,
+                ),
+            }
+            history.append(row)
+            print(
+                f"EXP-EPOCH {ep}/{epochs} practice_acc={prac['acc']} "
+                f"traces={row['n_traces']} mean_str={row['mean_trace_strength']}",
+                flush=True,
+            )
+
+        prove = self.experience_practice(n=max(24, practice_n), seed=seed + 9001)
+        self.sleep_replay(2)
+        self.save_traces()
+        report = {
+            "doctrine": "experience→episodic hop traces→WM atomics→sleep→prove transfer",
+            "n_lessons": len(lessons),
+            "n_taught_ok": n_taught,
+            "epochs": epochs,
+            "history": history,
+            "prove": prove,
+            "n_traces_final": len(self.traces),
+            "n_trace_teaches": self.n_trace_teaches,
+            "n_trace_hits": self.n_trace_hits,
+            "n_trace_tries": self.n_trace_tries,
+        }
+        EXPERIENCE_REPORT.parent.mkdir(parents=True, exist_ok=True)
+        EXPERIENCE_REPORT.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        return report
 
     def _seed_atomics(self) -> None:
         """School atomics — premises for multi-hop (claimability style)."""
@@ -192,16 +639,25 @@ class MathMultihopOrganism:
         return None
 
     def sleep_replay(self, rounds: int = 3) -> None:
-        """NREM proxy: strengthen high-priority episodes (STDP densify)."""
+        """NREM proxy: strengthen high-priority episodes + hop traces (STDP densify)."""
         ranked = sorted(self.episodes.values(), key=lambda e: -e.strength)[:48]
         for _ in range(rounds):
             for e in ranked:
                 e.strength = min(8.0, e.strength + 0.08)
                 self.n_replays += 1
+        # densify retained multi-hop methods
+        tr_ranked = sorted(self.traces.values(), key=lambda t: -t.strength)[:48]
+        for _ in range(rounds):
+            for t in tr_ranked:
+                t.strength = min(8.0, t.strength + 0.10)
+                self.n_replays += 1
         # decay weak
         for e in self.episodes.values():
             if e.strength < 1.1:
                 e.strength = max(0.2, e.strength * 0.97)
+        for t in self.traces.values():
+            if t.strength < 1.1:
+                t.strength = max(0.2, t.strength * 0.97)
 
     def train_from_successful_solve(
         self, question: str, answer: str, rule_ids: List[str]
@@ -248,10 +704,16 @@ class MathMultihopOrganism:
     def multi_hop_solve(self, question: str) -> SolveResult:
         """Compose atomics via WM hops — *application*, not stuffed Q→A.
 
-        Hop order (language-driven plan):
-          BIND absolute bases → HALF of referent → MORE/FEWER offsets
-          → TIMES chains → REMAINDER sell → pure retrieve short drills
+        Preference (pure-bio):
+          1) solve_from_experience — replay hop traces retained from lessons
+          2) legacy language plans (frozen; not expanded for benchmark chasing)
+          3) short atomic drills
         """
+        # ----- experience first: what was taught and retained -----
+        exp = self.solve_from_experience(question)
+        if exp.ok and exp.answer is not None:
+            return exp
+
         steps: List[StepTrace] = []
         used: List[str] = []
         self.wm_clear()
@@ -1855,6 +2317,108 @@ def _fold_cue(s: str) -> str:
     return re.sub(r"\s+", " ", s).strip()[:160]
 
 
+def cue_skeleton(question: str) -> str:
+    """Language shape with numbers blanked — method cue, not the answer."""
+    s = (question or "").lower()
+    s = (
+        s.replace("\u2019", "'")
+        .replace("\u2018", "'")
+        .replace("\u2013", "-")
+        .replace("\u2014", "-")
+    )
+    s = s.replace(",", "")
+    s = re.sub(r"\d+(?:\.\d+)?", "N", s)
+    s = re.sub(r"[^a-zN %]+", " ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s[:180]
+
+
+def extract_slot_nums(question: str) -> List[float]:
+    t = (question or "").replace(",", "")
+    out: List[float] = []
+    for m in NUM_RE.finditer(t):
+        try:
+            out.append(float(m.group(1)))
+        except ValueError:
+            pass
+    return out
+
+
+def _hop_sig(hop_trace: List[Dict[str, Any]]) -> str:
+    parts = []
+    for h in hop_trace:
+        op = str(h.get("op", ""))
+        args = h.get("args") or []
+        ap = []
+        for a in args:
+            if isinstance(a, (list, tuple)):
+                ap.append(f"{a[0]}{a[1]}")
+            else:
+                ap.append(str(a))
+        parts.append(f"{op}({','.join(ap)})")
+    return "|".join(parts)
+
+
+def hop_trace_from_worked(
+    question: str,
+    answer_body: str,
+    gold: str,
+) -> Optional[List[Dict[str, Any]]]:
+    """School-side: turn a worked solution into a hop list for teach_trace.
+
+    Uses the same calc abstraction as curriculum mining, but the result is
+    written into organism memory — not a permanent solver rule table.
+    """
+    try:
+        from .math_auto_templates import abstract_solution
+    except Exception:
+        return None
+    tmpl = abstract_solution(question, answer_body, gold)
+    if tmpl is None or not tmpl.steps:
+        return None
+    hops: List[Dict[str, Any]] = []
+    for st in tmpl.steps:
+        op = str(st.get("op", ""))
+        args_out: List[str] = []
+        for a in st.get("args") or []:
+            if not isinstance(a, (list, tuple)) or len(a) < 2:
+                continue
+            kind, val = a[0], a[1]
+            if kind == "n":
+                args_out.append(f"slot:{int(val)}")
+            elif kind == "t":
+                args_out.append(f"t:{int(val)}")
+            elif kind == "c":
+                args_out.append(f"const:{val}")
+        if op == "id" and args_out:
+            hops.append({"op": "id", "args": args_out[:1]})
+        elif op in _OP_MAP or op in ("+", "-", "*", "/"):
+            hops.append({"op": _OP_MAP.get(op, op), "args": args_out})
+        else:
+            return None
+    return hops if hops else None
+
+
+def _resurfaced_question(skeleton: str, slots: List[float]) -> str:
+    """Put novel numbers back into a blanked skeleton for retrieval practice."""
+    parts = skeleton.split()
+    out: List[str] = []
+    si = 0
+    for w in parts:
+        if w == "N" and si < len(slots):
+            v = slots[si]
+            out.append(str(int(v)) if abs(v - int(v)) < 1e-9 else str(v))
+            si += 1
+        else:
+            out.append(w)
+    # if skeleton had fewer N than slots, append remaining as "N = ..."
+    while si < len(slots):
+        v = slots[si]
+        out.append(str(int(v)) if abs(v - int(v)) < 1e-9 else str(v))
+        si += 1
+    return " ".join(out)
+
+
 _ORG: Optional[MathMultihopOrganism] = None
 
 
@@ -1867,6 +2431,13 @@ def get_organism() -> MathMultihopOrganism:
 
 def solve_multihop(question: str) -> SolveResult:
     return get_organism().multi_hop_solve(question)
+
+
+def reset_organism() -> MathMultihopOrganism:
+    """Fresh organism instance (tests / clean experience runs)."""
+    global _ORG
+    _ORG = MathMultihopOrganism()
+    return _ORG
 
 
 def bootstrap_train_from_drills() -> Dict[str, Any]:
