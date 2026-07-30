@@ -1,0 +1,240 @@
+Q: is learn a verb?  A: yes
+Q: learn is a?  A: verb
+Q: what does learn mean?  A: study
+Q: is city a verb?  A: no
+Q: city is a?  A: noun
+Q: what does city mean?  A: place
+Q: is child a verb?  A: no
+Q: child is a?  A: noun
+Q: what does child mean?  A: person
+Q: is listen a verb?  A: yes
+Q: listen is a?  A: verb
+Q: what does listen mean?  A: hear
+Q: is speak a verb?  A: yes
+Q: speak is a?  A: verb
+Q: what does speak mean?  A: talk
+Q: is slowly a verb?  A: no
+Q: slowly is a?  A: adverb
+Q: what does slowly mean?  A: slow
+Q: is friend a verb?  A: no
+Q: friend is a?  A: noun
+Q: what does friend mean?  A: person
+Q: is house a verb?  A: no
+Q: house is a?  A: noun
+Q: what does house mean?  A: home
+Q: is remember a verb?  A: yes
+Q: remember is a?  A: verb
+Q: what does remember mean?  A: recall
+Q: is beautiful a verb?  A: no
+Q: beautiful is a?  A: adjective
+Q: what does beautiful mean?  A: pretty
+Q: is book a verb?  A: no
+Q: book is a?  A: noun
+Q: what does book mean?  A: pages
+Q: is think a verb?  A: yes
+Q: think is a?  A: verb
+Q: what does think mean?  A: reason
+Q: is water a verb?  A: no
+Q: water is a?  A: noun
+Q: what does water mean?  A: liquid
+Q: is quickly a verb?  A: no
+Q: quickly is a?  A: adverb
+Q: what does quickly mean?  A: fast
+Q: is happy a verb?  A: no
+Q: happy is a?  A: adjective
+Q: what does happy mean?  A: glad
+Q: is teacher a verb?  A: no
+Q: teacher is a?  A: noun
+Q: what does teacher mean?  A: person
+Q: is dog a verb?  A: no
+Q: dog is a?  A: noun
+Q: what does dog mean?  A: animal
+Q: is aah a verb?  A: yes
+Q: aah is a?  A: verb
+Q: what does aah mean?  A: express
+Q: is aby a verb?  A: yes
+Q: aby is a?  A: verb
+Q: what does aby mean?  A: make-amends
+Q: is add a verb?  A: yes
+Q: add is a?  A: verb
+Q: what does add mean?  A: make-addition
+Q: is aid a verb?  A: yes
+Q: aid is a?  A: verb
+Q: what does aid mean?  A: give-help
+Q: is ask a verb?  A: yes
+Q: ask is a?  A: verb
+Q: what does ask mean?  A: make-request
+Q: is ban a verb?  A: yes
+Q: ban is a?  A: verb
+Q: what does ban mean?  A: prohibit
+Q: is bat a verb?  A: yes
+Q: bat is a?  A: verb
+Q: what does bat mean?  A: strike
+Q: is beg a verb?  A: yes
+Q: beg is a?  A: verb
+Q: what does beg mean?  A: call-upon
+Q: is bet a verb?  A: yes
+Q: bet is a?  A: verb
+Q: what does bet mean?  A: maintain
+Q: is bid a verb?  A: yes
+Q: bid is a?  A: verb
+Q: what does bid mean?  A: propose
+Q: is bob a verb?  A: yes
+Q: bob is a?  A: verb
+Q: what does bob mean?  A: move-down
+Q: is boo a verb?  A: yes
+Q: boo is a?  A: verb
+Q: what does boo mean?  A: show-displeasure
+Q: is bow a verb?  A: yes
+Q: bow is a?  A: verb
+Q: what does bow mean?  A: bend-one
+Q: is buy a verb?  A: yes
+Q: buy is a?  A: verb
+Q: what does buy mean?  A: obtain
+Q: is caw a verb?  A: yes
+Q: caw is a?  A: verb
+Q: what does caw mean?  A: utter
+Q: is cry a verb?  A: yes
+Q: cry is a?  A: verb
+Q: what does cry mean?  A: utter
+Q: is cut a verb?  A: yes
+Q: cut is a?  A: verb
+Q: what does cut mean?  A: separate
+Q: is dab a verb?  A: yes
+Q: dab is a?  A: verb
+Q: what does dab mean?  A: apply
+Q: is die a verb?  A: yes
+Q: die is a?  A: verb
+Q: what does die mean?  A: pass-physical
+Q: is dig a verb?  A: yes
+Q: dig is a?  A: verb
+Q: what does dig mean?  A: turn-loosen
+Q: is dip a verb?  A: yes
+Q: dip is a?  A: verb
+Q: what does dip mean?  A: immerse
+Q: is don a verb?  A: yes
+Q: don is a?  A: verb
+Q: what does don mean?  A: put-clothing
+Q: is dub a verb?  A: yes
+Q: dub is a?  A: verb
+Q: what does dub mean?  A: give-nickname
+Q: is dye a verb?  A: yes
+Q: dye is a?  A: verb
+Q: what does dye mean?  A: color
+Q: is eat a verb?  A: yes
+Q: eat is a?  A: verb
+Q: what does eat mean?  A: take-solid
+Q: is ebb a verb?  A: yes
+Q: ebb is a?  A: verb
+Q: what does ebb mean?  A: flow-back
+Q: is eff a verb?  A: yes
+Q: eff is a?  A: verb
+Q: what does eff mean?  A: have-sexual
+Q: is end a verb?  A: yes
+Q: end is a?  A: verb
+Q: what does end mean?  A: have-end
+Q: is err a verb?  A: yes
+Q: err is a?  A: verb
+Q: what does err mean?  A: make-mistake
+Q: is fit a verb?  A: yes
+Q: fit is a?  A: verb
+Q: what does fit mean?  A: agreeable
+Q: is fix a verb?  A: yes
+Q: fix is a?  A: verb
+Q: what does fix mean?  A: restore
+Q: is fly a verb?  A: yes
+Q: fly is a?  A: verb
+Q: what does fly mean?  A: travel
+Q: is fry a verb?  A: yes
+Q: fry is a?  A: verb
+Q: what does fry mean?  A: cook-hot
+Q: is get a verb?  A: yes
+Q: get is a?  A: verb
+Q: what does get mean?  A: cause
+Q: is gip a verb?  A: yes
+Q: gip is a?  A: verb
+Q: what does gip mean?  A: deprive
+Q: is hew a verb?  A: yes
+Q: hew is a?  A: verb
+Q: what does hew mean?  A: strike
+Q: is hie a verb?  A: yes
+Q: hie is a?  A: verb
+Q: what does hie mean?  A: move-fast
+Q: is hit a verb?  A: yes
+Q: hit is a?  A: verb
+Q: what does hit mean?  A: cause
+Q: is hog a verb?  A: yes
+Q: hog is a?  A: verb
+Q: what does hog mean?  A: take-greedily
+Q: is hop a verb?  A: yes
+Q: hop is a?  A: verb
+Q: what does hop mean?  A: jump-lightly
+Q: is hug a verb?  A: yes
+Q: hug is a?  A: verb
+Q: what does hug mean?  A: squeeze
+Q: is hum a verb?  A: yes
+Q: hum is a?  A: verb
+Q: what does hum mean?  A: sing-closed
+Q: is irk a verb?  A: yes
+Q: irk is a?  A: verb
+Q: what does irk mean?  A: irritate
+Q: is jab a verb?  A: yes
+Q: jab is a?  A: verb
+Q: what does jab mean?  A: poke-thrust
+Q: is jig a verb?  A: yes
+Q: jig is a?  A: verb
+Q: what does jig mean?  A: dance
+Q: is jog a verb?  A: yes
+Q: jog is a?  A: verb
+Q: what does jog mean?  A: continue
+Q: is lag a verb?  A: yes
+Q: lag is a?  A: verb
+Q: what does lag mean?  A: hang-back
+Q: is lam a verb?  A: yes
+Q: lam is a?  A: verb
+Q: what does lam mean?  A: flee-take
+Q: is lay a verb?  A: yes
+Q: lay is a?  A: verb
+Q: what does lay mean?  A: put-certain
+Q: is let a verb?  A: yes
+Q: let is a?  A: verb
+Q: what does let mean?  A: make-possible
+Q: is lie a verb?  A: yes
+Q: lie is a?  A: verb
+Q: what does lie mean?  A: lying
+Q: is lob a verb?  A: yes
+Q: lob is a?  A: verb
+Q: what does lob mean?  A: propel
+Q: is lop a verb?  A: yes
+Q: lop is a?  A: verb
+Q: what does lop mean?  A: cultivate
+Q: is lug a verb?  A: yes
+Q: lug is a?  A: verb
+Q: what does lug mean?  A: carry
+Q: is mar a verb?  A: yes
+Q: mar is a?  A: verb
+Q: what does mar mean?  A: make-imperfect
+Q: is mew a verb?  A: yes
+Q: mew is a?  A: verb
+Q: what does mew mean?  A: cry-like
+Q: is mix a verb?  A: yes
+Q: mix is a?  A: verb
+Q: what does mix mean?  A: mix-together
+Q: is moo a verb?  A: yes
+Q: moo is a?  A: verb
+Q: what does moo mean?  A: make-low
+Q: is mop a verb?  A: yes
+Q: mop is a?  A: verb
+Q: what does mop mean?  A: wash-wipe
+Q: is mow a verb?  A: yes
+Q: mow is a?  A: verb
+Q: what does mow mean?  A: cut-blade
+Q: is nab a verb?  A: yes
+Q: nab is a?  A: verb
+Q: what does nab mean?  A: take-custody
+Q: is nag a verb?  A: yes
+Q: nag is a?  A: verb
+Q: what does nag mean?  A: bother
+Q: is nip a verb?  A: yes
+Q: nip is a?  A: verb
+Q: what does nip mean?  A: give-small
