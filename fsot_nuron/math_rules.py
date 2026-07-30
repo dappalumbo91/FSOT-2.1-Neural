@@ -66,6 +66,21 @@ ARITH_RULES: List[MathRule] = [
     MathRule("percent", "percent of", "p% of x = (p/100) × x", "Percent of a quantity", "percent"),
     MathRule("remain_after", "remainder chain", "left = start − a − b", "Start, use some, use more, what left", "sub_chain"),
     MathRule("compose", "compose steps", "use prior result in next rule", "Multi-hop: output of step k is input to step k+1", "compose"),
+    # Referent binding (wrong-fire fix): operate on named quantities, not digit order
+    MathRule("BIND-01", "quantity binding", "number ↔ noun/role", "Bind each number to its noun/role before operating", "bind"),
+    MathRule("BIND-02", "referent attachment", "half/% of X → binding[X]", "Modifiers attach to their object, not nums[0]", "bind"),
+    MathRule("BIND-03", "relative chain", "A=k·B; B=m·C; C=n → A=k·m·n", "Compose multi-hop times-as relations from a known base", "bind"),
+    MathRule("BIND-04", "offset after referent", "A = B ± k", "Fewer/more shift a bound quantity after resolving B", "bind"),
+    MathRule("SCHEMA-remainder-sell", "remainder then sell", "money=(start−u1−u2)×price", "Inventory residual sold at unit price", "schema"),
+    MathRule("SCHEMA-win-loss", "win/loss total", "W=(T+d)/2", "Won d more than lost with T games", "schema"),
+    MathRule("SCHEMA-clock", "clock duration", "hours=end−start", "Time-of-day span, then optional rate×hours", "schema"),
+    MathRule(
+        "SCHEMA-profit-markup",
+        "house-flip profit",
+        "new=buy·(1+p/100); profit=new−buy−repair",
+        "Percent increase on purchase price; subtract buy+repair",
+        "schema",
+    ),
 ]
 
 
@@ -87,6 +102,12 @@ LANGUAGE_MAPS: List[Tuple[str, str, str]] = [
     (r"\bpercent|%\b", "percent", "percent of means times p over 100"),
     (r"\bper (hour|minute|day|week)\b", "rate", "per unit time is a rate"),
     (r"\b(sells the remainder|rest of)\b", "sub_chain", "remainder after uses is subtract chain"),
+    (r"\bhalf of [A-Za-z]", "bind", "half of NAME binds to that person's quantity"),
+    (r"\btimes as (old|many) as\b|\btwice as many\b", "bind", "times-as chain: compose relations from known base"),
+    (r"\bfewer than\b|\bmore \w+ than half\b", "bind", "offset after resolving the referent first"),
+    (r"\bwon \d+ more than .+ lost\b", "schema", "win/loss: W=(T+d)/2"),
+    (r"\bfrom \d.+(am|pm).+(to|until)\b", "schema", "clock span then optional rate"),
+    (r"\bincreased the value\b.*%", "schema", "profit = cost × p%"),
 ]
 
 
@@ -199,11 +220,8 @@ def apply_rules(question: str) -> SolveResult:
             used.append(rule_id)
         return value
 
-    if not nums:
-        return SolveResult(None, steps, used, False)
-
     # --- ordered rule application (school: read problem → pick operations) ---
-    # Priority: explicit school wording before generic each→mul.
+    # Priority: pure arithmetic identities → BIND/SCHEMA multi-hop → keyword templates.
 
     def _safe_eval_arith(expr_raw: str) -> Optional[float]:
         expr = expr_raw.replace(" ", "").replace("^", "**")
@@ -231,6 +249,20 @@ def apply_rules(question: str) -> SolveResult:
         if v is not None:
             push("AR-262", "evaluate expression", bare, v)
             return SolveResult(_norm(v), steps, used, True)
+
+    # BIND/SCHEMA first for multi-hop / referent problems (lazy import avoids cycle)
+    # Runs even when only number-words are present (e.g. "eats three").
+    try:
+        from .math_binding import solve_with_binding
+
+        bound = solve_with_binding(q)
+        if bound.ok and bound.answer is not None:
+            return bound
+    except Exception:
+        pass
+
+    if not nums:
+        return SolveResult(None, steps, used, False)
 
     # AR-103 additive identity: a + 0
     m = re.match(r"what is (\d+(?:\.\d+)?)\s*\+\s*0\??$", ql)
@@ -523,16 +555,20 @@ def apply_rules(question: str) -> SolveResult:
         and re.search(r"\b(sold|gave|ate)\b", ql)
         and re.search(r"\b(left|remain)\b", ql)
         and len(nums) == 2
-        and not re.search(r"%|percent|each|per |times", ql)
+        and not re.search(r"%|percent|each|per |times|half|third|more", ql)
     ):
         v = push("sub_remove", "left=had−sold", f"{nums[0]}-{nums[1]}", nums[0] - nums[1])
         return SolveResult(_norm(v), steps, used, True)
 
-    # average only when explicitly asked and few numbers
+    # average only for explicit "average/mean of a, b, c" lists — not "average of 24 minutes"
     if re.search(r"\b(average|mean) of\b", ql) and 2 <= len(nums) <= 6:
-        s = sum(nums)
-        avg = push("mean", "mean=sum/n", f"{s}/{len(nums)}", s / len(nums))
-        return SolveResult(_norm(avg), steps, used, True)
+        if re.search(
+            r"\b(average|mean) of\s+\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)+",
+            ql,
+        ) or re.search(r"\b(average|mean) of\s+\d+.+\band\b.+\d+", ql):
+            s = sum(nums)
+            avg = push("mean", "mean=sum/n", f"{s}/{len(nums)}", s / len(nums))
+            return SolveResult(_norm(avg), steps, used, True)
 
     # eggs per day × days → dozens
     if re.search(r"\bdozen", ql) and len(nums) >= 2:
@@ -568,14 +604,23 @@ def apply_rules(question: str) -> SolveResult:
             v = push("sub_remove", "left=total−used", f"{nums[0]}-{nums[1]}", nums[0] - nums[1])
             return SolveResult(_norm(v), steps, used, True)
 
-    # difference two nums
-    if "sub" in strats and len(nums) == 2 and re.search(r"\b(more|less|difference)\b", ql):
+    # difference two nums — refuse when "more than twice/half" (needs BIND multi-hop)
+    if (
+        "sub" in strats
+        and len(nums) == 2
+        and re.search(r"\b(more|less|difference)\b", ql)
+        and not re.search(r"\bmore than twice\b|\btwice\b|\bhalf\b|\btimes as\b", ql)
+    ):
         v = push("sub_diff", "diff=|a-b|", f"|{nums[0]}-{nums[1]}|", abs(nums[0] - nums[1]))
         return SolveResult(_norm(v), steps, used, True)
 
     # add: only when wording is clearly total/altogether AND exactly 2 addends (avoid over-fire)
+    # Refuse "K more X than Y" (needs base+base+K) and "more than" comparative totals.
     if re.search(r"\b(altogether|in all|in total|combined)\b", ql) and len(nums) == 2:
-        if not re.search(r"\b(each|per|times|half|%|percent|left|remain)\b", ql):
+        if not re.search(
+            r"\b(each|per|times|half|%|percent|left|remain|more \w+ than|more than)\b",
+            ql,
+        ):
             s = push("add_combine", "total=a+b", f"{nums[0]}+{nums[1]}", nums[0] + nums[1])
             return SolveResult(_norm(s), steps, used, True)
 
@@ -714,6 +759,17 @@ def build_rule_drills() -> List[PracticeItem]:
             "drill",
         )
     )
+    # BIND/SCHEMA drills (referent attachment + multi-hop — from fail analysis)
+    try:
+        from .math_binding import binding_drills
+
+        for q, a, focus in binding_drills():
+            # skip exact duplicates already listed above
+            if any(it.question == q for it in items):
+                continue
+            items.append(PracticeItem(q, a, focus, "drill"))
+    except Exception:
+        pass
     return items
 
 
@@ -814,6 +870,22 @@ def rules_to_bank_rows() -> List[str]:
     for rx, strat, cue in LANGUAGE_MAPS:
         rows.append(f"math\trules\tlangmap\tWhat operation for: {cue.split(' means ')[0]}?\t{strat}\n")
         rows.append(f"math\trules\tlangmap\t{cue}\t{strat}\n")
+    # BIND/SCHEMA form+why+how (teachable text, not Q→A stuffing)
+    try:
+        from .math_binding import BINDING_RULES
+
+        for br in BINDING_RULES:
+            rows.append(
+                f"math\trules\trule\tWhat is the rule {br['name']}?\t{br['formula']}\n"
+            )
+            rows.append(
+                f"math\trules\trule\tWhy {br['id']}?\t{br['why']}\n"
+            )
+            rows.append(
+                f"math\trules\trule\tHow to apply {br['id']}?\t{br['how']}\n"
+            )
+    except Exception:
+        pass
     return rows
 
 

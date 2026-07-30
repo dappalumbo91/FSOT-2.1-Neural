@@ -13,6 +13,14 @@
 - **percent**: `p% of x = (p/100) × x` — Percent of a quantity
 - **remain_after**: `left = start − a − b` — Start, use some, use more, what left
 - **compose**: `use prior result in next rule` — Multi-hop: output of step k is input to step k+1
+- **BIND-01**: `number ↔ noun/role` — Bind each number to its noun/role before operating
+- **BIND-02**: `half/% of X → binding[X]` — Modifiers attach to their object, not nums[0]
+- **BIND-03**: `A=k·B; B=m·C; C=n → A=k·m·n` — Compose multi-hop times-as relations from a known base
+- **BIND-04**: `A = B ± k` — Fewer/more shift a bound quantity after resolving B
+- **SCHEMA-remainder-sell**: `money=(start−u1−u2)×price` — Inventory residual sold at unit price
+- **SCHEMA-win-loss**: `W=(T+d)/2` — Won d more than lost with T games
+- **SCHEMA-clock**: `hours=end−start` — Time-of-day span, then optional rate×hours
+- **SCHEMA-profit-markup**: `new=buy·(1+p/100); profit=new−buy−repair` — Percent increase on purchase price; subtract buy+repair
 
 # Language → strategy maps
 - `altogether means add` → **add**
@@ -26,3 +34,9 @@
 - `percent of means times p over 100` → **percent**
 - `per unit time is a rate` → **rate**
 - `remainder after uses is subtract chain` → **sub_chain**
+- `half of NAME binds to that person's quantity` → **bind**
+- `times-as chain: compose relations from known base` → **bind**
+- `offset after resolving the referent first` → **bind**
+- `win/loss: W=(T+d)/2` → **schema**
+- `clock span then optional rate` → **schema**
+- `profit = cost × p%` → **schema**
