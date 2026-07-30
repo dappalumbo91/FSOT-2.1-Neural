@@ -1,12 +1,12 @@
 # Lean 4 × Wet-lab scientific certificate
 
-Generated: `2026-07-30T01:12:11.870630+00:00`
+Generated: `2026-07-30T01:12:31.773117+00:00`
 
 ## Verdict
 
 | Gate | Status |
 |------|--------|
-| Lean `lake build` (scientific_panel_ok) | **FAIL** |
+| Lean `lake build` (scientific_panel_ok) | **PASS** |
 | Archive pin D1D38A / seeds | **PASS** |
 | Wet-lab battery critical | **PASS** |
 | Free parameters on scalar | **0** |
