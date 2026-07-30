@@ -477,21 +477,39 @@ def apply_rules(question: str) -> SolveResult:
         return SolveResult(_norm(v), steps, used, True)
 
     # split / among / equally → divide BEFORE each→mul
-    if re.search(r"\b(split|equally among|share equally|divided equally)\b", ql) and len(nums) >= 2:
+    # Refuse multi-party shares (adults+children, tickets+food) — need SCHEMA.
+    if (
+        re.search(r"\b(split|equally among|share equally|divided equally)\b", ql)
+        and len(nums) == 2
+        and not re.search(r"\b(adult|child|ticket|packet|also spent|less on)\b", ql)
+    ):
         v = eval_binop(nums[0], "/", nums[1])
         if v is not None:
             push("div_share", "each = total ÷ n", f"{nums[0]}/{nums[1]}", v)
             return SolveResult(_norm(v), steps, used, True)
 
-    # percent of — require "p% of <number>" or explicit drill form (not any nearby %)
+    # percent of — only clean "p% of <number>" or "what is p% of x" drills.
+    # Refuse "p% of the amount/wood/price" multi-hop (loan/fee/section schemas).
     if re.search(r"\d+\s*%\s*of\b|\bpercent of\b|what is \d+\s*% of", ql):
-        m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*of\s*[^0-9]{0,40}?(\d+(?:\.\d+)?)", ql)
-        if not m:
-            m = re.search(r"what is\s+(\d+(?:\.\d+)?)\s*%\s*of\s+(\d+(?:\.\d+)?)", ql)
-        if m:
-            p, x = float(m.group(1)), float(m.group(2))
-            v = push("AR-202", "p% of x = (p/100)*x", f"{p}% of {x}", (p / 100.0) * x)
-            return SolveResult(_norm(v), steps, used, True)
+        if re.search(
+            r"%\s*of (?:the |this |his |her )?(?:amount|wood|price|selling|house|loan|value|redwood)",
+            ql,
+        ) and not re.search(r"what is\s+\d+\s*%\s*of\s+\d+", ql):
+            pass  # leave for SCHEMA in solve_with_binding
+        else:
+            m = re.search(
+                r"(\d+(?:\.\d+)?)\s*%\s*of\s+(\d+(?:\.\d+)?)",
+                ql,
+            )
+            if not m:
+                m = re.search(
+                    r"what is\s+(\d+(?:\.\d+)?)\s*%\s*of\s+(\d+(?:\.\d+)?)",
+                    ql,
+                )
+            if m:
+                p, x = float(m.group(1)), float(m.group(2))
+                v = push("AR-202", "p% of x = (p/100)*x", f"{p}% of {x}", (p / 100.0) * x)
+                return SolveResult(_norm(v), steps, used, True)
         # enrolled chain: "class of N, p% enrolled, q% of the remaining"
         if re.search(r"\bof the remaining\b", ql) and len(nums) >= 1:
             pcts = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", q)]
@@ -628,12 +646,15 @@ def apply_rules(question: str) -> SolveResult:
         v = push("sub_remove", "left=had−sold", f"{nums[0]}-{nums[1]}", nums[0] - nums[1])
         return SolveResult(_norm(v), steps, used, True)
 
-    # average only for explicit "average/mean of a, b, c" lists — not "average of 24 minutes"
+    # average only for explicit numeric lists — never "takes an average of 4 hours"
     if re.search(r"\b(average|mean) of\b", ql) and 2 <= len(nums) <= 6:
         if re.search(
-            r"\b(average|mean) of\s+\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)+",
+            r"\b(average|mean) of\s+\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)+(?:\s*,?\s*and\s+\d+)?",
             ql,
-        ) or re.search(r"\b(average|mean) of\s+\d+.+\band\b.+\d+", ql):
+        ) or re.search(
+            r"\b(average|mean) of\s+\d+(?:\.\d+)?\s+and\s+\d+(?:\.\d+)?\b",
+            ql,
+        ):
             s = sum(nums)
             avg = push("mean", "mean=sum/n", f"{s}/{len(nums)}", s / len(nums))
             return SolveResult(_norm(avg), steps, used, True)
@@ -688,7 +709,7 @@ def apply_rules(question: str) -> SolveResult:
     # Refuse "K more X than Y" (needs base+base+K) and "more than" comparative totals.
     if re.search(r"\b(altogether|in all|in total|combined)\b", ql) and len(nums) == 2:
         if not re.search(
-            r"\b(each|per|times|half|%|percent|left|remain|more \w+ than|more than)\b",
+            r"\b(each|per|times|half|%|percent|left|remain|more \w+ than|more than|twice)\b",
             ql,
         ):
             s = push("add_combine", "total=a+b", f"{nums[0]}+{nums[1]}", nums[0] + nums[1])

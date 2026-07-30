@@ -1,5 +1,5 @@
 # domain	grade	kind	question	answer
-# Math RULES curriculum 2026-07-30T02:55:42.157111+00:00
+# Math RULES curriculum 2026-07-30T03:14:57.857974+00:00
 # kind=rule | langmap | drill — symbolic laws, not Q/A stuffing
 math	rules	rule	What is the rule addition commutative?	a + b = b + a
 math	rules	rule	Explain add_comm	Order of addends does not change sum
@@ -280,6 +280,14 @@ math	rules	drill	A hospital sees 500 people a day. Each patient is seen for an a
 math	rules	drill	Jeans makeup artist charges her $250 an hour. It takes 6 hours to do each day and she needs it done 4 times a week. The movie takes 5 weeks to finish. After the movie the makeup artist gives Jean a 10% discount. How much did Jean pay?	27000
 math	rules	drill	A bakery produces 60 loaves of bread each day. Two-thirds of the loaves are sold in the morning and half of what is left is sold equally in the afternoon and evening. How many loaves of bread are sold in the afternoon?	10
 math	rules	drill	Zaid spends 1/4 of his salary on rent, 1/3 on car fuel and donates half of the remaining amount to his favorite charity. He gives his daughter 200$ to use for her weekly expenses and 700$ to his wife. If Zaid earns 6000$ per month, how much money will he still have after all these expenses and donations?	350
+math	rules	drill	He bought 38 chicken sausages and 6 more fish sausages than chicken sausages. How many sausages did he buy in all?	82
+math	rules	drill	A water tank is filled with 120 liters of water. Celine used 90 liters. She collected rainwater that is twice as much as what was left. How many liters of water are in the tank now?	90
+math	rules	drill	On Tuesday, Peter wants to exercise for twice the amount of time he did on Monday and Sunday combined. On Sunday he exercised for 23 minutes. On Monday he exercised for 16 minutes. How many minutes does he have to exercise on Tuesday?	78
+math	rules	drill	If a classroom has 3 times as many girls as they do boys, and 1/10 as many nongendered children as they do boys, and the classroom has 30 boys. How many total children does it have?	123
+math	rules	drill	Janeth borrowed $2000 and promised to return it with an additional 10% of the amount. If she is going to pay $165 a month for 12 months, how much will be Janeth's remaining balance by then?	220
+math	rules	drill	Mr. Tan sold his house for $400000. He paid the transfer fees that amount to 3% of the selling price and also paid a brokerage fee that is 5% of the selling price. If he also paid $250000 for the remaining loan amount of the house, how much is Mr. Tan's net proceeds from selling the house?	118000
+math	rules	drill	Each solid 10-foot section of a redwood tree weighs 400 pounds. Termites ate 30% of this redwood's wood. If the redwood is 200 feet tall, how much does it weigh?	5600
+math	rules	drill	4 adults and 8 children are to share 8 packets of chocolate bars. Each packet contains 5 chocolate bars. If each adult gets 6 chocolate bars and the rest are to be shared equally among the children, how many will each child get?	2
 math	arithmetic	rule_id	What rule is AR-001?	Numeral denotes value
 math	arithmetic	rule_name	State the form of Numeral denotes value	n → Value(n)
 math	arithmetic	rule_form	AR-001 input form	n

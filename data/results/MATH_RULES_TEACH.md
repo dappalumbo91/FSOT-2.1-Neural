@@ -1,20 +1,20 @@
 # Math rules teach — not Q/A stuffing
 
-Generated: `2026-07-30T02:55:42.164602+00:00`
+Generated: `2026-07-30T03:14:57.867189+00:00`
 
 **Doctrine:** Teach RULES and language→operator maps; solve by decomposition and rule application. Do NOT stuff GSM8K Q→A and retrieve. Authority rule corpus: Desktop Math generator → data/math_rulebook.
 
-Runtime apply rules: **28** · Language maps: **17** · Drills: **119**  
+Runtime apply rules: **28** · Language maps: **17** · Drills: **127**  
 **Imported Math-generator atomic rules: 1520** · Bank rows from import: 9136
 
 ## Scores (rule application)
 
 | Set | Acc | n |
 |-----|----:|--:|
-| **Drills (worksheet)** | **1.0000** | 119 |
-| GSM8K train (rule-covered only) | 1.0000 | 18 |
-| GSM8K test (all) | 0.0833 | 300 |
-| GSM8K test (where rules fire) | 0.7143 | 35 |
+| **Drills (worksheet)** | **1.0000** | 127 |
+| GSM8K train (rule-covered only) | 1.0000 | 20 |
+| GSM8K test (all) | 0.1067 | 300 |
+| GSM8K test (where rules fire) | 0.9143 | 35 |
 
 **Straight-A on rule drills (≥0.95):** PASS
 

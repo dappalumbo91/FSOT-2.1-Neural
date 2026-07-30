@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-07-30T02:55:42.164602+00:00",
+  "generated_at": "2026-07-30T03:14:57.867189+00:00",
   "doctrine": "Teach RULES and language\u2192operator maps; solve by decomposition and rule application. Do NOT stuff GSM8K Q\u2192A and retrieve. Authority rule corpus: Desktop Math generator \u2192 data/math_rulebook.",
   "pass_threshold": 0.95,
   "n_arith_rules_runtime": 28,
   "n_language_maps": 17,
   "n_imported_math_generator_rules": 1520,
   "n_imported_bank_rows": 9136,
-  "n_drills": 119,
-  "n_gsm8k_rule_covered_practice": 18,
+  "n_drills": 127,
+  "n_gsm8k_rule_covered_practice": 20,
   "n_heldout_test": 300,
   "n_heldout_rule_covered": 35,
   "scores": {
     "drills_rule_application": {
-      "n": 119,
-      "correct": 119,
+      "n": 127,
+      "correct": 127,
       "accuracy": 1.0,
-      "with_rule_trace": 119,
+      "with_rule_trace": 127,
       "by_focus": {
         "add": {
           "correct": 13,
@@ -108,13 +108,13 @@
           "accuracy": 1.0
         },
         "BIND-04": {
-          "correct": 3,
-          "n": 3,
+          "correct": 4,
+          "n": 4,
           "accuracy": 1.0
         },
         "BIND-03": {
-          "correct": 3,
-          "n": 3,
+          "correct": 6,
+          "n": 6,
           "accuracy": 1.0
         },
         "SCHEMA-remainder-sell": {
@@ -166,15 +166,35 @@
           "correct": 1,
           "n": 1,
           "accuracy": 1.0
+        },
+        "SCHEMA-loan-balance": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-fee-stack": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-section-weight": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-share-rest": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "practice_mixed": {
-      "n": 137,
-      "correct": 137,
+      "n": 147,
+      "correct": 147,
       "accuracy": 1.0,
-      "with_rule_trace": 137,
+      "with_rule_trace": 147,
       "by_focus": {
         "add": {
           "correct": 13,
@@ -267,13 +287,13 @@
           "accuracy": 1.0
         },
         "BIND-04": {
-          "correct": 3,
-          "n": 3,
+          "correct": 10,
+          "n": 10,
           "accuracy": 1.0
         },
         "BIND-03": {
-          "correct": 5,
-          "n": 5,
+          "correct": 8,
+          "n": 8,
           "accuracy": 1.0
         },
         "SCHEMA-remainder-sell": {
@@ -326,6 +346,26 @@
           "n": 1,
           "accuracy": 1.0
         },
+        "SCHEMA-loan-balance": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-fee-stack": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-section-weight": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "SCHEMA-share-rest": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
         "div_rate": {
           "correct": 1,
           "n": 1,
@@ -337,16 +377,11 @@
           "accuracy": 1.0
         },
         "AR-202": {
-          "correct": 4,
-          "n": 4,
-          "accuracy": 1.0
-        },
-        "sub_diff": {
           "correct": 1,
           "n": 1,
           "accuracy": 1.0
         },
-        "div_share": {
+        "sub_diff": {
           "correct": 1,
           "n": 1,
           "accuracy": 1.0
@@ -355,14 +390,19 @@
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "gsm8k_train_rule_covered": {
-      "n": 18,
-      "correct": 18,
+      "n": 20,
+      "correct": 20,
       "accuracy": 1.0,
-      "with_rule_trace": 18,
+      "with_rule_trace": 20,
       "by_focus": {
         "half": {
           "correct": 2,
           "n": 2,
+          "accuracy": 1.0
+        },
+        "BIND-04": {
+          "correct": 6,
+          "n": 6,
           "accuracy": 1.0
         },
         "div_rate": {
@@ -375,14 +415,14 @@
           "n": 1,
           "accuracy": 1.0
         },
-        "AR-202": {
-          "correct": 4,
-          "n": 4,
-          "accuracy": 1.0
-        },
         "BIND-02": {
           "correct": 6,
           "n": 6,
+          "accuracy": 1.0
+        },
+        "AR-202": {
+          "correct": 1,
+          "n": 1,
           "accuracy": 1.0
         },
         "sub_diff": {
@@ -394,39 +434,34 @@
           "correct": 2,
           "n": 2,
           "accuracy": 1.0
-        },
-        "div_share": {
-          "correct": 1,
-          "n": 1,
-          "accuracy": 1.0
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "gsm8k_test_all": {
       "n": 300,
-      "correct": 25,
-      "accuracy": 0.0833,
-      "with_rule_trace": 25,
+      "correct": 32,
+      "accuracy": 0.1067,
+      "with_rule_trace": 32,
       "by_focus": {
         "transfer": {
-          "correct": 25,
+          "correct": 32,
           "n": 300,
-          "accuracy": 0.0833
+          "accuracy": 0.1067
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "gsm8k_test_where_rules_fire": {
       "n": 35,
-      "correct": 25,
-      "accuracy": 0.7143,
-      "with_rule_trace": 25,
+      "correct": 32,
+      "accuracy": 0.9143,
+      "with_rule_trace": 32,
       "by_focus": {
         "transfer": {
-          "correct": 25,
+          "correct": 32,
           "n": 35,
-          "accuracy": 0.7143
+          "accuracy": 0.9143
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"

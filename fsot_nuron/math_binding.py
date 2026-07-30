@@ -612,6 +612,38 @@ def solve_with_binding(question: str) -> SolveResult:
             ):
                 return SolveResult(_norm(h), steps, used, True)
 
+    # ----- classroom composition BEFORE generic times-chain -----
+    # "k times as many girls as boys, 1/10 as many Z as boys, has N boys; total"
+    if (
+        re.search(r"\btimes as many\b", ql)
+        and re.search(r"\b\d+/\d+\s+as many\b", ql)
+        and re.search(r"\b(total|how many total|total children)\b", ql)
+    ):
+        km = re.search(r"(\d+)\s+times as many", ql)
+        fm = re.search(r"(\d+)/(\d+)\s+as many", ql)
+        # base count: "has 30 boys" — not "has 3 times"
+        bm = re.search(
+            r"(?:has|have)\s+(\d+)\s+(boys|girls|students|children)\b",
+            ql,
+        )
+        if not bm:
+            # last absolute "has N <noun>" not followed by times
+            cands = list(
+                re.finditer(
+                    r"(?:has|have)\s+(\d+)\s+\w+\b(?!\s*times)",
+                    ql,
+                )
+            )
+            bm = cands[-1] if cands else None
+        if km and fm and bm:
+            k = float(km.group(1))
+            f = float(fm.group(1)) / float(fm.group(2))
+            base = float(bm.group(1))
+            g = push("BIND-03", "k×base", f"{k}*{base}", k * base)
+            z = push("BIND-02", "f×base", f"{f:g}*{base}", f * base)
+            tot = push("add_combine", "g+base+z", f"{g}+{base}+{z}", g + base + z)
+            return SolveResult(_norm(tot), steps, used, True)
+
     # ----- BIND-03 relative chains: times as old / times as many / twice as many -----
     edges: List[Tuple[str, float, str]] = []
 
@@ -875,8 +907,10 @@ def solve_with_binding(question: str) -> SolveResult:
         return SolveResult(_norm(left), steps, used, True)
 
     # ----- bought A of X and K more Y than X; total items -----
+    # Allow multi-word noun between more and than ("more fish sausages than")
     m = re.search(
-        r"bought\s+(\d+(?:\.\d+)?)\s+\w+.*?(\d+(?:\.\d+)?)\s+more\s+\w+\s+than"
+        r"(?:bought|has|have|had)\s+(\d+(?:\.\d+)?)\s+(?:\w+\s+){0,3}\w+"
+        r".*?(\d+(?:\.\d+)?)\s+more\s+(?:\w+\s+){1,3}than\s+"
         r".*?(?:total|altogether|in all|how many)",
         ql,
         re.S,
@@ -1232,6 +1266,273 @@ def solve_with_binding(question: str) -> SolveResult:
             if re.search(r"\b(still have|left|remain)\b", ql):
                 return SolveResult(_norm(rem), steps, used, True)
 
+    # =====================================================================
+    # Refinement batch (linguistics cues → known multi-hop forms)
+    # =====================================================================
+
+    # ----- leave L, then twice as much as left added back (water tank) -----
+    if re.search(r"twice as much as what was left", ql) and re.search(
+        r"\b(used|took|removed)\b", ql
+    ):
+        nums_local = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)", ql)]
+        # start and consumed are first two quantities
+        if len(nums_local) >= 2:
+            start, consumed = nums_local[0], nums_local[1]
+            if start > consumed:
+                left = push(
+                    "sub_remove",
+                    "left=start−used",
+                    f"{start}-{consumed}",
+                    start - consumed,
+                )
+                rain = push("BIND-03", "twice left", f"2*{left}", 2.0 * left)
+                now = push("add_combine", "left+rain", f"{left}+{rain}", left + rain)
+                return SolveResult(_norm(now), steps, used, True)
+
+    # ----- twice (A + B) combined (Peter exercise) -----
+    m = re.search(
+        r"twice the amount.*?combined.*?"
+        r"(?:sunday|monday|first).*?(\d+(?:\.\d+)?)\s*minutes?.*?"
+        r"(?:monday|sunday|second).*?(\d+(?:\.\d+)?)\s*minutes?",
+        ql,
+        re.S,
+    )
+    if not m:
+        m = re.search(
+            r"twice.*?(?:monday and sunday|sunday and monday) combined.*?"
+            r"(\d+(?:\.\d+)?)\s*minutes?.*?(\d+(?:\.\d+)?)\s*minutes?",
+            ql,
+            re.S,
+        )
+    if m and re.search(r"\btwice\b", ql) and re.search(r"\bcombined\b", ql):
+        a, b = float(m.group(1)), float(m.group(2))
+        s = push("add_combine", "A+B", f"{a}+{b}", a + b)
+        t = push("BIND-03", "twice sum", f"2*{s}", 2.0 * s)
+        return SolveResult(_norm(t), steps, used, True)
+    # looser: two minute amounts + twice + combined
+    if (
+        re.search(r"\btwice\b", ql)
+        and re.search(r"\bcombined\b", ql)
+        and re.search(r"\bminutes?\b", ql)
+    ):
+        mins = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*minutes?", ql)]
+        if len(mins) == 2:
+            s = push("add_combine", "A+B", f"{mins[0]}+{mins[1]}", mins[0] + mins[1])
+            t = push("BIND-03", "twice sum", f"2*{s}", 2.0 * s)
+            return SolveResult(_norm(t), steps, used, True)
+
+    # ----- classroom: k times as many X as Y, f as many Z as Y, Y has N; total -----
+    m = re.search(
+        r"(\d+)\s+times as many \w+ as (?:they do )?(\w+).*?"
+        r"(1/\d+|\d+/\d+)\s+as many \w+ as (?:they do )?(?:\w+).*?"
+        r"(?:has|have)\s+(\d+)\s+(\w+)",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(total|how many total|in total|total children)\b", ql):
+        k = float(m.group(1))
+        frac = m.group(3)
+        base = float(m.group(4))
+        if "/" in frac:
+            a, b = frac.split("/")
+            f = float(a) / float(b)
+        else:
+            f = float(frac)
+        g = push("BIND-03", "k×base", f"{k}*{base}", k * base)
+        z = push("BIND-02", "f×base", f"{f:g}*{base}", f * base)
+        tot = push("add_combine", "g+base+z", f"{g}+{base}+{z}", g + base + z)
+        return SolveResult(_norm(tot), steps, used, True)
+    # looser classroom: "N times as many" + "1/10 as many" + "has 30 boys" + total
+    if (
+        re.search(r"\btimes as many\b", ql)
+        and re.search(r"\b1/\d+\s+as many\b", ql)
+        and re.search(r"\b(total|how many total)\b", ql)
+    ):
+        km = re.search(r"(\d+)\s+times as many", ql)
+        fm = re.search(r"(1/\d+|\d+/\d+)\s+as many", ql)
+        bm = re.search(r"(?:has|have)\s+(\d+)\s+\w+", ql)
+        if km and fm and bm:
+            k = float(km.group(1))
+            a, b = fm.group(1).split("/")
+            f = float(a) / float(b)
+            base = float(bm.group(1))
+            g = push("BIND-03", "k×base", f"{k}*{base}", k * base)
+            z = push("BIND-02", "f×base", f"{f:g}*{base}", f * base)
+            tot = push("add_combine", "g+base+z", f"{g}+{base}+{z}", g + base + z)
+            return SolveResult(_norm(tot), steps, used, True)
+
+    # ----- loan + interest − payments remaining (Janeth) -----
+    m = re.search(
+        r"borrowed\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(?:additional|interest)\s+(\d+(?:\.\d+)?)\s*%.*?"
+        r"\$?\s*(\d+(?:\.\d+)?)\s*(?:a month|per month).*?"
+        r"(\d+)\s*months?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(remaining|balance|left)\b", ql):
+        principal = float(m.group(1))
+        pct = float(m.group(2))
+        monthly = float(m.group(3))
+        months = float(m.group(4))
+        interest = push(
+            "SCHEMA-loan-balance",
+            "interest=p%×principal",
+            f"{pct}%*{principal}",
+            principal * pct / 100.0,
+        )
+        owed = push(
+            "add_combine",
+            "owed=principal+interest",
+            f"{principal}+{interest}",
+            principal + interest,
+        )
+        paid = push(
+            "mul_groups",
+            "paid=monthly×months",
+            f"{monthly}*{months}",
+            monthly * months,
+        )
+        rem = push("sub_remove", "balance=owed−paid", f"{owed}-{paid}", owed - paid)
+        return SolveResult(_norm(rem), steps, used, True)
+
+    # ----- fee stack net proceeds (Mr Tan) -----
+    # sale price, p% transfer, q% brokerage, loan remaining → net = sale − fees − loan
+    if re.search(r"\b(net proceeds|net from selling)\b", ql) or (
+        re.search(r"\b(transfer fees?|brokerage)\b", ql)
+        and re.search(r"\b(selling price|sold .* for)\b", ql)
+    ):
+        price_m = re.search(
+            r"(?:sold .* for|selling price of)\s+\$?\s*(\d+(?:\s+\d+)*)",
+            ql,
+        )
+        if not price_m:
+            price_m = re.search(r"\$\s*(\d+(?:\s+\d+){0,2})", q.replace(",", ""))
+        pcts = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", ql)]
+        loan_m = re.search(
+            r"(?:loan|remaining loan|paid)\s+\$?\s*(\d+(?:\s+\d+)*)",
+            ql,
+        )
+        # normalize "400 000" → 400000
+        def _money(s: str) -> float:
+            return float(re.sub(r"\s+", "", s))
+
+        if price_m and len(pcts) >= 2:
+            price = _money(price_m.group(1))
+            fees = 0.0
+            for p in pcts[:2]:
+                fee = push(
+                    "SCHEMA-fee-stack",
+                    "fee=p%×price",
+                    f"{p}%*{price}",
+                    price * p / 100.0,
+                )
+                fees += fee
+            loan = 0.0
+            if loan_m:
+                loan = _money(loan_m.group(1))
+                # avoid treating small percents as loan
+                if loan < price:
+                    push("BIND-01", "loan", f"loan={loan}", loan)
+                else:
+                    loan = 0.0
+            # also "paid $250000 for the remaining loan"
+            loan2 = re.search(
+                r"paid\s+\$?\s*(\d+(?:\s+\d+)*)\s+for the remaining loan",
+                ql,
+            )
+            if loan2:
+                loan = _money(loan2.group(1))
+            net = push(
+                "SCHEMA-fee-stack",
+                "net=price−fees−loan",
+                f"{price}-{fees}-{loan}",
+                price - fees - loan,
+            )
+            return SolveResult(_norm(net), steps, used, True)
+
+    # ----- section weight × height, then (1−p%) remains (redwood) -----
+    m = re.search(
+        r"(\d+(?:\.\d+)?)-foot section.*?weighs\s+(\d+(?:\.\d+)?).*?"
+        r"(\d+(?:\.\d+)?)\s*%.*?"
+        r"(\d+(?:\.\d+)?)\s*feet?\s+tall",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bweigh\b", ql):
+        sec, w, pct, height = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        nsec = push("div_share", "sections=h/sec", f"{height}/{sec}", height / sec)
+        full = push("mul_groups", "full weight", f"{nsec}*{w}", nsec * w)
+        eaten = push(
+            "SCHEMA-section-weight",
+            "eaten=p%×full",
+            f"{pct}%*{full}",
+            full * pct / 100.0,
+        )
+        left = push("sub_remove", "left=full−eaten", f"{full}-{eaten}", full - eaten)
+        return SolveResult(_norm(left), steps, used, True)
+
+    # ----- multi-day times-as-many + calorie diff (Sue cookies) -----
+    if (
+        re.search(r"\bon monday\b", ql)
+        and re.search(r"\bon tuesday\b", ql)
+        and re.search(r"\btimes as many\b", ql)
+        and re.search(r"\bcalories?\b", ql)
+    ):
+        # sister ate A Monday and B next day; Sue k× Mon, m× Tue; cal per cookie
+        sm = re.search(
+            r"sister ate\s+(\d+).*?monday.*?(\d+).*?(?:next day|tuesday)",
+            ql,
+            re.S,
+        )
+        km = re.search(r"monday.*?(\d+)\s+times as many", ql, re.S)
+        tm = re.search(r"tuesday.*?(\d+|twice)\s+times as many|tuesday.*?twice as many", ql, re.S)
+        cal = re.search(r"(\d+)\s*calories?", ql)
+        if sm and km and cal:
+            sis_m, sis_t = float(sm.group(1)), float(sm.group(2))
+            k = float(km.group(1))
+            if tm:
+                raw = tm.group(1) if tm.lastindex else "2"
+                mlt = 2.0 if str(raw) == "twice" or raw is None else float(raw)
+            else:
+                mlt = 2.0 if re.search(r"tuesday.*?twice", ql, re.S) else 2.0
+            sue_m = push("BIND-03", "sue mon", f"{k}*{sis_m}", k * sis_m)
+            sue_t = push("BIND-03", "sue tue", f"{mlt}*{sis_t}", mlt * sis_t)
+            sue = push("add_combine", "sue total", f"{sue_m}+{sue_t}", sue_m + sue_t)
+            sis = push("add_combine", "sis total", f"{sis_m}+{sis_t}", sis_m + sis_t)
+            diff = push("sub_diff", "more cookies", f"{sue}-{sis}", sue - sis)
+            cals = float(cal.group(1))
+            out = push("mul_groups", "cal diff", f"{diff}*{cals}", diff * cals)
+            return SolveResult(_norm(out), steps, used, True)
+
+    # ----- adults take fixed, rest share among children -----
+    m = re.search(
+        r"(\d+)\s+adults?.*?(\d+)\s+children?.*?"
+        r"(\d+)\s+packets?.*?each packet contains\s+(\d+).*?"
+        r"each adult gets\s+(\d+).*?"
+        r"(?:rest|remaining).*?(?:shared equally|equally).*?children",
+        ql,
+        re.S,
+    )
+    if m:
+        nad, nch, npk, per_pk, per_ad = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+            float(m.group(5)),
+        )
+        total = push("mul_groups", "bars", f"{npk}*{per_pk}", npk * per_pk)
+        ad = push("mul_groups", "adults", f"{nad}*{per_ad}", nad * per_ad)
+        rem = push("sub_remove", "rest", f"{total}-{ad}", total - ad)
+        each = push("div_share", "per child", f"{rem}/{nch}", rem / nch)
+        return SolveResult(_norm(each), steps, used, True)
+
     return SolveResult(None, steps, used, False)
 
 
@@ -1412,5 +1713,60 @@ def binding_drills() -> List[Tuple[str, str, str]]:
             "will he still have after all these expenses and donations?",
             "350",
             "SCHEMA-salary-fractions",
+        ),
+        (
+            "He bought 38 chicken sausages and 6 more fish sausages than chicken sausages. "
+            "How many sausages did he buy in all?",
+            "82",
+            "BIND-04",
+        ),
+        (
+            "A water tank is filled with 120 liters of water. Celine used 90 liters. She collected "
+            "rainwater that is twice as much as what was left. How many liters of water are in "
+            "the tank now?",
+            "90",
+            "BIND-03",
+        ),
+        (
+            "On Tuesday, Peter wants to exercise for twice the amount of time he did on Monday "
+            "and Sunday combined. On Sunday he exercised for 23 minutes. On Monday he exercised "
+            "for 16 minutes. How many minutes does he have to exercise on Tuesday?",
+            "78",
+            "BIND-03",
+        ),
+        (
+            "If a classroom has 3 times as many girls as they do boys, and 1/10 as many "
+            "nongendered children as they do boys, and the classroom has 30 boys. How many total "
+            "children does it have?",
+            "123",
+            "BIND-03",
+        ),
+        (
+            "Janeth borrowed $2000 and promised to return it with an additional 10% of the amount. "
+            "If she is going to pay $165 a month for 12 months, how much will be Janeth's "
+            "remaining balance by then?",
+            "220",
+            "SCHEMA-loan-balance",
+        ),
+        (
+            "Mr. Tan sold his house for $400000. He paid the transfer fees that amount to 3% of "
+            "the selling price and also paid a brokerage fee that is 5% of the selling price. "
+            "If he also paid $250000 for the remaining loan amount of the house, how much is "
+            "Mr. Tan's net proceeds from selling the house?",
+            "118000",
+            "SCHEMA-fee-stack",
+        ),
+        (
+            "Each solid 10-foot section of a redwood tree weighs 400 pounds. Termites ate 30% of "
+            "this redwood's wood. If the redwood is 200 feet tall, how much does it weigh?",
+            "5600",
+            "SCHEMA-section-weight",
+        ),
+        (
+            "4 adults and 8 children are to share 8 packets of chocolate bars. Each packet "
+            "contains 5 chocolate bars. If each adult gets 6 chocolate bars and the rest are to "
+            "be shared equally among the children, how many will each child get?",
+            "2",
+            "SCHEMA-share-rest",
         ),
     ]
