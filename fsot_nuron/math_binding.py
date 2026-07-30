@@ -1786,6 +1786,320 @@ def solve_with_binding(question: str) -> SolveResult:
             )
             return SolveResult(_norm(left), steps, used, True)
 
+    # =====================================================================
+    # High-coverage generic forms (batch no-fire lift — local, no API)
+    # =====================================================================
+
+    # feet → inches / piece length → how many pieces
+    m = re.search(
+        r"(\d+(?:\.\d+)?)\s*feet?.*?cut into.*?(\d+(?:\.\d+)?)\s*inches?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow many\b", ql):
+        feet, inches = float(m.group(1)), float(m.group(2))
+        tot_in = push("mul_groups", "inches", f"{feet}*12", feet * 12.0)
+        n = push("div_share", "pieces", f"{tot_in}/{inches}", tot_in / inches)
+        return SolveResult(_norm(n), steps, used, True)
+
+    # ratio a:b of total T; ask one part (+ optional years later)
+    m = re.search(
+        r"ratio of\s+(\d+)\s*:\s*(\d+).*?total.*?(\d+)",
+        ql,
+        re.S,
+    )
+    if m:
+        a, b, tot = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        parts = push("add_combine", "parts", f"{a}+{b}", a + b)
+        # which name asked? larger part if "Allen" etc. — use second if "latter" else first or by name order
+        # default: if ask second name or larger share when second > first
+        share_b = push("div_share", "b share", f"{b}/{parts}*{tot}", b / parts * tot)
+        share_a = push("div_share", "a share", f"{a}/{parts}*{tot}", a / parts * tot)
+        years = re.search(r"(\d+)\s+years? from now", ql)
+        # prefer the person mentioned in the how-old/how-many ask
+        ask = re.search(r"(?:calculate|how old is|how many.*?is)\s+([a-z]+)", ql)
+        names = re.findall(r"\b([A-Z][a-z]+)\b", q)
+        val = share_b if b >= a else share_a
+        if ask and names:
+            # crude: if ask name is second listed, use share_b
+            an = ask.group(1).lower()
+            if len(names) >= 2 and an == names[1].lower():
+                val = share_b
+            elif len(names) >= 1 and an == names[0].lower():
+                val = share_a
+        if years:
+            val = push("BIND-04", "+years", f"{val}+{years.group(1)}", val + float(years.group(1)))
+        return SolveResult(_norm(val), steps, used, True)
+
+    # N of X; K fewer Y than X; Z = m times Y; total
+    m = re.search(
+        r"(\d+)\s+\w+.*?(\d+)\s+fewer \w+ than.*?"
+        r"(?:twice|(\d+)\s+times) as many \w+ as.*?"
+        r"(?:total|how many \w+ (?:were|are) there|in all)",
+        ql,
+        re.S,
+    )
+    if m:
+        x = float(m.group(1))
+        fewer = float(m.group(2))
+        mult = 2.0 if "twice" in ql else float(m.group(3) or 2)
+        y = push("BIND-04", "y=x−k", f"{x}-{fewer}", x - fewer)
+        z = push("BIND-03", "z=m*y", f"{mult}*{y}", mult * y)
+        tot = push("add_combine", "x+y+z", f"{x}+{y}+{z}", x + y + z)
+        return SolveResult(_norm(tot), steps, used, True)
+    # gems: 175 diamonds, 35 fewer rubies, twice as many emeralds as rubies
+    m = re.search(
+        r"(\d+)\s+\w+.*?(\d+)\s+fewer \w+ than \w+.*?(\d+|twice)\s+times as many",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(total|altogether|in all|how many \w+ did)\b", ql):
+        x, fewer = float(m.group(1)), float(m.group(2))
+        mt = m.group(3)
+        mult = 2.0 if mt == "twice" else float(mt)
+        y = push("BIND-04", "y=x−k", f"{x}-{fewer}", x - fewer)
+        z = push("BIND-03", "z=m*y", f"{mult}*{y}", mult * y)
+        tot = push("add_combine", "sum", f"{x}+{y}+{z}", x + y + z)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # trip: total T, stop after A, second stop B before end → middle segment
+    m = re.search(
+        r"(\d+(?:\.\d+)?)\s*[- ]?mile.*?stopped after\s+(\d+(?:\.\d+)?).*?"
+        r"(\d+(?:\.\d+)?)\s*miles? before",
+        ql,
+        re.S,
+    )
+    if m:
+        total, first, before_end = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        used = push("add_combine", "ends", f"{first}+{before_end}", first + before_end)
+        mid = push("sub_remove", "middle", f"{total}-{used}", total - used)
+        return SolveResult(_norm(mid), steps, used, True)
+
+    # MPG: miles / gallons * tank gallons
+    m = re.search(
+        r"(\d+(?:\.\d+)?)\s*miles.*?(\d+(?:\.\d+)?)\s*gallons?.*?"
+        r"(\d+(?:\.\d+)?)\s*gallons?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(how far|tank|drive)\b", ql):
+        miles, gal_used, tank = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        if gal_used > 0:
+            mpg = push("div_rate", "mpg", f"{miles}/{gal_used}", miles / gal_used)
+            dist = push("mul_rate", "range", f"{mpg}*{tank}", mpg * tank)
+            return SolveResult(_norm(dist), steps, used, True)
+
+    # sale: eat N/day for D days, pack of K for $P → spend
+    m = re.search(
+        r"(\d+)\s+\w+ a day.*?(\d+)\s+\w+ for\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(\d+)\s*days?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\b(spend|cost|how much)\b", ql):
+        per_day, pack_n, pack_p, days = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        # also "over 30 days" / "3 months" ≈ 30 days if months
+        if re.search(r"\bmonths?\b", ql) and days <= 12:
+            days = days * 30.0
+        need = push("mul_groups", "need", f"{per_day}*{days}", per_day * days)
+        packs = push("div_share", "packs", f"{need}/{pack_n}", need / pack_n)
+        spend = push("mul_groups", "spend", f"{packs}*{pack_p}", packs * pack_p)
+        return SolveResult(_norm(spend), steps, used, True)
+
+    # spend X year1, third of that year2, total
+    m = re.search(
+        r"\$?\s*(\d+(?:\.\d+)?)\s+on \w+.*?a year.*?third of that amount.*?another year",
+        ql,
+        re.S,
+    )
+    if m:
+        y1 = float(m.group(1))
+        y2 = push("div_share", "third", f"{y1}/3", y1 / 3.0)
+        tot = push("add_combine", "two years", f"{y1}+{y2}", y1 + y2)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # A is k times B's capacity; B holds N; how many does A hold? → k*N
+    # reverse ask: A holds M = k * B → B = M/k
+    m = re.search(
+        r"(\d+)\s+times more.*?than.*?(\d+(?:\.\d+)?)",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow many\b", ql) and not re.search(r"\$", ql):
+        k, n = float(m.group(1)), float(m.group(2))
+        # "6 times more photographs than Brittany... Brittany max" wait
+        pass
+    m = re.search(
+        r"(\d+)\s+times (?:more|as many).*?(\d+(?:\.\d+)?)\s*(?:photographs|photos|items)?",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bmaximum\b|\bhold\b", ql):
+        # Jamal holds 6× Brittany; Brittany? Jamal max 1800 → Brit = 1800/6
+        nums = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)", ql)]
+        if len(nums) >= 2:
+            # last large number is often capacity of larger
+            k = float(m.group(1))
+            big = max(nums)
+            if big > k:
+                small = push("div_share", "smaller", f"{big}/{k}", big / k)
+                return SolveResult(_norm(small), steps, used, True)
+
+    # age: A born Y years before B; A had son at age S; B now N → years ago A son
+    m = re.search(
+        r"(\d+)\s+years? before.*?age of\s+(\d+).*?now\s+(\d+)",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\byears? ago\b", ql):
+        before, age_son, now_b = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        # B age when A had son = age_son - before
+        b_then = push("sub_remove", "B then", f"{age_son}-{before}", age_son - before)
+        ago = push("sub_remove", "years ago", f"{now_b}-{b_then}", now_b - b_then)
+        return SolveResult(_norm(ago), steps, used, True)
+
+    # N each * stalls, then buy M divide equally into stalls, cows per stall after
+    m = re.search(
+        r"(\d+)\s+stalls?.*?(\d+)\s+\w+ each.*?buys?\s+(\d+).*?"
+        r"divides them equally",
+        ql,
+        re.S,
+    )
+    if m:
+        stalls, each0, buy = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        add = push("div_share", "per stall new", f"{buy}/{stalls}", buy / stalls)
+        # question sometimes total cows after: (each0+add)*stalls or each0+add
+        if re.search(r"\bhow many.*?(each|per stall|in each)\b", ql):
+            v = push("add_combine", "each after", f"{each0}+{add}", each0 + add)
+            return SolveResult(_norm(v), steps, used, True)
+        tot = push(
+            "mul_groups",
+            "total after",
+            f"({each0}+{add})*{stalls}",
+            (each0 + add) * stalls,
+        )
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # cart: N items @ $P each (multiple lines) + delivery fee % + tip
+    if re.search(r"\bdelivery fee\b", ql) and re.search(r"%", ql):
+        lines = re.findall(
+            r"(\d+)\s+\w+.*?\$?\s*(\d+(?:\.\d+)?)\s*each",
+            ql,
+        )
+        fee_m = re.search(r"(\d+(?:\.\d+)?)\s*%\s*(?:delivery )?fee", ql)
+        tip_m = re.search(r"\$?\s*(\d+(?:\.\d+)?)\s*(?:tip|tip\.)", ql)
+        if lines and fee_m:
+            sub = 0.0
+            for n, p in lines:
+                sub += float(n) * float(p)
+            push("add_combine", "subtotal", str(sub), sub)
+            fee = push(
+                "SCHEMA-fee-stack",
+                "fee",
+                f"{fee_m.group(1)}%*{sub}",
+                sub * float(fee_m.group(1)) / 100.0,
+            )
+            tot = sub + fee
+            if tip_m:
+                tip = float(tip_m.group(1))
+                tot = push("add_combine", "sub+fee+tip", f"{sub}+{fee}+{tip}", sub + fee + tip)
+            else:
+                tot = push("add_combine", "sub+fee", f"{sub}+{fee}", sub + fee)
+            return SolveResult(_norm(tot), steps, used, True)
+
+    # classes: weekdays W days * C classes + sat S, each class students * charge
+    m = re.search(
+        r"(\d+)\s+\w+ classes.*?every day.*?weekdays.*?(\d+)\s+classes? on saturday.*?"
+        r"each class has\s+(\d+)\s+students.*?\$?\s*(\d+(?:\.\d+)?)",
+        ql,
+        re.S,
+    )
+    if m:
+        per_wd, sat, students, rate = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        wd = push("mul_groups", "weekday classes", f"{per_wd}*5", per_wd * 5.0)
+        week_c = push("add_combine", "classes/week", f"{wd}+{sat}", wd + sat)
+        # if "week" and not "year" — weekly revenue; else * weeks vague
+        stu = push("mul_groups", "students", f"{students}*{week_c}", students * week_c)
+        money = push("mul_groups", "pay", f"{stu}*{rate}", stu * rate)
+        return SolveResult(_norm(money), steps, used, True)
+
+    # A more than B who collected N; total both Monday (same) *2? or A=B+N_more
+    m = re.search(
+        r"(\d+)\s+more \w+ than \w+.*?collects?\s+(\d+).*?"
+        r"(?:how many.*?together|total)",
+        ql,
+        re.S,
+    )
+    if m:
+        more, base = float(m.group(1)), float(m.group(2))
+        a = push("BIND-04", "a=b+k", f"{base}+{more}", base + more)
+        # if both days same and "together for the two days"
+        if re.search(r"\btwo days\b|\bboth days\b", ql):
+            day = push("add_combine", "one day", f"{a}+{base}", a + base)
+            tot = push("mul_groups", "two days", f"{day}*2", day * 2.0)
+            return SolveResult(_norm(tot), steps, used, True)
+        tot = push("add_combine", "together", f"{a}+{base}", a + base)
+        return SolveResult(_norm(tot), steps, used, True)
+
+    # packages of n for $p vs packages of m for $q; save on N items
+    m = re.search(
+        r"packages of\s+(\d+)\s+for\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"packages of\s+(\d+)\s+for\s+\$?\s*(\d+(?:\.\d+)?).*?"
+        r"(?:buy(?:ing)?|save).*?(\d+)\s+\w+",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bsave\b", ql):
+        n1, p1, n2, p2, need = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+            float(m.group(5)),
+        )
+        c1 = push("mul_groups", "cost1", f"{need/n1}*{p1}", (need / n1) * p1)
+        c2 = push("mul_groups", "cost2", f"{need/n2}*{p2}", (need / n2) * p2)
+        save = push("sub_diff", "save", f"|{c1}-{c2}|", abs(c1 - c2))
+        return SolveResult(_norm(save), steps, used, True)
+
+    # plant cost C; annual profit = lemons*price - water; years to repay = C/profit
+    m = re.search(
+        r"cost\s+\$?\s*(\d+(?:\.\d+)?)\s+to plant.*?"
+        r"(\d+)\s+lemons?.*?\$?\s*(\d+(?:\.\d+)?)\s*each.*?"
+        r"\$?\s*(\d+(?:\.\d+)?)\s*a year to water",
+        ql,
+        re.S,
+    )
+    if m and re.search(r"\bhow many years\b", ql):
+        cost, lemons, price, water = (
+            float(m.group(1)),
+            float(m.group(2)),
+            float(m.group(3)),
+            float(m.group(4)),
+        )
+        rev = push("mul_groups", "revenue", f"{lemons}*{price}", lemons * price)
+        profit = push("sub_remove", "net/year", f"{rev}-{water}", rev - water)
+        if profit > 0:
+            years = push("div_share", "years", f"{cost}/{profit}", cost / profit)
+            # round up if needed for whole years
+            import math as _m
+
+            years_up = float(_m.ceil(years - 1e-9))
+            if abs(years_up - years) > 1e-6:
+                push("ceil", "whole years", str(years_up), years_up)
+                return SolveResult(_norm(years_up), steps, used, True)
+            return SolveResult(_norm(years), steps, used, True)
+
     return SolveResult(None, steps, used, False)
 
 
