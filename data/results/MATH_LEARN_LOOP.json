@@ -1,0 +1,21 @@
+{
+  "bootstrap": {
+    "n": 80,
+    "hit": 69,
+    "acc": 0.8625,
+    "n_episodes": 198,
+    "n_teaches": 675,
+    "n_replays": 1104,
+    "claim_rate": 0.7347
+  },
+  "n_episodes": 307,
+  "binding_prove": "37/37",
+  "gsm8k_200": {
+    "correct": 58,
+    "wrong_fire": 25,
+    "no_fire": 117,
+    "overall": 0.29,
+    "fire_precision": 0.6988
+  },
+  "doctrine": "train\u2192sleep\u2192prove multi-hop organism (not LLM)"
+}

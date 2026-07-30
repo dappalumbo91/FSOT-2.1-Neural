@@ -316,7 +316,41 @@ def apply_rules(question: str) -> SolveResult:
 
         bound = solve_with_binding(q)
         if bound.ok and bound.answer is not None:
+            # encode success into multihop organism (train under DA proxy)
+            try:
+                from .math_multihop_organism import get_organism
+
+                get_organism().train_from_successful_solve(
+                    q, bound.answer, bound.strategies_used or []
+                )
+            except Exception:
+                pass
             return bound
+    except Exception:
+        pass
+
+    # Bio multi-hop organism: WM + grounded hops + claim (not LLM).
+    # Only when language asks for multi-hop composition — avoid wrong-fire spam.
+    try:
+        from .math_multihop_organism import solve_multihop
+
+        multi_cue = bool(
+            re.search(
+                r"\bhalf of\b|\btimes as (many|old)\b|\btwice as many\b|"
+                r"\bfewer than\b|\bmore than half\b|\bremainder\b|"
+                r"\btogether if\b|\bhow many .* together\b",
+                ql,
+            )
+        )
+        if len(q) >= 60 and multi_cue and len(nums) >= 2:
+            mh = solve_multihop(q)
+            if (
+                mh.ok
+                and mh.answer is not None
+                and len(mh.steps) >= 2
+                and any(s.rule_id.startswith("MH-") for s in mh.steps)
+            ):
+                return mh
     except Exception:
         pass
 

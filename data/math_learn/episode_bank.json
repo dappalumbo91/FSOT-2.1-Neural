@@ -1,0 +1,1391 @@
+{
+  "n": 198,
+  "episodes": [
+    {
+      "cue": "half of 2",
+      "answer": "1",
+      "strength": 4.890000000000002,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 4",
+      "answer": "2",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 8",
+      "answer": "4",
+      "strength": 2.3000000000000003,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 10",
+      "answer": "5",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 16",
+      "answer": "8",
+      "strength": 5.940000000000002,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 20",
+      "answer": "10",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 40",
+      "answer": "20",
+      "strength": 7.690000000000001,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 50",
+      "answer": "25",
+      "strength": 5.940000000000002,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "half of 100",
+      "answer": "50",
+      "strength": 2.3000000000000003,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "twice 3",
+      "answer": "6",
+      "strength": 4.890000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "twice 5",
+      "answer": "10",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "twice 7",
+      "answer": "14",
+      "strength": 4.890000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "twice 10",
+      "answer": "20",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "twice 20",
+      "answer": "40",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "3 plus 5",
+      "answer": "8",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "add"
+    },
+    {
+      "cue": "10 plus 15",
+      "answer": "25",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "add"
+    },
+    {
+      "cue": "100 plus 25",
+      "answer": "125",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "add"
+    },
+    {
+      "cue": "10 minus 3",
+      "answer": "7",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "sub"
+    },
+    {
+      "cue": "50 minus 12",
+      "answer": "38",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "sub"
+    },
+    {
+      "cue": "4 times 6",
+      "answer": "24",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "mul"
+    },
+    {
+      "cue": "3 times 7",
+      "answer": "21",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "mul"
+    },
+    {
+      "cue": "5 times 9",
+      "answer": "45",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "mul"
+    },
+    {
+      "cue": "12 divided by 3",
+      "answer": "4",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "div"
+    },
+    {
+      "cue": "20 divided by 4",
+      "answer": "5",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "div"
+    },
+    {
+      "cue": "50 percent of 80",
+      "answer": "40",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "percent"
+    },
+    {
+      "cue": "25 percent of 200",
+      "answer": "50",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "percent"
+    },
+    {
+      "cue": "10 percent of 90",
+      "answer": "9",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "percent"
+    },
+    {
+      "cue": "one and one",
+      "answer": "two",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "add"
+    },
+    {
+      "cue": "two and one",
+      "answer": "three",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "add"
+    },
+    {
+      "cue": "two and three",
+      "answer": "five",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "add"
+    },
+    {
+      "cue": "three and two",
+      "answer": "five",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "add"
+    },
+    {
+      "cue": "what is 3 plus 5 altogether",
+      "answer": "8",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "combine 3 and 5 in total.",
+      "answer": "8",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 12 plus 8 altogether",
+      "answer": "20",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "combine 12 and 8 in total.",
+      "answer": "20",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 100 plus 25 altogether",
+      "answer": "125",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "combine 100 and 25 in total.",
+      "answer": "125",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 7 plus 9 altogether",
+      "answer": "16",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "combine 7 and 9 in total.",
+      "answer": "16",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 15 plus 15 altogether",
+      "answer": "30",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "combine 15 and 15 in total.",
+      "answer": "30",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "start with 10. use 3. how many are left",
+      "answer": "7",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "how many more is 10 than 3",
+      "answer": "7",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "start with 50. use 12. how many are left",
+      "answer": "38",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "how many more is 50 than 12",
+      "answer": "38",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "start with 100. use 40. how many are left",
+      "answer": "60",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "how many more is 100 than 40",
+      "answer": "60",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "start with 25. use 8. how many are left",
+      "answer": "17",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "how many more is 25 than 8",
+      "answer": "17",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "there are 4 groups of 6 each. how many in all",
+      "answer": "24",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "there are 3 groups of 7 each. how many in all",
+      "answer": "21",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "there are 5 groups of 9 each. how many in all",
+      "answer": "45",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "there are 8 groups of 8 each. how many in all",
+      "answer": "64",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "there are 12 groups of 3 each. how many in all",
+      "answer": "36",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "split 12 equally among 3 people. how many each",
+      "answer": "4",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "split 20 equally among 4 people. how many each",
+      "answer": "5",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "split 45 equally among 5 people. how many each",
+      "answer": "9",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "split 100 equally among 10 people. how many each",
+      "answer": "10",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is half of 8",
+      "answer": "4",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is twice 8",
+      "answer": "16",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "twice 8",
+      "answer": "16",
+      "strength": 1.9500000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "what is half of 16",
+      "answer": "8",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is twice 16",
+      "answer": "32",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "twice 16",
+      "answer": "32",
+      "strength": 1.9500000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "what is half of 50",
+      "answer": "25",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is twice 50",
+      "answer": "100",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "twice 50",
+      "answer": "100",
+      "strength": 1.9500000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "what is half of 100",
+      "answer": "50",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is twice 100",
+      "answer": "200",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "twice 100",
+      "answer": "200",
+      "strength": 1.9500000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "what is half of 24",
+      "answer": "12",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "half of 24",
+      "answer": "12",
+      "strength": 1.9500000000000002,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "what is twice 24",
+      "answer": "48",
+      "strength": 2.6500000000000004,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "twice 24",
+      "answer": "48",
+      "strength": 1.9500000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "what is 50% of 80",
+      "answer": "40",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 25% of 200",
+      "answer": "50",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 10% of 90",
+      "answer": "9",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 20% of 50",
+      "answer": "10",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "add fractions 1 4 2 4",
+      "answer": "3/4",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-107"
+    },
+    {
+      "cue": "add fractions 1 5 2 5",
+      "answer": "3/5",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-107"
+    },
+    {
+      "cue": "add fractions 2 7 3 7",
+      "answer": "5/7",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-107"
+    },
+    {
+      "cue": "add fractions 1 2 1 3",
+      "answer": "5/6",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-108"
+    },
+    {
+      "cue": "add fractions 1 4 1 6",
+      "answer": "10/24",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-108"
+    },
+    {
+      "cue": "multiply fractions 2 3 3 4",
+      "answer": "6/12",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-148"
+    },
+    {
+      "cue": "multiply fractions 1 2 1 5",
+      "answer": "1/10",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-148"
+    },
+    {
+      "cue": "equivalent fraction 2 3 times 4",
+      "answer": "8/12",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-181"
+    },
+    {
+      "cue": "what is 5 0",
+      "answer": "0",
+      "strength": 5.590000000000002,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 5 - 0",
+      "answer": "5",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 5 - 5",
+      "answer": "0",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 5 1",
+      "answer": "5",
+      "strength": 7.34,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 17 0",
+      "answer": "0",
+      "strength": 5.590000000000002,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 17 - 0",
+      "answer": "17",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 17 - 17",
+      "answer": "0",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 17 1",
+      "answer": "17",
+      "strength": 5.940000000000001,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 100 0",
+      "answer": "0",
+      "strength": 5.590000000000002,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 100 - 0",
+      "answer": "100",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 100 - 100",
+      "answer": "0",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 100 1",
+      "answer": "100",
+      "strength": 5.940000000000001,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 0 9",
+      "answer": "0",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 2 0",
+      "answer": "1",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 2 3",
+      "answer": "8",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 3 4",
+      "answer": "81",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is -7",
+      "answer": "7",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "absolute value of -12",
+      "answer": "12",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "gcd 12 18",
+      "answer": "6",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "lcm 4 6",
+      "answer": "12",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 3 4 5",
+      "answer": "27",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is 25% as a decimal",
+      "answer": "0.25",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is - -3",
+      "answer": "3",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is - -8",
+      "answer": "8",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "train"
+    },
+    {
+      "cue": "what is - -12",
+      "answer": "12",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-022"
+    },
+    {
+      "cue": "evaluate 2 3 4",
+      "answer": "20",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "AR-262"
+    },
+    {
+      "cue": "evaluate 10 - 2 3",
+      "answer": "4",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "AR-262"
+    },
+    {
+      "cue": "she earns 12 dollars per hour. she works 50 minutes. how much does she earn",
+      "answer": "10",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "div_rate,mul_rate"
+    },
+    {
+      "cue": "he runs 3 sprints 3 times a week. he runs 60 meters each sprint. how many total",
+      "answer": "540",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "he runs 3 sprints 3 times a week. he runs 60 meters each sprint. how many total meters does he run a week",
+      "answer": "540",
+      "strength": 1.25,
+      "hops": 2,
+      "rule_id": "mul_groups"
+    },
+    {
+      "cue": "ducks lay 16 eggs per day. she eats 3 and bakes with 4. she sells the remainder for 2 dollars each. how much does she ma",
+      "answer": "18",
+      "strength": 1.6,
+      "hops": 2,
+      "rule_id": "sub_remove,SCHEMA-remainder-sell"
+    },
+    {
+      "cue": "ducks lay 16 eggs per day. she eats 3 and bakes with 4. she sells the remainder",
+      "answer": "18",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "she sold 48 in april and then half as many in may. how many did she sell altoget",
+      "answer": "72",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "she sold 48 in april and then half as many in may. how many did she sell altogether",
+      "answer": "72",
+      "strength": 1.25,
+      "hops": 2,
+      "rule_id": "half,add_combine"
+    },
+    {
+      "cue": "a robe takes 2 bolts of blue fiber and half that much white fiber. how many bolt",
+      "answer": "3",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "a robe takes 2 bolts of blue fiber and half that much white fiber. how many bolts in total",
+      "answer": "3",
+      "strength": 1.25,
+      "hops": 2,
+      "rule_id": "half,add_combine"
+    },
+    {
+      "cue": "toulouse has twice as many sheep as charleston. charleston has 4 times as many sheep as seattle. how many sheep do toulo",
+      "answer": "260",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-01,BIND-03,add_combine"
+    },
+    {
+      "cue": "twice 4",
+      "answer": "8",
+      "strength": 4.540000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "toulouse has twice as many sheep as charleston. charleston has 4 times as many s",
+      "answer": "260",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "claire makes a 3 egg omelet every morning. how many dozens of eggs will she eat",
+      "answer": "7",
+      "strength": 1.25,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "claire makes a 3 egg omelet every morning. how many dozens of eggs will she eat in 4 weeks",
+      "answer": "7",
+      "strength": 1.25,
+      "hops": 2,
+      "rule_id": "mul_groups,div_share"
+    },
+    {
+      "cue": "raymond has 40 jewels. what is half of raymond s jewels",
+      "answer": "20",
+      "strength": 5.240000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02"
+    },
+    {
+      "cue": "siobhan has 2 fewer jewels than aaron. aaron has 5 more jewels than half of raymond s jewels. if raymond has 40 jewels",
+      "answer": "23",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02,BIND-04"
+    },
+    {
+      "cue": "siobhan has 2 fewer jewels than aaron. aaron has 5 more jewels than half of raym",
+      "answer": "23",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "brandon s iphone is four times as old as ben s iphone. ben s iphone is two times older than suzy s iphone. if suzy s iph",
+      "answer": "8",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-01,BIND-03"
+    },
+    {
+      "cue": "brandon s iphone is four times as old as ben s iphone. ben s iphone is two times",
+      "answer": "8",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "ducks lay 16 eggs per day. she eats three for breakfast every morning and bakes muffins for her friends every day with f",
+      "answer": "18",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "sub_remove,SCHEMA-remainder-sell"
+    },
+    {
+      "cue": "ducks lay 16 eggs per day. she eats three for breakfast every morning and bakes",
+      "answer": "18",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "a football team played 22 games. they won 8 more than they lost. how many did they win",
+      "answer": "15",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "SCHEMA-win-loss"
+    },
+    {
+      "cue": "a football team played 22 games. they won 8 more than they lost. how many did th",
+      "answer": "15",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "a candle melts by 2 centimeters every hour that it burns. how many centimeters shorter will a candle be after burning fr",
+      "answer": "8",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "SCHEMA-clock,mul_rate"
+    },
+    {
+      "cue": "a candle melts by 2 centimeters every hour that it burns. how many centimeters s",
+      "answer": "8",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "one glass costs 5 but every second glass costs only 60% of the price. kylar wants to buy 16 glasses. how much does he",
+      "answer": "64",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02,mul_groups"
+    },
+    {
+      "cue": "one glass costs 5 but every second glass costs only 60% of the price. kylar wa",
+      "answer": "64",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "josh decides to try flipping a house. he buys a house for 80000 and then puts in 50000 in repairs. this increased the",
+      "answer": "70000",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "add_combine,SCHEMA-profit-markup"
+    },
+    {
+      "cue": "josh decides to try flipping a house. he buys a house for 80000 and then puts i",
+      "answer": "70000",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "jim spends 2 hours watching tv and then decides to go to bed and reads for half as long. he does this 3 times a week. ho",
+      "answer": "36",
+      "strength": 5.940000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02,add_combine,mul_groups"
+    },
+    {
+      "cue": "jim spends 2 hours watching tv and then decides to go to bed and reads for half",
+      "answer": "36",
+      "strength": 4.540000000000002,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "jenna picked half as many apples as her mom. if her mom got 20 apples how many apples did they both pick",
+      "answer": "30",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02,add_combine"
+    },
+    {
+      "cue": "jenna picked half as many apples as her mom. if her mom got 20 apples how many",
+      "answer": "30",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "jimmy has 2 more than twice the money ethel has. if ethel has 8 how much money is jimmy having",
+      "answer": "18",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-03,BIND-04"
+    },
+    {
+      "cue": "twice 2",
+      "answer": "4",
+      "strength": 4.540000000000002,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "jimmy has 2 more than twice the money ethel has. if ethel has 8 how much mone",
+      "answer": "18",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "tom s ship can travel at 10 miles per hour. he is sailing from 1 to 4 pm. he then travels back at a rate of 6 mph. how l",
+      "answer": "5",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "mul_rate,div_rate"
+    },
+    {
+      "cue": "tom s ship can travel at 10 miles per hour. he is sailing from 1 to 4 pm. he the",
+      "answer": "5",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "what is half of 40",
+      "answer": "20",
+      "strength": 5.240000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02"
+    },
+    {
+      "cue": "what is twice 7",
+      "answer": "14",
+      "strength": 5.240000000000002,
+      "hops": 2,
+      "rule_id": "BIND-03"
+    },
+    {
+      "cue": "maria has 30 apples. what is half of maria s apples",
+      "answer": "15",
+      "strength": 5.240000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02"
+    },
+    {
+      "cue": "half of 30",
+      "answer": "15",
+      "strength": 4.540000000000002,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "alex has twice as many books as sam. sam has 3 times as many books as pat. if pat has 5 books how many books do alex s",
+      "answer": "50",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-01,BIND-03,add_combine"
+    },
+    {
+      "cue": "alex has twice as many books as sam. sam has 3 times as many books as pat. if pa",
+      "answer": "50",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "a team played 30 games and won 6 more than they lost. how many did they win",
+      "answer": "18",
+      "strength": 5.240000000000002,
+      "hops": 2,
+      "rule_id": "SCHEMA-win-loss"
+    },
+    {
+      "cue": "a juggler can juggle 16 balls. half of the balls are golf balls and half of the golf balls are blue. how many blue golf",
+      "answer": "4",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02"
+    },
+    {
+      "cue": "a juggler can juggle 16 balls. half of the balls are golf balls and half of the",
+      "answer": "4",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "there are 4 roses in the vase. there are 7 more dahlias than roses in the vase. how many flowers are there in the vase i",
+      "answer": "15",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-04,add_combine"
+    },
+    {
+      "cue": "there are 4 roses in the vase. there are 7 more dahlias than roses in the vase.",
+      "answer": "15",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "annika brought 50 to the town fair. she spent half of it on food and snacks and an additional 10 for rides. how much",
+      "answer": "15",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02,add_combine,sub_remove"
+    },
+    {
+      "cue": "annika brought 50 to the town fair. she spent half of it on food and snacks an",
+      "answer": "15",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "andrew plans a road trip. it takes 6 days to travel by bus and half as many days to travel by car. how many days will he",
+      "answer": "9",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-02,add_combine"
+    },
+    {
+      "cue": "andrew plans a road trip. it takes 6 days to travel by bus and half as many days",
+      "answer": "9",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "melanie sold a third of her vacuum cleaners at the green house 2 more to the red house and half of what was left at th",
+      "answer": "18",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "SCHEMA-inventory-cascade"
+    },
+    {
+      "cue": "melanie sold a third of her vacuum cleaners at the green house 2 more to the re",
+      "answer": "18",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "nissa hires 60 seasonal workers to play elves. a third of the elves quit after children vomit on them then 10 of the re",
+      "answer": "30",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "SCHEMA-sequential-fraction,sub_remove"
+    },
+    {
+      "cue": "nissa hires 60 seasonal workers to play elves. a third of the elves quit after c",
+      "answer": "30",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "a hospital sees 500 people a day. each patient is seen for an average of 24 minutes. the doctors charge 150 an hour to",
+      "answer": "10000",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "mul_groups,div_rate,sub_diff,SCHEMA-billable-hours"
+    },
+    {
+      "cue": "a hospital sees 500 people a day. each patient is seen for an average of 24 minu",
+      "answer": "10000",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "jeans makeup artist charges her 250 an hour. it takes 6 hours to do each day and she needs it done 4 times a week. the",
+      "answer": "27000",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "mul_rate,mul_groups,SCHEMA-rate-schedule"
+    },
+    {
+      "cue": "jeans makeup artist charges her 250 an hour. it takes 6 hours to do each day an",
+      "answer": "27000",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "a bakery produces 60 loaves of bread each day. two-thirds of the loaves are sold in the morning and half of what is left",
+      "answer": "10",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "SCHEMA-fraction-remaining-split,sub_remove"
+    },
+    {
+      "cue": "half of 60",
+      "answer": "30",
+      "strength": 4.540000000000002,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "a bakery produces 60 loaves of bread each day. two-thirds of the loaves are sold",
+      "answer": "10",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "zaid spends 1 4 of his salary on rent 1 3 on car fuel and donates half of the remaining amount to his favorite charity.",
+      "answer": "350",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "SCHEMA-salary-fractions,sub_remove,BIND-02,add_combine"
+    },
+    {
+      "cue": "half of 6000",
+      "answer": "3000",
+      "strength": 4.540000000000002,
+      "hops": 1,
+      "rule_id": "half"
+    },
+    {
+      "cue": "zaid spends 1 4 of his salary on rent 1 3 on car fuel and donates half of the r",
+      "answer": "350",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "he bought 38 chicken sausages and 6 more fish sausages than chicken sausages. how many sausages did he buy in all",
+      "answer": "82",
+      "strength": 4.540000000000002,
+      "hops": 2,
+      "rule_id": "BIND-04,add_combine"
+    },
+    {
+      "cue": "he bought 38 chicken sausages and 6 more fish sausages than chicken sausages. ho",
+      "answer": "82",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "a water tank is filled with 120 liters of water. celine used 90 liters. she collected rainwater that is twice as much as",
+      "answer": "90",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "sub_remove,BIND-03,add_combine"
+    },
+    {
+      "cue": "twice 120",
+      "answer": "240",
+      "strength": 2.3000000000000003,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "a water tank is filled with 120 liters of water. celine used 90 liters. she coll",
+      "answer": "90",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "on tuesday peter wants to exercise for twice the amount of time he did on monday and sunday combined. on sunday he exer",
+      "answer": "78",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "add_combine,BIND-03"
+    },
+    {
+      "cue": "twice 23",
+      "answer": "46",
+      "strength": 2.3000000000000003,
+      "hops": 1,
+      "rule_id": "double"
+    },
+    {
+      "cue": "on tuesday peter wants to exercise for twice the amount of time he did on monda",
+      "answer": "78",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "if a classroom has 3 times as many girls as they do boys and 1 10 as many nongendered children as they do boys and the",
+      "answer": "123",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "BIND-03,BIND-02,add_combine"
+    },
+    {
+      "cue": "if a classroom has 3 times as many girls as they do boys and 1 10 as many nonge",
+      "answer": "123",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "janeth borrowed 2000 and promised to return it with an additional 10% of the amount. if she is going to pay 165 a mont",
+      "answer": "220",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "SCHEMA-loan-balance,add_combine,mul_groups,sub_remove"
+    },
+    {
+      "cue": "janeth borrowed 2000 and promised to return it with an additional 10% of the am",
+      "answer": "220",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "mr. tan sold his house for 400000. he paid the transfer fees that amount to 3% of the selling price and also paid a bro",
+      "answer": "118000",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "SCHEMA-fee-stack,BIND-01"
+    },
+    {
+      "cue": "mr. tan sold his house for 400000. he paid the transfer fees that amount to 3%",
+      "answer": "118000",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "each solid 10-foot section of a redwood tree weighs 400 pounds. termites ate 30% of this redwood s wood. if the redwood",
+      "answer": "5600",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "div_share,mul_groups,SCHEMA-section-weight,sub_remove"
+    },
+    {
+      "cue": "each solid 10-foot section of a redwood tree weighs 400 pounds. termites ate 30%",
+      "answer": "5600",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    },
+    {
+      "cue": "4 adults and 8 children are to share 8 packets of chocolate bars. each packet contains 5 chocolate bars. if each adult g",
+      "answer": "2",
+      "strength": 2.3000000000000003,
+      "hops": 2,
+      "rule_id": "mul_groups,sub_remove,div_share"
+    },
+    {
+      "cue": "4 adults and 8 children are to share 8 packets of chocolate bars. each packet co",
+      "answer": "2",
+      "strength": 1.6,
+      "hops": 1,
+      "rule_id": "teacher"
+    }
+  ]
+}

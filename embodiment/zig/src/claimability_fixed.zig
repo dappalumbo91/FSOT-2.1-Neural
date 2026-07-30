@@ -45,6 +45,17 @@ const LESSONS = [_]Lesson{
     .{ .id = "l16", .fact = "A map shows where places are.", .question = "shows places", .answer = "map" },
     .{ .id = "l17", .fact = "Grass is green.", .question = "grass color", .answer = "green" },
     .{ .id = "l18", .fact = "The sky is blue on a sunny day.", .question = "sky color", .answer = "blue" },
+    // Math atomics (claimable arithmetic knowledge — multi-hop premises)
+    .{ .id = "m1", .fact = "Half of forty is twenty.", .question = "half of forty", .answer = "twenty" },
+    .{ .id = "m2", .fact = "Half of twenty is ten.", .question = "half of twenty", .answer = "ten" },
+    .{ .id = "m3", .fact = "Twice seven is fourteen.", .question = "twice seven", .answer = "fourteen" },
+    .{ .id = "m4", .fact = "Twice ten is twenty.", .question = "twice ten", .answer = "twenty" },
+    .{ .id = "m5", .fact = "Four times two is eight.", .question = "four times two", .answer = "eight" },
+    .{ .id = "m6", .fact = "Three times five is fifteen.", .question = "three times five", .answer = "fifteen" },
+    .{ .id = "m7", .fact = "Ten plus five is fifteen.", .question = "ten plus five", .answer = "fifteen" },
+    .{ .id = "m8", .fact = "Twenty minus five is fifteen.", .question = "twenty minus five", .answer = "fifteen" },
+    .{ .id = "m9", .fact = "Fifty percent of eighty is forty.", .question = "fifty percent of eighty", .answer = "forty" },
+    .{ .id = "m10", .fact = "A dozen is twelve.", .question = "dozen is", .answer = "twelve" },
 };
 
 const Chain = struct {
@@ -79,10 +90,19 @@ const CHAINS = [_]Chain{
     .{ .id = "c18", .prompt = "see→eyes then sky color?", .cues = .{ "see with", "sky color", "sun when" }, .n_hops = 3, .answer = "day" },
     .{ .id = "c19", .prompt = "math triple hop end five", .cues = .{ "one and one", "two and three", "three and two" }, .n_hops = 3, .answer = "five" },
     .{ .id = "c20", .prompt = "dog animal + people water", .cues = .{ "dog is", "people need", "days in week" }, .n_hops = 3, .answer = "seven" },
+    // Math multi-hop claim chains (learn → compose → claim)
+    .{ .id = "c21", .prompt = "half of forty?", .cues = .{ "half of forty", "", "" }, .n_hops = 1, .answer = "twenty" },
+    .{ .id = "c22", .prompt = "twice seven?", .cues = .{ "twice seven", "", "" }, .n_hops = 1, .answer = "fourteen" },
+    .{ .id = "c23", .prompt = "half forty then half twenty", .cues = .{ "half of forty", "half of twenty", "" }, .n_hops = 2, .answer = "ten" },
+    .{ .id = "c24", .prompt = "twice ten then half forty", .cues = .{ "twice ten", "half of forty", "" }, .n_hops = 2, .answer = "twenty" },
+    .{ .id = "c25", .prompt = "four times two then twice seven", .cues = .{ "four times two", "twice seven", "" }, .n_hops = 2, .answer = "fourteen" },
+    .{ .id = "c26", .prompt = "math triple half twice plus", .cues = .{ "half of forty", "twice ten", "ten plus five" }, .n_hops = 3, .answer = "fifteen" },
+    .{ .id = "c27", .prompt = "percent then half", .cues = .{ "fifty percent of eighty", "half of forty", "" }, .n_hops = 2, .answer = "twenty" },
+    .{ .id = "c28", .prompt = "dozen compose triple", .cues = .{ "dozen is", "half of twenty", "ten plus five" }, .n_hops = 3, .answer = "fifteen" },
 };
 
-var bank_q: [64]u32 = .{0} ** 64;
-var bank_a: [64]u32 = .{0} ** 64;
+var bank_q: [128]u32 = .{0} ** 128;
+var bank_a: [128]u32 = .{0} ** 128;
 var bank_n: usize = 0;
 var taught_answers: [64]u32 = .{0} ** 64;
 var n_taught_ans: usize = 0;
@@ -240,11 +260,11 @@ pub fn runClaimabilityProbe() ClaimReport {
     }
     // Gate: ≥95% claimable overall, all hop tiers have activity, neuromod ok
     rep.ok = rep.neuromod_ok and
-        rep.n_chains >= 18 and
+        rep.n_chains >= 24 and
         rep.claim_rate >= 0.95 and
         rep.accuracy >= 0.95 and
         rep.correct_3 >= 1 and
-        rep.n_3hop >= 3;
+        rep.n_3hop >= 4;
     return rep;
 }
 

@@ -1,6 +1,6 @@
 # Dual-track scorecard — bio + math
 
-Generated: `2026-07-30T03:56:30.214405+00:00`
+Generated: `2026-07-30T04:06:08.218784+00:00`
 
 **Doctrine:** Biological wet-lab accuracy and math curriculum are **separate tracks**. GSM8K climb must never drop rule drills below 95%. Auto-templates that break drills are refused.
 
@@ -30,8 +30,8 @@ Intel/bio stack modes (Zig): `intel-loop`, neuromod, sleep_replay — see `docs/
 
 - Drills: **1.0** (n=127) · hard gate ≥0.95
 - Binding drills: 37/37
-- GSM8K sample n=500: correct=77 wrong_fire=16 no_fire=407
-- Fire precision: **0.828**
+- GSM8K sample n=500: correct=77 wrong_fire=23 no_fire=400
+- Fire precision: **0.77**
 
 Hard rule: `drills≥95% never sacrificed for auto-templates`
 

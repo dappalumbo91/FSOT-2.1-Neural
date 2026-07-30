@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-30T03:56:30.214405+00:00",
+  "generated_at": "2026-07-30T04:06:08.218784+00:00",
   "bio": {
     "wetlab_found": true,
     "bio_card_found": true,
@@ -26,9 +26,9 @@
     "binding_pass": true,
     "gsm8k_n": 500,
     "correct": 77,
-    "wrong_fire": 16,
-    "no_fire": 407,
-    "fire_precision": 0.828,
+    "wrong_fire": 23,
+    "no_fire": 400,
+    "fire_precision": 0.77,
     "pass_threshold_drills": 0.95,
     "hard_gate": "drills\u226595% never sacrificed for auto-templates"
   },
