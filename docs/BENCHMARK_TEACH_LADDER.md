@@ -30,11 +30,20 @@ External LLM benchmarks are taught **one at a time**, like another grade band �
 ```
 
 ```powershell
+# 1) Pull full Math-generator corpus (Desktop) into monorepo
+python scripts/import_math_generator_rules.py
+#    → data/math_rulebook/MASTER_RULEBOOK.json  (~1520 atomic rules)
+#    → data/math_rulebook/bank.tsv
+
+# 2) Runtime apply + drills (school word-problem layer)
 python scripts/run_math_rules_teach.py
 # artifacts: data/curriculum/math_rules/{RULES.md,bank.tsv,REPORT.md}
 ```
 
-Legacy GSM8K stuffing path remains as contrast only; **doctrine is math_rules**.
+**Authority rule source:** `C:\Users\damia\Desktop\Math generator`  
+(`MATH_GENERATOR_ROOT` env override). Registry: `RULE_DOCUMENT_REGISTRY.json`.
+
+Legacy GSM8K stuffing path remains as contrast only; **doctrine is math_rules + imported rulebook**.
 
 ## Run GSM8K (active)
 

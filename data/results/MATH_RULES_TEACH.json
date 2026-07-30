@@ -1,13 +1,15 @@
 {
-  "generated_at": "2026-07-30T02:13:38.051476+00:00",
-  "doctrine": "Teach RULES and language\u2192operator maps; solve by decomposition and rule application. Do NOT stuff GSM8K Q\u2192A and retrieve.",
+  "generated_at": "2026-07-30T02:17:49.054223+00:00",
+  "doctrine": "Teach RULES and language\u2192operator maps; solve by decomposition and rule application. Do NOT stuff GSM8K Q\u2192A and retrieve. Authority rule corpus: Desktop Math generator \u2192 data/math_rulebook.",
   "pass_threshold": 0.95,
-  "n_arith_rules": 14,
+  "n_arith_rules_runtime": 14,
   "n_language_maps": 11,
+  "n_imported_math_generator_rules": 1520,
+  "n_imported_bank_rows": 9136,
   "n_drills": 48,
   "n_gsm8k_rule_covered_practice": 47,
-  "n_heldout_test": 1319,
-  "n_heldout_rule_covered": 501,
+  "n_heldout_test": 300,
+  "n_heldout_rule_covered": 107,
   "scores": {
     "drills_rule_application": {
       "n": 48,
@@ -192,29 +194,29 @@
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "gsm8k_test_all": {
-      "n": 1319,
-      "correct": 10,
-      "accuracy": 0.0076,
-      "with_rule_trace": 10,
+      "n": 300,
+      "correct": 7,
+      "accuracy": 0.0233,
+      "with_rule_trace": 7,
       "by_focus": {
         "transfer": {
-          "correct": 10,
-          "n": 1319,
-          "accuracy": 0.0076
+          "correct": 7,
+          "n": 300,
+          "accuracy": 0.0233
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
     },
     "gsm8k_test_where_rules_fire": {
-      "n": 501,
-      "correct": 10,
-      "accuracy": 0.02,
-      "with_rule_trace": 10,
+      "n": 107,
+      "correct": 7,
+      "accuracy": 0.0654,
+      "with_rule_trace": 7,
       "by_focus": {
         "transfer": {
-          "correct": 10,
-          "n": 501,
-          "accuracy": 0.02
+          "correct": 7,
+          "n": 107,
+          "accuracy": 0.0654
         }
       },
       "method": "apply_taught_rules_not_retrieval_stuffing"
@@ -222,14 +224,16 @@
   },
   "gates": {
     "curriculum_drills_ge_95": true,
-    "straight_a_rules": true
+    "straight_a_rules": true,
+    "rulebook_imported": true
   },
-  "coverage_note": "Rules currently fire on 501/1319 held-out items. Expand language maps + strategies to raise coverage; accuracy on covered set is the rule-learning metric; full test rises as coverage grows.",
+  "coverage_note": "Imported Math-generator rules: 1520. Runtime word-problem apply fires on 107/300 held-out items. Expand apply_rules using ARITHMETIC/ALGEBRA forms from the imported book; full GSM8K rises as more atomic rules become executable.",
   "next_rule_expansions": [
+    "Wire AR-* arithmetic rules from MASTER_RULEBOOK into apply_rules",
     "multi-step percent remaining chains",
     "unit conversion (weeks\u2194days, hours\u2194minutes) as explicit rules",
-    "money tax/tip formulas",
-    "age / relative comparison schemas",
-    "explicit parse of 'of the remaining'"
-  ]
+    "algebra identity application from ALGEBRA_RULES",
+    "geometry formulas from GEOMETRY_RULES"
+  ],
+  "math_generator_source": "C:\\Users\\damia\\Desktop\\Math generator"
 }

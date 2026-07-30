@@ -38,7 +38,9 @@ def main() -> int:
             {
                 "doctrine": "rules_not_stuffing",
                 "pass_threshold": PASS,
-                "n_rules": man["n_arith_rules"],
+                "n_runtime_apply_rules": man.get("n_arith_rules_runtime"),
+                "n_imported_math_generator_rules": man.get("n_imported_math_generator_rules"),
+                "n_imported_bank_rows": man.get("n_imported_bank_rows"),
                 "n_lang_maps": man["n_language_maps"],
                 "drills_acc": s["drills_rule_application"]["accuracy"],
                 "drills_n": s["drills_rule_application"]["n"],
@@ -48,6 +50,7 @@ def main() -> int:
                 "gsm8k_test_covered_acc": s["gsm8k_test_where_rules_fire"].get("accuracy"),
                 "gsm8k_test_covered_n": s["gsm8k_test_where_rules_fire"].get("n"),
                 "straight_a_drills": g["straight_a_rules"],
+                "rulebook_imported": g.get("rulebook_imported"),
                 "coverage_note": man["coverage_note"],
             },
             indent=2,

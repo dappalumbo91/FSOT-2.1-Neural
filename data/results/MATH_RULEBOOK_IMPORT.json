@@ -1,0 +1,844 @@
+{
+  "generated_at": "2026-07-30T02:17:32.093600+00:00",
+  "source": "C:\\Users\\damia\\Desktop\\Math generator",
+  "n_documents": 61,
+  "n_rules": 1520,
+  "n_duplicate_ids_renamed": 65,
+  "n_fsot_algorithmic_law_nodes_approx": 171,
+  "by_domain_family": {
+    "arithmetic": 83,
+    "calculus": 44,
+    "algebra": 36,
+    "science_side": 28,
+    "geometry": 27,
+    "probability": 26,
+    "linear_systems": 25,
+    "number_theory": 25,
+    "euclidean_proof": 25,
+    "linear_algebra": 25,
+    "discrete_math": 25,
+    "topology": 25,
+    "logic_foundations": 25,
+    "meta_mathematics": 25,
+    "general_mathematics": 25,
+    "advanced_foundations": 25,
+    "real_analysis": 25,
+    "measure_theory": 25,
+    "complex_analysis": 25,
+    "differential_equations": 25,
+    "abstract_algebra": 25,
+    "structural_algebra": 25,
+    "advanced_algebra": 25,
+    "category_theory": 25,
+    "statistics": 25,
+    "stochastic_processes": 25,
+    "numerical_analysis": 25,
+    "analytic_extensions": 25,
+    "advanced_analysis": 25,
+    "optimization": 25,
+    "control_theory": 25,
+    "probability_applications": 25,
+    "computational_applied": 25,
+    "computational_shape": 25,
+    "differential_geometry": 25,
+    "algebraic_topology": 25,
+    "information_theory": 25,
+    "mathematical_physics": 25,
+    "fluid_mechanics": 25,
+    "advanced_geometry_topology": 25,
+    "fsot_overlay": 25,
+    "engineering_statics": 25,
+    "engineering_dynamics": 25,
+    "strength_of_materials": 25,
+    "heat_transfer": 25,
+    "thermodynamics_engineering": 25,
+    "electrical_circuits": 25,
+    "signals_systems": 25,
+    "manufacturing_processes": 25,
+    "woodworking_math": 25,
+    "civil_structural": 25,
+    "operations_research": 25,
+    "finance_econ_math": 25,
+    "open_problems": 16,
+    "machining_math": 13,
+    "cad": 12,
+    "robotics": 12,
+    "ai_ml": 12,
+    "quantum_computing": 12,
+    "cryptography": 12,
+    "materials_science": 12
+  },
+  "by_category_top": {
+    "auto_expansion_structure": 151,
+    "auto_expansion_normalization": 59,
+    "auto_expansion_transformation": 58,
+    "auto_expansion_constraints": 56,
+    "auto_expansion_validation": 49,
+    "auto_expansion_conditions": 43,
+    "auto_expansion_invariants": 42,
+    "auto_expansion_numerics": 42,
+    "auto_expansion_analysis": 41,
+    "auto_expansion_scaling": 32,
+    "auto_expansion_solver_routing": 32,
+    "auto_expansion_edge_cases": 30,
+    "invalid pattern": 15,
+    "auto_expansion_computation": 13,
+    "auto_expansion_dynamics": 12,
+    "auto_expansion_inference": 12,
+    "auto_expansion_consistency": 12,
+    "auto_expansion_piecewise": 12,
+    "graph theory": 11,
+    "limits": 8,
+    "derivatives": 8,
+    "distributions": 8,
+    "multiplication": 7,
+    "exponent": 7,
+    "integrals": 7,
+    "addition": 6,
+    "division": 6,
+    "compactness": 6,
+    "computational topology": 6,
+    "millennium": 6,
+    "topology operators": 5,
+    "computability theory": 5,
+    "stochastic calculus": 5,
+    "computational geometry": 5,
+    "prediction_normalization": 5,
+    "number_theory": 5,
+    "subtraction": 4,
+    "fraction": 4,
+    "order of operations": 4,
+    "equation balance": 4
+  },
+  "documents": [
+    {
+      "document_id": "arithmetic",
+      "file_name": "ARITHMETIC_RULES.json",
+      "domain_family": "arithmetic",
+      "n_rules": 83,
+      "document_source": "ARITHMETIC_RULEBOOK.md",
+      "domain_symbols": {
+        "N": "natural numbers",
+        "W": "whole numbers",
+        "Z": "integers",
+        "Q": "rational numbers",
+        "R": "real numbers",
+        "C": "complex numbers",
+        "measurement": "measured quantities with explicit units"
+      }
+    },
+    {
+      "document_id": "algebra",
+      "file_name": "ALGEBRA_RULES.json",
+      "domain_family": "algebra",
+      "n_rules": 36,
+      "document_source": "ALGEBRA_RULEBOOK.md",
+      "domain_symbols": {
+        "N": "natural numbers",
+        "W": "whole numbers",
+        "Z": "integers",
+        "Q": "rational numbers",
+        "R": "real numbers",
+        "C": "complex numbers",
+        "symbolic": "symbolic expressions over an active domain"
+      }
+    },
+    {
+      "document_id": "calculus",
+      "file_name": "CALCULUS_RULES.json",
+      "domain_family": "calculus",
+      "n_rules": 44,
+      "document_source": "CALCULUS_RULEBOOK.md",
+      "domain_symbols": {
+        "R": "real numbers",
+        "C": "complex numbers",
+        "function_real": "real-valued functions on real domains",
+        "function_complex": "complex-valued functions",
+        "symbolic": "symbolic expressions with calculus operators"
+      }
+    },
+    {
+      "document_id": "geometry",
+      "file_name": "GEOMETRY_RULES.json",
+      "domain_family": "geometry",
+      "n_rules": 27,
+      "document_source": "GEOMETRY_RULEBOOK.md",
+      "domain_symbols": {
+        "euclidean_plane": "Euclidean plane geometry",
+        "euclidean_space": "Euclidean geometry in standard space",
+        "coordinate_plane": "Cartesian coordinate plane",
+        "symbolic": "symbolic geometric objects and relations"
+      }
+    },
+    {
+      "document_id": "linear_system",
+      "file_name": "LINEAR_SYSTEM_RULES.json",
+      "domain_family": "linear_systems",
+      "n_rules": 25,
+      "document_source": "LINEAR_SYSTEM_RULEBOOK.md",
+      "domain_symbols": {
+        "R": "real numbers",
+        "symbolic": "symbolic linear equations and systems",
+        "matrix_real": "real matrices and vectors used to represent systems"
+      }
+    },
+    {
+      "document_id": "number_theory",
+      "file_name": "NUMBER_THEORY_RULES.json",
+      "domain_family": "number_theory",
+      "n_rules": 25,
+      "document_source": "NUMBER_THEORY_RULEBOOK.md",
+      "domain_symbols": {
+        "Z": "integers",
+        "N": "natural numbers",
+        "symbolic": "symbolic number-theoretic expressions"
+      }
+    },
+    {
+      "document_id": "euclidean_proof",
+      "file_name": "EUCLIDEAN_PROOF_RULES.json",
+      "domain_family": "euclidean_proof",
+      "n_rules": 25,
+      "document_source": "EUCLIDEAN_PROOF_RULEBOOK.md",
+      "domain_symbols": {
+        "euclidean_plane": "Euclidean plane geometry",
+        "proof_symbolic": "structured Euclidean proof statements"
+      }
+    },
+    {
+      "document_id": "linear_algebra",
+      "file_name": "LINEAR_ALGEBRA_RULES.json",
+      "domain_family": "linear_algebra",
+      "n_rules": 25,
+      "document_source": "LINEAR_ALGEBRA_RULEBOOK.md",
+      "domain_symbols": {
+        "field": "base field of scalars",
+        "vector_space": "vector spaces over a field",
+        "symbolic": "symbolic linear-algebra expressions"
+      }
+    },
+    {
+      "document_id": "discrete_math",
+      "file_name": "DISCRETE_MATH_RULES.json",
+      "domain_family": "discrete_math",
+      "n_rules": 25,
+      "document_source": "DISCRETE_MATH_RULEBOOK.md",
+      "domain_symbols": {
+        "finite": "finite discrete objects",
+        "graph": "finite graphs",
+        "symbolic": "symbolic discrete-mathematics expressions"
+      }
+    },
+    {
+      "document_id": "probability",
+      "file_name": "PROBABILITY_RULES.json",
+      "domain_family": "probability",
+      "n_rules": 26,
+      "document_source": "PROBABILITY_RULEBOOK.md",
+      "domain_symbols": {
+        "probability_space": "fixed probability space",
+        "event": "event in the sigma-algebra",
+        "random_variable": "random variable on the probability space",
+        "symbolic": "symbolic probability expressions"
+      }
+    },
+    {
+      "document_id": "topology",
+      "file_name": "TOPOLOGY_RULES.json",
+      "domain_family": "topology",
+      "n_rules": 25,
+      "document_source": "TOPOLOGY_RULEBOOK.md",
+      "domain_symbols": {
+        "topological_space": "topological spaces",
+        "subset": "subsets of a topological space",
+        "symbolic": "symbolic topology expressions"
+      }
+    },
+    {
+      "document_id": "logic_foundations",
+      "file_name": "LOGIC_FOUNDATIONS_RULES.json",
+      "domain_family": "logic_foundations",
+      "n_rules": 25,
+      "document_source": "LOGIC_FOUNDATIONS_RULEBOOK.md",
+      "domain_symbols": {
+        "logic": "classical logical statements",
+        "set_theory": "basic set-theoretic foundation",
+        "symbolic": "symbolic formal statements"
+      }
+    },
+    {
+      "document_id": "meta_mathematics",
+      "file_name": "META_MATHEMATICS_RULES.json",
+      "domain_family": "meta_mathematics",
+      "n_rules": 25,
+      "document_source": "META_MATHEMATICS_RULEBOOK.md",
+      "domain_symbols": {
+        "meta_structure": "formal dependency, axiomatic, and instructional structures for mathematics",
+        "theory_layer": "theory definitions, prerequisites, and abstractions",
+        "symbolic": "symbolic meta-mathematical expressions"
+      }
+    },
+    {
+      "document_id": "general_mathematics",
+      "file_name": "GENERAL_MATHEMATICS_RULES.json",
+      "domain_family": "general_mathematics",
+      "n_rules": 25,
+      "document_source": "GENERAL_MATHEMATICS_RULEBOOK.md",
+      "domain_symbols": {
+        "solver_state": "parsed mathematical states with goals, constraints, and branch candidates",
+        "math_object": "normalized mathematical objects and structured subgoals",
+        "symbolic": "symbolic general-mathematics expressions"
+      }
+    },
+    {
+      "document_id": "advanced_foundations",
+      "file_name": "ADVANCED_FOUNDATIONS_RULES.json",
+      "domain_family": "advanced_foundations",
+      "n_rules": 25,
+      "document_source": "ADVANCED_FOUNDATIONS_RULEBOOK.md",
+      "domain_symbols": {
+        "formal_system": "languages, structures, and proof systems",
+        "computation": "machines, algorithms, and decision procedures",
+        "symbolic": "symbolic advanced-foundations expressions"
+      }
+    },
+    {
+      "document_id": "real_analysis",
+      "file_name": "REAL_ANALYSIS_RULES.json",
+      "domain_family": "real_analysis",
+      "n_rules": 25,
+      "document_source": "REAL_ANALYSIS_RULEBOOK.md",
+      "domain_symbols": {
+        "real_line": "real numbers and intervals",
+        "sequence": "real-valued sequences",
+        "symbolic": "symbolic analysis expressions"
+      }
+    },
+    {
+      "document_id": "measure_theory",
+      "file_name": "MEASURE_THEORY_RULES.json",
+      "domain_family": "measure_theory",
+      "n_rules": 25,
+      "document_source": "MEASURE_THEORY_RULEBOOK.md",
+      "domain_symbols": {
+        "measure_space": "measurable spaces with sigma-algebras and measures",
+        "function_space": "measurable and integrable function classes",
+        "symbolic": "symbolic measure-theory expressions"
+      }
+    },
+    {
+      "document_id": "complex_analysis",
+      "file_name": "COMPLEX_ANALYSIS_RULES.json",
+      "domain_family": "complex_analysis",
+      "n_rules": 25,
+      "document_source": "COMPLEX_ANALYSIS_RULEBOOK.md",
+      "domain_symbols": {
+        "complex_plane": "complex numbers and planar complex domains",
+        "holomorphic": "holomorphic complex functions",
+        "symbolic": "symbolic complex-analysis expressions"
+      }
+    },
+    {
+      "document_id": "differential_equations",
+      "file_name": "DIFFERENTIAL_EQUATIONS_RULES.json",
+      "domain_family": "differential_equations",
+      "n_rules": 25,
+      "document_source": "DIFFERENTIAL_EQUATIONS_RULEBOOK.md",
+      "domain_symbols": {
+        "function_space": "differentiable real-valued functions",
+        "ode": "ordinary differential equations",
+        "symbolic": "symbolic differential-equation expressions"
+      }
+    },
+    {
+      "document_id": "abstract_algebra",
+      "file_name": "ABSTRACT_ALGEBRA_RULES.json",
+      "domain_family": "abstract_algebra",
+      "n_rules": 25,
+      "document_source": "ABSTRACT_ALGEBRA_RULEBOOK.md",
+      "domain_symbols": {
+        "group": "groups and group homomorphisms",
+        "ring": "rings and ideals",
+        "field": "fields and field operations",
+        "symbolic": "symbolic abstract-algebra expressions"
+      }
+    },
+    {
+      "document_id": "structural_algebra",
+      "file_name": "STRUCTURAL_ALGEBRA_RULES.json",
+      "domain_family": "structural_algebra",
+      "n_rules": 25,
+      "document_source": "STRUCTURAL_ALGEBRA_RULEBOOK.md",
+      "domain_symbols": {
+        "ordered_structure": "partially ordered and adjoint structures",
+        "algebraic_structure": "fields and non-associative algebras",
+        "symbolic": "symbolic structural-algebra expressions"
+      }
+    },
+    {
+      "document_id": "advanced_algebra",
+      "file_name": "ADVANCED_ALGEBRA_RULES.json",
+      "domain_family": "advanced_algebra",
+      "n_rules": 25,
+      "document_source": "ADVANCED_ALGEBRA_RULEBOOK.md",
+      "domain_symbols": {
+        "algebraic_structure": "ordered, universal, and ring-like structures",
+        "module_like": "modules, complexes, and representations",
+        "symbolic": "symbolic advanced-algebra expressions"
+      }
+    },
+    {
+      "document_id": "category_theory",
+      "file_name": "CATEGORY_THEORY_RULES.json",
+      "domain_family": "category_theory",
+      "n_rules": 25,
+      "document_source": "CATEGORY_THEORY_RULEBOOK.md",
+      "domain_symbols": {
+        "category": "categories, functors, and diagrams",
+        "morphism": "morphisms and compositions",
+        "symbolic": "symbolic category-theory expressions"
+      }
+    },
+    {
+      "document_id": "statistics",
+      "file_name": "STATISTICS_RULES.json",
+      "domain_family": "statistics",
+      "n_rules": 25,
+      "document_source": "STATISTICS_RULEBOOK.md",
+      "domain_symbols": {
+        "sample": "finite data samples",
+        "parameter": "statistical model parameters",
+        "statistic": "functions of sample data",
+        "symbolic": "symbolic statistical expressions"
+      }
+    },
+    {
+      "document_id": "stochastic_processes",
+      "file_name": "STOCHASTIC_PROCESSES_RULES.json",
+      "domain_family": "stochastic_processes",
+      "n_rules": 25,
+      "document_source": "STOCHASTIC_PROCESSES_RULEBOOK.md",
+      "domain_symbols": {
+        "process": "indexed families of random variables",
+        "filtration": "increasing information families",
+        "symbolic": "symbolic stochastic-process expressions"
+      }
+    },
+    {
+      "document_id": "numerical_analysis",
+      "file_name": "NUMERICAL_ANALYSIS_RULES.json",
+      "domain_family": "numerical_analysis",
+      "n_rules": 25,
+      "document_source": "NUMERICAL_ANALYSIS_RULEBOOK.md",
+      "domain_symbols": {
+        "numeric_method": "numerical algorithms and approximations",
+        "matrix_numeric": "matrix computations in floating-point or symbolic numeric settings",
+        "symbolic": "symbolic numerical-analysis expressions"
+      }
+    },
+    {
+      "document_id": "analytic_extensions",
+      "file_name": "ANALYTIC_EXTENSIONS_RULES.json",
+      "domain_family": "analytic_extensions",
+      "n_rules": 25,
+      "document_source": "ANALYTIC_EXTENSIONS_RULEBOOK.md",
+      "domain_symbols": {
+        "analytic_object": "continuous, discrete, and variational analytic objects",
+        "function_family": "special functions and approximation classes",
+        "symbolic": "symbolic analytic-extension expressions"
+      }
+    },
+    {
+      "document_id": "advanced_analysis",
+      "file_name": "ADVANCED_ANALYSIS_RULES.json",
+      "domain_family": "advanced_analysis",
+      "n_rules": 25,
+      "document_source": "ADVANCED_ANALYSIS_RULEBOOK.md",
+      "domain_symbols": {
+        "analytic_space": "domains, function spaces, and analytic structures",
+        "operator_space": "operators and transforms on function spaces",
+        "symbolic": "symbolic advanced-analysis expressions"
+      }
+    },
+    {
+      "document_id": "optimization",
+      "file_name": "OPTIMIZATION_RULES.json",
+      "domain_family": "optimization",
+      "n_rules": 25,
+      "document_source": "OPTIMIZATION_RULEBOOK.md",
+      "domain_symbols": {
+        "feasible_set": "optimization feasible domains",
+        "objective": "objective functions",
+        "symbolic": "symbolic optimization expressions"
+      }
+    },
+    {
+      "document_id": "control_theory",
+      "file_name": "CONTROL_THEORY_RULES.json",
+      "domain_family": "control_theory",
+      "n_rules": 25,
+      "document_source": "CONTROL_THEORY_RULEBOOK.md",
+      "domain_symbols": {
+        "state_space": "linear state, input, and output spaces",
+        "control_system": "controlled dynamical systems",
+        "symbolic": "symbolic control-theory expressions"
+      }
+    },
+    {
+      "document_id": "probability_applications",
+      "file_name": "PROBABILITY_APPLICATIONS_RULES.json",
+      "domain_family": "probability_applications",
+      "n_rules": 25,
+      "document_source": "PROBABILITY_APPLICATIONS_RULEBOOK.md",
+      "domain_symbols": {
+        "probabilistic_model": "random variables, processes, and statistical models",
+        "uncertainty_structure": "uncertainty sets, metrics, and rate descriptions",
+        "symbolic": "symbolic probability-applications expressions"
+      }
+    },
+    {
+      "document_id": "computational_applied",
+      "file_name": "COMPUTATIONAL_APPLIED_RULES.json",
+      "domain_family": "computational_applied",
+      "n_rules": 25,
+      "document_source": "COMPUTATIONAL_APPLIED_RULEBOOK.md",
+      "domain_symbols": {
+        "computational_model": "algorithms, symbolic rewrites, and computational systems",
+        "decision_model": "optimization, cryptographic, and game-theoretic structures",
+        "symbolic": "symbolic computational-applied expressions"
+      }
+    },
+    {
+      "document_id": "computational_shape",
+      "file_name": "COMPUTATIONAL_SHAPE_RULES.json",
+      "domain_family": "computational_shape",
+      "n_rules": 25,
+      "document_source": "COMPUTATIONAL_SHAPE_RULEBOOK.md",
+      "domain_symbols": {
+        "shape_data": "finite geometric and topological data structures",
+        "algorithmic_structure": "ordered events, complexes, and filtrations",
+        "symbolic": "symbolic computational-shape expressions"
+      }
+    },
+    {
+      "document_id": "differential_geometry",
+      "file_name": "DIFFERENTIAL_GEOMETRY_RULES.json",
+      "domain_family": "differential_geometry",
+      "n_rules": 25,
+      "document_source": "DIFFERENTIAL_GEOMETRY_RULEBOOK.md",
+      "domain_symbols": {
+        "manifold": "smooth manifolds and charts",
+        "tangent_space": "tangent vectors and tangent bundles",
+        "symbolic": "symbolic differential-geometry expressions"
+      }
+    },
+    {
+      "document_id": "algebraic_topology",
+      "file_name": "ALGEBRAIC_TOPOLOGY_RULES.json",
+      "domain_family": "algebraic_topology",
+      "n_rules": 25,
+      "document_source": "ALGEBRAIC_TOPOLOGY_RULEBOOK.md",
+      "domain_symbols": {
+        "space": "topological spaces with chosen structure",
+        "algebraic_invariant": "groups and homology-type invariants attached to spaces",
+        "symbolic": "symbolic algebraic-topology expressions"
+      }
+    },
+    {
+      "document_id": "information_theory",
+      "file_name": "INFORMATION_THEORY_RULES.json",
+      "domain_family": "information_theory",
+      "n_rules": 25,
+      "document_source": "INFORMATION_THEORY_RULEBOOK.md",
+      "domain_symbols": {
+        "distribution": "probability distributions on finite supports",
+        "information_measure": "entropy, divergence, and capacity quantities",
+        "symbolic": "symbolic information-theory expressions"
+      }
+    },
+    {
+      "document_id": "mathematical_physics",
+      "file_name": "MATHEMATICAL_PHYSICS_RULES.json",
+      "domain_family": "mathematical_physics",
+      "n_rules": 25,
+      "document_source": "MATHEMATICAL_PHYSICS_RULEBOOK.md",
+      "domain_symbols": {
+        "physical_field": "fields and states in mathematical models of physics",
+        "pde_model": "partial differential equation models",
+        "symbolic": "symbolic mathematical-physics expressions"
+      }
+    },
+    {
+      "document_id": "fluid_mechanics",
+      "file_name": "FLUID_MECHANICS_RULES.json",
+      "domain_family": "fluid_mechanics",
+      "n_rules": 25,
+      "document_source": "FLUID_MECHANICS_RULEBOOK.md",
+      "domain_symbols": {
+        "fluid_field": "velocity, pressure, density, and forcing fields",
+        "continuum_model": "continuum-fluid equations and control volumes",
+        "symbolic": "symbolic fluid-mechanics expressions"
+      }
+    },
+    {
+      "document_id": "advanced_geometry_topology",
+      "file_name": "ADVANCED_GEOMETRY_TOPOLOGY_RULES.json",
+      "domain_family": "advanced_geometry_topology",
+      "n_rules": 25,
+      "document_source": "ADVANCED_GEOMETRY_TOPOLOGY_RULEBOOK.md",
+      "domain_symbols": {
+        "geometric_space": "projective, affine, metric, and topological spaces",
+        "topological_object": "manifolds, knots, and simplicial decompositions",
+        "symbolic": "symbolic advanced-geometry-topology expressions"
+      }
+    },
+    {
+      "document_id": "science_side",
+      "file_name": "SCIENCE_SIDE_RULES.json",
+      "domain_family": "science_side",
+      "n_rules": 28,
+      "document_source": "SCIENCE_SIDE_RULEBOOK.md",
+      "domain_symbols": {
+        "science_model": "physical, biological, chemical, and socioeconomic models",
+        "field_or_state": "fields, states, and ensemble quantities in scientific models",
+        "symbolic": "symbolic science-side expressions"
+      }
+    },
+    {
+      "document_id": "fsot_overlay",
+      "file_name": "FSOT_OVERLAY_RULES.json",
+      "domain_family": "fsot_overlay",
+      "n_rules": 25,
+      "document_source": "FSOT_OVERLAY_RULEBOOK.md",
+      "domain_symbols": {
+        "overlay_basis": "Declared FSOT primitive basis and admissibility constraints",
+        "overlay_workflow": "Workflow objects used to generate and rank FSOT candidate formulas",
+        "overlay_prediction": "Prediction records tied to explicit provenance and failure classes",
+        "overlay_theorem": "Theorem-level FSOT records normalized from executable and thesis sources",
+        "overlay_benchmark": "Concrete benchmark-report artifacts promoted with held-out metrics and provenance",
+        "normalized_branch_link": "Base mathematics branches used to route supporting reasoning"
+      }
+    },
+    {
+      "document_id": "engineering_statics",
+      "file_name": "ENGINEERING_STATICS_RULES.json",
+      "domain_family": "engineering_statics",
+      "n_rules": 25,
+      "document_source": "ENGINEERING_STATICS_RULEBOOK.md",
+      "domain_symbols": {
+        "engineering_statics": "core formulas and derivations in engineering_statics",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "engineering_dynamics",
+      "file_name": "ENGINEERING_DYNAMICS_RULES.json",
+      "domain_family": "engineering_dynamics",
+      "n_rules": 25,
+      "document_source": "ENGINEERING_DYNAMICS_RULEBOOK.md",
+      "domain_symbols": {
+        "engineering_dynamics": "core formulas and derivations in engineering_dynamics",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "strength_of_materials",
+      "file_name": "STRENGTH_OF_MATERIALS_RULES.json",
+      "domain_family": "strength_of_materials",
+      "n_rules": 25,
+      "document_source": "STRENGTH_OF_MATERIALS_RULEBOOK.md",
+      "domain_symbols": {
+        "strength_of_materials": "core formulas and derivations in strength_of_materials",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "heat_transfer",
+      "file_name": "HEAT_TRANSFER_RULES.json",
+      "domain_family": "heat_transfer",
+      "n_rules": 25,
+      "document_source": "HEAT_TRANSFER_RULEBOOK.md",
+      "domain_symbols": {
+        "heat_transfer": "core formulas and derivations in heat_transfer",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "thermodynamics_engineering",
+      "file_name": "THERMODYNAMICS_ENGINEERING_RULES.json",
+      "domain_family": "thermodynamics_engineering",
+      "n_rules": 25,
+      "document_source": "THERMODYNAMICS_ENGINEERING_RULEBOOK.md",
+      "domain_symbols": {
+        "thermodynamics_engineering": "core formulas and derivations in thermodynamics_engineering",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "electrical_circuits",
+      "file_name": "ELECTRICAL_CIRCUITS_RULES.json",
+      "domain_family": "electrical_circuits",
+      "n_rules": 25,
+      "document_source": "ELECTRICAL_CIRCUITS_RULEBOOK.md",
+      "domain_symbols": {
+        "electrical_circuits": "core formulas and derivations in electrical_circuits",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "signals_systems",
+      "file_name": "SIGNALS_SYSTEMS_RULES.json",
+      "domain_family": "signals_systems",
+      "n_rules": 25,
+      "document_source": "SIGNALS_SYSTEMS_RULEBOOK.md",
+      "domain_symbols": {
+        "signals_systems": "core formulas and derivations in signals_systems",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "manufacturing_processes",
+      "file_name": "MANUFACTURING_PROCESSES_RULES.json",
+      "domain_family": "manufacturing_processes",
+      "n_rules": 25,
+      "document_source": "MANUFACTURING_PROCESSES_RULEBOOK.md",
+      "domain_symbols": {
+        "manufacturing_processes": "core formulas and derivations in manufacturing_processes",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "machining_math",
+      "file_name": "MACHINING_MATH_RULES.json",
+      "domain_family": "machining_math",
+      "n_rules": 13,
+      "document_source": "MACHINING_MATH_RULEBOOK.md",
+      "domain_symbols": {
+        "machining": "CNC feeds, speeds, material removal, and tool life math",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "woodworking_math",
+      "file_name": "WOODWORKING_MATH_RULES.json",
+      "domain_family": "woodworking_math",
+      "n_rules": 25,
+      "document_source": "WOODWORKING_MATH_RULEBOOK.md",
+      "domain_symbols": {
+        "woodworking_math": "core formulas and derivations in woodworking_math",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "civil_structural",
+      "file_name": "CIVIL_STRUCTURAL_RULES.json",
+      "domain_family": "civil_structural",
+      "n_rules": 25,
+      "document_source": "CIVIL_STRUCTURAL_RULEBOOK.md",
+      "domain_symbols": {
+        "civil_structural": "core formulas and derivations in civil_structural",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "operations_research",
+      "file_name": "OPERATIONS_RESEARCH_RULES.json",
+      "domain_family": "operations_research",
+      "n_rules": 25,
+      "document_source": "OPERATIONS_RESEARCH_RULEBOOK.md",
+      "domain_symbols": {
+        "operations_research": "core formulas and derivations in operations_research",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "finance_econ_math",
+      "file_name": "FINANCE_ECON_MATH_RULES.json",
+      "domain_family": "finance_econ_math",
+      "n_rules": 25,
+      "document_source": "FINANCE_ECON_MATH_RULEBOOK.md",
+      "domain_symbols": {
+        "finance_econ_math": "core formulas and derivations in finance_econ_math",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "cad",
+      "file_name": "CAD_RULES.json",
+      "domain_family": "cad",
+      "n_rules": 12,
+      "document_source": "CAD_RULEBOOK.md",
+      "domain_symbols": {
+        "cad": "computer-aided design parametric and geometric modeling",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "robotics",
+      "file_name": "ROBOTICS_RULES.json",
+      "domain_family": "robotics",
+      "n_rules": 12,
+      "document_source": "ROBOTICS_RULEBOOK.md",
+      "domain_symbols": {
+        "robotics": "robot kinematics, dynamics, control, and planning",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "ai_ml",
+      "file_name": "AI_ML_RULES.json",
+      "domain_family": "ai_ml",
+      "n_rules": 12,
+      "document_source": "AI_ML_RULEBOOK.md",
+      "domain_symbols": {
+        "ai_ml": "machine learning and deep learning formulas",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "quantum_computing",
+      "file_name": "QUANTUM_COMPUTING_RULES.json",
+      "domain_family": "quantum_computing",
+      "n_rules": 12,
+      "document_source": "QUANTUM_COMPUTING_RULEBOOK.md",
+      "domain_symbols": {
+        "quantum_computing": "qubits, gates, algorithms, error correction",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "cryptography",
+      "file_name": "CRYPTOGRAPHY_RULES.json",
+      "domain_family": "cryptography",
+      "n_rules": 12,
+      "document_source": "CRYPTOGRAPHY_RULEBOOK.md",
+      "domain_symbols": {
+        "cryptography": "classical and post-quantum cryptography primitives",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "materials_science",
+      "file_name": "MATERIALS_SCIENCE_RULES.json",
+      "domain_family": "materials_science",
+      "n_rules": 12,
+      "document_source": "MATERIALS_SCIENCE_RULEBOOK.md",
+      "domain_symbols": {
+        "materials_science": "solid-state, mechanical, and condensed matter formulas",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    },
+    {
+      "document_id": "open_problems",
+      "file_name": "OPEN_PROBLEMS_RULES.json",
+      "domain_family": "open_problems",
+      "n_rules": 16,
+      "document_source": "OPEN_PROBLEMS_RULEBOOK.md",
+      "domain_symbols": {
+        "open_problems": "world-famous unsolved problems and partial results",
+        "symbolic": "symbolic expressions used by this domain"
+      }
+    }
+  ],
+  "doctrine": "Authority mathematical rule book imported from Math generator. Teach rules (form + operation + examples). Apply by decomposition \u2014 not Q/A stuffing."
+}

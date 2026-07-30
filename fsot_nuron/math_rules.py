@@ -529,10 +529,23 @@ def rules_to_bank_rows() -> List[str]:
     return rows
 
 
+def load_imported_rulebook() -> Dict[str, Any]:
+    """Pull Desktop Math-generator catalog if imported."""
+    try:
+        from .math_rulebook_import import OUT_DIR, load_master
+
+        if (OUT_DIR / "MASTER_RULEBOOK.json").is_file():
+            return load_master()
+    except Exception:
+        pass
+    return {}
+
+
 def build_pack(
     gsm8k_practice_limit: int = 400,
     gsm8k_test_limit: int = 300,
 ) -> Dict[str, Any]:
+    imported = load_imported_rulebook()
     drills = build_rule_drills()
     gsm_cov = load_gsm8k_practice(limit=gsm8k_practice_limit)
     practice = drills + gsm_cov
@@ -568,16 +581,32 @@ def build_pack(
         bank_rows.append(
             f"math\trules\tdrill\t{it.question.replace(chr(9), ' ')}\t{it.answer}\n"
         )
+    # Merge imported Math-generator bank if present (full authority corpus)
+    imported_bank = DATA / "math_rulebook" / "bank.tsv"
+    n_imported_bank = 0
+    if imported_bank.is_file():
+        for line in imported_bank.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("#") or not line.strip():
+                continue
+            bank_rows.append(line + ("\n" if not line.endswith("\n") else ""))
+            n_imported_bank += 1
+
+    n_imported_rules = int((imported.get("meta") or imported).get("n_rules") or 0)
+    if not n_imported_rules and imported.get("rules"):
+        n_imported_rules = len(imported["rules"])
 
     man = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "doctrine": (
             "Teach RULES and language→operator maps; solve by decomposition and rule "
-            "application. Do NOT stuff GSM8K Q→A and retrieve."
+            "application. Do NOT stuff GSM8K Q→A and retrieve. "
+            "Authority rule corpus: Desktop Math generator → data/math_rulebook."
         ),
         "pass_threshold": PASS,
-        "n_arith_rules": len(ARITH_RULES),
+        "n_arith_rules_runtime": len(ARITH_RULES),
         "n_language_maps": len(LANGUAGE_MAPS),
+        "n_imported_math_generator_rules": n_imported_rules,
+        "n_imported_bank_rows": n_imported_bank,
         "n_drills": len(drills),
         "n_gsm8k_rule_covered_practice": len(gsm_cov),
         "n_heldout_test": len(heldout),
@@ -592,19 +621,22 @@ def build_pack(
         "gates": {
             "curriculum_drills_ge_95": curriculum_ok,
             "straight_a_rules": curriculum_ok and pathway_ok,
+            "rulebook_imported": n_imported_rules > 0,
         },
         "coverage_note": (
-            f"Rules currently fire on {len(covered_held)}/{len(heldout)} held-out items. "
-            "Expand language maps + strategies to raise coverage; accuracy on covered "
-            "set is the rule-learning metric; full test rises as coverage grows."
+            f"Imported Math-generator rules: {n_imported_rules}. "
+            f"Runtime word-problem apply fires on {len(covered_held)}/{len(heldout)} held-out items. "
+            "Expand apply_rules using ARITHMETIC/ALGEBRA forms from the imported book; "
+            "full GSM8K rises as more atomic rules become executable."
         ),
         "next_rule_expansions": [
+            "Wire AR-* arithmetic rules from MASTER_RULEBOOK into apply_rules",
             "multi-step percent remaining chains",
             "unit conversion (weeks↔days, hours↔minutes) as explicit rules",
-            "money tax/tip formulas",
-            "age / relative comparison schemas",
-            "explicit parse of 'of the remaining'",
+            "algebra identity application from ALGEBRA_RULES",
+            "geometry formulas from GEOMETRY_RULES",
         ],
+        "math_generator_source": (imported.get("meta") or imported).get("source", ""),
     }
 
     for d in (REPO_DIR, GAME_DIR):
@@ -664,7 +696,10 @@ def render_report(man: Dict[str, Any]) -> str:
         "",
         f"**Doctrine:** {man['doctrine']}",
         "",
-        f"Rules taught: **{man['n_arith_rules']}** · Language maps: **{man['n_language_maps']}** · Drills: **{man['n_drills']}**",
+        f"Runtime apply rules: **{man.get('n_arith_rules_runtime', man.get('n_arith_rules'))}** · "
+        f"Language maps: **{man['n_language_maps']}** · Drills: **{man['n_drills']}**  ",
+        f"**Imported Math-generator atomic rules: {man.get('n_imported_math_generator_rules', 0)}** · "
+        f"Bank rows from import: {man.get('n_imported_bank_rows', 0)}",
         "",
         "## Scores (rule application)",
         "",

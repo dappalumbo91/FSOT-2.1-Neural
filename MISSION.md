@@ -76,7 +76,8 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | Repo connectivity audit | [`docs/REPO_CONNECTIVITY_AUDIT.md`](docs/REPO_CONNECTIVITY_AUDIT.md) |
 | **Forward intelligence (bio)** | [`docs/FORWARD_INTELLIGENCE_BIO.md`](docs/FORWARD_INTELLIGENCE_BIO.md) · `fsot_mind intel-bio` |
 | **Game-drive capability** | [`docs/GAME_DRIVE_CAPABILITY.md`](docs/GAME_DRIVE_CAPABILITY.md) · `python scripts/run_game_drive_bench.py --bench` |
-| **Benchmark teach ladder** | [`docs/BENCHMARK_TEACH_LADDER.md`](docs/BENCHMARK_TEACH_LADDER.md) · **rules first, not stuffing** · `python scripts/run_math_rules_teach.py` |
+| **Benchmark teach ladder** | [`docs/BENCHMARK_TEACH_LADDER.md`](docs/BENCHMARK_TEACH_LADDER.md) · **rules first** · import Math generator · `python scripts/import_math_generator_rules.py` |
+| **Math rulebook (imported)** | `data/math_rulebook/` · ~1520 atomic rules from Desktop Math generator |
 | **Emergent monitor (observe only)** | `D:\fsot_training\logs\emergent_behavior.jsonl` · no curb |
 | **Speech reconnect** | [`docs/SPEECH_RECONNECT.md`](docs/SPEECH_RECONNECT.md) |
 | Embodiment | [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md) — Python host → Zig/Rust/Ada body |
