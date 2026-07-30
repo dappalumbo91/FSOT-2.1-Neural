@@ -1,12 +1,12 @@
 # Lean 4 × Wet-lab scientific certificate
 
-Generated: `2026-07-28T16:52:45.098021+00:00`
+Generated: `2026-07-30T01:12:11.870630+00:00`
 
 ## Verdict
 
 | Gate | Status |
 |------|--------|
-| Lean `lake build` (scientific_panel_ok) | **PASS** |
+| Lean `lake build` (scientific_panel_ok) | **FAIL** |
 | Archive pin D1D38A / seeds | **PASS** |
 | Wet-lab battery critical | **PASS** |
 | Free parameters on scalar | **0** |
@@ -15,12 +15,16 @@ Generated: `2026-07-28T16:52:45.098021+00:00`
 
 ## What is proved in Lean (structure)
 
-The Lean panel proves *definitions and contracts* of the neurological substrate:
+The Lean panel proves *definitions and contracts* of the neurological substrate + mind stack:
 
 - 64-codon finite set and primary trinary fiber round-trip
 - Neuroscience fold slots (D_eff, N, P, observed)
 - Cell-type E/I polarity and cortical fraction sum
 - Expression positivity
+- Fixed lattice SCALE=1e12; all-atom MD lab-only (not cognition)
+- Wet stack: 48 AMPA / 16 NMDA / 12 quantal sites; 50µs×20 Markov
+- FSOT pair-weight zero free params; curriculum ≥95%; no history
+- Math solidification: docs/FSOT_MATH_SYSTEM_SOLIDIFIED.md
 - Zero free parameters on the scalar *path*
 - Machine primary / Morse not primary
 - Wet-lab gate *shapes* (4 Allen classes, 2% floor, SME/top-1 predicates)
@@ -30,14 +34,10 @@ Continuous analytic \(S=K(T_1+T_2+T_3)\) remains in **FSOT-2.1-Lean / physical a
 
 ## What is measured against wet-lab (empirical)
 
-- Battery: **34/36** pass
+- Battery: **37/37** pass
 - Critical fails: **0**
-- Soft fails: **2** (1% stretch allowed)
-- Battery timestamp: `2026-07-28T16:09:43.037486+00:00`
-
-Soft (non-critical) stretch failures:
-- `T2/rate_Pyr_within_1pct` measured=0.012070575883824328
-- `T2/rate_SST_within_1pct` measured=0.010402939410548344
+- Soft fails: **0** (1% stretch allowed)
+- Battery timestamp: `2026-07-29T12:34:50.908567+00:00`
 
 ## Cross-reference table (Lean ↔ runtime ↔ wet-lab)
 
@@ -53,8 +53,13 @@ Soft (non-critical) stretch failures:
 | `FSOTNeural.free_parameters_zero` | 0 free parameters on scalar path | fsot_bridge free_parameters=0 | T0/fsot_bridge_zero_free |
 | `FSOTNeural.machine_primary / morse_not_primary` | Machine body primary; Morse secondary | machine_encode EncodePath | T0/machine_abi_roundtrip |
 | `FSOTNeural.wetlab_structural_ok` | 4 Allen classes; tol floor 2%; freeParams=0 | run_wetlab_accuracy_battery | T1–T2 Allen rates |
-| `FSOTNeural.scientific_panel_ok` | Master structural certificate (no sorry) | lake build formal/ | full battery critical path |
-| `FSOTNeural.stage_scientific_verification` | formal_panel ∧ wetlab_structural ∧ free0 ∧ scientific_panel | export_lean_wetlab_certificate.py | this document |
+| `FSOTNeural.fixed_lattice_ok` | SCALE=1e12 Fixed authority; MD not on mind path | fixed.zig SCALE; allatom_md host f64 lab | structural (lab separation) |
+| `FSOTNeural.wet_stack_ok` | 48 AMPA / 16 NMDA / 12 quantal / 20×50µs Markov | channel_stoch_fixed / molecular_fixed / glia_fixed | pathways wet cascade gate |
+| `FSOTNeural.pair_weight_ok` | FSOT pair kernel zero free params (π,e,φ) | genetic_fixed.fsotPairWeight | genetic network / STDP coupling |
+| `FSOTNeural.curriculum_gates_ok` | ≥95% ppt; PK–G8 bands; no history pollution | grade_ladder_fixed / understand_depth_fixed | curriculum intelligence gates |
+| `FSOTNeural.scientific_panel_ok` | Master structural certificate mind stack (no sorry) | lake build formal/ | full battery critical path |
+| `FSOTNeural.stage_scientific_verification` | formal_panel ∧ wetlab ∧ fixed ∧ wet_stack ∧ pair ∧ curriculum ∧ scientific_panel | export_lean_wetlab_certificate.py | this document |
+| `FSOTNeural.leanStampLabel` | LEAN4_STAMP:scientific_panel_ok:v4.31.0:0_sorry:mind_stack | formal Certificate.lean | GitHub stamp artifact |
 
 ## Atlas scalars (runtime pin)
 

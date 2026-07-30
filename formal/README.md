@@ -25,8 +25,15 @@ Toolchain: `leanprover/lean4:v4.31.0` (matches physical archive).
 | `FSOTNeural/Expression.lean` | expression score always ≥ 1 |
 | `FSOTNeural/Authority.lean` | free_parameters=0; machine primary; Morse not primary |
 | `FSOTNeural/WetLabGates.lean` | Allen 4 classes; 2%/1% tol shapes; SME/top-1 predicates |
+| `FSOTNeural/FullSpine.lean` | consciousness / observer / POOF–SUCTION duals |
+| `FSOTNeural/FixedLattice.lean` | SCALE=1e12; Fixed authority; MD lab-only |
+| `FSOTNeural/WetStack.lean` | 48 AMPA / 16 NMDA / 12 quantal / 50µs·20 steps; glia |
+| `FSOTNeural/PairWeight.lean` | FSOT pair kernel shape; zero free params |
+| `FSOTNeural/CurriculumGates.lean` | ≥95% ppt; PK–G8; no history |
 | `FSOTNeural/Certificate.lean` | **`scientific_panel_ok`** master theorem (no sorry) |
 | `FSOTNeural.lean` | `formal_panel_ok` + `stage_scientific_verification` |
+
+Math solidification: `docs/FSOT_MATH_SYSTEM_SOLIDIFIED.md` (archive 405-domain bridge).
 
 ## Scientific certificate
 

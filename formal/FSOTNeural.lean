@@ -8,9 +8,14 @@
     • Gene-expression positivity
     • Authority: free_parameters = 0; machine primary; Morse not primary
     • Wet-lab structural gates (Allen 4 classes, 2% floor, SME/top-1 shapes)
+    • Full spine duals (POOF/SUCTION, observer, consciousness on path)
+    • Fixed lattice SCALE=1e12; MD lab not cognition
+    • Wet stack: 48 AMPA / 16 NMDA / 12 quantal / 50µs Markov
+    • Pair-weight zero free params; curriculum ≥95%; no history
     • Master theorem: scientific_panel_ok (Certificate.lean)
 
   Continuous scalar S = K(T1+T2+T3): FSOT-2.1-Lean / physical archive (D1D38A).
+  Math solidification: docs/FSOT_MATH_SYSTEM_SOLIDIFIED.md
   Empirical wet-lab floats: data/results/wetlab_accuracy_battery.json
   Cross-reference: docs/LEAN_WETLAB_CROSSREF.md
 
@@ -28,6 +33,10 @@ import FSOTNeural.Expression
 import FSOTNeural.Authority
 import FSOTNeural.WetLabGates
 import FSOTNeural.FullSpine
+import FSOTNeural.FixedLattice
+import FSOTNeural.WetStack
+import FSOTNeural.PairWeight
+import FSOTNeural.CurriculumGates
 import FSOTNeural.Certificate
 
 namespace FSOTNeural
@@ -56,6 +65,11 @@ theorem stage_scientific_verification : True := by
   have := formal_panel_ok
   have := wetlab_structural_ok
   have := free_parameters_zero
+  have := fixed_lattice_ok
+  have := wet_stack_ok
+  have := pair_weight_ok
+  have := curriculum_gates_ok
+  have := full_spine_structural_ok
   have := scientific_panel_ok
   trivial
 

@@ -1,5 +1,8 @@
 # FSOT-2.1-Neural — Formula ledger
 
+**Authoritative solidification (full mind stack + archive bridge):**  
+[`FSOT_MATH_SYSTEM_SOLIDIFIED.md`](FSOT_MATH_SYSTEM_SOLIDIFIED.md) · Lean stamp `scientific_panel_ok` · pin **D1D38A…**
+
 **Living appendix to the thesis.** Every formula here is implemented in code and must stay consistent with the archive authority pin **D1D38A…** for seed-derived constants.
 
 | Symbol source | Location |

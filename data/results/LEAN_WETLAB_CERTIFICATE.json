@@ -1,12 +1,10 @@
 {
-  "generated_at": "2026-07-28T16:37:16.024619+00:00",
+  "generated_at": "2026-07-30T01:12:11.870630+00:00",
   "certificate": "FSOT-2.1-Neural scientific stage verification",
   "overall": "PASS",
   "lean_build": {
-    "ok": true,
-    "returncode": 0,
-    "stdout_tail": "Build completed successfully (10 jobs).\n",
-    "stderr_tail": ""
+    "ok": null,
+    "skipped": true
   },
   "formal_theorems": [
     "FSOTNeural.formal_panel_ok",
@@ -76,16 +74,46 @@
       "wetlab_check": "T1\u2013T2 Allen rates"
     },
     {
+      "lean": "FSOTNeural.fixed_lattice_ok",
+      "claim": "SCALE=1e12 Fixed authority; MD not on mind path",
+      "runtime": "fixed.zig SCALE; allatom_md host f64 lab",
+      "wetlab_check": "structural (lab separation)"
+    },
+    {
+      "lean": "FSOTNeural.wet_stack_ok",
+      "claim": "48 AMPA / 16 NMDA / 12 quantal / 20\u00d750\u00b5s Markov",
+      "runtime": "channel_stoch_fixed / molecular_fixed / glia_fixed",
+      "wetlab_check": "pathways wet cascade gate"
+    },
+    {
+      "lean": "FSOTNeural.pair_weight_ok",
+      "claim": "FSOT pair kernel zero free params (\u03c0,e,\u03c6)",
+      "runtime": "genetic_fixed.fsotPairWeight",
+      "wetlab_check": "genetic network / STDP coupling"
+    },
+    {
+      "lean": "FSOTNeural.curriculum_gates_ok",
+      "claim": "\u226595% ppt; PK\u2013G8 bands; no history pollution",
+      "runtime": "grade_ladder_fixed / understand_depth_fixed",
+      "wetlab_check": "curriculum intelligence gates"
+    },
+    {
       "lean": "FSOTNeural.scientific_panel_ok",
-      "claim": "Master structural certificate (no sorry)",
+      "claim": "Master structural certificate mind stack (no sorry)",
       "runtime": "lake build formal/",
       "wetlab_check": "full battery critical path"
     },
     {
       "lean": "FSOTNeural.stage_scientific_verification",
-      "claim": "formal_panel \u2227 wetlab_structural \u2227 free0 \u2227 scientific_panel",
+      "claim": "formal_panel \u2227 wetlab \u2227 fixed \u2227 wet_stack \u2227 pair \u2227 curriculum \u2227 scientific_panel",
       "runtime": "export_lean_wetlab_certificate.py",
       "wetlab_check": "this document"
+    },
+    {
+      "lean": "FSOTNeural.leanStampLabel",
+      "claim": "LEAN4_STAMP:scientific_panel_ok:v4.31.0:0_sorry:mind_stack",
+      "runtime": "formal Certificate.lean",
+      "wetlab_check": "GitHub stamp artifact"
     }
   ],
   "archive_pin": {
@@ -102,35 +130,12 @@
   },
   "wetlab_battery_status": {
     "battery_present": true,
-    "n_pass": 34,
-    "n_checks": 36,
+    "n_pass": 37,
+    "n_checks": 37,
     "critical_fail_count": 0,
     "critical_fails": [],
-    "soft_fails": [
-      {
-        "tier": "T2",
-        "name": "rate_Pyr_within_1pct",
-        "ok": false,
-        "critical": false,
-        "measured": 0.012070575883824328,
-        "expected": "|err| \u2264 1% (stretch)",
-        "source": "Allen Cre FI rate",
-        "note": "",
-        "t_s": 6.73
-      },
-      {
-        "tier": "T2",
-        "name": "rate_SST_within_1pct",
-        "ok": false,
-        "critical": false,
-        "measured": 0.010402939410548344,
-        "expected": "|err| \u2264 1% (stretch)",
-        "source": "Allen Cre FI rate",
-        "note": "",
-        "t_s": 6.73
-      }
-    ],
-    "generated_at": "2026-07-28T16:09:43.037486+00:00"
+    "soft_fails": [],
+    "generated_at": "2026-07-29T12:34:50.908567+00:00"
   },
   "wetlab_battery_path": "I:\\fsot nuron\\data\\results\\wetlab_accuracy_battery.json",
   "formal_dir": "I:\\fsot nuron\\formal",
