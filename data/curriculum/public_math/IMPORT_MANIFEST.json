@@ -1,0 +1,16 @@
+{
+  "counts": {
+    "svamp": 1000,
+    "gsm8k_train": 7473,
+    "math_jsonl": 199,
+    "rulebook": 1828,
+    "drills": 164
+  },
+  "n_unified_bank": 9915,
+  "bank_path": "I:\\fsot nuron\\data\\curriculum\\public_math\\UNIFIED_TEACH_BANK.tsv",
+  "teach": {
+    "taught_cues": 20723,
+    "n_episodes": 16777
+  },
+  "doctrine": "Public + local curricula imported for learning depth. SVAMP + GSM8K train + MATH + rulebook + drills. Encoded into episode bank when --teach."
+}

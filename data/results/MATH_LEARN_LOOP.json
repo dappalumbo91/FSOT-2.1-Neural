@@ -3,19 +3,19 @@
     "n": 80,
     "hit": 69,
     "acc": 0.8625,
-    "n_episodes": 198,
-    "n_teaches": 675,
+    "n_episodes": 16777,
+    "n_teaches": 644,
     "n_replays": 1104,
-    "claim_rate": 0.7347
+    "claim_rate": 0.9
   },
-  "n_episodes": 307,
+  "n_episodes": 16850,
   "binding_prove": "37/37",
   "gsm8k_200": {
-    "correct": 58,
-    "wrong_fire": 25,
-    "no_fire": 117,
-    "overall": 0.29,
-    "fire_precision": 0.6988
+    "correct": 57,
+    "wrong_fire": 7,
+    "no_fire": 136,
+    "overall": 0.285,
+    "fire_precision": 0.8906
   },
   "doctrine": "train\u2192sleep\u2192prove multi-hop organism (not LLM)"
 }
