@@ -1,0 +1,115 @@
+# domain	grade	kind	question	answer
+# Math RULES curriculum 2026-07-30T02:13:38.051476+00:00
+# kind=rule | langmap | drill — symbolic laws, not Q/A stuffing
+math	rules	rule	What is the rule addition commutative?	a + b = b + a
+math	rules	rule	Explain add_comm	Order of addends does not change sum
+math	rules	rule	Formula for addition commutative	a + b = b + a
+math	rules	rule	What is the rule addition identity?	a + 0 = a
+math	rules	rule	Explain add_zero	Adding zero leaves a number unchanged
+math	rules	rule	Formula for addition identity	a + 0 = a
+math	rules	rule	What is the rule combine quantities?	total = a + b + …
+math	rules	rule	Explain add_combine	Together / altogether / in all → add
+math	rules	rule	Formula for combine quantities	total = a + b + …
+math	rules	rule	What is the rule subtraction remove?	left = total − used
+math	rules	rule	Explain sub_remove	Left / remain / rest → subtract
+math	rules	rule	Formula for subtraction remove	left = total − used
+math	rules	rule	What is the rule difference?	diff = |a − b|
+math	rules	rule	Explain sub_diff	How many more / less → difference
+math	rules	rule	Formula for difference	diff = |a − b|
+math	rules	rule	What is the rule multiplication groups?	total = n × size
+math	rules	rule	Explain mul_groups	Each / every / times → multiply
+math	rules	rule	Formula for multiplication groups	total = n × size
+math	rules	rule	What is the rule rate product?	amount = rate × time
+math	rules	rule	Explain mul_rate	Per hour/day with duration → multiply (convert units)
+math	rules	rule	Formula for rate product	amount = rate × time
+math	rules	rule	What is the rule division share?	each = total ÷ n
+math	rules	rule	Explain div_share	Split equally / per person → divide
+math	rules	rule	Formula for division share	each = total ÷ n
+math	rules	rule	What is the rule division rate?	time = amount ÷ rate
+math	rules	rule	Explain div_rate	How long at constant rate → divide
+math	rules	rule	Formula for division rate	time = amount ÷ rate
+math	rules	rule	What is the rule half?	half(n) = n / 2
+math	rules	rule	Explain half	Half as many / half of → divide by 2
+math	rules	rule	Formula for half	half(n) = n / 2
+math	rules	rule	What is the rule double?	double(n) = n × 2
+math	rules	rule	Explain double	Twice / double → multiply by 2
+math	rules	rule	Formula for double	double(n) = n × 2
+math	rules	rule	What is the rule percent of?	p% of x = (p/100) × x
+math	rules	rule	Explain percent	Percent of a quantity
+math	rules	rule	Formula for percent of	p% of x = (p/100) × x
+math	rules	rule	What is the rule remainder chain?	left = start − a − b
+math	rules	rule	Explain remain_after	Start, use some, use more, what left
+math	rules	rule	Formula for remainder chain	left = start − a − b
+math	rules	rule	What is the rule compose steps?	use prior result in next rule
+math	rules	rule	Explain compose	Multi-hop: output of step k is input to step k+1
+math	rules	rule	Formula for compose steps	use prior result in next rule
+math	rules	langmap	What operation for: altogether?	add
+math	rules	langmap	altogether means add	add
+math	rules	langmap	What operation for: left?	sub
+math	rules	langmap	left means subtract from total	sub
+math	rules	langmap	What operation for: more/less?	sub
+math	rules	langmap	more/less means difference	sub
+math	rules	langmap	What operation for: each/every often?	mul
+math	rules	langmap	each/every often means multiply groups	mul
+math	rules	langmap	What operation for: times as many?	mul
+math	rules	langmap	times as many means multiply	mul
+math	rules	langmap	What operation for: half?	half
+math	rules	langmap	half means divide by two	half
+math	rules	langmap	What operation for: twice?	double
+math	rules	langmap	twice means multiply by two	double
+math	rules	langmap	What operation for: split equally?	div
+math	rules	langmap	split equally means divide	div
+math	rules	langmap	What operation for: percent of?	percent
+math	rules	langmap	percent of means times p over 100	percent
+math	rules	langmap	What operation for: per unit time is a rate?	rate
+math	rules	langmap	per unit time is a rate	rate
+math	rules	langmap	What operation for: remainder after uses is subtract chain?	sub_chain
+math	rules	langmap	remainder after uses is subtract chain	sub_chain
+math	rules	drill	What is 3 plus 5 altogether?	8
+math	rules	drill	Combine 3 and 5 in total.	8
+math	rules	drill	What is 12 plus 8 altogether?	20
+math	rules	drill	Combine 12 and 8 in total.	20
+math	rules	drill	What is 100 plus 25 altogether?	125
+math	rules	drill	Combine 100 and 25 in total.	125
+math	rules	drill	What is 7 plus 9 altogether?	16
+math	rules	drill	Combine 7 and 9 in total.	16
+math	rules	drill	What is 15 plus 15 altogether?	30
+math	rules	drill	Combine 15 and 15 in total.	30
+math	rules	drill	Start with 10. Use 3. How many are left?	7
+math	rules	drill	How many more is 10 than 3?	7
+math	rules	drill	Start with 50. Use 12. How many are left?	38
+math	rules	drill	How many more is 50 than 12?	38
+math	rules	drill	Start with 100. Use 40. How many are left?	60
+math	rules	drill	How many more is 100 than 40?	60
+math	rules	drill	Start with 25. Use 8. How many are left?	17
+math	rules	drill	How many more is 25 than 8?	17
+math	rules	drill	There are 4 groups of 6 each. How many in all?	24
+math	rules	drill	There are 3 groups of 7 each. How many in all?	21
+math	rules	drill	There are 5 groups of 9 each. How many in all?	45
+math	rules	drill	There are 8 groups of 8 each. How many in all?	64
+math	rules	drill	There are 12 groups of 3 each. How many in all?	36
+math	rules	drill	Split 12 equally among 3 people. How many each?	4
+math	rules	drill	Split 20 equally among 4 people. How many each?	5
+math	rules	drill	Split 45 equally among 5 people. How many each?	9
+math	rules	drill	Split 100 equally among 10 people. How many each?	10
+math	rules	drill	What is half of 8?	4
+math	rules	drill	What is twice 8?	16
+math	rules	drill	What is half of 16?	8
+math	rules	drill	What is twice 16?	32
+math	rules	drill	What is half of 50?	25
+math	rules	drill	What is twice 50?	100
+math	rules	drill	What is half of 100?	50
+math	rules	drill	What is twice 100?	200
+math	rules	drill	What is half of 24?	12
+math	rules	drill	What is twice 24?	48
+math	rules	drill	What is 50% of 80?	40
+math	rules	drill	What is 25% of 200?	50
+math	rules	drill	What is 10% of 90?	9
+math	rules	drill	What is 20% of 50?	10
+math	rules	drill	She earns 12 dollars per hour. She works 50 minutes. How much does she earn?	10
+math	rules	drill	He runs 3 sprints 3 times a week. He runs 60 meters each sprint. How many total meters does he run a week?	540
+math	rules	drill	Ducks lay 16 eggs per day. She eats 3 and bakes with 4. She sells the remainder for 2 dollars each. How much does she make?	18
+math	rules	drill	She sold 48 in April and then half as many in May. How many did she sell altogether?	72
+math	rules	drill	A robe takes 2 bolts of blue fiber and half that much white fiber. How many bolts in total?	3
+math	rules	drill	Toulouse has twice as many sheep as Charleston. Charleston has 4 times as many sheep as Seattle. How many sheep do Toulouse, Charleston, and Seattle have together if Seattle has 20?	260
+math	rules	drill	Claire makes a 3 egg omelet every morning. How many dozens of eggs will she eat in 4 weeks?	7

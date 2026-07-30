@@ -17,17 +17,24 @@ External LLM benchmarks are taught **one at a time**, like another grade band �
 
 **Not first:** MMLU (too broad, less pathway structure), TruthfulQA (knowledge/truth, not hop math), HumanEval (needs interpreter).
 
-## How we teach (same spirit as grade school)
+## How we teach (rule-first — not stuffing)
+
+**Correction:** shoving Q→A and retrieving is *not* teaching. Humans learn:
 
 ```text
-source solutions
-  → extract pathway atoms (<<expr=value>>)
-  → bank.tsv calc hops + word Q→final + bridges
-  → held-out exam.tsv
-  → score: final numeric + hop coverage + full pathway
-  → emergent log (observe only)
-  → climb limit_train / re-teach weak hops
+1. RULES / formulas   (a+b, left=total−used, half=n/2, …)
+2. LANGUAGE MAPS      ("altogether"→add, "left"→subtract, …)
+3. DECOMPOSITION      find quantities → pick rule → evaluate → compose hops
+4. DRILLS             worksheet practice of rule application
+5. WORD PROBLEMS      only as practice applying rules (not answer memorization)
 ```
+
+```powershell
+python scripts/run_math_rules_teach.py
+# artifacts: data/curriculum/math_rules/{RULES.md,bank.tsv,REPORT.md}
+```
+
+Legacy GSM8K stuffing path remains as contrast only; **doctrine is math_rules**.
 
 ## Run GSM8K (active)
 
@@ -45,16 +52,19 @@ Artifacts:
 - `D:\fsot_training\curriculum\gsm8k\` (mirror)
 - `data/results/GSM8K_TEACH.md`
 
-## Success culture
+## Success culture (same as grade school: ≥95%)
 
-| Signal | Meaning |
-|--------|---------|
-| Hop accuracy ↑ | Pathway atoms landing (teach is working) |
-| Final accuracy ↑ | Composition / word→answer improving |
-| Full pathway ↑ | Multi-hop claimability on math |
-| Emergent log | Lifts logged, never curbed |
+| Gate | Bar | Meaning |
+|------|-----|---------|
+| **Re-ask taught** | ≥**95%** | Exact taught questions |
+| **Paraphrase taught** | ≥**95%** | Reworded taught (numbers kept) |
+| **Pathway hops** | ≥**95%** | `<<expr>>` calc atoms + executor |
+| **Official GSM8K test** | climb | Transfer / OOD; keep pushing |
 
-Targets are **climb bars**, not LLM leaderboard cosplay. GSM8K papers report high numbers with huge models + CoT; we measure **substrate teach lift** from cold bank.
+Straight-A on GSM8K **curriculum** = first three gates (like PK→G8).  
+Official test is the **hard transfer** climb (case-based pathway rewrite + heuristics), not a free pass.
+
+Targets are climb bars with honest split metrics — not LLM leaderboard cosplay.
 
 ## After GSM8K moves
 

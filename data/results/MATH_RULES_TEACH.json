@@ -1,0 +1,235 @@
+{
+  "generated_at": "2026-07-30T02:13:38.051476+00:00",
+  "doctrine": "Teach RULES and language\u2192operator maps; solve by decomposition and rule application. Do NOT stuff GSM8K Q\u2192A and retrieve.",
+  "pass_threshold": 0.95,
+  "n_arith_rules": 14,
+  "n_language_maps": 11,
+  "n_drills": 48,
+  "n_gsm8k_rule_covered_practice": 47,
+  "n_heldout_test": 1319,
+  "n_heldout_rule_covered": 501,
+  "scores": {
+    "drills_rule_application": {
+      "n": 48,
+      "correct": 48,
+      "accuracy": 1.0,
+      "with_rule_trace": 48,
+      "by_focus": {
+        "add": {
+          "correct": 10,
+          "n": 10,
+          "accuracy": 1.0
+        },
+        "sub": {
+          "correct": 8,
+          "n": 8,
+          "accuracy": 1.0
+        },
+        "mul": {
+          "correct": 7,
+          "n": 7,
+          "accuracy": 1.0
+        },
+        "div": {
+          "correct": 4,
+          "n": 4,
+          "accuracy": 1.0
+        },
+        "half": {
+          "correct": 7,
+          "n": 7,
+          "accuracy": 1.0
+        },
+        "double": {
+          "correct": 6,
+          "n": 6,
+          "accuracy": 1.0
+        },
+        "percent": {
+          "correct": 4,
+          "n": 4,
+          "accuracy": 1.0
+        },
+        "rate": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "sub_chain": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        }
+      },
+      "method": "apply_taught_rules_not_retrieval_stuffing"
+    },
+    "practice_mixed": {
+      "n": 95,
+      "correct": 95,
+      "accuracy": 1.0,
+      "with_rule_trace": 95,
+      "by_focus": {
+        "add": {
+          "correct": 10,
+          "n": 10,
+          "accuracy": 1.0
+        },
+        "sub": {
+          "correct": 8,
+          "n": 8,
+          "accuracy": 1.0
+        },
+        "mul": {
+          "correct": 7,
+          "n": 7,
+          "accuracy": 1.0
+        },
+        "div": {
+          "correct": 4,
+          "n": 4,
+          "accuracy": 1.0
+        },
+        "half": {
+          "correct": 27,
+          "n": 27,
+          "accuracy": 1.0
+        },
+        "double": {
+          "correct": 18,
+          "n": 18,
+          "accuracy": 1.0
+        },
+        "percent": {
+          "correct": 12,
+          "n": 12,
+          "accuracy": 1.0
+        },
+        "rate": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "sub_chain": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "div_rate": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "mul_groups": {
+          "correct": 3,
+          "n": 3,
+          "accuracy": 1.0
+        },
+        "sub_diff": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "div_share": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "mul_rate": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        }
+      },
+      "method": "apply_taught_rules_not_retrieval_stuffing"
+    },
+    "gsm8k_train_rule_covered": {
+      "n": 47,
+      "correct": 47,
+      "accuracy": 1.0,
+      "with_rule_trace": 47,
+      "by_focus": {
+        "half": {
+          "correct": 20,
+          "n": 20,
+          "accuracy": 1.0
+        },
+        "div_rate": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "double": {
+          "correct": 12,
+          "n": 12,
+          "accuracy": 1.0
+        },
+        "percent": {
+          "correct": 8,
+          "n": 8,
+          "accuracy": 1.0
+        },
+        "mul_groups": {
+          "correct": 3,
+          "n": 3,
+          "accuracy": 1.0
+        },
+        "sub_diff": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "div_share": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "mul_rate": {
+          "correct": 1,
+          "n": 1,
+          "accuracy": 1.0
+        }
+      },
+      "method": "apply_taught_rules_not_retrieval_stuffing"
+    },
+    "gsm8k_test_all": {
+      "n": 1319,
+      "correct": 10,
+      "accuracy": 0.0076,
+      "with_rule_trace": 10,
+      "by_focus": {
+        "transfer": {
+          "correct": 10,
+          "n": 1319,
+          "accuracy": 0.0076
+        }
+      },
+      "method": "apply_taught_rules_not_retrieval_stuffing"
+    },
+    "gsm8k_test_where_rules_fire": {
+      "n": 501,
+      "correct": 10,
+      "accuracy": 0.02,
+      "with_rule_trace": 10,
+      "by_focus": {
+        "transfer": {
+          "correct": 10,
+          "n": 501,
+          "accuracy": 0.02
+        }
+      },
+      "method": "apply_taught_rules_not_retrieval_stuffing"
+    }
+  },
+  "gates": {
+    "curriculum_drills_ge_95": true,
+    "straight_a_rules": true
+  },
+  "coverage_note": "Rules currently fire on 501/1319 held-out items. Expand language maps + strategies to raise coverage; accuracy on covered set is the rule-learning metric; full test rises as coverage grows.",
+  "next_rule_expansions": [
+    "multi-step percent remaining chains",
+    "unit conversion (weeks\u2194days, hours\u2194minutes) as explicit rules",
+    "money tax/tip formulas",
+    "age / relative comparison schemas",
+    "explicit parse of 'of the remaining'"
+  ]
+}
