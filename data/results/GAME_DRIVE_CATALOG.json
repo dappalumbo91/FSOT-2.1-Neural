@@ -1,0 +1,554 @@
+{
+  "generated_at": "2026-07-30T01:54:24.044762+00:00",
+  "fsot_training": "D:\\fsot_training",
+  "game_data": "D:\\training data",
+  "n_hits": 46,
+  "n_convertible": 19,
+  "hits": [
+    {
+      "name": "fsot_training",
+      "path": "D:\\fsot_training",
+      "kind": "local_pack",
+      "n_files": 19,
+      "size_mb": 139.15,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": "curriculum pk_to_g8 + mnist packs"
+    },
+    {
+      "name": "ARC-Challenge_test.csv",
+      "path": "D:\\training data\\ARC-Challenge_test.csv",
+      "kind": "science_mcq",
+      "n_files": 1,
+      "size_mb": 0.43,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": "root-level file"
+    },
+    {
+      "name": "ARC-Challenge_train.csv",
+      "path": "D:\\training data\\ARC-Challenge_train.csv",
+      "kind": "science_mcq",
+      "n_files": 1,
+      "size_mb": 0.4,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": "root-level file"
+    },
+    {
+      "name": "ARC-Challenge_validation.csv",
+      "path": "D:\\training data\\ARC-Challenge_validation.csv",
+      "kind": "science_mcq",
+      "n_files": 1,
+      "size_mb": 0.11,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": "root-level file"
+    },
+    {
+      "name": "ARC-Easy_test.csv",
+      "path": "D:\\training data\\ARC-Easy_test.csv",
+      "kind": "science_mcq",
+      "n_files": 1,
+      "size_mb": 0.76,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": "root-level file"
+    },
+    {
+      "name": "ARC-Easy_train.csv",
+      "path": "D:\\training data\\ARC-Easy_train.csv",
+      "kind": "science_mcq",
+      "n_files": 1,
+      "size_mb": 0.72,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": "root-level file"
+    },
+    {
+      "name": "ARC-Easy_validation.csv",
+      "path": "D:\\training data\\ARC-Easy_validation.csv",
+      "kind": "science_mcq",
+      "n_files": 1,
+      "size_mb": 0.18,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": "root-level file"
+    },
+    {
+      "name": "archive",
+      "path": "D:\\training data\\archive",
+      "kind": "science_mcq",
+      "n_files": 1,
+      "size_mb": 48.83,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "arXiv Dataset",
+      "path": "D:\\training data\\arXiv Dataset",
+      "kind": "corpus",
+      "n_files": 1,
+      "size_mb": 4881.52,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "arxiv_dataset",
+      "path": "D:\\training data\\arxiv_dataset",
+      "kind": "corpus",
+      "n_files": 1,
+      "size_mb": 5018.91,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "bbh",
+      "path": "D:\\training data\\bbh",
+      "kind": "hard_reasoning",
+      "n_files": 1,
+      "size_mb": 0.7,
+      "sample_keys": [
+        "task",
+        "input",
+        "target"
+      ],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "cnc_data",
+      "path": "D:\\training data\\cnc_data",
+      "kind": "corpus",
+      "n_files": 24,
+      "size_mb": 11.75,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "coqa",
+      "path": "D:\\training data\\coqa",
+      "kind": "conversational_qa",
+      "n_files": 3,
+      "size_mb": 65.63,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "FSOT-Market-History",
+      "path": "D:\\training data\\FSOT-Market-History",
+      "kind": "corpus",
+      "n_files": 86,
+      "size_mb": 34.15,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "fsot_genome_results.csv",
+      "path": "D:\\training data\\fsot_genome_results.csv",
+      "kind": "file",
+      "n_files": 1,
+      "size_mb": 0.0,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": "root-level file"
+    },
+    {
+      "name": "FSOT_Machine_And_Molecule",
+      "path": "D:\\training data\\FSOT_Machine_And_Molecule",
+      "kind": "corpus",
+      "n_files": 1002,
+      "size_mb": 427.42,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "gene_emergence_risk.csv",
+      "path": "D:\\training data\\gene_emergence_risk.csv",
+      "kind": "file",
+      "n_files": 1,
+      "size_mb": 0.0,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": "root-level file"
+    },
+    {
+      "name": "genetics_deep_dive_20260512_172422",
+      "path": "D:\\training data\\genetics_deep_dive_20260512_172422",
+      "kind": "corpus",
+      "n_files": 5000,
+      "size_mb": 3406.78,
+      "sample_keys": [
+        "source",
+        "messages",
+        "metadata"
+      ],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "GIAB_NA12878_Exome_FASTQ",
+      "path": "D:\\training data\\GIAB_NA12878_Exome_FASTQ",
+      "kind": "corpus",
+      "n_files": 11,
+      "size_mb": 15412.92,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "GRCh38 Human Genome",
+      "path": "D:\\training data\\GRCh38 Human Genome",
+      "kind": "corpus",
+      "n_files": 27,
+      "size_mb": 6010.87,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "gsm8k",
+      "path": "D:\\training data\\gsm8k",
+      "kind": "math_word",
+      "n_files": 2,
+      "size_mb": 4.69,
+      "sample_keys": [
+        "question",
+        "answer"
+      ],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "hellaswag",
+      "path": "D:\\training data\\hellaswag",
+      "kind": "commonsense_mcq",
+      "n_files": 3,
+      "size_mb": 49.42,
+      "sample_keys": [
+        "context",
+        "endings",
+        "label",
+        "activity_label"
+      ],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "humaneval",
+      "path": "D:\\training data\\humaneval",
+      "kind": "code",
+      "n_files": 1,
+      "size_mb": 0.2,
+      "sample_keys": [
+        "task_id",
+        "prompt",
+        "canonical_solution",
+        "test",
+        "entry_point"
+      ],
+      "convertible": false,
+      "notes": "code gen \u2014 need code runtime"
+    },
+    {
+      "name": "ifeval",
+      "path": "D:\\training data\\ifeval",
+      "kind": "instruction",
+      "n_files": 1,
+      "size_mb": 0.6,
+      "sample_keys": [
+        "key",
+        "prompt",
+        "instruction_id_list",
+        "kwargs"
+      ],
+      "convertible": false,
+      "notes": "instruction following"
+    },
+    {
+      "name": "kaggle",
+      "path": "D:\\training data\\kaggle",
+      "kind": "corpus",
+      "n_files": 5,
+      "size_mb": 877.76,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "kaggle_downloads",
+      "path": "D:\\training data\\kaggle_downloads",
+      "kind": "corpus",
+      "n_files": 3,
+      "size_mb": 34.34,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "kaggle_staging",
+      "path": "D:\\training data\\kaggle_staging",
+      "kind": "corpus",
+      "n_files": 30,
+      "size_mb": 2072.97,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "math",
+      "path": "D:\\training data\\math",
+      "kind": "competition_math",
+      "n_files": 1,
+      "size_mb": 0.43,
+      "sample_keys": [
+        "problem",
+        "solution",
+        "answer",
+        "subject",
+        "level",
+        "unique_id"
+      ],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "mathematics_dataset-master",
+      "path": "D:\\training data\\mathematics_dataset-master",
+      "kind": "competition_math",
+      "n_files": 44,
+      "size_mb": 0.27,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "mmlu",
+      "path": "D:\\training data\\mmlu",
+      "kind": "mcq_multi_subject",
+      "n_files": 5,
+      "size_mb": 165.67,
+      "sample_keys": [
+        "question",
+        "choices",
+        "answer",
+        "subject"
+      ],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "mmlu_pro",
+      "path": "D:\\training data\\mmlu_pro",
+      "kind": "mcq_multi_subject",
+      "n_files": 1,
+      "size_mb": 9.37,
+      "sample_keys": [
+        "question_id",
+        "question",
+        "options",
+        "answer",
+        "answer_index",
+        "cot_content",
+        "category",
+        "src"
+      ],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "nlp",
+      "path": "D:\\training data\\nlp",
+      "kind": "corpus",
+      "n_files": 195,
+      "size_mb": 446.37,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "olympiad_metadata.csv",
+      "path": "D:\\training data\\olympiad_metadata.csv",
+      "kind": "file",
+      "n_files": 1,
+      "size_mb": 0.03,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": "root-level file"
+    },
+    {
+      "name": "open_data",
+      "path": "D:\\training data\\open_data",
+      "kind": "corpus",
+      "n_files": 3,
+      "size_mb": 2.08,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "pflt_linguistics",
+      "path": "D:\\training data\\pflt_linguistics",
+      "kind": "corpus",
+      "n_files": 1083,
+      "size_mb": 60149.06,
+      "sample_keys": [
+        "source_lang",
+        "source_word",
+        "target_lang",
+        "target_word",
+        "meaning_key",
+        "gloss",
+        "pos",
+        "confidence",
+        "source_title",
+        "tier",
+        "word_id",
+        "score"
+      ],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "problems",
+      "path": "D:\\training data\\problems",
+      "kind": "corpus",
+      "n_files": 569,
+      "size_mb": 268.07,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "qa-dataset",
+      "path": "D:\\training data\\qa-dataset",
+      "kind": "corpus",
+      "n_files": 335,
+      "size_mb": 12.36,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "questions_answers.csv",
+      "path": "D:\\training data\\questions_answers.csv",
+      "kind": "file",
+      "n_files": 1,
+      "size_mb": 0.0,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": "root-level file"
+    },
+    {
+      "name": "reference_apps",
+      "path": "D:\\training data\\reference_apps",
+      "kind": "corpus",
+      "n_files": 1002,
+      "size_mb": 427.42,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "solutions",
+      "path": "D:\\training data\\solutions",
+      "kind": "corpus",
+      "n_files": 544,
+      "size_mb": 271.68,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": ""
+    },
+    {
+      "name": "squad",
+      "path": "D:\\training data\\squad",
+      "kind": "extractive_qa",
+      "n_files": 3,
+      "size_mb": 42.24,
+      "sample_keys": [],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "test.csv",
+      "path": "D:\\training data\\test.csv",
+      "kind": "file",
+      "n_files": 1,
+      "size_mb": 0.52,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": "root-level file"
+    },
+    {
+      "name": "train.csv",
+      "path": "D:\\training data\\train.csv",
+      "kind": "file",
+      "n_files": 1,
+      "size_mb": 6.06,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": "root-level file"
+    },
+    {
+      "name": "truthfulqa",
+      "path": "D:\\training data\\truthfulqa",
+      "kind": "truthful_qa",
+      "n_files": 1,
+      "size_mb": 0.51,
+      "sample_keys": [
+        "question",
+        "best_answer",
+        "correct_answers",
+        "incorrect_answers",
+        "category",
+        "source"
+      ],
+      "convertible": true,
+      "notes": ""
+    },
+    {
+      "name": "validation.csv",
+      "path": "D:\\training data\\validation.csv",
+      "kind": "file",
+      "n_files": 1,
+      "size_mb": 0.51,
+      "sample_keys": [],
+      "convertible": false,
+      "notes": "root-level file"
+    },
+    {
+      "name": "winogrande",
+      "path": "D:\\training data\\winogrande",
+      "kind": "coref_mcq",
+      "n_files": 1,
+      "size_mb": 0.21,
+      "sample_keys": [
+        "sentence",
+        "option1",
+        "option2",
+        "answer"
+      ],
+      "convertible": true,
+      "notes": ""
+    }
+  ],
+  "priority_bench": [
+    "gsm8k",
+    "ARC-Easy",
+    "ARC-Challenge",
+    "mmlu",
+    "hellaswag",
+    "winogrande",
+    "truthfulqa",
+    "bbh",
+    "math",
+    "fsot_training/curriculum"
+  ]
+}

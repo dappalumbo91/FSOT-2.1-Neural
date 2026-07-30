@@ -75,6 +75,9 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | Formal (Lean) | [`formal/`](formal/) · **`scientific_panel_ok`** · [`docs/FORMAL_VERIFICATION_CHOICE.md`](docs/FORMAL_VERIFICATION_CHOICE.md) · certificate `data/results/LEAN_WETLAB_CERTIFICATE.md` |
 | Repo connectivity audit | [`docs/REPO_CONNECTIVITY_AUDIT.md`](docs/REPO_CONNECTIVITY_AUDIT.md) |
 | **Forward intelligence (bio)** | [`docs/FORWARD_INTELLIGENCE_BIO.md`](docs/FORWARD_INTELLIGENCE_BIO.md) · `fsot_mind intel-bio` |
+| **Game-drive capability** | [`docs/GAME_DRIVE_CAPABILITY.md`](docs/GAME_DRIVE_CAPABILITY.md) · `python scripts/run_game_drive_bench.py --bench` |
+| **Emergent monitor (observe only)** | `D:\fsot_training\logs\emergent_behavior.jsonl` · no curb |
+| **Speech reconnect** | [`docs/SPEECH_RECONNECT.md`](docs/SPEECH_RECONNECT.md) |
 | Embodiment | [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md) — Python host → Zig/Rust/Ada body |
 | Efficiency doctrine | [`docs/EFFICIENCY_DOCTRINE.md`](docs/EFFICIENCY_DOCTRINE.md) |
 | Path / phases | [`BRAIN_PATH.md`](BRAIN_PATH.md) |
