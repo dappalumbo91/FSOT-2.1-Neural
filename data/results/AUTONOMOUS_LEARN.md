@@ -37,4 +37,4 @@ Internal storage is machine/trinary compact codes; this digest is host-facing En
 }
 ```
 
-JSON: `I:\fsot nuron\artifacts\autonomous_learn_last.json`
+JSON: `artifacts/autonomous_learn_last.json`

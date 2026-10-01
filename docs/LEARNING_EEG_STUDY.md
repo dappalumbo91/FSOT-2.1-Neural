@@ -39,9 +39,9 @@ Place CSVs yourself (Kaggle / mirror). Repro **does not require** Git LFS for fu
 ## 3. Commands
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 
 python run_learning_eeg_study.py
 python run_learning_eeg_study.py --items 8 --delay-steps 300

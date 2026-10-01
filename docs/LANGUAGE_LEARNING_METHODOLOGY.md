@@ -34,8 +34,8 @@ If the teacher vanishes, the mind still runs on committed artifacts under `data/
 ### A — Lexicon (productive words)
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 
 # Free offline (bulk TSV seeds)
 python run_lexicon_teacher.py --offline --target 2000
@@ -79,7 +79,7 @@ Committed seeds:
 ### E — Student gates (Zig, no teacher online)
 
 ```powershell
-cd "I:\fsot nuron\embodiment\zig"
+cd "embodiment/zig"
 # build (example)
 zig build-exe -OReleaseFast "-femit-bin=$env:TEMP\fsot_mind_live.exe" --cache-dir "$env:TEMP\fsot_zig_cache_live" --name fsot_mind_live src/main_mind.zig -lgdi32 -luser32 -lwinmm
 

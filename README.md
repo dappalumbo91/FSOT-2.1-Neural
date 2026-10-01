@@ -47,7 +47,7 @@ $env:PYTHONPATH = (Get-Location).Path
 python run_archive_pin.py
 python run_autonomous_learn.py --docs-only --max-docs 6
 # optional media world:
-# $env:FSOT_MEDIA_ROOTS = "G:\movies;G:\showes;G:\Debut"
+# $env:FSOT_MEDIA_ROOTS = "<local media folders, not included in repo>"
 # python run_autonomous_learn.py --videos 1 --frames 10
 ```
 
@@ -134,9 +134,9 @@ python scripts/ci_smoke.py
 **Local product console — boot and see it (no web):**
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 python run_console.py
 # or: python -m product.console
 ```
@@ -147,7 +147,7 @@ Readable boot checklist · hardware re-probe every boot · POOF/SUCTION homeosta
 **Stress (full):** 40/40 pass · 0 critical · 0 soft — Allen ≤1% via continuous-ms climb · intel 24@800 top-1 ~0.92 · stage H embodiment green. See [`docs/BIO_STRESS_COMPARISON.md`](docs/BIO_STRESS_COMPARISON.md) · [`docs/STRESS_STAGE_REPORT.md`](docs/STRESS_STAGE_REPORT.md).
 
 **Standalone transplant:** [`docs/STANDALONE_TRANSPLANT.md`](docs/STANDALONE_TRANSPLANT.md) — no external archive required.  
-**Optional media world:** [`docs/MEDIA_SENSORY.md`](docs/MEDIA_SENSORY.md) · `python run_media_chew.py` (G:\ movies/shows/music as eyes/ears test injectors).
+**Optional media world:** [`docs/MEDIA_SENSORY.md`](docs/MEDIA_SENSORY.md) · `python run_media_chew.py` (<local drive> movies/shows/music as eyes/ears test injectors).
 
 ```powershell
 python run_console.py

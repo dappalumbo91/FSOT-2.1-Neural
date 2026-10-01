@@ -149,9 +149,9 @@ Each step \(t\) (dt = 1 ms):
 ## 6. Reproduction (commands)
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 
 # Pin theory
 python run_archive_pin.py
@@ -167,7 +167,7 @@ cd embodiment\zig
 powershell -File .\run_qemu.ps1
 
 # Biological cross-check (Allen local CSV)
-cd "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
 python run_bio_validate.py --mode bio_match --primary-only --units 64 --steps 1000
 ```
 

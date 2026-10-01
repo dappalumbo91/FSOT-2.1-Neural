@@ -9,7 +9,7 @@ Zig body must live **inside this repository** (or be generated under
 
 It must **not** depend on:
 
-- Another folder on your machine (e.g. `I:\FSOT-Physical-Archive`)
+- Another folder on your machine (e.g. `<local folder, not included in repo: FSOT-Physical-Archive>`)
 - Desktop copies of other projects
 - A specific GPU model (CUDA is optional enhancement)
 - Cloud services or web servers
@@ -75,7 +75,7 @@ Ship the updated snapshot **with the repo** so clones stay transplantable.
 Movies / music / shows can be **streamed as sensory injectors** for testing:
 
 ```powershell
-$env:FSOT_MEDIA_ROOTS = "G:\movies;G:\showes;G:\Debut"
+$env:FSOT_MEDIA_ROOTS = "<local media folders, not included in repo>"
 python run_media_chew.py
 ```
 

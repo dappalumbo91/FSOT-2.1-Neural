@@ -9,9 +9,9 @@ versus workspace bulk that is optional, demo, or local-only.
 
 | Layer | Path |
 |-------|------|
-| Physical archive | `I:\FSOT-Physical-Archive` |
+| Physical archive | `<local folder, not included in repo: FSOT-Physical-Archive>` |
 | Compute pin | `vendor/fsot_compute.py` D1D38A… |
-| Codon map | `data/64_codon_trinary_map.txt` ≡ `I:\64_codon_trinary_map.txt` |
+| Codon map | `data/64_codon_trinary_map.txt` ≡ `<local file, not included in repo: 64_codon_trinary_map.txt>` |
 | Snapshot | `data/archive_snapshot/` |
 
 ## Primary entrypoints (run these)

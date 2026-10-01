@@ -144,10 +144,10 @@ Binary is a **transport accident of current lab machines**, not the design endpo
 
 ```powershell
 # Formal math panel
-cd "I:\fsot nuron\formal"; lake build
+cd "formal"; lake build
 
 # Host brain
-cd "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
 $env:PYTHONPATH = "."
 python run_brain_design.py --profile ai_efficient --sensory
 python -c "from fsot_nuron.trinary_substrate import self_test; print(self_test())"

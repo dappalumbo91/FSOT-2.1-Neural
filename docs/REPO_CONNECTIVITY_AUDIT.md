@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-30  
 **Repos:** monorepo `FSOT-2.1-Neural` (`experiment/fsot-fixed-precision`) + product `fsot-neuron-zig` (`main`)  
-**Reference math:** [`FSOT_MATH_SYSTEM_SOLIDIFIED.md`](FSOT_MATH_SYSTEM_SOLIDIFIED.md) · archive `I:\FSOT-Physical-Archive`
+**Reference math:** [`FSOT_MATH_SYSTEM_SOLIDIFIED.md`](FSOT_MATH_SYSTEM_SOLIDIFIED.md) · archive `<local folder, not included in repo: FSOT-Physical-Archive>`
 
 ## Verdict
 
@@ -45,7 +45,7 @@ Monorepo working tree still has result JSON churn (`stress_suite_report`, `preci
 ## Connectivity map (as of this audit)
 
 ```text
-I:\FSOT-Physical-Archive  (405-domain pin D1D38A, full Lean hub)
+<local folder, not included in repo: FSOT-Physical-Archive>  (405-domain pin D1D38A, full Lean hub)
         │ pin / seeds / doctrine
         ▼
 FSOT-2.1-Neural monorepo

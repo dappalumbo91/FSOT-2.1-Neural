@@ -32,4 +32,4 @@ Among layers **below** threshold, refine the **highest** score first.
 - [ok] 72.0% `self_curriculum`
 - [ok] 72.0% `free_monologue`
 
-JSON: `I:\fsot nuron\artifacts\refine_cycle_last.json`
+JSON: `artifacts/refine_cycle_last.json`

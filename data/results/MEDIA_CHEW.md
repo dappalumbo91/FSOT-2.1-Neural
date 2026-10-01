@@ -13,4 +13,4 @@ Optional world injectors (movies / shows / music). Brain boots without them.
 
 Decode: luma · RGB · hue hist · 8×8 retinotopic grid · edge · motion · FFT bands.
 
-JSON: `I:\fsot nuron\artifacts\media_chew_report.json`
+JSON: `artifacts/media_chew_report.json`

@@ -7,7 +7,7 @@
 | **Document type** | Living research thesis (methods + formulas + measured results) |
 | **Theory authority** | [FSOT-2.1-Lean](https://github.com/dappalumbo91/FSOT-2.1-Lean) · pin **D1D38A…** |
 | **Code repository** | [FSOT-2.1-Neural](https://github.com/dappalumbo91/FSOT-2.1-Neural) |
-| **Physical archive** | `I:\FSOT-Physical-Archive` |
+| **Physical archive** | `<local folder, not included in repo: FSOT-Physical-Archive>` |
 | **Companion formulas** | [`docs/FORMULAS.md`](FORMULAS.md) |
 | **Formal verification choice** | [`docs/FORMAL_VERIFICATION_CHOICE.md`](FORMAL_VERIFICATION_CHOICE.md) |
 | **Efficiency doctrine** | [`docs/EFFICIENCY_DOCTRINE.md`](EFFICIENCY_DOCTRINE.md) |
@@ -58,7 +58,7 @@ This repository **does not re-derive** the multi-domain certificate. It **pins**
 ### 3.1 Authority pin
 
 ```text
-resolve I:\FSOT-Physical-Archive → vendor/fsot_compute.py
+resolve <local folder, not included in repo: FSOT-Physical-Archive> → vendor/fsot_compute.py
 hash == certificate authority (D1D38A…)
 local seeds match closed forms (float64, max rel err ~1e-14)
 ```
@@ -182,7 +182,7 @@ Accuracy is **to measured public data and closed-form FSOT law**, not to marketi
 
 | Resource | Role |
 |----------|------|
-| `I:\FSOT-Physical-Archive` | Master proofs, genetics, public data |
+| `<local folder, not included in repo: FSOT-Physical-Archive>` | Master proofs, genetics, public data |
 | FSOT-2.1-Lean | Formal / certificate authority |
 | Archive methodology | Multi-prover + 0.5% green gate on science panels |
 
@@ -191,9 +191,9 @@ Accuracy is **to measured public data and closed-form FSOT law**, not to marketi
 ## 8. How to reproduce this thesis’s claims
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 
 python run_archive_pin.py
 python run_genetic_bio.py --units 64 --steps 1200

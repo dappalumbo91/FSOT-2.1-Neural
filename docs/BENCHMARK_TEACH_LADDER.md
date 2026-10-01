@@ -40,7 +40,7 @@ python scripts/run_math_rules_teach.py
 # artifacts: data/curriculum/math_rules/{RULES.md,bank.tsv,REPORT.md}
 ```
 
-**Authority rule source:** `C:\Users\damia\Desktop\Math generator`  
+**Authority rule source:** `<local folder, not included in repo: Math generator>`  
 (`MATH_GENERATOR_ROOT` env override). Registry: `RULE_DOCUMENT_REGISTRY.json`.
 
 Legacy GSM8K stuffing path remains as contrast only; **doctrine is math_rules + imported rulebook**.
@@ -65,7 +65,7 @@ python scripts/run_rules_teach_all.py
 ## Run GSM8K (active)
 
 ```powershell
-cd "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
 python scripts/run_gsm8k_teach.py
 python scripts/run_gsm8k_teach.py --limit-train 800 --limit-test 200
 ```
@@ -75,7 +75,7 @@ Artifacts:
 - `data/curriculum/gsm8k/bank.tsv`
 - `data/curriculum/gsm8k/exam.tsv`
 - `data/curriculum/gsm8k/pathways.jsonl`
-- `D:\fsot_training\curriculum\gsm8k\` (mirror)
+- `<local folder, not included in repo: fsot_training/curriculum/gsm8k>` (mirror)
 - `data/results/GSM8K_TEACH.md`
 
 ## Success culture (same as grade school: ≥95%)

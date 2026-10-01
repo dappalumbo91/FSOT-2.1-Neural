@@ -2,9 +2,9 @@
 
 Generated: `2026-07-30T01:54:26.365927+00:00`
 
-**Game data:** `D:\training data`  
-**Training pack:** `D:\fsot_training`  
-**Bank:** `D:\fsot_training\capability\bench_bank.tsv`
+**Game data:** `<local folder, not included in repo: training data>`  
+**Training pack:** `<local folder, not included in repo: fsot_training>`  
+**Bank:** `<local file, not included in repo: bench_bank.tsv>`
 
 Scores are bank-retrieval / overlap capability of the FSOT mind stack after conversion — not LLM fine-tune SOTA. Curriculum pk_to_g8 is the straight-A path; external benches map progress toward broader claimability.
 

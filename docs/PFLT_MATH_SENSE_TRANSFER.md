@@ -1,7 +1,7 @@
 # PFLT → math: sense-identity bindings (not drip schemas)
 
 **Date:** 2026-07-29  
-**Authority twin:** `I:\pflt` Protofluid Language Translator  
+**Authority twin:** `protofluid-language-translator` Protofluid Language Translator  
 **Pin doctrine:** form → SENSE → form/formula · densify offline · no free LLM core
 
 ---
@@ -15,7 +15,7 @@
 | Mass densify packs (`densify_lexicon` 17k+) | “Next steps” drip that burns budget |
 | `chew_climb` mines misses → **binds**, not cloud NMT | Paying for multi-hop analysis every round |
 
-Vision lock (`I:\pflt\docs\VISION_SENSE_IDENTITY.md`):
+Vision lock (`protofluid-language-translator/docs/VISION_SENSE_IDENTITY.md`):
 
 > Surface forms are labels. **Sense is identity.**  
 > Bind once; resolve instantly forever under law.
@@ -90,7 +90,7 @@ Sources bulk-loaded (PFLT `_build` order):
 4. `BINDING_RULES` (BIND-*/SCHEMA-*)  
 5. **Math-generator MASTER rulebook (~1520 RB_* senses)**  
 6. densify pack on disk  
-7. Optional **PFLT** number/quantity forms (`I:\pflt` SenseInterlingua)
+7. Optional **PFLT** number/quantity forms (`protofluid-language-translator` SenseInterlingua)
 
 ### First densify stats (this machine)
 
@@ -133,8 +133,8 @@ Executor path stays:
 ## Commands (local, no API)
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH="I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH="."
 $env:FSOT_STANDALONE="1"
 
 # Build / refresh thousands of math sense bindings
@@ -147,7 +147,7 @@ python scripts/run_math_rules_teach.py --gsm8k-practice 300 --test 300
 PFLT itself (reference):
 
 ```powershell
-cd I:\pflt
+cd protofluid-language-translator
 python pflt_sense_translate.py --smoke
 python pflt_sense_translate.py "aqua manus lingua" --src la --tgt en
 ```

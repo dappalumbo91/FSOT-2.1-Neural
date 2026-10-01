@@ -20,8 +20,8 @@ We do **not** invent a toy 12-fact pack and call it grade 1.
 ## Build the bank
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 python run_curriculum_open.py
 ```
 

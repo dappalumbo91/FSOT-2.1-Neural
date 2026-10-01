@@ -7,17 +7,17 @@ It does **not** re-derive the multi-domain formal verification already held in t
 
 | Layer | Location |
 |-------|----------|
-| **Physical master** | `I:\FSOT-Physical-Archive` |
-| **Canonical Lean hub** | `I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full` |
+| **Physical master** | `<local folder, not included in repo: FSOT-Physical-Archive>` |
+| **Canonical Lean hub** | `FSOT-2.1-Lean` |
 | **Public theory** | [FSOT-2.1-Lean](https://github.com/dappalumbo91/FSOT-2.1-Lean) |
 | **Compute authority** | `vendor/fsot_compute.py` (SHA256 pinned in certificate) |
 
 ### Connect this repo to the archive
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 python run_archive_pin.py
 python run_archive_pin.py --apply-env   # print FSOT_* env for this machine
 ```

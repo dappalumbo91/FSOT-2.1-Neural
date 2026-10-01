@@ -1,8 +1,8 @@
 # GitHub hygiene — reproducible without confusion
 
 **Repo:** https://github.com/dappalumbo91/FSOT-2.1-Neural  
-**Local master worktree:** `I:\fsot nuron`  
-**Math authority:** `I:\FSOT-Physical-Archive` (not fully mirrored in this repo)
+**Local master worktree:** `.`  
+**Math authority:** `<local folder, not included in repo: FSOT-Physical-Archive>` (not fully mirrored in this repo)
 
 ---
 
@@ -37,7 +37,7 @@ git clone https://github.com/dappalumbo91/FSOT-2.1-Neural.git
 cd FSOT-2.1-Neural
 pip install -r requirements.txt
 # Mount or clone Physical Archive:
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 $env:PYTHONPATH = (Get-Location).Path
 python run_archive_pin.py
 python run_fsot_bridge.py

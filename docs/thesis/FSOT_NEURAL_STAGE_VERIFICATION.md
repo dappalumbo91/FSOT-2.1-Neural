@@ -153,9 +153,9 @@ See §Precision in the `.tex` source.
 ## 6. Reproduce
 
 ```powershell
-cd "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
+$env:PYTHONPATH = "."
 python run_archive_pin.py
 python run_wetlab_accuracy_battery.py
 cd formal; lake build; cd ..

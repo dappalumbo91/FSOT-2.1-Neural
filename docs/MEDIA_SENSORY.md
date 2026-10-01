@@ -2,7 +2,7 @@
 
 ## Intent
 
-The brain is **standalone**. Media libraries on `G:\` (or any path) are
+The brain is **standalone**. Media libraries on `<local drive>` (or any path) are
 **optional sensory worlds** — like eyes looking at a screen or ears hearing music —
 not dependencies of identity or boot.
 
@@ -23,14 +23,14 @@ Analogy:
 
 Default test libraries (if present):
 
-- `G:\movies`
-- `G:\showes`
-- `G:\Debut` (music)
+- `<local folder, not included in repo: movies>`
+- `<local folder, not included in repo: showes>`
+- `<local folder, not included in repo: Debut>` (music)
 
 Override:
 
 ```powershell
-$env:FSOT_MEDIA_ROOTS = "G:\movies;G:\showes;G:\Debut"
+$env:FSOT_MEDIA_ROOTS = "<local media folders, not included in repo>"
 python run_media_chew.py
 ```
 
@@ -49,7 +49,7 @@ python run_media_chew.py --videos 2 --frames 20 --audio 2
 ```python
 from fsot_nuron.sensory.media_stream import chew_media, MediaChewConfig
 
-rep = chew_media(MediaChewConfig(roots=[r"G:\movies"], max_video_files=1))
+rep = chew_media(MediaChewConfig(roots=[r"<local folder, not included in repo: movies>"], max_video_files=1))
 ```
 
 Packets: `SensoryModality.VISION` / `AUDIO` → primarily **sens**; motion salience → **thal**.

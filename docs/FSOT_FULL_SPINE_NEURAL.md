@@ -1,6 +1,6 @@
 # Full FSOT spine in Neural (do not drop)
 
-**Authority:** `I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full`  
+**Authority:** `FSOT-2.1-Lean`  
 **Code:** `fsot_nuron/fsot_full_spine.py` · `scalar.py` · Lean `FSOTNeural/FullSpine.lean`  
 **Philosophy:** archive `docs/FSOT_PHILOSOPHY_AND_CONSCIOUSNESS_SPINE.md`
 

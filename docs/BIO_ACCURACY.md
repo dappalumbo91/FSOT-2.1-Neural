@@ -68,7 +68,7 @@ That *is* scientific biological accuracy for a computational system. Full molecu
 | Allen NWB sample | `data/eeg/allen_ephys/ephys.nwb` | — |
 | OpenNeuro PD index/priors | `data/eeg/openneuro_pd/` | human clinical |
 | Emotions EEG features | `data/eeg/kaggle_emotions/` | human (feature tables) |
-| Archive public science | `I:\FSOT-Physical-Archive\03_FSOT-PublicData\` | multi-domain |
+| Archive public science | `<local folder, not included in repo: FSOT-Physical-Archive/03_FSOT-PublicData>` | multi-domain |
 
 **Cre-line labels in `cells.json` are wet-lab genetic identity** — we use them to lock PV / SST / VIP / Pyr classes to real ephys.
 

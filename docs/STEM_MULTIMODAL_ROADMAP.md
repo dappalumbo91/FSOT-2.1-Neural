@@ -1,6 +1,6 @@
 # STEM multimodal expansion (no history)
 
-**Archive root:** `I:\FSOT-Physical-Archive` — FSOT theory + prior brain-state checkpoints.  
+**Archive root:** `<local folder, not included in repo: FSOT-Physical-Archive>` — FSOT theory + prior brain-state checkpoints.  
 **Student mind:** Zig Fixed lattice + machine language ([fsot-neuron-zig](https://github.com/dappalumbo91/fsot-neuron-zig)).  
 **Lab data:** monorepo + Kaggle CLI (authenticated).
 
@@ -33,8 +33,8 @@ Kaggle image/label
 ## Commands
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 
 python run_kaggle_multimodal.py --catalog
 python run_kaggle_multimodal.py --mnist --limit 32
@@ -42,7 +42,7 @@ python run_kaggle_multimodal.py --mnist --limit 32
 # Zig (Windows TEMP build)
 $out = "$env:TEMP\fsot_mind_live.exe"
 # ... build main_mind ...
-& $out inject-file "I:\fsot nuron\data\multimodal\inject\mnist_digits_inject.txt"
+& $out inject-file "data/multimodal/inject/mnist_digits_inject.txt"
 ```
 
 ## Curriculum ladder (toward HS graduate — stepwise)

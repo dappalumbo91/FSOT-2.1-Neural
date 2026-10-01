@@ -42,9 +42,9 @@ Human learning literature (theta/gamma SME, consolidation, retrieval) is mapped 
 ## 3. Reproduce
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 
 python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.02
 python run_intelligence_probe.py --tol 0.02 --items 6

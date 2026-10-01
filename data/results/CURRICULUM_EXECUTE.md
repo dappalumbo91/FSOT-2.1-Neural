@@ -31,7 +31,7 @@ OK: **True**  gap_steps=**4**
 
 ## Notes
 
-- plan steps=4 path=I:\fsot nuron\artifacts\curriculum\latest_plan.json
+- plan steps=4 path=artifacts/curriculum/latest_plan.json
 - gap_order=['dialogue', 'explain', 'face', 'particularly', 'person', 'project', 'science', 'shakespeare', 'subscribe', 'sufficiently']
 - fixed_order=['action', 'animal', 'brain', 'dialogue', 'dog', 'explain', 'face', 'happened', 'human', 'ian']
 - baseline recall=0.900 pixel=1.000 caption=1.000
