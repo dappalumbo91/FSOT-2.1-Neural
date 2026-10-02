@@ -12,6 +12,18 @@ Derives PD lesion strength scales from beta-sync / irregularity priors.
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import math
 import struct
@@ -28,15 +40,15 @@ LOCAL_EEG_ROOTS = [
     ROOT / "data" / "eeg",
     ROOT / "data" / "eeg" / "allen_ephys",
     ROOT / "data" / "eeg" / "openneuro_pd",
-    Path(r"C:\Users\damia\Desktop\Brain"),
-    Path(r"C:\Users\damia\Desktop\FSOT NeuroLab"),
-    Path(r"C:\Users\damia\Desktop\nuron"),
-    Path(r"I:\FSOT-Physical-Archive\03_FSOT-PublicData\consciousness"),
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'Brain',
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'FSOT NeuroLab',
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'nuron',
+    _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '03_FSOT-PublicData' / 'consciousness',
 ]
 
 OPENNEURO_INDEX_CANDIDATES = [
-    Path(r"I:\FSOT-Physical-Archive\03_FSOT-PublicData\consciousness\openneuro\openneuro_index.json"),
-    Path(r"I:\FSOT-Physical-Archive\03_FSOT-PublicData\anomaly_observables\consciousness\openneuro\openneuro_index.json"),
+    _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '03_FSOT-PublicData' / 'consciousness' / 'openneuro' / 'openneuro_index.json',
+    _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '03_FSOT-PublicData' / 'anomaly_observables' / 'consciousness' / 'openneuro' / 'openneuro_index.json',
 ]
 
 # Literature-grounded PD resting EEG priors (used when raw EEG not yet loaded)

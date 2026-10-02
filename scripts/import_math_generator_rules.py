@@ -2,10 +2,22 @@
 """Pull full Math-generator rule corpus into FSOT neural mind rulebook.
 
   python scripts/import_math_generator_rules.py
-  python scripts/import_math_generator_rules.py --source "C:/Users/damia/Desktop/Math generator"
+  python scripts/import_math_generator_rules.py --source "$FSOT_LOCAL_DATA/Math generator"
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import argparse
 import json
@@ -23,7 +35,7 @@ def main() -> int:
     p = argparse.ArgumentParser(description="Import Math generator rules into monorepo")
     p.add_argument(
         "--source",
-        default=os.environ.get("MATH_GENERATOR_ROOT", r"C:\Users\damia\Desktop\Math generator"),
+        default=os.environ.get("MATH_GENERATOR_ROOT", _os.fspath(_REPO_ROOT / 'data_external/local' / 'Math generator')),
     )
     args = p.parse_args()
 

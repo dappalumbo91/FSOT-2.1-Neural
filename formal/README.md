@@ -6,7 +6,7 @@ Continuous scalar \(S=K(T_1+T_2+T_3)\) remains in the physical archive / FSOT-2.
 ## Build
 
 ```powershell
-cd "I:\fsot nuron\formal"
+cd "formal"
 lake build
 # or from repo root:
 python scripts/verify_formal.py
@@ -47,7 +47,7 @@ Cross-reference Lean structure × wet-lab battery × archive pin:
 
 | Layer | Where |
 |-------|--------|
-| Continuous FSOT scalar | `I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full` (D1D38A) |
+| Continuous FSOT scalar | `FSOT-2.1-Lean` (D1D38A) |
 | Neural discrete + gates | this `formal/` panel |
 | Empirical wet-lab | `run_wetlab_accuracy_battery.py` |
 

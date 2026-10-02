@@ -78,7 +78,7 @@ Dialogue-heavy clusters are treated like **TV captions**, not a heavy continuous
 5. **Save episode memory** → recall later in plain English  
 
 ```powershell
-python run_episode_watch.py --path "G:\movies\Brave (2012) [1080p]\Brave....mp4"
+python run_episode_watch.py --path "<local folder, not included in repo: movies/Brave> (2012) [1080p]\Brave....mp4"
 python run_episode_watch.py --recall "Brave"
 python run_episode_watch.py --list
 # if no sidecar:  python run_episode_watch.py --path "...mp4" --stt

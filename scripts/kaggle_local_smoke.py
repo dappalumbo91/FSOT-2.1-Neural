@@ -2,6 +2,18 @@
 """Simulate the Kaggle notebook path using local emotions.csv."""
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import math
 import re
@@ -19,7 +31,7 @@ WORK.mkdir(parents=True, exist_ok=True)
 # locate emotions
 cands = [
     ROOT / "data" / "eeg" / "kaggle_emotions" / "emotions.csv",
-    Path(r"D:\training data\archive\emotions.csv"),
+    _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'archive' / 'emotions.csv',
 ]
 EMO = next((p for p in cands if p.is_file()), None)
 assert EMO, "emotions.csv missing"

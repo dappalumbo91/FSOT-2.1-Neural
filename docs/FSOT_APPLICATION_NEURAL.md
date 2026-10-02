@@ -1,11 +1,11 @@
 # FSOT application recipe — Neural body
 
-**Authority:** `I:\FSOT-Physical-Archive`  
+**Authority:** `<local folder, not included in repo: FSOT-Physical-Archive>`  
 **Compute pin:** `D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70`  
 **Formula:** \(S = K(T_1 + T_2 + T_3)\) — **zero free parameters**  
-**Codon map:** `I:\64_codon_trinary_map.txt` ≡ archive Genetics ≡ project `data/64_codon_trinary_map.txt`  
-**Doctrine:** `I:\FSOT-Physical-Archive\FSOT_USAGE_DOCTRINE.md`  
-**Methodology:** `I:\FSOT_REPRODUCIBLE_METHODOLOGY.md` / archive copy  
+**Codon map:** `<local file, not included in repo: 64_codon_trinary_map.txt>` ≡ archive Genetics ≡ project `data/64_codon_trinary_map.txt`  
+**Doctrine:** `<local file, not included in repo: FSOT_USAGE_DOCTRINE.md>`  
+**Methodology:** `<local file, not included in repo: FSOT_REPRODUCIBLE_METHODOLOGY.md>` / archive copy  
 
 ---
 
@@ -56,8 +56,8 @@ Transport packing (T1 / `MachineFrame`) is the ABI carrier — same idea as Zig 
 ## 3. Code entrypoints
 
 ```powershell
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
-$env:PYTHONPATH = "I:\fsot nuron"
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
+$env:PYTHONPATH = "."
 
 python run_archive_pin.py          # fail-closed pin
 python run_fsot_bridge.py          # folds + machine/chem bridges + inject
@@ -81,8 +81,8 @@ python run_console.py              # bootable UI — see pin + S folds live
 
 | Doc | Relevant to Neural? |
 |-----|---------------------|
-| `I:\FSOT-Physical-Archive` + methodology | **Yes — master math** |
-| `I:\64_codon_trinary_map.txt` | **Yes — genetic authority** |
+| `<local folder, not included in repo: FSOT-Physical-Archive>` + methodology | **Yes — master math** |
+| `<local file, not included in repo: 64_codon_trinary_map.txt>` | **Yes — genetic authority** |
 | `FSOT_USAGE_DOCTRINE.md` | **Yes — pin/bridge recipe** |
 | `AGENTS_BIOHUB.md` / `KAGGLE_*` / `PIXEL_FIRST` / `WIN_PATH_0985` | **Biohub Kaggle only** — same *recipe*, different *domain engine* (U-Net not neurons). Do not import thr/NMS hacks into Neural. |
 

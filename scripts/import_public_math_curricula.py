@@ -16,6 +16,18 @@ Not LLM. Not test stuffing — train/public only into teach bank.
 """
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import argparse
 import json
 import os
@@ -86,8 +98,8 @@ def load_svamp() -> List[Tuple[str, str, str, str]]:
 
 def load_gsm8k_train(limit: Optional[int] = None) -> List[Tuple[str, str, str, str]]:
     paths = [
-        Path(r"D:\training data\gsm8k\train.jsonl"),
-        Path(r"D:\fsot_training\curriculum\gsm8k\train.jsonl"),
+        _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'gsm8k' / 'train.jsonl',
+        _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'curriculum' / 'gsm8k' / 'train.jsonl',
         ROOT / "data" / "gsm8k" / "train.jsonl",
     ]
     path = next((p for p in paths if p.is_file()), None)
@@ -117,7 +129,7 @@ def load_gsm8k_train(limit: Optional[int] = None) -> List[Tuple[str, str, str, s
 
 def load_math_jsonl(limit: int = 500) -> List[Tuple[str, str, str, str]]:
     """Competition MATH — keep only simple numeric answers."""
-    path = Path(r"D:\training data\math\math.jsonl")
+    path = _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'math' / 'math.jsonl'
     if not path.is_file():
         return []
     rows = []

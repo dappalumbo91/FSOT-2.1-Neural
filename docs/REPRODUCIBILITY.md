@@ -10,7 +10,7 @@
 
 | Requirement | Notes |
 |-------------|--------|
-| **This repo only** | Clone is the brain — no `I:\FSOT-Physical-Archive` required |
+| **This repo only** | Clone is the brain — no `<local folder, not included in repo: FSOT-Physical-Archive>` required |
 | Python 3.10+ | Tested 3.11 |
 | `pip install -r requirements.txt` | torch, numpy; optional: pypdf, faster-whisper, psutil, av, soundfile |
 | OS | Windows / Linux / macOS (paths are portable) |
@@ -19,7 +19,7 @@
 
 | Optional | Env / path |
 |----------|------------|
-| Movies / shows / music | `FSOT_MEDIA_ROOTS=G:\movies;G:\showes;G:\Debut` |
+| Movies / shows / music | `FSOT_MEDIA_ROOTS=<local media folders, not included in repo>` |
 | Local STT | `faster-whisper` + `python run_episode_watch.py --stt` |
 | Online lexicon expand | `FSOT_KNOWLEDGE_ONLINE=1` |
 
@@ -87,7 +87,7 @@ per-item human prompts**.
 python run_autonomous_learn.py --docs-only --max-docs 6
 
 # Documents + optional media libraries
-$env:FSOT_MEDIA_ROOTS = "G:\movies;G:\showes;G:\Debut"
+$env:FSOT_MEDIA_ROOTS = "<local media folders, not included in repo>"
 python run_autonomous_learn.py --max-docs 5 --videos 1 --frames 10
 
 # Recall what it stored

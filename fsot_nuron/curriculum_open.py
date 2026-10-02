@@ -9,12 +9,24 @@ Sources (no paywall textbooks required):
 
 Outputs:
   data/curriculum/pk_to_g8/{facts,problems,bank,MANIFEST}
-  also mirrored to D:/fsot_training/curriculum/pk_to_g8 when that drive exists
+  also mirrored to $FSOT_TRAINING_ROOT/curriculum/pk_to_g8 when that drive exists
 
 bank.tsv: domain \\t grade \\t kind \\t question \\t answer
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import json
 import re
@@ -30,7 +42,7 @@ CUR_DIR = DATA / "curriculum" / "pk_to_g8"
 # Legacy alias still written for older ladder paths
 LEGACY_DIR = DATA / "curriculum" / "pk_k_g1"
 # Game drive mirror (user request: training data on game hard drive)
-GAME_DIR = Path("D:/fsot_training/curriculum/pk_to_g8")
+GAME_DIR = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'curriculum' / 'pk_to_g8'
 
 GRADES = [
     "preschool",

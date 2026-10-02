@@ -21,8 +21,8 @@
 ## Commands
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 
 python run_lexicon_teacher.py --offline --target 2000
 python run_lexicon_teacher.py --llm --model gemma:7b --target 2000   # local Ollama only

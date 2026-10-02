@@ -186,7 +186,7 @@ def main() -> int:
 
     report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "authority": "I:\\FSOT-Physical-Archive + data/archive_snapshot",
+        "authority": "$FSOT_LOCAL_DATA/FSOT-Physical-Archive + data/archive_snapshot",
         "entrypoints": [e[0] for e in ENTRYPOINTS],
         "import_graph": graph,
         "workspace_roles": roles,
@@ -217,9 +217,9 @@ def main() -> int:
         "",
         "| Layer | Path |",
         "|-------|------|",
-        "| Physical archive | `I:\\FSOT-Physical-Archive` |",
+        "| Physical archive | `$FSOT_PHYSICAL_ARCHIVE` |",
         "| Compute pin | `vendor/fsot_compute.py` D1D38A… |",
-        "| Codon map | `data/64_codon_trinary_map.txt` ≡ `I:\\64_codon_trinary_map.txt` |",
+        "| Codon map | `data/64_codon_trinary_map.txt` ≡ `$FSOT_LOCAL_DATA/64_codon_trinary_map.txt` |",
         "| Snapshot | `data/archive_snapshot/` |",
         "",
         "## Primary entrypoints (run these)",

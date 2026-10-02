@@ -1,7 +1,7 @@
 """Import the full Math-generator rule corpus into FSOT-2.1-Neural.
 
 Source (user Desktop — FSOT math generator):
-  C:\\Users\\damia\\Desktop\\Math generator
+  $FSOT_LOCAL_DATA/Math generator
   - RULE_DOCUMENT_REGISTRY.json
   - *_RULES.json (~1520 atomic rules across arithmetic…topology…engineering)
 
@@ -10,10 +10,22 @@ Doctrine:
   This module *pulls the authority rule book* you already built.
 
   python scripts/import_math_generator_rules.py
-  python scripts/import_math_generator_rules.py --source "C:/Users/damia/Desktop/Math generator"
+  python scripts/import_math_generator_rules.py --source "$FSOT_LOCAL_DATA/Math generator"
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import json
 import os
@@ -27,10 +39,10 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from .paths import DATA
 
 DEFAULT_SOURCE = Path(
-    os.environ.get("MATH_GENERATOR_ROOT", r"C:\Users\damia\Desktop\Math generator")
+    os.environ.get("MATH_GENERATOR_ROOT", _os.fspath(_REPO_ROOT / 'data_external/local' / 'Math generator'))
 )
 OUT_DIR = DATA / "math_rulebook"
-GAME_OUT = Path(r"D:\fsot_training\math_rulebook")
+GAME_OUT = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'math_rulebook'
 
 
 def _safe_read_json(path: Path) -> Optional[Dict[str, Any]]:

@@ -286,12 +286,12 @@ const BANK_CANDIDATES = [_][]const u8{
     "data/curriculum/pk_to_g8/bank.tsv",
     "../data/curriculum/pk_to_g8/bank.tsv",
     "../../data/curriculum/pk_to_g8/bank.tsv",
-    "D:/fsot_training/curriculum/pk_to_g8/bank.tsv",
+    "../../data_external/fsot_training/curriculum/pk_to_g8/bank.tsv",
     "data/curriculum/pk_k_g1/bank.tsv",
     "../data/curriculum/pk_k_g1/bank.tsv",
     "../../data/curriculum/pk_k_g1/bank.tsv",
-    "I:/fsot nuron/data/curriculum/pk_to_g8/bank.tsv",
-    "I:/fsot nuron/data/curriculum/pk_k_g1/bank.tsv",
+    "../../data/curriculum/pk_to_g8/bank.tsv",
+    "../../data/curriculum/pk_k_g1/bank.tsv",
 };
 
 fn loadCurriculum() void {

@@ -9,11 +9,11 @@ Offline only:
   - Open the folder in Obsidian desktop (Open folder as vault) for local Graph view
 
 Usage:
-  cd "I:\\fsot nuron"
-  $env:PYTHONPATH = "I:\\fsot nuron"
+  cd "."
+  $env:PYTHONPATH = "."
   python run_obsidian_brain.py
   python run_obsidian_brain.py --units 64 --top-k 8 --sparse
-  python run_obsidian_brain.py --vault "D:\\MyVaults\\FSOT_Brain" --no-dynamics
+  python run_obsidian_brain.py --vault "$FSOT_LOCAL_DATA/MyVaults/FSOT_Brain" --no-dynamics
 """
 
 from __future__ import annotations

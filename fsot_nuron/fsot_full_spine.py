@@ -1,7 +1,7 @@
 """
 Full FSOT spine for Neural — archive concepts that must not be dropped.
 
-Authority: I:\\FSOT-Physical-Archive\\02_FSOT-2.1-Lean-Full
+Authority: FSOT-2.1-Lean
   vendor/fsot_compute.py · FSOT/Scalar.lean · docs/FSOT_PHILOSOPHY_AND_CONSCIOUSNESS_SPINE.md
 
 Layers restored / made explicit for this project:
@@ -264,7 +264,7 @@ def full_spine_snapshot() -> Dict[str, Any]:
     t3 = term3_dual_report()
     cons = consciousness_model_seed_table()
     return {
-        "authority": "I:/FSOT-Physical-Archive/02_FSOT-2.1-Lean-Full",
+        "authority": "FSOT-2.1-Lean",
         "free_parameters": 0,
         "formula": "S = K*(T1+T2+T3)",
         "consciousness": {

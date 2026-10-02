@@ -7,6 +7,18 @@
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import argparse
 import json
 import os
@@ -21,7 +33,7 @@ os.environ.setdefault("PYTHONPATH", str(ROOT))
 
 def main() -> int:
     p = argparse.ArgumentParser(description="FSOT GSM8K teach pack + pathway score")
-    p.add_argument("--gsm8k", default=r"D:\training data\gsm8k")
+    p.add_argument("--gsm8k", default=_os.fspath(_fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'gsm8k'))
     p.add_argument("--limit-train", type=int, default=500)
     p.add_argument("--limit-test", type=int, default=150)
     args = p.parse_args()

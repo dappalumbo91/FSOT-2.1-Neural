@@ -34,19 +34,19 @@ Those demos may remain under `run_climb.py` / `run_sota_fronts.py` for explorati
 | Layer | Source |
 |-------|--------|
 | Theory pin | **Standalone** `data/archive_snapshot/` → **D1D38A…** (no external drive required) |
-| Codon map | `I:\64_codon_trinary_map.txt` ≡ archive ≡ `data/64_codon_trinary_map.txt` |
+| Codon map | `<local file, not included in repo: 64_codon_trinary_map.txt>` ≡ archive ≡ `data/64_codon_trinary_map.txt` |
 | Protein interaction form | Archive `04_Genetics-Longevity` fluid-to-solid / protein formulas |
 | Bio targets | Allen Cell Types ephys (when CSV present) |
 | Application recipe | pin → fold → bridge → couple — [`docs/FSOT_APPLICATION_NEURAL.md`](docs/FSOT_APPLICATION_NEURAL.md) |
-| Usage doctrine | `I:\FSOT-Physical-Archive\FSOT_USAGE_DOCTRINE.md` |
+| Usage doctrine | `<local file, not included in repo: FSOT_USAGE_DOCTRINE.md>` |
 
 **Do not stitch** encodings, neurons, and UI without the scalar. Every claim-sensitive path runs `run_archive_pin.py` / `run_fsot_bridge.py`.
 
 ## Primary commands
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 $env:FSOT_STANDALONE = "1"
 
 python run_archive_pin.py
@@ -80,7 +80,7 @@ Connective patterns export as a **local-only** Markdown vault (wikilinks = synap
 | **Math rulebook (imported)** | `data/math_rulebook/` · ~1520 atomic rules from Desktop Math generator |
 | **Linguistics rules** | [`data/curriculum/linguistics_rules/RULES.md`](data/curriculum/linguistics_rules/RULES.md) · reading/writing **why+how** · `python scripts/run_linguistics_rules_teach.py` |
 | **All rules teach** | `python scripts/run_rules_teach_all.py` |
-| **Emergent monitor (observe only)** | `D:\fsot_training\logs\emergent_behavior.jsonl` · no curb |
+| **Emergent monitor (observe only)** | `<local file, not included in repo: emergent_behavior.jsonl>` · no curb |
 | **Speech reconnect** | [`docs/SPEECH_RECONNECT.md`](docs/SPEECH_RECONNECT.md) |
 | Embodiment | [`docs/EMBODIMENT_ROADMAP.md`](docs/EMBODIMENT_ROADMAP.md) — Python host → Zig/Rust/Ada body |
 | Efficiency doctrine | [`docs/EFFICIENCY_DOCTRINE.md`](docs/EFFICIENCY_DOCTRINE.md) |

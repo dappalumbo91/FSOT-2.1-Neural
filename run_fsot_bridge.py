@@ -4,7 +4,7 @@ FSOT bridge verification for Neural — marry body I/O through the math.
 
   pin → domain fold → ScalarInput bridge → S/trinary couple → domain engine
 
-Authority: I:\\FSOT-Physical-Archive (D1D38A…)
+Authority: $FSOT_PHYSICAL_ARCHIVE (D1D38A…)
 """
 
 from __future__ import annotations

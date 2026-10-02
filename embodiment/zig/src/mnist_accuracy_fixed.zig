@@ -1,6 +1,6 @@
 //! Real MNIST held-out accuracy gate (loads pack from run_mnist_gate.py).
 //!
-//! Pack: data/multimodal/mnist_gate/mnist_pack.bin (or D:/fsot_training/...)
+//! Pack: data/multimodal/mnist_gate/mnist_pack.bin (or $FSOT_TRAINING_ROOT/...)
 //! Features: 14x14 spatial pool, L2-normalized (dim=196).
 //! Classifier: k-NN on train exemplars → test labels.
 //! Straight-A: top1 ≥ 0.95
@@ -28,8 +28,8 @@ const PACK_CANDIDATES = [_][]const u8{
     "data/multimodal/mnist_gate/mnist_pack.bin",
     "../data/multimodal/mnist_gate/mnist_pack.bin",
     "../../data/multimodal/mnist_gate/mnist_pack.bin",
-    "D:/fsot_training/datasets/mnist_gate/mnist_pack.bin",
-    "I:/fsot nuron/data/multimodal/mnist_gate/mnist_pack.bin",
+    "../../data_external/fsot_training/datasets/mnist_gate/mnist_pack.bin",
+    "../../data/multimodal/mnist_gate/mnist_pack.bin",
 };
 
 // static storage (not stack)

@@ -1,7 +1,7 @@
 """
 FSOT application bridge for FSOT-2.1-Neural.
 
-Doctrine (I:\\FSOT-Physical-Archive\\FSOT_USAGE_DOCTRINE.md):
+Doctrine ($FSOT_PHYSICAL_ARCHIVE/FSOT_USAGE_DOCTRINE.md):
 
   1. PIN the law     → archive vendor/fsot_compute.py (D1D38A…) + seed match
   2. MATCH seeds     → local SEEDS vs archive closed forms
@@ -15,7 +15,7 @@ Doctrine (I:\\FSOT-Physical-Archive\\FSOT_USAGE_DOCTRINE.md):
 This is how we marry machine body I/O, chemical codon genetics, and neurons
 *through* FSOT — not by stitching random encodings to free dynamics.
 
-Authority: I:\\FSOT-Physical-Archive
+Authority: $FSOT_PHYSICAL_ARCHIVE
 Methodology: FSOT_REPRODUCIBLE_METHODOLOGY.md
 """
 

@@ -90,8 +90,8 @@ python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.05
 ## 5. Reproduce
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 python run_scalpel_rates.py --focus Pyr,PV --tol 0.05
 # later:
 python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.05

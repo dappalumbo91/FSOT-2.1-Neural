@@ -1,13 +1,13 @@
 """
 Real MNIST accuracy gate — straight-A bar for vision domain.
 
-Uses local MNIST CSV (repo or D:/fsot_training). Features = 14x14 spatial pool
+Uses local MNIST CSV (repo or $FSOT_TRAINING_ROOT). Features = 14x14 spatial pool
 (L2-normalized). Classifier = k-NN (default k=3). Target top1 ≥ 0.95.
 
 Writes:
   - binary feature pack for Zig (mnist_pack.bin)
   - JSON gate report (mnist_gate.json)
-  - mirrors to D:/fsot_training/datasets when present
+  - mirrors to $FSOT_TRAINING_ROOT/datasets when present
 
 Usage:
   python run_mnist_gate.py
@@ -15,6 +15,18 @@ Usage:
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parent
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import argparse
 import json
@@ -33,11 +45,11 @@ SIDE = 14
 DIM = SIDE * SIDE  # 196
 
 CANDIDATE_ROOTS = [
-    Path(r"D:/fsot_training/datasets/mnist_csv"),
+    _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'datasets' / 'mnist_csv',
     DATA / "kaggle_datasets" / "mnist_csv",
 ]
 OUT_DIR = DATA / "multimodal" / "mnist_gate"
-GAME_OUT = Path(r"D:/fsot_training/datasets/mnist_gate")
+GAME_OUT = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'datasets' / 'mnist_gate'
 
 
 def find_mnist() -> Path:

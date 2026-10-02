@@ -1,6 +1,6 @@
 # Imported Math Generator Rule Book
 
-Source: `C:\Users\damia\Desktop\Math generator`
+Source: `<local folder, not included in repo: Math generator>`
 Generated: `2026-07-30T02:17:32.093600+00:00`
 
 **Documents:** 61  

@@ -14,7 +14,7 @@ Authority pin remains `D1D38A…` / archive certificate. Living formulas: [`FORM
 
 ## 1. What you already have (archive)
 
-From `I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full`:
+From `FSOT-2.1-Lean`:
 
 | Layer | Role today |
 |-------|------------|

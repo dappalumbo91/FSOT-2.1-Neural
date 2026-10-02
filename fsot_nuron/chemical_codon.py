@@ -14,6 +14,18 @@ cross-verify, not a new free-parameter chemistry model.
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import re
 from pathlib import Path
@@ -24,15 +36,15 @@ from .paths import ROOT, ARTIFACTS
 # Codon map candidates (your machines)
 CODON_MAP_CANDIDATES = [
     ROOT / "data" / "64_codon_trinary_map.txt",
-    Path(r"I:\64_codon_trinary_map.txt"),
-    Path(r"I:\FSOT-Physical-Archive\01_SR-ITE-USB-Original\3_driver_zig\64_codon_trinary_map.txt"),
-    Path(r"I:\FSOT-Physical-Archive\04_Genetics-Longevity\64_codon_trinary_map.txt"),
-    Path(r"C:\Users\damia\Desktop\FSOT_Trinary_Codon_Project\64_codon_trinary_map.txt"),
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / '64_codon_trinary_map.txt',
+    _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '01_SR-ITE-USB-Original' / '3_driver_zig' / '64_codon_trinary_map.txt',
+    _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '04_Genetics-Longevity' / '64_codon_trinary_map.txt',
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'FSOT_Trinary_Codon_Project' / '64_codon_trinary_map.txt',
 ]
 
 SMILES_JSON_CANDIDATES = [
-    Path(r"I:\FSOT-Physical-Archive\01_SR-ITE-USB-Original\6_unified_oracle\smiles_lab\FSOT_SMILES_Lab_Dataset.json"),
-    Path(r"C:\Users\damia\Desktop\FSOT SMILES Lab\FSOT_SMILES_Lab_Dataset.json"),
+    _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '01_SR-ITE-USB-Original' / '6_unified_oracle' / 'smiles_lab' / 'FSOT_SMILES_Lab_Dataset.json',
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'FSOT SMILES Lab' / 'FSOT_SMILES_Lab_Dataset.json',
 ]
 
 # IUPAC standard genetic code

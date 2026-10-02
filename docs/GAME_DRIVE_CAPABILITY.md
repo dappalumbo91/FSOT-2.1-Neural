@@ -4,8 +4,8 @@
 
 | Path | Role |
 |------|------|
-| `D:\fsot_training` | Local pack: `curriculum/pk_to_g8`, MNIST gate, climb logs |
-| `D:\training data` | Full holdings: GSM8K, MMLU, HellaSwag, ARC, BBH, SQuAD, HumanEval, arXiv, genetics, … |
+| `<local folder, not included in repo: fsot_training>` | Local pack: `curriculum/pk_to_g8`, MNIST gate, climb logs |
+| `<local folder, not included in repo: training data>` | Full holdings: GSM8K, MMLU, HellaSwag, ARC, BBH, SQuAD, HumanEval, arXiv, genetics, … |
 
 Env overrides: `FSOT_TRAINING_ROOT`, `FSOT_GAME_DATA`.
 
@@ -15,9 +15,9 @@ Env overrides: `FSOT_TRAINING_ROOT`, `FSOT_GAME_DATA`.
 |-------|------|
 | Catalog + convert + score | `fsot_nuron/game_drive_bench.py` |
 | Runner | `scripts/run_game_drive_bench.py` |
-| Scoreboard (on game drive) | `D:\fsot_training\capability\CAPABILITY_SCOREBOARD.md` |
-| Converted bank | `D:\fsot_training\capability\bench_bank.tsv` |
-| Emergent log (observe only) | `D:\fsot_training\logs\emergent_behavior.jsonl` |
+| Scoreboard (on game drive) | `<local file, not included in repo: CAPABILITY_SCOREBOARD.md>` |
+| Converted bank | `<local file, not included in repo: bench_bank.tsv>` |
+| Emergent log (observe only) | `<local file, not included in repo: emergent_behavior.jsonl>` |
 
 ## Convert apparatus
 
@@ -61,7 +61,7 @@ We do **not** damp, prune, or “fix” for emergence. See append-only JSONL.
 ## Run
 
 ```powershell
-cd "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
 python scripts/run_game_drive_bench.py --catalog
 python scripts/run_game_drive_bench.py --convert --bench --limit 80
 python scripts/run_game_drive_bench.py --emergent-summary
@@ -70,8 +70,8 @@ python scripts/run_game_drive_bench.py --emergent-summary
 Then feed bank into Zig:
 
 ```powershell
-# bank already at D:\fsot_training\capability\bench_bank.tsv
-# depth/ladder load paths include D:/fsot_training/curriculum/...
+# bank already at <local file, not included in repo: bench_bank.tsv>
+# depth/ladder load paths include <local folder, not included in repo: fsot_training/curriculum>
 fsot_mind depth
 fsot_mind frontier
 ```

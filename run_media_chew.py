@@ -5,11 +5,11 @@ Chew optional media libraries as sensory input (vision + audio).
 Standalone brain does NOT require media. These roots are *test injectors*
 (like eyes/ears on the world), defaulting to:
 
-  G:\\movies  G:\\showes  G:\\Debut
+  $FSOT_LOCAL_DATA/movies  $FSOT_LOCAL_DATA/showes  $FSOT_LOCAL_DATA/Debut
 
 Usage:
   python run_media_chew.py
-  python run_media_chew.py --roots "G:\\movies;G:\\showes;G:\\Debut"
+  python run_media_chew.py --roots "$FSOT_LOCAL_DATA/movies;$FSOT_LOCAL_DATA/showes;$FSOT_LOCAL_DATA/Debut"
   python run_media_chew.py --videos 2 --frames 16 --audio 2
 """
 
@@ -32,7 +32,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="FSOT media sensory chew (optional libraries)")
     ap.add_argument(
         "--roots",
-        default=os.environ.get("FSOT_MEDIA_ROOTS", r"G:\movies;G:\showes;G:\Debut"),
+        default=os.environ.get("FSOT_MEDIA_ROOTS", r"$FSOT_LOCAL_DATA/movies;$FSOT_LOCAL_DATA/showes;$FSOT_LOCAL_DATA/Debut"),
         help="Media roots separated by ; (optional)",
     )
     ap.add_argument("--videos", type=int, default=2)

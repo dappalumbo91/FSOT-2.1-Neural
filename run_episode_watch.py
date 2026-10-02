@@ -2,12 +2,24 @@
 """
 Watch one media file with subtitle-style dialogue + AV bind + knowledge + memory.
 
-  python run_episode_watch.py --path "G:\\movies\\Brave (2012) [1080p]\\Brave.2012.1080p.BRrip.x264.YIFY.mp4"
+  python run_episode_watch.py --path "$FSOT_LOCAL_DATA/movies/Brave (2012) [1080p]\\Brave.2012.1080p.BRrip.x264.YIFY.mp4"
   python run_episode_watch.py --path "...mp4" --stt
   python run_episode_watch.py --recall "Brave"
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parent
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import argparse
 import json
@@ -49,7 +61,7 @@ def main() -> int:
     path = Path(args.path) if args.path else None
     if path is None or not path.is_file():
         # default: Brave has sidecar srt
-        cand = Path(r"G:\movies\Brave (2012) [1080p]\Brave.2012.1080p.BRrip.x264.YIFY.mp4")
+        cand = _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'movies' / 'Brave (2012) [1080p]' / 'Brave.2012.1080p.BRrip.x264.YIFY.mp4'
         path = cand if cand.is_file() else None
     if path is None or not path.is_file():
         print("Need --path to a media file (with optional .srt sidecar).")

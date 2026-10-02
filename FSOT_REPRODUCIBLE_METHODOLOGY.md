@@ -6,11 +6,11 @@
 |--|--|
 | **Author** | Damian Arthur Palumbo |
 | **Document type** | Master reproducible methodology (agents + humans) |
-| **Physical archive (master)** | `I:\FSOT-Physical-Archive` |
-| **Lean hub** | `I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full` |
-| **Public data cache** | `I:\FSOT-Physical-Archive\03_FSOT-PublicData` |
+| **Physical archive (master)** | `<local folder, not included in repo: FSOT-Physical-Archive>` |
+| **Lean hub** | `FSOT-2.1-Lean` |
+| **Public data cache** | `<local folder, not included in repo: FSOT-Physical-Archive/03_FSOT-PublicData>` |
 | **GitHub** | https://github.com/dappalumbo91/FSOT-2.1-Lean |
-| **Desktop copy** | `C:\Users\damia\Desktop\FSOT_REPRODUCIBLE_METHODOLOGY.md` |
+| **Desktop copy** | `<local file, not included in repo: FSOT_REPRODUCIBLE_METHODOLOGY.md>` |
 | **Also in** | biohub project root; archive root; `02_…\docs\` |
 | **Authority SHA-256** | `D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70` |
 | **Last revised** | 2026-07-24 |
@@ -42,8 +42,8 @@ Use this as a **checklist for any AI** entering a new session. Paths are under t
 
 | # | Artifact | Why open it |
 |---|----------|-------------|
-| 1 | `I:\FSOT-Physical-Archive\READ_ME_FIRST.md` | Archive layout |
-| 2 | `I:\FSOT-Physical-Archive\VERIFICATION_REPORT.json` | GREEN ledger + authority repin |
+| 1 | `<local file, not included in repo: READ_ME_FIRST.md>` | Archive layout |
+| 2 | `<local file, not included in repo: VERIFICATION_REPORT.json>` | GREEN ledger + authority repin |
 | 3 | `02_FSOT-2.1-Lean-Full\vendor\fsot_compute.py` | **50-digit authority engine** (must hash D1D38A…) |
 | 4 | `data\canonical_constants.json` | Seeds + hash_gate + Wave-1 cache |
 | 5 | `FSOT\Scalar.lean` | Lean twin of seeds + `raw_S` |
@@ -94,7 +94,7 @@ Use this as a **checklist for any AI** entering a new session. Paths are under t
 
 | # | Artifact | Why open it |
 |---|----------|-------------|
-| 33 | `I:\FSOT-Physical-Archive\FSOT_USAGE_DOCTRINE.md` | Pin → bridge → domain engine |
+| 33 | `<local file, not included in repo: FSOT_USAGE_DOCTRINE.md>` | Pin → bridge → domain engine |
 | 34 | **This file** | Full methodology |
 | 35 | `docs\PRACTICAL_PIPELINE.md` | Validation → application |
 | 36 | `docs\REPOSITORY_TECHNICAL_GUIDE.md` | Module / tier map |
@@ -196,7 +196,7 @@ Publication dual-anchor H0 (bubble-bleed sector) and tension deltas are separate
 ### 3.2 Certificate runner
 
 ```powershell
-cd I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full
+cd FSOT-2.1-Lean
 $env:FSOT_PORTABLE = "1"   # required on I: — do not mutate desktop mirrors
 pip install -r requirements.txt
 python scripts/fsot_verification_runner.py
@@ -275,8 +275,8 @@ Includes: GBIF, GWOSC, SIMBAD TAP, Gaia DR3 TAP, VizieR WDS, PubChem PUG, JPL SS
 ### 4.4 Pipeline (reproduce anytime network is available)
 
 ```powershell
-cd I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full
-$env:FSOT_EXTERNAL_DATA_ROOT = "I:\FSOT-Physical-Archive\03_FSOT-PublicData"
+cd FSOT-2.1-Lean
+$env:FSOT_EXTERNAL_DATA_ROOT = "<local folder, not included in repo: FSOT-Physical-Archive/03_FSOT-PublicData>"
 $env:FSOT_PORTABLE = "1"
 
 # 1) Prove channels alive
@@ -385,7 +385,7 @@ Full URL registry: `data/api_requirements.yaml`.
 | Runtime | ≤12h CPU **or** GPU notebook; internet off; stock torch on T4 |
 | Submits | 5/day — local verify first |
 
-Project files: `C:\Users\damia\biohub-fsot-unet\` — `BASELINE_0848.md`, `SCOREBOARD.md`, `FSOT_USAGE_DOCTRINE.md`.
+Project files: `<local folder, not included in repo: biohub-fsot-unet>` — `BASELINE_0848.md`, `SCOREBOARD.md`, `FSOT_USAGE_DOCTRINE.md`.
 
 ---
 
@@ -407,10 +407,10 @@ Always set on archive drive:
 
 ```powershell
 $env:FSOT_PORTABLE = "1"
-$env:FSOT_EXTERNAL_DATA_ROOT = "I:\FSOT-Physical-Archive\03_FSOT-PublicData"
+$env:FSOT_EXTERNAL_DATA_ROOT = "<local folder, not included in repo: FSOT-Physical-Archive/03_FSOT-PublicData>"
 ```
 
-Portable toolchain (optional): `I:\FSOT-Physical-Archive\07_Portable-Toolchain`.
+Portable toolchain (optional): `<local folder, not included in repo: FSOT-Physical-Archive/07_Portable-Toolchain>`.
 
 ---
 

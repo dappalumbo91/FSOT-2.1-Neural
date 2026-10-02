@@ -2,10 +2,22 @@
 Autonomous climb: rebuild open PK→G8 curriculum, run Zig ladder band-by-band
 until middle school (grade8) straight-A or failure.
 
-Logs to D:/fsot_training/logs when available, else data/results.
+Logs to $FSOT_TRAINING_ROOT/logs when available, else data/results.
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parent
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import json
 import os
@@ -18,7 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 ZIG_DIR = ROOT / "embodiment" / "zig"
 MIND = ZIG_DIR / "zig-out" / "bin" / "fsot_mind.exe"
-LOG_DIR = Path("D:/fsot_training/logs") if Path("D:/fsot_training").exists() else (ROOT / "data" / "results")
+LOG_DIR = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'logs' if _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training').exists() else (ROOT / "data" / "results")
 BANDS = [
     "preschool",
     "kindergarten",

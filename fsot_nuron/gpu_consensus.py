@@ -8,6 +8,18 @@ feeds Q,K,V; output is re-read as Morse + chemical codon stream.
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import sys
 from pathlib import Path
@@ -20,9 +32,7 @@ from .morse_itu import ITUMorseCodec
 from .paths import ARTIFACTS, ROOT
 from .reservoir import FluidReservoir, ReservoirConfig
 
-FSOT_GPU_LIB = Path(
-    r"C:\Users\damia\Desktop\gpu exparment for lean coq isabell andf star"
-)
+FSOT_GPU_LIB = _fsot_local_path('FSOT_GPU_ROOT', '../FSOT-GPU')
 
 
 def _load_consensus_fn():

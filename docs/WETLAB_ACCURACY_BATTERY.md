@@ -14,14 +14,14 @@ _None._
 
 | Tier | Check | OK | Measured | Expected | Source |
 |------|-------|:--:|----------|----------|--------|
-| T0 | seeds_match_archive | Y | `7.172083472051352e-15` | <1e-12 class | I:\FSOT-Physical-Archive closed forms |
+| T0 | seeds_match_archive | Y | `7.172083472051352e-15` | <1e-12 class | <local folder, not included in repo: FSOT-Physical-Archive> closed forms |
 | T0 | archive_pin_D1D38A | Y | `D1D38A185487B452E470` | D1D38A… | vendor/fsot_compute.py |
 | T0 | codon_map_64_roundtrip | Y | `64/64` | 64/64 | data/64_codon_trinary_map.txt (A,G=+1; C |
 | T0 | atlas_S_Biology | Y | `0.4447250077038458` | ≈+0.445 | fsot_compute DomainConfig Biology D_eff= |
 | T0 | atlas_S_Neuroscience | Y | `0.5143619629083619` | ≈+0.514 | fsot_compute Neuroscience D_eff=14 |
 | T0 | fsot_bridge_zero_free | Y | `0` | 0 | S=K(T1+T2+T3) |
 | T0 | machine_abi_roundtrip | Y | `{"utf8": true, "frame": true}` | lossless UTF-8 + frame | machine_encode (not Morse) |
-| T0 | zig_host_body | Y | `True` | FSOT_TRIT PASS (+ FSOT_FRAME if rebuilt) | I:\fsot nuron\embodiment\zig\zig-out\bin |
+| T0 | zig_host_body | Y | `True` | FSOT_TRIT PASS (+ FSOT_FRAME if rebuilt) | embodiment/zig/zig-out/bin |
 | T1 | allen_target_Pyr | Y | `{"n": 723, "rate_Hz": 16.35121532610921}` | public Allen Cre means | Allen Cell Types Database (mouse, min_ce |
 | T1 | allen_target_PV | Y | `{"n": 222, "rate_Hz": 83.3504049172855}` | public Allen Cre means | Allen Cell Types Database (mouse, min_ce |
 | T1 | allen_target_SST | Y | `{"n": 155, "rate_Hz": 29.538052683455557` | public Allen Cre means | Allen Cell Types Database (mouse, min_ce |
@@ -37,7 +37,7 @@ _None._
 | T2 | rate_SST_within_1pct | Y | `{"target_Hz": 29.538052683455557, "measu` | |err| ≤ 1% (continuous-ms climb) | Allen Cre FI rate + precision_climb |
 | T2 | rate_VIP_within_1pct | Y | `{"target_Hz": 34.81541758294487, "measur` | |err| ≤ 1% (continuous-ms climb) | Allen Cre FI rate + precision_climb |
 | T2 | precision_all_focus_1pct | Y | `True` | True | precision_micro_climb tol=0.01 dt=0.5 si |
-| T3 | mental_state_eeg_loaded | Y | `{"concentrating": 830, "neutral": 830, "` | concentrate/neutral/relaxed public EEG | I:\fsot nuron\data\kaggle_datasets\eeg_m |
+| T3 | mental_state_eeg_loaded | Y | `{"concentrating": 830, "neutral": 830, "` | concentrate/neutral/relaxed public EEG | <local folder, not included in repo: data/kaggle_datasets/eeg_m> |
 | T3 | study_theta_elevated_vs_rest | Y | `1.573884113069094` | >1.0 (concentrate > relax energy proxy) | public mental-state EEG feature matrix |
 | T3 | literature_sme_priors | Y | `["sederberg_2003_sme", "creery_2022_cons` | Sederberg SME + Creery consolidation | iEEG literature (coded priors) |
 | T3 | sme_theta_encode_gt_rest | Y | `True` | True | Sederberg-style direction on spike-band  |

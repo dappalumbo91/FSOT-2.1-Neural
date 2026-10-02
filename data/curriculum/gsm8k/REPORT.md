@@ -36,5 +36,5 @@ Train self-check final: `{'n': 80, 'correct': 80, 'accuracy': 1.0, 'method': 'ba
 data/curriculum/gsm8k/bank.tsv
 data/curriculum/gsm8k/exam.tsv
 data/curriculum/gsm8k/pathways.jsonl
-D:/fsot_training/curriculum/gsm8k/  (mirror)
+<local folder, not included in repo: fsot_training/curriculum/gsm8k>  (mirror)
 ```

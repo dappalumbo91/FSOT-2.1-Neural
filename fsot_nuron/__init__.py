@@ -5,7 +5,7 @@ Primary mission: biologically accurate neural networks whose structure comes
 from 64-codon trinary genetics (ion-channel gene programs + FSOT synapses),
 driven by the zero-free-parameter FSOT scalar.
 
-Theory authority: FSOT-2.1-Lean / physical archive (I:/FSOT-Physical-Archive).
+Theory authority: FSOT-2.1-Lean / physical archive ($FSOT_PHYSICAL_ARCHIVE).
 """
 
 __version__ = "0.4.0"

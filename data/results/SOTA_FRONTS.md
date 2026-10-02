@@ -2,7 +2,7 @@
 
 ## Data downloads (external **I:** drive only)
 
-Root: `I:\fsot nuron\data\external`  
+Root: `data/external`  
 Manifest: `data/external/DOWNLOAD_MANIFEST.json`  
 (Large CSVs are **not** git-tracked; only the manifest is.)
 
@@ -33,7 +33,7 @@ Method: Morse â†’ FluidReservoir â†’ time-pool fingerprint â†’ **
 ## EEG bands
 
 - CSV band proxies from emotions / mental-state / external EEG feature tables
-- EDF lightweight reader ready when `.edf` files appear on I:/D:
+- EDF lightweight reader ready when `.edf` files appear on a local drive
 - Results: `data/results/eeg_bands_suite.json`
 
 ## Scale under learning
@@ -45,8 +45,8 @@ Method: Morse â†’ FluidReservoir â†’ time-pool fingerprint â†’ **
 ## How to re-run
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 python run_sota_fronts.py
 ```
 

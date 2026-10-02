@@ -12,7 +12,7 @@ Suggested public name (matches theory pin):
 
 This package **depends on** FSOT 2.1 verification authority:
 
-- Physical: `I:\FSOT-Physical-Archive\02_FSOT-2.1-Lean-Full`  
+- Physical: `FSOT-2.1-Lean`  
 - Public: https://github.com/dappalumbo91/FSOT-2.1-Lean  
 - Local pin: `python run_archive_pin.py` → `data/archive_snapshot/`
 
@@ -21,7 +21,7 @@ Kaggle notebooks are already a public run path; GitHub is the **code + pin** hom
 ## Create repo (when `gh auth login` is done)
 
 ```powershell
-cd "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
 
 git init
 git add LICENSE NOTICE VERIFICATION.md GITHUB_PUBLISH.md README.md pyproject.toml requirements.txt .gitignore

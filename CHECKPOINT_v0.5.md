@@ -63,9 +63,9 @@ Reproduce: `python run_intelligence_probe.py --suite --items 12 --delay-steps 60
 ## 3. Reproduce full checkpoint suite
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<local folder, not included in repo: FSOT-Physical-Archive>"
 
 python run_archive_pin.py
 python run_scalpel_rates.py --focus Pyr,PV,SST,VIP --tol 0.01

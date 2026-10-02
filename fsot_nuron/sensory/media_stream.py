@@ -15,6 +15,18 @@ Backends (graceful):
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[2]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import math
 import os
 import random
@@ -30,9 +42,9 @@ from ..seeds import SEEDS
 
 # Optional default test libraries (user machine) — never required
 DEFAULT_MEDIA_ROOTS = (
-    Path(r"G:\movies"),
-    Path(r"G:\showes"),
-    Path(r"G:\Debut"),
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'movies',
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'showes',
+    _fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'Debut',
 )
 
 VIDEO_EXTS = {".mp4", ".mkv", ".avi", ".m4v", ".wmv", ".mov", ".webm", ".mpg", ".mpeg"}

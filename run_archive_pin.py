@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
-"""Connect / verify FSOT-2.1-Neural against I:\\FSOT-Physical-Archive."""
+"""Connect / verify FSOT-2.1-Neural against $FSOT_PHYSICAL_ARCHIVE."""
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parent
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import argparse
 import json
@@ -18,7 +30,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Pin neuron substrate to FSOT physical archive")
     ap.add_argument(
         "--archive",
-        default=os.environ.get("FSOT_PHYSICAL_ARCHIVE", r"I:\FSOT-Physical-Archive"),
+        default=os.environ.get("FSOT_PHYSICAL_ARCHIVE", _os.fspath(_REPO_ROOT / 'data_external/physical_archive')),
         help="Physical archive root",
     )
     ap.add_argument("--json", action="store_true", help="Print full pin JSON")

@@ -29,6 +29,6 @@ Live refine: `python run_refine_cycle.py --domain bio --score-only`
 - density=0.1593 reciprocity=0.257 hub_frac=0.070
 - reciprocity_in_fly_band=True
 
-JSON: `I:\fsot nuron\artifacts\bio_equivalence_scorecard.json`
+JSON: `artifacts/bio_equivalence_scorecard.json`
 
 See docs/BIO_EQUIVALENCE_DISTANCE.md

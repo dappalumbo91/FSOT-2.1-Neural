@@ -22,7 +22,7 @@ Custom trinary substrate in **Zig** — host mind, freestanding QEMU kernel, gen
 ## Build
 
 ```powershell
-cd "I:\fsot nuron\embodiment\zig"
+cd "embodiment/zig"
 zig build -Doptimize=ReleaseSafe   # install all artifacts
 zig build host                     # native trit/neuron parity host
 zig build mind -- all              # **mind authority** (multi-region + learn)
@@ -51,7 +51,7 @@ Expect: `FSOT_TRIT PASS` on the serial console.
 ## Parity with Python
 
 ```powershell
-cd "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
 $env:PYTHONPATH = "."
 python -c "from fsot_nuron.trinary_substrate import self_test; print(self_test())"
 ```

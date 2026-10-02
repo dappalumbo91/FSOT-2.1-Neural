@@ -13,7 +13,7 @@ Credit that dataset in the notebook header (already done).
 ## One-time: package *your* code (optional, for full package path)
 
 ```powershell
-cd "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
 python scripts\package_for_kaggle.py
 # → dist\fsot-2-1-neural-kaggle.zip
 ```
@@ -25,7 +25,7 @@ Upload that zip as a **new Kaggle Dataset** owned by you, e.g. `yourname/fsot-2-
 
 1. Kaggle → **Code** → **New Notebook**
 2. **File → Import Notebook** →  
-   `I:\fsot nuron\notebooks\kaggle\FSOT_2_1_Neural_Kaggle_Emotions.ipynb`  
+   `notebooks/kaggle/FSOT_2_1_Neural_Kaggle_Emotions.ipynb`  
    or copy-paste cells
 3. **Add data**
    - Required: `birdy654/eeg-brainwave-dataset-feeling-emotions`
@@ -36,8 +36,8 @@ Upload that zip as a **new Kaggle Dataset** owned by you, e.g. `yourname/fsot-2-
 ## Local dry-run (same logic as Kaggle)
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 python scripts\kaggle_local_smoke.py
 ```
 
@@ -53,5 +53,5 @@ Pattern: Add Data → discover CSV → energy/label stats → FSOT templates →
 ## CLI download (optional, local only)
 
 ```powershell
-kaggle datasets download -d birdy654/eeg-brainwave-dataset-feeling-emotions -p "D:\training data\kaggle_emotions" --unzip
+kaggle datasets download -d birdy654/eeg-brainwave-dataset-feeling-emotions -p "<local folder, not included in repo: training data/kaggle_emotions>" --unzip
 ```

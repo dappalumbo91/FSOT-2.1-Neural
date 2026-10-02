@@ -295,9 +295,9 @@ def write_md(cert: Dict[str, Any]) -> str:
         "## How to reproduce",
         "",
         "```powershell",
-        'cd "I:\\fsot nuron"',
-        '$env:FSOT_PHYSICAL_ARCHIVE = "I:\\FSOT-Physical-Archive"',
-        '$env:PYTHONPATH = "I:\\fsot nuron"',
+        'cd "."',
+        '$env:FSOT_PHYSICAL_ARCHIVE = "$FSOT_PHYSICAL_ARCHIVE"',
+        '$env:PYTHONPATH = "."',
         "python run_archive_pin.py",
         "python run_wetlab_accuracy_battery.py",
         "cd formal; lake build; cd ..",
@@ -383,8 +383,8 @@ def main() -> int:
         "formal_dir": str(FORMAL),
         "toolchain": "leanprover/lean4:v4.31.0",
         "authority_split": {
-            "continuous_scalar": "I:\\FSOT-Physical-Archive\\02_FSOT-2.1-Lean-Full",
-            "neural_panel": "I:\\fsot nuron\\formal",
+            "continuous_scalar": "FSOT-2.1-Lean",
+            "neural_panel": "formal",
             "empirical": "run_wetlab_accuracy_battery.py",
         },
     }

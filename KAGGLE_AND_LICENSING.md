@@ -4,7 +4,7 @@
 
 | Item | Value |
 |------|--------|
-| Path | `D:\training data\archive\emotions.csv` (also staged under `data/eeg/kaggle_emotions/`) |
+| Path | `<local file, not included in repo: emotions.csv>` (also staged under `data/eeg/kaggle_emotions/`) |
 | Origin | Kaggle EEG emotion feature set |
 | Shape | **2132 × 2549** (2548 numeric + `label`) |
 | Labels | `NEGATIVE` (708), `NEUTRAL` (716), `POSITIVE` (708) |
@@ -43,8 +43,8 @@ This is **useful real EEG-derived data** for emotion-conditioned drive and irreg
 ## Commands
 
 ```powershell
-cd "I:\fsot nuron"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "FSOT-2.1-Neural"
+$env:PYTHONPATH = "."
 
 # Stats from Kaggle emotions.csv
 python -c "from fsot_nuron.emotions_eeg import compute_emotions_stats, integrate_with_eeg_bundle; print(compute_emotions_stats()['labels']); integrate_with_eeg_bundle()"
@@ -60,5 +60,5 @@ Notebook: `notebooks/FSOT_2_1_Neural_Emotions_Chew_Query.ipynb`
 ```powershell
 kaggle datasets list -s "eeg emotion"
 # only download what you need; check each dataset's license
-# kaggle datasets download -d <owner/dataset> -p "D:\training data"
+# kaggle datasets download -d <owner/dataset> -p "<local folder, not included in repo: training data>"
 ```
