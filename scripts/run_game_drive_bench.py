@@ -8,6 +8,18 @@
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import argparse
 import json
 import os
@@ -26,8 +38,8 @@ def main() -> int:
     p.add_argument("--convert", action="store_true", help="Convert priority benches to bank.tsv")
     p.add_argument("--bench", action="store_true", help="Run capability scoreboard")
     p.add_argument("--limit", type=int, default=80, help="Max items per dataset")
-    p.add_argument("--game-data", default=os.environ.get("FSOT_GAME_DATA", r"D:\training data"))
-    p.add_argument("--training", default=os.environ.get("FSOT_TRAINING_ROOT", r"D:\fsot_training"))
+    p.add_argument("--game-data", default=os.environ.get("FSOT_GAME_DATA", _os.fspath(_REPO_ROOT / 'data_external/training_data')))
+    p.add_argument("--training", default=os.environ.get("FSOT_TRAINING_ROOT", _os.fspath(_REPO_ROOT / 'data_external/fsot_training')))
     p.add_argument("--emergent-summary", action="store_true", help="Summarize emergent log")
     args = p.parse_args()
 

@@ -15,6 +15,18 @@ Outputs under data/curriculum/pk_to_g8/:
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import re
 from collections import Counter
@@ -28,7 +40,7 @@ BANK = CUR / "bank.tsv"
 EXAM_TSV = CUR / "paraphrase_exam.tsv"
 EXAM_JSONL = CUR / "paraphrase_exam.jsonl"
 MANIFEST = CUR / "DEPTH_MANIFEST.json"
-GAME = Path("D:/fsot_training/curriculum/pk_to_g8")
+GAME = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'curriculum' / 'pk_to_g8'
 
 STOP = {
     "a", "an", "the", "is", "are", "was", "were", "be", "to", "of", "in", "on", "for",

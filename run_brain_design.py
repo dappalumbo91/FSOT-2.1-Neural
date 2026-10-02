@@ -10,8 +10,8 @@ Builds:
   → optional local Obsidian vault (no server/web)
 
 Usage:
-  cd "I:\\fsot nuron"
-  $env:PYTHONPATH = "I:\\fsot nuron"
+  cd "."
+  $env:PYTHONPATH = "."
   python run_brain_design.py
   python run_brain_design.py --scale 1.5 --steps 1000 --obsidian
 """

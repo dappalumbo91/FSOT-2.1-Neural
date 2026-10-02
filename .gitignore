@@ -48,3 +48,6 @@ data/math_learn/*.bak*
 embodiment/zig/$out
 embodiment/zig/$out.pdb
 
+
+# Local external data (see FSOT_* env vars); never committed
+data_external/

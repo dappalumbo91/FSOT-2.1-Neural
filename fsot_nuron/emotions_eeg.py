@@ -13,6 +13,18 @@ Used to:
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -21,7 +33,7 @@ from .paths import ROOT, ARTIFACTS
 
 CANDIDATES = [
     ROOT / "data" / "eeg" / "kaggle_emotions" / "emotions.csv",
-    Path(r"D:\training data\archive\emotions.csv"),
+    _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'archive' / 'emotions.csv',
 ]
 
 STATS_OUT = ARTIFACTS / "eeg_cache" / "kaggle_emotions_stats.json"
@@ -39,7 +51,7 @@ def load_emotions_frame(path: Optional[Path] = None, max_rows: Optional[int] = N
 
     path = path or find_emotions_csv()
     if path is None:
-        raise FileNotFoundError("emotions.csv not found under data/eeg/kaggle_emotions or D:\\training data\\archive")
+        raise FileNotFoundError("emotions.csv not found under data/eeg/kaggle_emotions or $FSOT_TRAINING_DATA/archive")
     df = pd.read_csv(path, nrows=max_rows)
     # normalize column names
     cols = list(df.columns)

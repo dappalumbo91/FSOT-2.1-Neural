@@ -1,8 +1,8 @@
 """Game-drive dataset catalog, convert-to-bank apparatus, capability scoreboard.
 
 Training roots (game hard drive):
-  D:\\fsot_training          — curriculum + MNIST packs (already wired)
-  D:\\training data          — full benchmark / corpus holdings
+  $FSOT_TRAINING_ROOT          — curriculum + MNIST packs (already wired)
+  $FSOT_TRAINING_DATA          — full benchmark / corpus holdings
 
 Doctrine:
   • Convert public Q/A into mind bank.tsv rows (domain/grade/kind/q/a)
@@ -16,6 +16,18 @@ Doctrine:
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import csv
 import hashlib
@@ -33,8 +45,8 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 # Roots
 # ---------------------------------------------------------------------------
 
-DEFAULT_FSOT_TRAINING = Path(os.environ.get("FSOT_TRAINING_ROOT", r"D:\fsot_training"))
-DEFAULT_GAME_DATA = Path(os.environ.get("FSOT_GAME_DATA", r"D:\training data"))
+DEFAULT_FSOT_TRAINING = Path(os.environ.get("FSOT_TRAINING_ROOT", _os.fspath(_REPO_ROOT / 'data_external/fsot_training')))
+DEFAULT_GAME_DATA = Path(os.environ.get("FSOT_GAME_DATA", _os.fspath(_REPO_ROOT / 'data_external/training_data')))
 DEFAULT_OUT = DEFAULT_FSOT_TRAINING / "capability"
 EMERGENT_LOG = DEFAULT_FSOT_TRAINING / "logs" / "emergent_behavior.jsonl"
 
@@ -452,7 +464,7 @@ def load_curriculum_bank(path: Path, limit: int) -> List[BenchItem]:
     items: List[BenchItem] = []
     bank = path / "curriculum" / "pk_to_g8" / "bank.tsv"
     if not bank.is_file():
-        bank = Path(r"I:\fsot nuron\data\curriculum\pk_to_g8\bank.tsv")
+        bank = _REPO_ROOT / 'data' / 'curriculum' / 'pk_to_g8' / 'bank.tsv'
     if not bank.is_file():
         return items
     with bank.open("r", encoding="utf-8", errors="replace") as f:

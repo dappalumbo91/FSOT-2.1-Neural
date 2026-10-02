@@ -16,6 +16,18 @@ Local only. No cloud API.
 """
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import argparse
 import json
 import os
@@ -30,8 +42,8 @@ os.environ.setdefault("FSOT_STANDALONE", "1")
 os.environ.setdefault("PYTHONPATH", str(ROOT))
 
 TRAIN_PATHS = [
-    Path(r"D:\training data\gsm8k\train.jsonl"),
-    Path(r"D:\fsot_training\gsm8k\train.jsonl"),
+    _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'gsm8k' / 'train.jsonl',
+    _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'gsm8k' / 'train.jsonl',
     ROOT / "data" / "curriculum" / "gsm8k" / "train.jsonl",
 ]
 FINAL_RE = re.compile(r"####\s*(.+)\s*$", re.M)

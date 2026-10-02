@@ -60,7 +60,7 @@ split cleanly:
 \end{enumerate}
 
 Authority for continuous \(S\): physical archive
-\texttt{I:/FSOT-Physical-Archive/02\_FSOT-2.1-Lean-Full}, compute hash
+\texttt{\$FSOT\_PHYSICAL\_ARCHIVE/02\_FSOT-2.1-Lean-Full}, compute hash
 \[
 \texttt{D1D38A185487B452E470AC68ECE2EB45AEB1CA9CE25FC9BF9564C19633FFBE70}.
 \]
@@ -296,9 +296,9 @@ archive-pinned. See \texttt{docs/GENOME\_AS\_CODE.md}.
 \label{sec:repro}
 
 \begin{verbatim}
-cd "I:\fsot nuron"
-$env:FSOT_PHYSICAL_ARCHIVE = "I:\FSOT-Physical-Archive"
-$env:PYTHONPATH = "I:\fsot nuron"
+cd "."
+$env:FSOT_PHYSICAL_ARCHIVE = "<path to FSOT-Physical-Archive>"
+$env:PYTHONPATH = "."
 python run_archive_pin.py
 python run_wetlab_accuracy_battery.py
 cd formal; lake build; cd ..

@@ -10,6 +10,18 @@ This is how you cover hundreds of no-fires without hand-writing 20 regexes/turn.
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import re
 from collections import Counter, defaultdict
@@ -21,8 +33,8 @@ from .math_rules import SolveResult, StepTrace, _norm, exact_num
 from .paths import DATA
 
 TRAIN_PATHS = [
-    Path(r"D:\training data\gsm8k\train.jsonl"),
-    Path(r"D:\fsot_training\gsm8k\train.jsonl"),
+    _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'gsm8k' / 'train.jsonl',
+    _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'gsm8k' / 'train.jsonl',
 ]
 PACK_PATH = DATA / "math_templates" / "TRAIN_TEMPLATES.json"
 REPORT_PATH = DATA / "results" / "MATH_AUTO_TEMPLATES.json"

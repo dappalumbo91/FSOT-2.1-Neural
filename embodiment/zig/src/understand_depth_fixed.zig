@@ -71,14 +71,14 @@ fn isStop(w: []const u8) bool {
 const BANK_PATHS = [_][]const u8{
     "data/curriculum/pk_to_g8/bank.tsv",
     "../../data/curriculum/pk_to_g8/bank.tsv",
-    "D:/fsot_training/curriculum/pk_to_g8/bank.tsv",
-    "I:/fsot nuron/data/curriculum/pk_to_g8/bank.tsv",
+    "../../data_external/fsot_training/curriculum/pk_to_g8/bank.tsv",
+    "../../data/curriculum/pk_to_g8/bank.tsv",
 };
 const EXAM_PATHS = [_][]const u8{
     "data/curriculum/pk_to_g8/paraphrase_exam.tsv",
     "../../data/curriculum/pk_to_g8/paraphrase_exam.tsv",
-    "D:/fsot_training/curriculum/pk_to_g8/paraphrase_exam.tsv",
-    "I:/fsot nuron/data/curriculum/pk_to_g8/paraphrase_exam.tsv",
+    "../../data_external/fsot_training/curriculum/pk_to_g8/paraphrase_exam.tsv",
+    "../../data/curriculum/pk_to_g8/paraphrase_exam.tsv",
 };
 
 var file_buf: [6 * 1024 * 1024]u8 = undefined;

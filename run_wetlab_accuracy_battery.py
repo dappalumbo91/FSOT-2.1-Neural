@@ -85,7 +85,7 @@ class Battery:
             ok_s,
             measured=max_err,
             expected="<1e-12 class",
-            source="I:\\FSOT-Physical-Archive closed forms",
+            source="$FSOT_PHYSICAL_ARCHIVE closed forms",
         )
         pin = pin_archive(write_snapshot=False)
         self.check(

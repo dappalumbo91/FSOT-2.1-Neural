@@ -4,10 +4,22 @@ Demo: AV symbols + optional speech→text → local knowledge → machine/trinar
 
   python run_knowledge_demo.py
   python run_knowledge_demo.py --stt   # local faster-whisper if installed
-  python run_knowledge_demo.py --path "G:\\showes\\Adventure Time.Complete\\01.01 - Slumber Party Panic.mp4"
+  python run_knowledge_demo.py --path "$FSOT_LOCAL_DATA/showes/Adventure Time.Complete\\01.01 - Slumber Party Panic.mp4"
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parent
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import argparse
 import json
@@ -26,7 +38,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--path",
-        default=r"G:\showes\Adventure Time.Complete\01.01 - Slumber Party Panic.mp4",
+        default=_os.fspath(_fsot_local_path('FSOT_LOCAL_DATA', 'data_external/local') / 'showes' / 'Adventure Time.Complete' / '01.01 - Slumber Party Panic.mp4'),
     )
     ap.add_argument("--stt", action="store_true", help="run local speech→text")
     ap.add_argument("--moments", type=int, default=10)

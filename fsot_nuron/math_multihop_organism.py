@@ -66,7 +66,7 @@ class Episode:
 class EpisodeTrace:
     """Learned multi-hop method retained from experience (not hand rules).
 
-    hop_trace ops run through apply_atomic with slot:/t:/const: args so the
+    hop_trace ops run through apply_atomic with slot:/$FSOT_LOCAL_DATA/const: args so the
     same method transfers to novel numbers when the language cue matches.
     """
 

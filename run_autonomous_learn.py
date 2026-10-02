@@ -7,7 +7,7 @@ Boot the standalone brain and let it learn multi-modally with minimal instructio
   python run_autonomous_learn.py --max-docs 8 --videos 1 --frames 10
 
 Optional media (not required):
-  $env:FSOT_MEDIA_ROOTS = "G:\\movies;G:\\showes;G:\\Debut"
+  $env:FSOT_MEDIA_ROOTS = "$FSOT_LOCAL_DATA/movies;$FSOT_LOCAL_DATA/showes;$FSOT_LOCAL_DATA/Debut"
 """
 
 from __future__ import annotations

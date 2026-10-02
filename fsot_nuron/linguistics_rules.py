@@ -14,6 +14,18 @@ Domains:
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import re
 from dataclasses import dataclass, field
@@ -25,7 +37,7 @@ from .paths import DATA
 
 PASS = 0.95
 REPO_DIR = DATA / "curriculum" / "linguistics_rules"
-GAME_DIR = Path(r"D:\fsot_training\curriculum\linguistics_rules")
+GAME_DIR = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'curriculum' / 'linguistics_rules'
 
 
 @dataclass(frozen=True)

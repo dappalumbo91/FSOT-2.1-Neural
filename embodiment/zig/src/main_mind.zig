@@ -421,7 +421,7 @@ fn runFixed() void {
     var params: [32]bio_probe_fixed.UnitParamsF = undefined;
     bio_probe_fixed.defaultBioParams(params[0..]);
     // optional Allen params file
-    const allen_path = "I:\\fsot nuron\\artifacts\\zig_bio_params.txt";
+    const allen_path = "../../artifacts/zig_bio_params.txt";
     if (std.fs.cwd().openFile(allen_path, .{})) |file| {
         defer file.close();
         var buf: [64 * 1024]u8 = undefined;

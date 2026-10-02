@@ -11,6 +11,18 @@ climb multi-class sentiment and held-out domain NLP accuracy.
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import math
 import time
@@ -48,7 +60,7 @@ def discover_nlp_csvs() -> List[Path]:
     roots = [
         ROOT / "data" / "kaggle_datasets",
         EXTERNAL / "nlp",
-        Path(r"I:\FSOT-Physical-Archive\03_FSOT-PublicData\kaggle_downloads"),
+        _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '03_FSOT-PublicData' / 'kaggle_downloads',
     ]
     out: List[Path] = []
     for root in roots:

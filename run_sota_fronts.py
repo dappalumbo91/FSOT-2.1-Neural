@@ -81,7 +81,7 @@ def main() -> int:
         "",
         "## Data (external I: drive)",
         "",
-        "Downloads under `I:/fsot nuron/data/external/` — see `DOWNLOAD_MANIFEST.json`.",
+        "Downloads under `data/external` — see `DOWNLOAD_MANIFEST.json`.",
         "",
         "## Deep FSOT readout (multi-domain NLP)",
         "",

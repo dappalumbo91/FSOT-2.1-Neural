@@ -7,6 +7,18 @@ EDF path uses pure-Python / numpy if mne is absent; skips gracefully.
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import math
 import struct
@@ -258,8 +270,8 @@ def run_eeg_band_suite(write: bool = True) -> Dict[str, Any]:
     edf_roots = [
         ROOT / "data" / "eeg",
         EXTERNAL_EEG,
-        Path(r"I:\FSOT-Physical-Archive\03_FSOT-PublicData"),
-        Path(r"D:\training data"),
+        _fsot_local_path('FSOT_PHYSICAL_ARCHIVE', 'data_external/physical_archive') / '03_FSOT-PublicData',
+        _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data'),
     ]
     edf_files = []
     for root in edf_roots:

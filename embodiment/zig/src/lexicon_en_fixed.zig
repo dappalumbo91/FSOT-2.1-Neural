@@ -221,7 +221,7 @@ pub fn tryLoadDefaultRoles() u32 {
         "data/lexicon/en_roles.tsv",
         "../data/lexicon/en_roles.tsv",
         "../../data/lexicon/en_roles.tsv",
-        "I:/fsot nuron/data/lexicon/en_roles.tsv",
+        "../../data/lexicon/en_roles.tsv",
     };
     var total: u32 = 0;
     for (paths) |p| {

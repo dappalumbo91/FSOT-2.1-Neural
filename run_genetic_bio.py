@@ -10,9 +10,9 @@ Biologically structured network:
 Not an NLP scoreboard. Language/Morse demos are secondary.
 
 Usage:
-  cd "I:\\fsot nuron"
-  $env:PYTHONPATH = "I:\\fsot nuron"
-  $env:FSOT_PHYSICAL_ARCHIVE = "I:\\FSOT-Physical-Archive"
+  cd "."
+  $env:PYTHONPATH = "."
+  $env:FSOT_PHYSICAL_ARCHIVE = "$FSOT_PHYSICAL_ARCHIVE"
   python run_genetic_bio.py
   python run_genetic_bio.py --units 64 --steps 1200 --connectivity genetic_sparse
 """

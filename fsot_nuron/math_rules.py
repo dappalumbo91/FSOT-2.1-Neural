@@ -18,6 +18,18 @@ Executor is deterministic Fixed-compatible arithmetic (host f64 lab twin).
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import json
 import re
 from dataclasses import dataclass, field
@@ -29,8 +41,8 @@ from .paths import DATA
 
 PASS = 0.95
 REPO_DIR = DATA / "curriculum" / "math_rules"
-GAME_DIR = Path(r"D:\fsot_training\curriculum\math_rules")
-GSM8K = Path(r"D:\training data\gsm8k")
+GAME_DIR = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'curriculum' / 'math_rules'
+GSM8K = _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'gsm8k'
 
 # Allow sentence-final "10." — only block if more digits/letters continue the token
 NUM_RE = re.compile(r"(?<![\w])(\d+(?:\.\d+)?)(?![\d])")

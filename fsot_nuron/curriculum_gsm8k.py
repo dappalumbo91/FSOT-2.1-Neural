@@ -17,6 +17,18 @@ Same spirit as open curriculum:
 
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
+
 import hashlib
 import json
 import re
@@ -29,10 +41,10 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from .paths import DATA
 
 # Sources
-DEFAULT_GSM8K = Path(r"D:\training data\gsm8k")
+DEFAULT_GSM8K = _fsot_local_path('FSOT_TRAINING_DATA', 'data_external/training_data') / 'gsm8k'
 # Outputs
 REPO_DIR = DATA / "curriculum" / "gsm8k"
-GAME_DIR = Path(r"D:\fsot_training\curriculum\gsm8k")
+GAME_DIR = _fsot_local_path('FSOT_TRAINING_ROOT', 'data_external/fsot_training') / 'curriculum' / 'gsm8k'
 
 STEP_RE = re.compile(r"<<([^>=]+)=([^>]+)>>")
 FINAL_RE = re.compile(r"####\s*(.+)\s*$", re.MULTILINE)
@@ -476,7 +488,7 @@ def render_report(man: Dict[str, Any]) -> str:
         "data/curriculum/gsm8k/bank.tsv",
         "data/curriculum/gsm8k/exam.tsv",
         "data/curriculum/gsm8k/pathways.jsonl",
-        "D:/fsot_training/curriculum/gsm8k/  (mirror)",
+        "$FSOT_TRAINING_ROOT/curriculum/gsm8k  (mirror)",
         "```",
         "",
     ]

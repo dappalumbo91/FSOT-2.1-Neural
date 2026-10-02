@@ -1,6 +1,6 @@
 """Math sense interlingua — PFLT translation spine applied to word problems.
 
-PFLT doctrine (I:\\pflt sense_interlingua.py / VISION_SENSE_IDENTITY):
+PFLT doctrine (protofluid-language-translator sense_interlingua.py / VISION_SENSE_IDENTITY):
   surface form  →  SENSE_id  →  target form
   aqua          →  SENSE_water → water / Wasser
 
@@ -17,7 +17,7 @@ Sources bulk-loaded at build:
   2) SCHEMA senses (multi-hop templates)
   3) ARITH / BIND rules already in math_rules + math_binding
   4) Imported Math-generator rulebook (1520) — id/name/examples → senses
-  5) Optional PFLT SenseInterlingua number/word forms when I:\\pflt is present
+  5) Optional PFLT SenseInterlingua number/word forms when protofluid-language-translator is present
   6) densify pack data/math_sense/densify_bindings.json (chew-style growth)
 
 Usage:
@@ -27,6 +27,18 @@ Usage:
 """
 
 from __future__ import annotations
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+
+
+def _fsot_local_path(env, default):
+    """Local path outside the repo: $env if set, else a path relative to the repo root."""
+    _v = _os.environ.get(env, "").strip()
+    return _Path(_v) if _v else _REPO_ROOT / default
+
 
 import json
 import re
@@ -563,7 +575,7 @@ class MathSenseInterlingua:
 
     def _load_pflt_numeric_forms(self) -> None:
         """Pull number-related form→sense from PFLT if available (local, no API)."""
-        pflt_root = Path(r"I:\pflt")
+        pflt_root = _fsot_local_path('PROTOFLUID_LANGUAGE_TRANSLATOR_ROOT', '../protofluid-language-translator')
         if not pflt_root.is_dir():
             return
         try:
