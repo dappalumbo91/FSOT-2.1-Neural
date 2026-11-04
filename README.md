@@ -1,5 +1,7 @@
 # FSOT-2.1-Neural
 
+[![CI](https://github.com/dappalumbo91/FSOT-2.1-Neural/actions/workflows/ci.yml/badge.svg)](https://github.com/dappalumbo91/FSOT-2.1-Neural/actions/workflows/ci.yml) [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 **Fluid Spacetime Omni-Theory 2.1 — genetic-codon neural network**
 
 Biologically structured **FSOT neurons** whose identity and wiring come from the **64-codon trinary genetic map** and ion-channel gene programs (SCN / KCN / CACNA / LEAK). Dynamics use the zero-free-parameter scalar \(S = K(T_1+T_2+T_3)\). Multi-region brain design for **computer-native AI**: mechanism fidelity to neurological systems, **not** human neuron census (see efficiency doctrine). Optional Allen ephys lock. **Not** a free-parameter transformer NLP project.
